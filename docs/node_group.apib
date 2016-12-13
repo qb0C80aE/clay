@@ -1,0 +1,91 @@
+# Group NodeGroups
+Welcome to the node groups API. This API provides access to the node groups service.
+
+## node groups [/node_groups]
+
+### Create node group [POST]
+
+Create a new node group
+
++ Request node group (application/json; charset=utf-8)
+    + Headers
+
+            Accept: application/vnd.qb0C80aE+json
+    + Attributes
+
+        + name: NAME (string)
+        + remark: REMARK (string, nullable)
+        + nodes ([]node)
+
++ Response 201 (application/json; charset=utf-8)
+    + Attributes (node_group, fixed)
+
+### Get node groups [GET]
+
+Returns a node group list.
+
++ Request (application/json; charset=utf-8)
+    + Headers
+
+            Accept: application/vnd.qb0C80aE+json
+
++ Response 200 (application/json; charset=utf-8)
+    + Attributes (array, fixed)
+        + (node_group)
+
+## node group details [/node_groups/{id}]
+
++ Parameters
+    + id: `1` (enum[string]) - The ID of the desired node group.
+        + Members
+            + `1`
+            + `2`
+            + `3`
+
+### Get node group [GET]
+
+Returns a node group.
+
++ Request (application/json; charset=utf-8)
+    + Headers
+
+            Accept: application/vnd.qb0C80aE+json
+
++ Response 200 (application/json; charset=utf-8)
+    + Attributes (node_group, fixed)
+
+### Update node group [PUT]
+
+Update a node group.
+
++ Request node_group (application/json; charset=utf-8)
+    + Headers
+
+            Accept: application/vnd.qb0C80aE+json
+    + Attributes
+
+        + name: NAME (string)
+        + remark: REMARK (string, nullable)
+        + nodes ([]node)
+
++ Response 200 (application/json; charset=utf-8)
+    + Attributes (node_group, fixed)
+
+### Delete node group [DELETE]
+
+Delete a node group.
+
++ Request (application/json; charset=utf-8)
+    + Headers
+
+            Accept: application/vnd.qb0C80aE+json
+
++ Response 204
+
+# Data Structures
+## node_group (object)
+
++ id: *1* (number)
++ name: *NAME* (string)
++ remark: *REMARK* (string, nullable)
++ nodes ([]node)

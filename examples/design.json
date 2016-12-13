@@ -1,0 +1,501 @@
+{
+    "node_groups": [
+        {
+            "id": 1,
+            "name": "g1",
+            "nodes": [
+                {
+                    "id": 1
+                }
+            ],
+            "remark": {
+                "String": "",
+                "Valid": false
+            }
+        },
+        {
+            "id": 2,
+            "name": "g2",
+            "nodes": null,
+            "remark": {
+                "String": "",
+                "Valid": false
+            }
+        }
+    ],
+    "node_pvs": [
+        {
+            "id": 1,
+            "name": "physical"
+        },
+        {
+            "id": 2,
+            "name": "virtual"
+        }
+    ],
+    "node_types": [
+        {
+            "id": 1,
+            "name": "L2Switch"
+        },
+        {
+            "id": 2,
+            "name": "L3Switch"
+        },
+        {
+            "id": 3,
+            "name": "Firewall"
+        },
+        {
+            "id": 4,
+            "name": "Router"
+        },
+        {
+            "id": 5,
+            "name": "LoadBalancer"
+        },
+        {
+            "id": 6,
+            "name": "Server"
+        },
+        {
+            "id": 7,
+            "name": "Network"
+        }
+    ],
+    "nodes": [
+        {
+            "id": 1,
+            "name": "router1",
+            "node_groups": [
+                {
+                    "id": 1
+                }
+            ],
+            "node_pv_id": 1,
+            "node_type_id": 4,
+            "ports": [
+              {
+                  "id": 1
+              },
+              {
+                  "id": 2
+              }
+            ],
+            "remark": {
+                "String": "Router1",
+                "Valid": true
+            }
+        },
+        {
+            "id": 2,
+            "name": "l2sw1",
+            "node_groups": null,
+            "node_pv_id": 1,
+            "node_type_id": 1,
+            "ports": [
+                {
+                    "id": 3
+                },
+                {
+                    "id": 4
+                },
+                {
+                    "id": 5
+                }
+            ],
+            "remark": {
+                "String": "L2Switch1",
+                "Valid": true
+            }
+        },
+        {
+            "id": 3,
+            "name": "l2sw2",
+            "node_groups": null,
+            "node_pv_id": 1,
+            "node_type_id": 1,
+            "ports": [
+                {
+                    "id": 6
+                },
+                {
+                    "id": 7
+                },
+                {
+                    "id": 8
+                }
+            ],
+            "remark": {
+                "String": "L2Switch2",
+                "Valid": true
+            }
+        },
+        {
+            "id": 4,
+            "name": "server1",
+            "node_groups": null,
+            "node_pv_id": 1,
+            "node_type_id": 6,
+            "ports": [
+                {
+                    "id": 9
+                }
+            ],
+            "remark": {
+                "String": "Server1",
+                "Valid": true
+            }
+        },
+        {
+            "id": 5,
+            "name": "server2",
+            "node_groups": null,
+            "node_pv_id": 1,
+            "node_type_id": 6,
+            "ports": [
+                {
+                    "id": 10
+                }
+            ],
+            "remark": {
+                "String": "Server2",
+                "Valid": true
+            }
+        },
+        {
+            "id": 6,
+            "name": "server3",
+            "node_groups": null,
+            "node_pv_id": 1,
+            "node_type_id": 6,
+            "ports": [
+                {
+                    "id": 11
+                }
+            ],
+            "remark": {
+                "String": "Server3",
+                "Valid": true
+            }
+        },
+        {
+            "id": 7,
+            "name": "server4",
+            "node_groups": null,
+            "node_pv_id": 1,
+            "node_type_id": 6,
+            "ports": [
+                {
+                    "id": 12
+                }
+            ],
+            "remark": {
+                "String": "Server4",
+                "Valid": true
+            }
+        }
+    ],
+    "ports": [
+        {
+            "destination_port_id": {
+                "Int64": 3,
+                "Valid": true
+            },
+            "id": 1,
+            "ipv4_address": {
+                "String": "192.168.0.1",
+                "Valid": true
+            },
+            "ipv4_prefix": {
+                "Int64": 24,
+                "Valid": true
+            },
+            "mac_address": {
+                "String": "00:00:00:00:00:01",
+                "Valid": true
+            },
+            "name": "router1/0",
+            "node_id": 1,
+            "remark": {
+                "String": "Router1 eth0",
+                "Valid": true
+            }
+        },
+        {
+            "destination_port_id": {
+                "Int64": 6,
+                "Valid": true
+            },
+            "id": 2,
+            "ipv4_address": {
+                "String": "192.168.1.1",
+                "Valid": true
+            },
+            "ipv4_prefix": {
+                "Int64": 24,
+                "Valid": true
+            },
+            "mac_address": {
+                "String": "00:00:00:00:00:02",
+                "Valid": true
+            },
+            "name": "router1/1",
+            "node_id": 1,
+            "remark": {
+                "String": "Router1 eth1",
+                "Valid": true
+            }
+        },
+        {
+            "destination_port_id": {
+                "Int64": 1,
+                "Valid": true
+            },
+            "id": 3,
+            "ipv4_address": {
+                "String": null,
+                "Valid": false
+            },
+            "ipv4_prefix": {
+                "Int64": 0,
+                "Valid": false
+            },
+            "mac_address": {
+                "String": "00:00:00:00:00:03",
+                "Valid": true
+            },
+            "name": "l2sw1/0",
+            "node_id": 2,
+            "remark": {
+                "String": "L2Switch1 eth0",
+                "Valid": true
+            }
+        },
+        {
+            "destination_port_id": {
+                "Int64": 9,
+                "Valid": true
+            },
+            "id": 4,
+            "ipv4_address": {
+                "String": null,
+                "Valid": false
+            },
+            "ipv4_prefix": {
+                "Int64": 0,
+                "Valid": false
+            },
+            "mac_address": {
+                "String": "00:00:00:00:00:04",
+                "Valid": true
+            },
+            "name": "l2sw1/1",
+            "node_id": 2,
+            "remark": {
+                "String": "L2Switch1 eth1",
+                "Valid": true
+            }
+        },
+        {
+            "destination_port_id": {
+                "Int64": 10,
+                "Valid": true
+            },
+            "id": 5,
+            "ipv4_address": {
+                "String": null,
+                "Valid": false
+            },
+            "ipv4_prefix": {
+                "Int64": 0,
+                "Valid": false
+            },
+            "mac_address": {
+                "String": "00:00:00:00:00:05",
+                "Valid": true
+            },
+            "name": "l2sw1/2",
+            "node_id": 2,
+            "remark": {
+                "String": "L2Switch1 eth2",
+                "Valid": true
+            }
+        },
+        {
+            "destination_port_id": {
+                "Int64": 2,
+                "Valid": true
+            },
+            "id": 6,
+            "ipv4_address": {
+                "String": null,
+                "Valid": false
+            },
+            "ipv4_prefix": {
+                "Int64": 0,
+                "Valid": false
+            },
+            "mac_address": {
+                "String": "00:00:00:00:00:06",
+                "Valid": true
+            },
+            "name": "l2sw2/0",
+            "node_id": 3,
+            "remark": {
+                "String": "L2Switch2 eth0",
+                "Valid": true
+            }
+        },
+        {
+            "destination_port_id": {
+                "Int64": 11,
+                "Valid": true
+            },
+            "id": 7,
+            "ipv4_address": {
+                "String": null,
+                "Valid": false
+            },
+            "ipv4_prefix": {
+                "Int64": 0,
+                "Valid": false
+            },
+            "mac_address": {
+                "String": "00:00:00:00:00:07",
+                "Valid": true
+            },
+            "name": "l2sw2/1",
+            "node_id": 3,
+            "remark": {
+                "String": "L2Switch2 eth1",
+                "Valid": true
+            }
+        },
+        {
+            "destination_port_id": {
+                "Int64": 12,
+                "Valid": true
+            },
+            "id": 8,
+            "ipv4_address": {
+                "String": null,
+                "Valid": false
+            },
+            "ipv4_prefix": {
+                "Int64": 0,
+                "Valid": false
+            },
+            "mac_address": {
+                "String": "00:00:00:00:00:08",
+                "Valid": true
+            },
+            "name": "l2sw2/2",
+            "node_id": 3,
+            "remark": {
+                "String": "L2Switch2 eth2",
+                "Valid": true
+            }
+        },
+        {
+            "destination_port_id": {
+                "Int64": 4,
+                "Valid": true
+            },
+            "id": 9,
+            "ipv4_address": {
+                "String": "192.168.0.100",
+                "Valid": true
+            },
+            "ipv4_prefix": {
+                "Int64": 24,
+                "Valid": true
+            },
+            "mac_address": {
+                "String": "00:00:00:00:00:09",
+                "Valid": true
+            },
+            "name": "server1/0",
+            "node_id": 4,
+            "remark": {
+                "String": "Server1 eth0",
+                "Valid": true
+            }
+        },
+        {
+            "destination_port_id": {
+                "Int64": 5,
+                "Valid": true
+            },
+            "id": 10,
+            "ipv4_address": {
+                "String": "192.168.0.101",
+                "Valid": true
+            },
+            "ipv4_prefix": {
+                "Int64": 24,
+                "Valid": true
+            },
+            "mac_address": {
+                "String": "00:00:00:00:00:10",
+                "Valid": true
+            },
+            "name": "server2/0",
+            "node_id": 5,
+            "remark": {
+                "String": "Server2 eth0",
+                "Valid": true
+            }
+        },
+        {
+            "destination_port_id": {
+                "Int64": 7,
+                "Valid": true
+            },
+            "id": 11,
+            "ipv4_address": {
+                "String": "192.168.1.100",
+                "Valid": true
+            },
+            "ipv4_prefix": {
+                "Int64": 24,
+                "Valid": true
+            },
+            "mac_address": {
+                "String": "00:00:00:00:00:11",
+                "Valid": true
+            },
+            "name": "server3/0",
+            "node_id": 6,
+            "remark": {
+                "String": "Server3 eth0",
+                "Valid": true
+            }
+        },
+        {
+            "destination_port_id": {
+                "Int64": 8,
+                "Valid": true
+            },
+            "id": 12,
+            "ipv4_address": {
+                "String": "192.168.1.101",
+                "Valid": true
+            },
+            "ipv4_prefix": {
+                "Int64": 24,
+                "Valid": true
+            },
+            "mac_address": {
+                "String": "00:00:00:00:00:12",
+                "Valid": true
+            },
+            "name": "server4/0",
+            "node_id": 7,
+            "remark": {
+                "String": "Server4 eth0",
+                "Valid": true
+            }
+        }
+    ]
+}

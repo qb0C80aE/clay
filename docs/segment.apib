@@ -1,0 +1,23 @@
+# Group Segments
+Welcome to the segments API. This API provides access to the segments service.
+
+## segments [/segments]
+
+### Get segments [GET]
+
+Returns a segment list.
+
++ Request (application/json; charset=utf-8)
+    + Headers
+
+            Accept: application/vnd.qb0C80aE+json
+
++ Response 200 (application/json; charset=utf-8)
+    + Attributes (array, fixed)
+        + (segment)
+
+# Data Structures
+## segment (object)
+
++ ports ([]port)
++ cidr: *CIDR* (string)

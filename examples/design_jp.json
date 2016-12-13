@@ -1,0 +1,180 @@
+{
+    "node_groups": [
+        {
+            "id": 1,
+            "name": "g1",
+            "nodes": [
+                {
+                    "id": 1
+                }
+            ],
+            "remark": {
+                "String": "",
+                "Valid": false
+            }
+        },
+        {
+            "id": 2,
+            "name": "g2",
+            "nodes": null,
+            "remark": {
+                "String": "",
+                "Valid": false
+            }
+        }
+    ],
+    "node_pvs": [
+        {
+            "id": 1,
+            "name": "物理"
+        },
+        {
+            "id": 2,
+            "name": "仮想"
+        }
+    ],
+    "node_types": [
+        {
+            "id": 1,
+            "name": "レイヤ２スイッチ"
+        },
+        {
+            "id": 2,
+            "name": "レイヤ３スイッチ"
+        },
+        {
+            "id": 3,
+            "name": "ファイアウォール"
+        },
+        {
+            "id": 4,
+            "name": "ルータ"
+        },
+        {
+            "id": 5,
+            "name": "ロードバランサ"
+        },
+        {
+            "id": 6,
+            "name": "サーバ"
+        }
+    ],
+    "nodes": [
+        {
+            "id": 1,
+            "name": "test1",
+            "node_groups": [
+                {
+                    "id": 1
+                }
+            ],
+            "node_pv_id": 1,
+            "node_type_id": 1,
+            "ports": [
+                {
+                    "id": 1
+                }
+            ],
+            "remark": {
+                "String": "abc1",
+                "Valid": true
+            }
+        },
+        {
+            "id": 3,
+            "name": "test3",
+            "node_groups": null,
+            "node_pv_id": 2,
+            "node_type_id": 3,
+            "ports": [
+                {
+                    "id": 5
+                },
+                {
+                    "id": 6
+                }
+            ],
+            "remark": {
+                "String": "abc3",
+                "Valid": true
+            }
+        }
+    ],
+    "ports": [
+        {
+            "destination_port_id": {
+                "Int64": 6,
+                "Valid": true
+            },
+            "id": 1,
+            "ipv4_address": {
+                "String": "1.1.1.1",
+                "Valid": true
+            },
+            "ipv4_prefix": {
+                "Int64": 24,
+                "Valid": true
+            },
+            "mac_address": {
+                "String": "11:11:11:11:11:11",
+                "Valid": true
+            },
+            "name": "p11",
+            "node_id": 1,
+            "remark": {
+                "String": "sdf11",
+                "Valid": true
+            }
+        },
+        {
+            "destination_port_id": {
+                "Int64": 0,
+                "Valid": false
+            },
+            "id": 5,
+            "ipv4_address": {
+                "String": "1.1.3.1",
+                "Valid": true
+            },
+            "ipv4_prefix": {
+                "Int64": 24,
+                "Valid": true
+            },
+            "mac_address": {
+                "String": "11:11:11:11:11:31",
+                "Valid": true
+            },
+            "name": "p31",
+            "node_id": 3,
+            "remark": {
+                "String": "sdf31",
+                "Valid": true
+            }
+        },
+        {
+            "destination_port_id": {
+                "Int64": 1,
+                "Valid": true
+            },
+            "id": 6,
+            "ipv4_address": {
+                "String": "1.1.3.2",
+                "Valid": true
+            },
+            "ipv4_prefix": {
+                "Int64": 24,
+                "Valid": true
+            },
+            "mac_address": {
+                "String": "11:11:11:11:11:32",
+                "Valid": true
+            },
+            "name": "p32",
+            "node_id": 3,
+            "remark": {
+                "String": "sdf32",
+                "Valid": true
+            }
+        }
+    ]
+}

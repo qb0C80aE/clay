@@ -1,0 +1,38 @@
+/* メッセージ */
+.alert {
+    display: none; /* 初期状態は非表示 */
+    width: 300px;
+    /* 画面上部に表示 */
+    position: absolute;
+    top: 5%;
+    left: 50%;
+    margin-left: -175px; /* (width + padding-left + padding-right + border-left + border-right) の半分 */
+}
+
+
+/* inet-henge */
+
+.group rect { opacity: 0.5; }
+
+.node,
+.group rect { cursor: move; }
+
+.node rect,
+.group rect {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+.node text { font-size: 10px; }
+
+.link {
+  stroke: #888888;
+  stroke-width: 2px;
+  stroke-opacity: 1;
+}
+
+.path-label { font-size: 5px; }
+
+
+.loopback,
+.interface { fill: #333; }

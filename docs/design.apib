@@ -1,0 +1,76 @@
+# Group Designs
+Welcome to the designs API. This API provides access to the designs service.
+
+## designs [/designs]
+
+### Get design [GET]
+
+Returns a design.
+
++ Request (application/json; charset=utf-8)
+    + Headers
+
+            Accept: application/vnd.qb0C80aE+json
+
++ Response 200 (application/json; charset=utf-8)
+    + Attributes (design, fixed)
+
+## design details [/designs/{type}]
+
++ Parameters
+    + type: `present` (enum[string]) - The type of the desired design.
+        + Members
+            + `present`
+
+### Update design [PUT]
+
+Update a design.
+
++ Request design (application/json; charset=utf-8)
+    + Headers
+
+            Accept: application/vnd.qb0C80aE+json
+    + Attributes
+
+        + nodes ([]node)
+        + node_types ()
+        + node_pvs ()
+        + ports ()
+        + node_groups ()
+
++ Response 200 (application/json; charset=utf-8)
+    + Attributes (design, fixed)
+
+## design details [/designs/{type}]
+
++ Parameters
+    + type: `present` (enum[string]) - The type of the desired design.
+        + Members
+            + `present`
+
+### Delete design [DELETE]
+
+Delete a design.
+
++ Request (application/json; charset=utf-8)
+    + Headers
+
+            Accept: application/vnd.qb0C80aE+json
+
++ Response 204
+
+## design details [/designs/{type}]
+
++ Parameters
+    + type: `present` (enum[string]) - The type of the desired design.
+        + Members
+            + `present`
+
+# Data Structures
+## design (object)
+
++ nodes ([]node)
++ node_types ()
++ node_pvs ()
++ ports ()
++ node_groups ()
