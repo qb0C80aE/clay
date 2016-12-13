@@ -53,13 +53,23 @@ func Initialize(r *gin.Engine) {
 
 		api.GET("/segments", controllers.GetSegments)
 
+		api.GET("/template_external_parameters", controllers.GetTemplateExternalParameters)
+		api.GET("/template_external_parameters/:id", controllers.GetTemplateExternalParameter)
+		api.POST("/template_external_parameters", controllers.CreateTemplateExternalParameter)
+		api.PUT("/template_external_parameters/:id", controllers.UpdateTemplateExternalParameter)
+		api.DELETE("/template_external_parameters/:id", controllers.DeleteTemplateExternalParameter)
+
+		api.POST("/templates", controllers.CreateTemplate)
+		api.PUT("/templates/:id", controllers.UpdateTemplate)
+		api.GET("/templates/:id", controllers.GetTemplate)
+
 	}
 
 	r.Static("ui/files", "ui/files")
 	r.LoadHTMLGlob("ui/templates/*.tmpl")
 	ui := r.Group("/ui")
-	ui.GET("/", func(c *gin.Context) {c.HTML(http.StatusOK, "index.tmpl", gin.H{})})
-	ui.GET("/network", func(c *gin.Context) {c.HTML(http.StatusOK, "network.tmpl", gin.H{})})
-	ui.GET("/diagram", func(c *gin.Context) {c.HTML(http.StatusOK, "diagram.tmpl", gin.H{})})
+	ui.GET("/", func(c *gin.Context) { c.HTML(http.StatusOK, "index.tmpl", gin.H{}) })
+	ui.GET("/network", func(c *gin.Context) { c.HTML(http.StatusOK, "network.tmpl", gin.H{}) })
+	ui.GET("/diagram", func(c *gin.Context) { c.HTML(http.StatusOK, "diagram.tmpl", gin.H{}) })
 
 }
