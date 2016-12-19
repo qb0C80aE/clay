@@ -16,12 +16,12 @@
 	<body>
     <div class="container-fluid">
         <div class="row">
-          <div class="col-xs-2 bg-idefault"><a href="/ui/network.html">ネットワーク構成</a></div>
+          <div class="col-xs-2 bg-idefault"><a href="/ui/network.html">Network Design</a></div>
           <div class="col-xs-13 bg-idefault">&nbsp;</div>
         </div>
 				<div class="row">
-          <div class="col-xs-2 bg-idefault"><a id="physical_diagram_link" href="#">物理構成図</a></div>
-					<div class="col-xs-2 bg-idefault"><a id="logical_diagram_link" href="#">論理構成図</a></div>
+          <div class="col-xs-2 bg-idefault"><a id="physical_diagram_link" href="#">Physical Diagram</a></div>
+					<div class="col-xs-2 bg-idefault"><a id="logical_diagram_link" href="#">Logical Diagram</a></div>
           <div class="col-xs-13 bg-idefault">&nbsp;</div>
         </div>
         <div class="row">
@@ -29,7 +29,7 @@
 
                 <div class="row">
                     <div class="col-xs-12">
-                        <h5>ノード</h5>
+                        <h5>Node</h5>
                         <div class="input-group text-left">
                             <select class="form-control" id="nodes">
                             </select>
@@ -52,25 +52,25 @@
                         <div class="form-group">
                             <div class="row">
                                 <div class="col-xs-12">
-                                    <h6>ノード名</h6>
+                                    <h6>Node name</h6>
                                     <div id="node_name">&nbsp;&nbsp;&nbsp;</div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-xs-12">
-                                    <h6>物理／仮想</h6>
+                                    <h6>Physical/Virtual</h6>
                                     <div id="node_pv">&nbsp;&nbsp;&nbsp;</div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-xs-12">
-                                    <h6>ノード種別</h6>
+                                    <h6>Node type</h6>
                                     <div id="node_type">&nbsp;&nbsp;&nbsp;</div>
                                 </div>
                             </div>
                             <div class="row">
                                 <div class="col-xs-12">
-                                    <h6>ポート - 接続先</h6>
+                                    <h6>Port - Destination</h6>
                                     <div id = "ports" class="pre-scrollable"></div>
                                 </div>
                             </div>
@@ -85,15 +85,15 @@
 
             <div class="alert alert-info" id="alert_node_add">
                 <button type="button" class="close" data-dismiss="alert">×</button>
-                ノードを登録しました。
+                The node has been registered successfully.
             </div>
             <div class="alert alert-info" id="alert_node_update">
                 <button type="button" class="close" data-dismiss="alert">×</button>
-                ノードを更新しました。
+                The node has been updates successfuly.
             </div>
             <div class="alert alert-info" id="alert_node_delete">
                 <button type="button" class="close" data-dismiss="alert">×</button>
-                ノードを削除しました。
+                The node was deleted successfully.
             </div>
         </div>
     </div>
@@ -118,19 +118,19 @@
           + '                <div class="row">'
           + '                  <div class="col-xs-12">'
           + '                    <div><input type="hidden" id="edit_node_id"></div>'
-          + '                    <h6>ノード名</h6>'
+          + '                    <h6>Node name</h6>'
           + '                    <input id="edit_node_name" type="text" name="edit_node_name" class="form-control" {@readonly}>'
           + '                  </div>'
           + '                </div>'
           + '                <div class="row">'
           + '                  <div class="col-xs-12">'
-          + '                    <h6>物理／仮想</h6>'
+          + '                    <h6>Physical/Logical</h6>'
           + '                    <select class="form-control" id="edit_node_pv"></select>'
           + '                  </div>'
           + '                </div>'
           + '                <div class="row">'
           + '                  <div class="col-xs-12">'
-          + '                    <h6>種別</h6>'
+          + '                    <h6>Node type</h6>'
           + '                    <select class="form-control" id="edit_node_type"></select>'
           + '                  </div>'
           + '                </div>'
@@ -138,7 +138,7 @@
           + '                  <div class="col-xs-12">'
           + '                    <div class="row">'
           + '                      <div class="col-xs-12">'
-          + '                        <h6>ポート - 接続先</h6>'
+          + '                        <h6>Port - destination</h6>'
           + '                      </div>'
           + '                    </div>'
           + '                  </div>'
@@ -205,21 +205,21 @@
           + '                        </div>';
 
           const editNodeTemplateParametersForAdd = {
-            "title": "ノード登録",
+            "title": "Node registration",
             "readonly": "",
             "submit_button_id": "submit_add_node_btn",
-            "submit_button_label": "登録",
+            "submit_button_label": "Registration",
             "cancel_button_id": "cancel_add_node_btn",
-            "cancel_button_label": "キャンセル"
+            "cancel_button_label": "Cancel"
           }
 
           const editNodeTemplateParametersForUpdate = {
-            "title": "ノード更新",
+            "title": "Node update",
             "readonly": "readonly",
             "submit_button_id": "submit_update_node_btn",
-            "submit_button_label": "更新",
+            "submit_button_label": "Update",
             "cancel_button_id": "cancel_update_node_btn",
-            "cancel_button_label": "キャンセル"
+            "cancel_button_label": "Cancel"
           }
 
           function buildTemplate(template, templateParameters) {
@@ -601,11 +601,11 @@
           });
 
 					$('#physical_diagram_link').on('click', function() {
-						physicalDiagramWindow = window.open("/ui/diagram.html?diagram_type=physical", "物理構成図", "width=800,height=600");
+						physicalDiagramWindow = window.open("/ui/diagram.html?diagram_type=physical", "Physical Diagram", "width=800,height=600");
           });
 
 					$('#logical_diagram_link').on('click', function() {
-						logicalDiagramWindow = window.open("/ui/diagram.html?diagram_type=logical", "論理構成図", "width=800,height=600");
+						logicalDiagramWindow = window.open("/ui/diagram.html?diagram_type=logical", "Logical Diagram", "width=800,height=600");
           });
 
           $('.alert .close').on('click', function() {
