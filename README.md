@@ -6,10 +6,10 @@ It provides some APIs to access the system model store, and sample UI.
 ### Sample UI - network design
 ![Network design](./images/sample1.png)
 
-### Sample UI - physial diagram from the system model stora
+### Sample UI - physial diagram from the system model store
 ![Physical diagram](./images/sample2.png)
 
-### Sample UI - logical diagram from the system model stora
+### Sample UI - logical diagram from the system model store
 ![Logical diagram](./images/sample3.png)
 
 # How to use
