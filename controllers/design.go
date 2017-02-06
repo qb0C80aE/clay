@@ -7,14 +7,14 @@ import (
 )
 
 func GetDesign(c *gin.Context) {
-	processSingleGet(c, models.DesignModel, logics.GetDesign)
+	processSingleGet(c, models.DesignModel, logics.GetDesign, OutputJsonError, OutputSingleJsonResult)
 }
 
 func UpdateDesign(c *gin.Context) {
 	container := &models.Design{}
-	processUpdate(c, container, models.DesignModel, logics.UpdateDesign)
+	processUpdate(c, container, models.DesignModel, logics.UpdateDesign, OutputJsonError, OutputSingleJsonResult)
 }
 
 func DeleteDesign(c *gin.Context) {
-	processDelete(c, models.DesignModel, logics.DeleteDesign)
+	processDelete(c, logics.DeleteDesign, OutputJsonError)
 }

@@ -7,5 +7,5 @@ import (
 )
 
 func GetSegments(c *gin.Context) {
-	processMultiGet(c, models.SegmentModel, logics.GetSegments)
+	processMultiGet(c, models.SegmentModel, logics.GetSegments, OutputJsonError, OutputMultiJsonResult)
 }

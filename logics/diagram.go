@@ -84,7 +84,7 @@ func GetPhysicalDiagram(db *gorm.DB, _ string, queryFields string) (interface{},
 			diagramLink := &models.DiagramLink{
 				Source: sourceNode.Name,
 				Target: destinationNode.Name,
-				Meta: diagramMeta,
+				Meta:   diagramMeta,
 			}
 
 			diagram.Links = append(diagram.Links, diagramLink)
@@ -174,7 +174,7 @@ func GetLogicalDiagram(db *gorm.DB, _ string, queryFields string) (interface{}, 
 			diagramLink := &models.DiagramLink{
 				Source: fmt.Sprintf("[%d]%s", i, segment.Cidr),
 				Target: nodeMap[port.NodeID].Name,
-				Meta: diagramMeta,
+				Meta:   diagramMeta,
 			}
 			diagram.Links = append(diagram.Links, diagramLink)
 		}

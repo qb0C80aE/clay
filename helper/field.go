@@ -160,7 +160,7 @@ func FieldToMap(model interface{}, fields map[string]interface{}) (map[string]in
 	}
 
 	if !contains(fields, "*") {
-		for field, _ := range fields {
+		for field := range fields {
 			if !vs.FieldByName(snaker.SnakeToCamel(field)).IsValid() {
 				return nil, errors.New("Invalid Parameter. The specified field does not exist.")
 			}

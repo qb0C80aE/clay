@@ -7,23 +7,23 @@ import (
 )
 
 func GetNodeTypes(c *gin.Context) {
-	processMultiGet(c, models.NodeModel, logics.GetNodeTypes)
+	processMultiGet(c, models.NodeModel, logics.GetNodeTypes, OutputJsonError, OutputMultiJsonResult)
 }
 
 func GetNodeType(c *gin.Context) {
-	processSingleGet(c, models.NodeModel, logics.GetNodeType)
+	processSingleGet(c, models.NodeModel, logics.GetNodeType, OutputJsonError, OutputSingleJsonResult)
 }
 
 func CreateNodeType(c *gin.Context) {
 	container := &models.Node{}
-	processCreate(c, container, models.NodeModel, logics.CreateNodeType)
+	processCreate(c, container, logics.CreateNodeType, OutputJsonError, OutputSingleJsonResult)
 }
 
 func UpdateNodeType(c *gin.Context) {
 	container := &models.Node{}
-	processUpdate(c, container, models.NodeModel, logics.UpdateNodeType)
+	processUpdate(c, container, models.NodeModel, logics.UpdateNodeType, OutputJsonError, OutputSingleJsonResult)
 }
 
 func DeleteNodeType(c *gin.Context) {
-	processDelete(c, models.NodeModel, logics.DeleteNodeType)
+	processDelete(c, logics.DeleteNodeType, OutputJsonError)
 }
