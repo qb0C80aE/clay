@@ -7,23 +7,23 @@ import (
 )
 
 func GetNodes(c *gin.Context) {
-	processMultiGet(c, models.NodeModel, logics.GetNodes)
+	processMultiGet(c, models.NodeModel, logics.GetNodes, OutputJsonError, OutputMultiJsonResult)
 }
 
 func GetNode(c *gin.Context) {
-	processSingleGet(c, models.NodeModel, logics.GetNode)
+	processSingleGet(c, models.NodeModel, logics.GetNode, OutputJsonError, OutputSingleJsonResult)
 }
 
 func CreateNode(c *gin.Context) {
 	container := &models.Node{}
-	processCreate(c, container, models.NodeModel, logics.CreateNode)
+	processCreate(c, container, logics.CreateNode, OutputJsonError, OutputSingleJsonResult)
 }
 
 func UpdateNode(c *gin.Context) {
 	container := &models.Node{}
-	processUpdate(c, container, models.NodeModel, logics.UpdateNode)
+	processUpdate(c, container, models.NodeModel, logics.UpdateNode, OutputJsonError, OutputSingleJsonResult)
 }
 
 func DeleteNode(c *gin.Context) {
-	processDelete(c, models.NodeModel, logics.DeleteNode)
+	processDelete(c, logics.DeleteNode, OutputJsonError)
 }

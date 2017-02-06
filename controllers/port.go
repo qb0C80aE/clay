@@ -7,23 +7,23 @@ import (
 )
 
 func GetPorts(c *gin.Context) {
-	processMultiGet(c, models.PortModel, logics.GetPorts)
+	processMultiGet(c, models.PortModel, logics.GetPorts, OutputJsonError, OutputMultiJsonResult)
 }
 
 func GetPort(c *gin.Context) {
-	processSingleGet(c, models.PortModel, logics.GetPort)
+	processSingleGet(c, models.PortModel, logics.GetPort, OutputJsonError, OutputSingleJsonResult)
 }
 
 func CreatePort(c *gin.Context) {
 	container := &models.Port{}
-	processCreate(c, container, models.PortModel, logics.CreatePort)
+	processCreate(c, container, logics.CreatePort, OutputJsonError, OutputSingleJsonResult)
 }
 
 func UpdatePort(c *gin.Context) {
 	container := &models.Port{}
-	processUpdate(c, container, models.PortModel, logics.UpdatePort)
+	processUpdate(c, container, models.PortModel, logics.UpdatePort, OutputJsonError, OutputSingleJsonResult)
 }
 
 func DeletePort(c *gin.Context) {
-	processDelete(c, models.PortModel, logics.DeletePort)
+	processDelete(c, logics.DeletePort, OutputJsonError)
 }

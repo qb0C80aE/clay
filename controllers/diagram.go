@@ -7,10 +7,10 @@ import (
 )
 
 func GetPhysicalDiagram(c *gin.Context) {
-	processSingleGet(c, models.DiagramModel, logics.GetPhysicalDiagram)
+	processSingleGet(c, models.DiagramModel, logics.GetPhysicalDiagram, OutputJsonError, OutputSingleJsonResult)
 }
 
 func GetLogicalDiagram(c *gin.Context) {
-	processSingleGet(c, models.DiagramModel, logics.GetLogicalDiagram)
+	processSingleGet(c, models.DiagramModel, logics.GetLogicalDiagram, OutputJsonError, OutputSingleJsonResult)
 
 }

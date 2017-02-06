@@ -7,23 +7,23 @@ import (
 )
 
 func GetNodeGroups(c *gin.Context) {
-	processMultiGet(c, models.NodeGroupModel, logics.GetNodeGroups)
+	processMultiGet(c, models.NodeGroupModel, logics.GetNodeGroups, OutputJsonError, OutputMultiJsonResult)
 }
 
 func GetNodeGroup(c *gin.Context) {
-	processSingleGet(c, models.NodeGroupModel, logics.GetNodeGroup)
+	processSingleGet(c, models.NodeGroupModel, logics.GetNodeGroup, OutputJsonError, OutputSingleJsonResult)
 }
 
 func CreateNodeGroup(c *gin.Context) {
 	container := &models.NodeGroup{}
-	processCreate(c, container, models.NodeGroupModel, logics.CreateNodeGroup)
+	processCreate(c, container, logics.CreateNodeGroup, OutputJsonError, OutputSingleJsonResult)
 }
 
 func UpdateNodeGroup(c *gin.Context) {
 	container := &models.NodeGroup{}
-	processUpdate(c, container, models.NodeGroupModel, logics.UpdateNodeGroup)
+	processUpdate(c, container, models.NodeGroupModel, logics.UpdateNodeGroup, OutputJsonError, OutputSingleJsonResult)
 }
 
 func DeleteNodeGroup(c *gin.Context) {
-	processDelete(c, models.NodeGroupModel, logics.DeleteNodeGroup)
+	processDelete(c, logics.DeleteNodeGroup, OutputJsonError)
 }

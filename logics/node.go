@@ -64,7 +64,6 @@ func CreateNode(db *gorm.DB, data interface{}) (interface{}, error) {
 		return nil, err
 	}
 
-
 	if err := updateNodeLink(db, node); err != nil {
 		return nil, err
 	}
