@@ -21,7 +21,7 @@ func CreateNodePv(c *gin.Context) {
 
 func UpdateNodePv(c *gin.Context) {
 	container := &models.Node{}
-	processUpdate(c, container, models.NodeModel, logics.UpdateNodePv, OutputJsonError, OutputSingleJsonResult)
+	processUpdate(c, container, logics.UpdateNodePv, OutputJsonError, OutputSingleJsonResult)
 }
 
 func DeleteNodePv(c *gin.Context) {

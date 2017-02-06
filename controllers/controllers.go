@@ -125,7 +125,8 @@ func processMultiGet(c *gin.Context,
 	resultOutputFunction(c, http.StatusOK, result, fields)
 }
 
-func processCreate(c *gin.Context, container interface{},
+func processCreate(c *gin.Context,
+	container interface{},
 	actualLogic func(*gorm.DB, interface{}) (interface{}, error),
 	errorOutputFunction func(*gin.Context, int, error),
 	resultOutputFunction func(*gin.Context, int, interface{}, map[string]interface{})) {
@@ -149,8 +150,8 @@ func processCreate(c *gin.Context, container interface{},
 	resultOutputFunction(c, http.StatusCreated, result, nil)
 }
 
-func processUpdate(c *gin.Context, container interface{},
-	model interface{},
+func processUpdate(c *gin.Context,
+	container interface{},
 	actualLogic func(*gorm.DB, string, interface{}) (interface{}, error),
 	errorOutputFunction func(*gin.Context, int, error),
 	resultOutputFunction func(*gin.Context, int, interface{}, map[string]interface{})) {
