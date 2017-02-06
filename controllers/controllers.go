@@ -11,6 +11,10 @@ import (
 	"net/http"
 )
 
+func BindJson(c *gin.Context, container interface{}) error {
+	return c.Bind(container)
+}
+
 func OutputJsonError(c *gin.Context, code int, err error) {
 	c.JSON(code, gin.H{"error": err.Error()})
 }
@@ -127,11 +131,12 @@ func processMultiGet(c *gin.Context,
 
 func processCreate(c *gin.Context,
 	container interface{},
+	binderFunction func(*gin.Context, interface{}) error,
 	actualLogic func(*gorm.DB, interface{}) (interface{}, error),
 	errorOutputFunction func(*gin.Context, int, error),
 	resultOutputFunction func(*gin.Context, int, interface{}, map[string]interface{})) {
-	if err := c.Bind(container); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+	if err := binderFunction(c, container); err != nil {
+		errorOutputFunction(c, http.StatusBadRequest, err)
 		return
 	}
 
@@ -152,12 +157,13 @@ func processCreate(c *gin.Context,
 
 func processUpdate(c *gin.Context,
 	container interface{},
+	binderFunction func(*gin.Context, interface{}) error,
 	actualLogic func(*gorm.DB, string, interface{}) (interface{}, error),
 	errorOutputFunction func(*gin.Context, int, error),
 	resultOutputFunction func(*gin.Context, int, interface{}, map[string]interface{})) {
 	id := c.Params.ByName("id")
 
-	if err := c.Bind(container); err != nil {
+	if err := binderFunction(c, container); err != nil {
 		errorOutputFunction(c, http.StatusBadRequest, err)
 		return
 	}

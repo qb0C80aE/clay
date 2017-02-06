@@ -16,12 +16,12 @@ func GetPort(c *gin.Context) {
 
 func CreatePort(c *gin.Context) {
 	container := &models.Port{}
-	processCreate(c, container, logics.CreatePort, OutputJsonError, OutputSingleJsonResult)
+	processCreate(c, container, BindJson, logics.CreatePort, OutputJsonError, OutputSingleJsonResult)
 }
 
 func UpdatePort(c *gin.Context) {
 	container := &models.Port{}
-	processUpdate(c, container, logics.UpdatePort, OutputJsonError, OutputSingleJsonResult)
+	processUpdate(c, container, BindJson, logics.UpdatePort, OutputJsonError, OutputSingleJsonResult)
 }
 
 func DeletePort(c *gin.Context) {
