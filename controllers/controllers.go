@@ -77,6 +77,11 @@ func OutputMultiJsonResult(c *gin.Context, code int, result []interface{}, field
 	}
 }
 
+func OutputTextResult(c *gin.Context, code int, result interface{}, _ map[string]interface{}) {
+	text := result.(string)
+	c.String(code, text)
+}
+
 func processSingleGet(c *gin.Context,
 	model interface{},
 	actualLogic func(*gorm.DB, string, string) (interface{}, error),
