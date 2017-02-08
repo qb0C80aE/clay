@@ -9,10 +9,20 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"net/http"
+	"bytes"
+	"io/ioutil"
 )
 
 func BindJson(c *gin.Context, container interface{}) error {
 	return c.Bind(container)
+}
+
+func BindText(c *gin.Context, container interface{}) error {
+	buffer := container.(*bytes.Buffer)
+	file, _, err := c.Request.FormFile("file")
+	data, _ := ioutil.ReadAll(file)
+	buffer.Write(data)
+	return err
 }
 
 func OutputJsonError(c *gin.Context, code int, err error) {
