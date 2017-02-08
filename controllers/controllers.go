@@ -86,6 +86,10 @@ func OutputTextResult(c *gin.Context, code int, result interface{}, _ map[string
 	c.String(code, text)
 }
 
+func OutputNothing(c *gin.Context, code int, _ interface{}, _ map[string]interface{}) {
+	c.Writer.WriteHeader(code)
+}
+
 func processSingleGet(c *gin.Context,
 	model interface{},
 	actualLogic func(*gorm.DB, string, string) (interface{}, error),
@@ -185,7 +189,8 @@ func processUpdate(c *gin.Context,
 
 func processDelete(c *gin.Context,
 	actualLogic func(*gorm.DB, string) error,
-	errorOutputFunction func(*gin.Context, int, error)) {
+	errorOutputFunction func(*gin.Context, int, error),
+	resultOutputFunction func(*gin.Context, int, interface{}, map[string]interface{})) {
 	id := c.Params.ByName("id")
 
 	db := dbpkg.DBInstance(c)
@@ -200,5 +205,5 @@ func processDelete(c *gin.Context,
 
 	db.Commit()
 
-	c.Writer.WriteHeader(http.StatusNoContent)
+	resultOutputFunction(c, http.StatusNoContent, nil, nil)
 }

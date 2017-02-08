@@ -25,5 +25,5 @@ func UpdatePort(c *gin.Context) {
 }
 
 func DeletePort(c *gin.Context) {
-	processDelete(c, logics.DeletePort, OutputJsonError)
+	processDelete(c, logics.DeletePort, OutputJsonError, OutputNothing)
 }

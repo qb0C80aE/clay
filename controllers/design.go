@@ -16,5 +16,5 @@ func UpdateDesign(c *gin.Context) {
 }
 
 func DeleteDesign(c *gin.Context) {
-	processDelete(c, logics.DeleteDesign, OutputJsonError)
+	processDelete(c, logics.DeleteDesign, OutputJsonError, OutputNothing)
 }
