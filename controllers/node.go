@@ -25,5 +25,5 @@ func UpdateNode(c *gin.Context) {
 }
 
 func DeleteNode(c *gin.Context) {
-	processDelete(c, logics.DeleteNode, OutputJsonError)
+	processDelete(c, logics.DeleteNode, OutputJsonError, OutputNothing)
 }

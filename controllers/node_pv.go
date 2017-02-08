@@ -25,5 +25,5 @@ func UpdateNodePv(c *gin.Context) {
 }
 
 func DeleteNodePv(c *gin.Context) {
-	processDelete(c, logics.DeleteNodePv, OutputJsonError)
+	processDelete(c, logics.DeleteNodePv, OutputJsonError, OutputNothing)
 }
