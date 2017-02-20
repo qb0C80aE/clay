@@ -20,8 +20,6 @@ func main() {
 		}
 	}
 
-	s.Static("/ui", "ui")
-
 	s.Run(":" + port)
 
 }

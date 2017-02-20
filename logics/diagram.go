@@ -6,27 +6,29 @@ import (
 	"github.com/qb0C80aE/clay/models"
 )
 
+const diagramImageRoot string = "/ui/files/images/diagram"
+
 var physicalNodeIconPaths = map[int]string{
-	1: "/ui/images/diagram/l2switch.png",
-	2: "/ui/images/diagram/l3switch.png",
-	3: "/ui/images/diagram/firewall.png",
-	4: "/ui/images/diagram/router.png",
-	5: "/ui/images/diagram/loadbalancer.png",
-	6: "/ui/images/diagram/server.png",
-	7: "/ui/images/diagram/network.png",
+	1: fmt.Sprintf("%s/%s", diagramImageRoot, "l2switch.png"),
+	2: fmt.Sprintf("%s/%s", diagramImageRoot, "l3switch.png"),
+	3: fmt.Sprintf("%s/%s", diagramImageRoot, "firewall.png"),
+	4: fmt.Sprintf("%s/%s", diagramImageRoot, "router.png"),
+	5: fmt.Sprintf("%s/%s", diagramImageRoot, "loadbalancer.png"),
+	6: fmt.Sprintf("%s/%s", diagramImageRoot, "server.png"),
+	7: fmt.Sprintf("%s/%s", diagramImageRoot, "network.png"),
 }
 
 var virtualNodeIconPaths = map[int]string{
-	1: "/ui/images/diagram/l2switch_v.png",
-	2: "/ui/images/diagram/l3switch_v.png",
-	3: "/ui/images/diagram/firewall_v.png",
-	4: "/ui/images/diagram/router_v.png",
-	5: "/ui/images/diagram/loadbalancer_v.png",
-	6: "/ui/images/diagram/server_v.png",
-	7: "/ui/images/diagram/network.png",
+	1: fmt.Sprintf("%s/%s", diagramImageRoot, "l2switch_v.png"),
+	2: fmt.Sprintf("%s/%s", diagramImageRoot, "l3switch_v.png"),
+	3: fmt.Sprintf("%s/%s", diagramImageRoot, "firewall_v.png"),
+	4: fmt.Sprintf("%s/%s", diagramImageRoot, "router_v.png"),
+	5: fmt.Sprintf("%s/%s", diagramImageRoot, "loadbalancer_v.png"),
+	6: fmt.Sprintf("%s/%s", diagramImageRoot, "server_v.png"),
+	7: fmt.Sprintf("%s/%s", diagramImageRoot, "network.png"),
 }
 
-const segmentIconPath = "/ui/images/diagram/segment.png"
+var segmentIconPath = fmt.Sprintf("%s/%s", diagramImageRoot, "segment.png")
 
 func GetPhysicalDiagram(db *gorm.DB, _ string, queryFields string) (interface{}, error) {
 
