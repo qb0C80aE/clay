@@ -9,20 +9,57 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"net/http"
-	"bytes"
 	"io/ioutil"
+	"bytes"
+	"reflect"
 )
 
-func BindJson(c *gin.Context, container interface{}) error {
-	return c.Bind(container)
-}
+func bind(c *gin.Context, container interface{}) error {
+	if err := c.Bind(container); err != nil {
+		return err
+	}
+	if c.Request.ParseMultipartForm(1024 * 1024) == nil {
+		files := c.Request.MultipartForm.File
+		for name, _ := range (files) {
+			buffer := &bytes.Buffer{}
+			file, _, err := c.Request.FormFile(name)
+			if err != nil {
+				return err
+			}
+			data, _ := ioutil.ReadAll(file)
+			if err != nil {
+				return err
+			}
+			buffer.Write(data)
 
-func BindText(c *gin.Context, container interface{}) error {
-	buffer := container.(*bytes.Buffer)
-	file, _, err := c.Request.FormFile("file")
-	data, _ := ioutil.ReadAll(file)
-	buffer.Write(data)
-	return err
+			vs := reflect.ValueOf(container)
+			for vs.Kind() == reflect.Ptr {
+				vs = vs.Elem()
+			}
+			if !vs.IsValid() {
+				return errors.New("invalid container.")
+			}
+			if !vs.CanInterface() {
+				return nil
+			}
+			value := vs.Interface()
+
+			t := reflect.TypeOf(value)
+			for i := 0; i < t.NumField(); i++ {
+				field := t.Field(i)
+				jsonTag := field.Tag.Get("json")
+				formTag := field.Tag.Get("form")
+				if (jsonTag == name || formTag != name) && (field.Type.Kind() == reflect.String) {
+					vs.FieldByName(field.Name).SetString(buffer.String())
+					break
+				}
+			}
+
+
+
+		}
+	}
+	return nil
 }
 
 func OutputJsonError(c *gin.Context, code int, err error) {
@@ -145,11 +182,10 @@ func processMultiGet(c *gin.Context,
 
 func processCreate(c *gin.Context,
 	container interface{},
-	binderFunction func(*gin.Context, interface{}) error,
 	actualLogic func(*gorm.DB, interface{}) (interface{}, error),
 	errorOutputFunction func(*gin.Context, int, error),
 	resultOutputFunction func(*gin.Context, int, interface{}, map[string]interface{})) {
-	if err := binderFunction(c, container); err != nil {
+	if err := bind(c, container); err != nil {
 		errorOutputFunction(c, http.StatusBadRequest, err)
 		return
 	}
@@ -171,13 +207,12 @@ func processCreate(c *gin.Context,
 
 func processUpdate(c *gin.Context,
 	container interface{},
-	binderFunction func(*gin.Context, interface{}) error,
 	actualLogic func(*gorm.DB, string, interface{}) (interface{}, error),
 	errorOutputFunction func(*gin.Context, int, error),
 	resultOutputFunction func(*gin.Context, int, interface{}, map[string]interface{})) {
 	id := c.Params.ByName("id")
 
-	if err := binderFunction(c, container); err != nil {
+	if err := bind(c, container); err != nil {
 		errorOutputFunction(c, http.StatusBadRequest, err)
 		return
 	}

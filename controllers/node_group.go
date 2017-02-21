@@ -16,12 +16,12 @@ func GetNodeGroup(c *gin.Context) {
 
 func CreateNodeGroup(c *gin.Context) {
 	container := &models.NodeGroup{}
-	processCreate(c, container, BindJson, logics.CreateNodeGroup, OutputJsonError, OutputSingleJsonResult)
+	processCreate(c, container, logics.CreateNodeGroup, OutputJsonError, OutputSingleJsonResult)
 }
 
 func UpdateNodeGroup(c *gin.Context) {
 	container := &models.NodeGroup{}
-	processUpdate(c, container, BindJson, logics.UpdateNodeGroup, OutputJsonError, OutputSingleJsonResult)
+	processUpdate(c, container, logics.UpdateNodeGroup, OutputJsonError, OutputSingleJsonResult)
 }
 
 func DeleteNodeGroup(c *gin.Context) {

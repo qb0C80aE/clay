@@ -12,7 +12,7 @@ func GetDesign(c *gin.Context) {
 
 func UpdateDesign(c *gin.Context) {
 	container := &models.Design{}
-	processUpdate(c, container, BindJson, logics.UpdateDesign, OutputJsonError, OutputSingleJsonResult)
+	processUpdate(c, container, logics.UpdateDesign, OutputJsonError, OutputSingleJsonResult)
 }
 
 func DeleteDesign(c *gin.Context) {
