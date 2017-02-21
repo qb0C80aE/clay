@@ -32,6 +32,8 @@ func Connect() *gorm.DB {
 			&models.Node{},
 			&models.NodeGroup{},
 			&models.Port{},
+			&models.TemplateExternalParameter{},
+			&models.Template{},
 		)
 	}
 

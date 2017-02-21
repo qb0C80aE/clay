@@ -1,0 +1,117 @@
+provider "openvnet" {
+  api_endpoint = "http://172.16.3.10:9090/api/1.0"
+}
+
+#
+# Physical network
+#
+
+resource "openvnet_datapath" "dp-ci" {
+  uuid         = "dp-ci"
+  node_id      = "vna1"
+  display_name = "ci_datapath"
+  dpid         = "0x0000aaaaaaaaaaaa"
+}
+
+resource "openvnet_datapath" "dp-pica8" {
+  uuid         = "dp-pica8"
+  node_id      = "vna2"
+  display_name = "pica8_datapath"
+  dpid         = "0x0000bbbbbbbbbbbb"
+}
+
+resource "openvnet_mac_range_group" "mrg" {
+  uuid = "mrg-dpg"
+
+  mac_range {
+    begin_mac_address = "08:00:27:aa:00:00"
+    end_mac_address   = "08:00:27:aa:ff:ff"
+  }
+}
+
+resource "openvnet_network" "physical-network" {
+  uuid         = "nw-phys1"
+  display_name = "physical network that CI and pica8 are on"
+  ipv4_network = "172.16.4.0"
+  ipv4_prefix  = 24
+  network_mode = "physical"
+}
+
+resource "openvnet_interface" "if-host-ci" {
+  uuid                = "if-ci"
+  mode                = "host"
+  port_name           = "eth1"
+  mac_address         = "02:01:00:00:00:01"
+  owner_datapath_uuid = "${openvnet_datapath.dp-ci.id}"
+  network_uuid        = "${openvnet_network.physical-network.uuid}"
+  ipv4_address        = "172.16.4.10"
+}
+
+resource "openvnet_topology" "topo-physical" {
+  uuid = "topo-physical"
+  mode = "simple_underlay"
+
+  network {
+    uuid = "${openvnet_network.physical-network.uuid}"
+  }
+}
+
+# The IP lease on the pica8 host interface is a fake. Pica8 and CI are on the
+# same L2 network. This is done because the current tunnel manager code requires
+# an IP lease but we can safely assign a fake one since MAC2MAC tunnels ignore
+# IP addresses anyway. Only works if we're on the same L2 though.
+resource "openvnet_interface" "if-host-pica8" {
+  uuid                = "if-pica8"
+  mode                = "host"
+  port_name           = "eth9"
+  mac_address         = "52:56:01:00:01:01"
+  owner_datapath_uuid = "${openvnet_datapath.dp-pica8.uuid}"
+  network_uuid        = "${openvnet_network.physical-network.uuid}"
+  ipv4_address        = "172.16.4.2" # <= fake
+}
+
+#
+# Below is the virtual network
+#
+
+
+{{$dpid := index .TemplateExternalParameters "dpid"}}
+
+{{range $index, $segment := .Segments}}
+resource "openvnet_segment" "seg-seg{{$index}}" {
+  uuid = "seg-seg{{$index}}"
+  mode = "virtual"
+}
+{{end}}
+
+resource "openvnet_topology" "topo-vnet" {
+  uuid = "topo-vnet"
+  mode = "simple_overlay"
+
+  {{range $index, $segment := .Segments}}
+  segment {
+    uuid = "${openvnet_segment.seg-seg{{$index}}.uuid}"
+  }
+  {{end}}
+}
+
+{{range $index, $segment := .Segments}}
+
+#
+# Interfaces is segment {{$index}}
+#
+
+{{range $index2, $port := $segment.Ports}}
+resource "openvnet_interface" "seg-seg{{$index}}" {
+  uuid                = "if-{{$port.Node.Name}}{{$port.Name}}"
+  port_name           = "{{$port.Name}}"
+  owner_datapath_uuid = "${openvnet_datapath.{{$dpid}}.uuid}"
+  segment_uuid        = "${openvnet_segment.seg-seg{{$index}}.uuid}"
+  mac_address         = "{{$port.MacAddress}}"
+  {{if eq $port.Node.NodePvID 1}}mode                = "vif"{{end}}
+}
+
+{{end}}
+
+{{end}}
+

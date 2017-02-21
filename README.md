@@ -26,6 +26,16 @@ server runs at http://localhost:8080
 $ curl -X PUT localhost:8080/v1/designs/present -H "Content-Type: application/json" -d @examples/design.json
 ```
 
+# Example template
+
+```
+$ # register template and external parameters
+$ curl -X POST "localhost:8080/v1/templates" -H "Content-Type: multipart/form-data" -F name=terraform -F template_content=@examples/terraform.template
+$ curl -X POST "localhost:8080/v1/template_external_parameters" -H "Content-Type: application/json" -d '{"template_id": 1, "name": "dpid", "value": "dp-pica8"}'
+$ # show generated template
+$ curl -X GET "localhost:8080/v1/templates/1"
+```
+
 # API Server
 
 Simple Rest API using gin(framework) & gorm(orm)
