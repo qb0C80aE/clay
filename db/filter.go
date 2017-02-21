@@ -36,8 +36,12 @@ func FilterFields(c *gin.Context, model interface{}, db *gorm.DB) *gorm.DB {
 	if !vs.IsValid() {
 		return nil
 	}
+	if !vs.CanInterface() {
+		return nil
+	}
+	value := vs.Interface()
 
-	filters := filterToMap(c, vs)
+	filters := filterToMap(c, value)
 
 	for k, v := range filters {
 		if v != "" {

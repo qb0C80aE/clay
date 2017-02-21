@@ -16,12 +16,12 @@ func GetNodePv(c *gin.Context) {
 
 func CreateNodePv(c *gin.Context) {
 	container := &models.Node{}
-	processCreate(c, container, BindJson, logics.CreateNodePv, OutputJsonError, OutputSingleJsonResult)
+	processCreate(c, container, logics.CreateNodePv, OutputJsonError, OutputSingleJsonResult)
 }
 
 func UpdateNodePv(c *gin.Context) {
 	container := &models.Node{}
-	processUpdate(c, container, BindJson, logics.UpdateNodePv, OutputJsonError, OutputSingleJsonResult)
+	processUpdate(c, container, logics.UpdateNodePv, OutputJsonError, OutputSingleJsonResult)
 }
 
 func DeleteNodePv(c *gin.Context) {

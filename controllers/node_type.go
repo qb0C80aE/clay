@@ -16,12 +16,12 @@ func GetNodeType(c *gin.Context) {
 
 func CreateNodeType(c *gin.Context) {
 	container := &models.Node{}
-	processCreate(c, container, BindJson, logics.CreateNodeType, OutputJsonError, OutputSingleJsonResult)
+	processCreate(c, container, logics.CreateNodeType, OutputJsonError, OutputSingleJsonResult)
 }
 
 func UpdateNodeType(c *gin.Context) {
 	container := &models.Node{}
-	processUpdate(c, container, BindJson, logics.UpdateNodeType, OutputJsonError, OutputSingleJsonResult)
+	processUpdate(c, container, logics.UpdateNodeType, OutputJsonError, OutputSingleJsonResult)
 }
 
 func DeleteNodeType(c *gin.Context) {
