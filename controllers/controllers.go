@@ -4,13 +4,13 @@ import (
 	dbpkg "github.com/qb0C80aE/clay/db"
 	"github.com/qb0C80aE/clay/helper"
 
+	"bytes"
 	"encoding/json"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
-	"net/http"
 	"io/ioutil"
-	"bytes"
+	"net/http"
 	"reflect"
 )
 
@@ -18,9 +18,9 @@ func bind(c *gin.Context, container interface{}) error {
 	if err := c.Bind(container); err != nil {
 		return err
 	}
-	if c.Request.ParseMultipartForm(1024 * 1024) == nil {
+	if c.Request.ParseMultipartForm(1024*1024) == nil {
 		files := c.Request.MultipartForm.File
-		for name, _ := range (files) {
+		for name, _ := range files {
 			buffer := &bytes.Buffer{}
 			file, _, err := c.Request.FormFile(name)
 			if err != nil {
@@ -49,13 +49,11 @@ func bind(c *gin.Context, container interface{}) error {
 				field := t.Field(i)
 				jsonTag := field.Tag.Get("json")
 				formTag := field.Tag.Get("form")
-				if (jsonTag == name || formTag != name) && (field.Type.Kind() == reflect.String) {
+				if (jsonTag == name || formTag == name) && (field.Type.Kind() == reflect.String) {
 					vs.FieldByName(field.Name).SetString(buffer.String())
 					break
 				}
 			}
-
-
 
 		}
 	}
