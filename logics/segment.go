@@ -5,12 +5,37 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/models"
 	"github.com/qb0C80aE/clay/utils/net"
+	"sort"
 )
 
-func getStartPort(nodeMap map[int]*models.Node, consumedPortMap map[int]*models.Port) (*models.Port, string) {
+func sortNodeIDs(nodeMap map[int]*models.Node) []int {
+	var sortedNodeIDs []int
+	for nodeID, _ := range nodeMap {
+		sortedNodeIDs = append(sortedNodeIDs, nodeID)
+	}
+	sort.Ints(sortedNodeIDs)
+	return sortedNodeIDs
+}
 
-	for _, node := range nodeMap {
-		for _, port := range node.Ports {
+type sortablePorts []*models.Port
+
+func (this sortablePorts) Len() int {
+	return len(this)
+}
+
+func (this sortablePorts) Less(i, j int) bool {
+	return this[i].ID < this[j].ID
+}
+
+func (this sortablePorts) Swap(i, j int) {
+	this[i], this[j] = this[j], this[i]
+}
+
+func getStartPort(nodeMap map[int]*models.Node, sortedNodeIDs []int, consumedPortMap map[int]*models.Port) (*models.Port, string) {
+	for _, nodeID := range sortedNodeIDs {
+		var ports sortablePorts = nodeMap[nodeID].Ports
+		sort.Sort(ports)
+		for _, port := range ports {
 			if port.Ipv4Address.Valid {
 				if _, consumed := consumedPortMap[port.ID]; consumed {
 					continue
@@ -28,7 +53,6 @@ func getStartPort(nodeMap map[int]*models.Node, consumedPortMap map[int]*models.
 }
 
 func tracePort(nodeMap map[int]*models.Node, portMap map[int]*models.Port, consumedPortMap map[int]*models.Port, port *models.Port, segmentIpv4Address string) []*models.Port {
-
 	segmentPorts := make([]*models.Port, 0)
 	trace := true
 
@@ -70,9 +94,12 @@ func tracePort(nodeMap map[int]*models.Node, portMap map[int]*models.Port, consu
 }
 
 func createSegments(nodeMap map[int]*models.Node, portMap map[int]*models.Port, consumedPortMap map[int]*models.Port) []*models.Segment {
+
+	sortedNodeIDs := sortNodeIDs(nodeMap)
+
 	segments := make([]*models.Segment, 0, 10)
 	for {
-		startPort, segmentIp4Address := getStartPort(nodeMap, consumedPortMap)
+		startPort, segmentIp4Address := getStartPort(nodeMap, sortedNodeIDs, consumedPortMap)
 		if startPort == nil {
 			break
 		}
@@ -115,6 +142,7 @@ func GetSegments(db *gorm.DB, queryFields string) ([]interface{}, error) {
 	for _, node := range nodes {
 		nodeMap[node.ID] = node
 	}
+
 	for _, port := range ports {
 		portMap[port.ID] = port
 	}
