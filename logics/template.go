@@ -114,7 +114,7 @@ func CreateTemplate(db *gorm.DB, data interface{}) (interface{}, error) {
 		return nil, err
 	}
 
-	return nil, nil
+	return template, nil
 }
 
 func UpdateTemplate(db *gorm.DB, id string, data interface{}) (interface{}, error) {
@@ -125,7 +125,7 @@ func UpdateTemplate(db *gorm.DB, id string, data interface{}) (interface{}, erro
 		return nil, err
 	}
 
-	return nil, nil
+	return template, nil
 }
 
 func DeleteTemplate(db *gorm.DB, id string) error {
