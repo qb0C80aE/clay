@@ -59,9 +59,12 @@ func Initialize(r *gin.Engine) {
 		api.PUT("/template_external_parameters/:id", controllers.UpdateTemplateExternalParameter)
 		api.DELETE("/template_external_parameters/:id", controllers.DeleteTemplateExternalParameter)
 
+		api.GET("/templates", controllers.GetTemplates)
+		api.GET("/templates/:id", controllers.GetTemplate)
 		api.POST("/templates", controllers.CreateTemplate)
 		api.PUT("/templates/:id", controllers.UpdateTemplate)
-		api.GET("/templates/:id", controllers.GetTemplate)
+		api.DELETE("/templates/:id", controllers.DeleteTemplate)
+		api.PATCH("/templates/:id", controllers.ApplyTemplate)
 
 	}
 

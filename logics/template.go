@@ -78,7 +78,73 @@ func DeleteTemplateExternalParameter(db *gorm.DB, id string) error {
 
 }
 
+func GetTemplates(db *gorm.DB, queryFields string) ([]interface{}, error) {
+
+	templates := []*models.Template{}
+
+	if err := db.Select(queryFields).Find(&templates).Error; err != nil {
+		return nil, err
+	}
+
+	result := make([]interface{}, len(templates))
+	for i, data := range templates {
+		result[i] = data
+	}
+
+	return result, nil
+
+}
+
 func GetTemplate(db *gorm.DB, id string, queryFields string) (interface{}, error) {
+
+	template := &models.Template{}
+
+	if err := db.Select(queryFields).First(template, id).Error; err != nil {
+		return nil, err
+	}
+
+	return template, nil
+
+}
+
+func CreateTemplate(db *gorm.DB, data interface{}) (interface{}, error) {
+	template := data.(*models.Template)
+
+	if err := db.Create(template).Error; err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}
+
+func UpdateTemplate(db *gorm.DB, id string, data interface{}) (interface{}, error) {
+	template := data.(*models.Template)
+	template.ID, _ = strconv.Atoi(id)
+
+	if err := db.Save(template).Error; err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}
+
+func DeleteTemplate(db *gorm.DB, id string) error {
+
+	template := &models.Template{}
+
+	if err := db.First(&template, id).Error; err != nil {
+		return err
+	}
+
+	if err := db.Delete(&template).Error; err != nil {
+		return err
+	}
+
+	return nil
+
+}
+
+func ApplyTemplate(db *gorm.DB, id string, queryFields string) (interface{}, error) {
 	type templateParameter struct {
 		Nodes                      []*models.Node
 		Ports                      []*models.Port
@@ -156,25 +222,4 @@ func GetTemplate(db *gorm.DB, id string, queryFields string) (interface{}, error
 	result := doc.String()
 
 	return result, nil
-}
-
-func CreateTemplate(db *gorm.DB, data interface{}) (interface{}, error) {
-	template := data.(*models.Template)
-
-	if err := db.Create(template).Error; err != nil {
-		return nil, err
-	}
-
-	return nil, nil
-}
-
-func UpdateTemplate(db *gorm.DB, id string, data interface{}) (interface{}, error) {
-	template := data.(*models.Template)
-	template.ID, _ = strconv.Atoi(id)
-
-	if err := db.Save(template).Error; err != nil {
-		return nil, err
-	}
-
-	return nil, nil
 }

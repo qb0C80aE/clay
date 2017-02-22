@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/qb0C80aE/clay/models"
 	"github.com/qb0C80aE/clay/logics"
+	"github.com/qb0C80aE/clay/models"
 )
 
 func GetTemplateExternalParameters(c *gin.Context) {
@@ -28,6 +28,14 @@ func DeleteTemplateExternalParameter(c *gin.Context) {
 	processDelete(c, logics.DeleteTemplateExternalParameter, OutputJsonError, OutputNothing)
 }
 
+func GetTemplates(c *gin.Context) {
+	processMultiGet(c, models.TemplateModel, logics.GetTemplates, OutputJsonError, OutputMultiJsonResult)
+}
+
+func GetTemplate(c *gin.Context) {
+	processSingleGet(c, models.TemplateModel, logics.GetTemplate, OutputJsonError, OutputSingleJsonResult)
+}
+
 func CreateTemplate(c *gin.Context) {
 	container := &models.Template{}
 	processCreate(c, container, logics.CreateTemplate, OutputJsonError, OutputNothing)
@@ -38,6 +46,11 @@ func UpdateTemplate(c *gin.Context) {
 	processUpdate(c, container, logics.UpdateTemplate, OutputJsonError, OutputNothing)
 }
 
-func GetTemplate(c *gin.Context) {
-	processSingleGet(c, models.TemplateModel, logics.GetTemplate, OutputJsonError, OutputTextResult)
+func DeleteTemplate(c *gin.Context) {
+	processDelete(c, logics.DeleteTemplate, OutputJsonError, OutputNothing)
+}
+
+func ApplyTemplate(c *gin.Context) {
+	container := &models.Template{}
+	processSingleGet(c, container, logics.ApplyTemplate, OutputJsonError, OutputTextResult)
 }
