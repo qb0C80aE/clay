@@ -82,7 +82,7 @@
 <script language="javascript">
 	(function($) {
 
-		const API_PREFIX = 'http://localhost:8080/v1';
+		const API_PREFIX = 'http://{{ .env.ENDPOINT }}/v1';
 
 		var nodes = null;
 		var nodePvs = null;

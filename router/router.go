@@ -5,6 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"github.com/higanworks/envmap"
+	"os"
+	"fmt"
 )
 
 func Initialize(r *gin.Engine) {
@@ -70,9 +73,20 @@ func Initialize(r *gin.Engine) {
 
 	r.Static("ui/files", "ui/files")
 	r.LoadHTMLGlob("ui/templates/*.tmpl")
+	envMap := envmap.All()
+	if endPoint := os.Getenv("ENDPOINT"); endPoint == "" {
+		envMap["ENDPOINT"] = fmt.Sprintf("%s:%s", os.Getenv("HOST"), os.Getenv("PORT"))
+	}
 	ui := r.Group("/ui")
-	ui.GET("/", func(c *gin.Context) { c.HTML(http.StatusOK, "index.tmpl", gin.H{}) })
-	ui.GET("/network", func(c *gin.Context) { c.HTML(http.StatusOK, "network.tmpl", gin.H{}) })
-	ui.GET("/diagram", func(c *gin.Context) { c.HTML(http.StatusOK, "diagram.tmpl", gin.H{}) })
-
+	{
+		ui.GET("/", func(c *gin.Context) {
+			c.HTML(http.StatusOK, "index.tmpl", gin.H{"env": envMap})
+		})
+		ui.GET("/network", func(c *gin.Context) {
+			c.HTML(http.StatusOK, "network.tmpl", gin.H{"env": envMap})
+		})
+		ui.GET("/diagram", func(c *gin.Context) {
+			c.HTML(http.StatusOK, "diagram.tmpl", gin.H{"env": envMap})
+		})
+	}
 }
