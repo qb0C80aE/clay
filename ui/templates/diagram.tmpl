@@ -15,7 +15,7 @@
 			return vars;
 		}
 
-		const API_PREFIX = 'http://localhost:8080/v1';
+		const API_PREFIX = 'http://{{ .env.ENDPOINT }}/v1';
 		var diagramType = getUrlVars()["diagram_type"]
 
 		function onUpdateNetworkDiagram() {
