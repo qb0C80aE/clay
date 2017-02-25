@@ -8,4 +8,7 @@ type Design struct {
 	NodeGroups []*NodeGroup `json:"node_groups"`
 }
 
+func init() {
+}
+
 var DesignModel = &Design{}

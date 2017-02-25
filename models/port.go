@@ -1,6 +1,10 @@
 package models
 
-import "database/sql"
+import (
+	"database/sql"
+	"github.com/qb0C80aE/clay/extension"
+	"reflect"
+)
 
 type Port struct {
 	ID                int            `json:"id" gorm:"primary_key;AUTO_INCREMENT"`
@@ -13,6 +17,10 @@ type Port struct {
 	Ipv4Address       sql.NullString `json:"ipv4_address"`
 	Ipv4Prefix        sql.NullInt64  `json:"ipv4_prefix"`
 	Remark            sql.NullString `json:"remark"`
+}
+
+func init() {
+	extension.RegisterModelType(reflect.TypeOf(Port{}))
 }
 
 var PortModel = &Port{}

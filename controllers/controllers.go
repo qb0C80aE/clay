@@ -14,13 +14,16 @@ import (
 	"reflect"
 )
 
+func HookSubmodules() {
+}
+
 func bind(c *gin.Context, container interface{}) error {
 	if err := c.Bind(container); err != nil {
 		return err
 	}
 	if c.Request.ParseMultipartForm(1024*1024) == nil {
 		files := c.Request.MultipartForm.File
-		for name, _ := range files {
+		for name := range files {
 			buffer := &bytes.Buffer{}
 			file, _, err := c.Request.FormFile(name)
 			if err != nil {
@@ -135,7 +138,7 @@ func OutputNothing(c *gin.Context, code int, _ interface{}, _ map[string]interfa
 	c.Writer.WriteHeader(code)
 }
 
-func processSingleGet(c *gin.Context,
+func ProcessSingleGet(c *gin.Context,
 	model interface{},
 	actualLogic func(*gorm.DB, string, string) (interface{}, error),
 	errorOutputFunction func(*gin.Context, int, error),
@@ -156,7 +159,7 @@ func processSingleGet(c *gin.Context,
 	resultOutputFunction(c, http.StatusOK, result, fields)
 }
 
-func processMultiGet(c *gin.Context,
+func ProcessMultiGet(c *gin.Context,
 	model interface{},
 	actualLogic func(*gorm.DB, string) ([]interface{}, error),
 	errorOutputFunction func(*gin.Context, int, error),
@@ -178,7 +181,7 @@ func processMultiGet(c *gin.Context,
 	resultOutputFunction(c, http.StatusOK, result, fields)
 }
 
-func processCreate(c *gin.Context,
+func ProcessCreate(c *gin.Context,
 	container interface{},
 	actualLogic func(*gorm.DB, interface{}) (interface{}, error),
 	errorOutputFunction func(*gin.Context, int, error),
@@ -203,7 +206,7 @@ func processCreate(c *gin.Context,
 	resultOutputFunction(c, http.StatusCreated, result, nil)
 }
 
-func processUpdate(c *gin.Context,
+func ProcessUpdate(c *gin.Context,
 	container interface{},
 	actualLogic func(*gorm.DB, string, interface{}) (interface{}, error),
 	errorOutputFunction func(*gin.Context, int, error),
@@ -230,7 +233,7 @@ func processUpdate(c *gin.Context,
 	resultOutputFunction(c, http.StatusOK, result, nil)
 }
 
-func processDelete(c *gin.Context,
+func ProcessDelete(c *gin.Context,
 	actualLogic func(*gorm.DB, string) error,
 	errorOutputFunction func(*gin.Context, int, error),
 	resultOutputFunction func(*gin.Context, int, interface{}, map[string]interface{})) {

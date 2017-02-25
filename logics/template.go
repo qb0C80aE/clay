@@ -198,7 +198,7 @@ func ApplyTemplate(db *gorm.DB, id string, queryFields string) (interface{}, err
 		portMap[port.ID] = port
 	}
 
-	segments := createSegments(nodeMap, portMap, consumedPortMap)
+	segments := CreateSegments(nodeMap, portMap, consumedPortMap)
 
 	templateExternalParameterMap := make(map[string]string)
 	for _, templateExternalParameter := range template.TemplateExternalParameters {

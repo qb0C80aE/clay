@@ -1,0 +1,95 @@
+# Group Templates
+Welcome to the templates API. This API provides access to the templates service.
+
+## templates [/templates]
+
+### Create template [POST]
+
+Create a new template
+
+ multipart/form-data" -F name=terraform -F template_content=@examples/terraform.template
+
++ Request template (multipart/form-data)
+    + Attributes
+
+        + name: NAME (string)
+        + template_content: FILE (file)
+
++ Response 201 (application/json; charset=utf-8)
+    + Attributes (template, fixed)
+
+### Get templates [GET]
+
+Returns a template list.
+
++ Request (application/json; charset=utf-8)
+    + Headers
+
+            Accept: application/vnd.qb0C80aE+json
+
++ Response 200 (application/json; charset=utf-8)
+    + Attributes (array, fixed)
+        + (template)
+
+## template details [/templates/{id}]
+
++ Parameters
+    + id: `1` (enum[string]) - The ID of the desired template.
+        + Members
+            + `1`
+            + `2`
+            + `3`
+
+### Get template [GET]
+
+Returns a template.
+
++ Request (application/json; charset=utf-8)
+    + Headers
+
+            Accept: application/vnd.qb0C80aE+json
+
++ Response 200 (application/json; charset=utf-8)
+    + Attributes (template, fixed)
+
+### Update template [PUT]
+
+Update a template.
+
++ Request template (multipart/form-data)
+    + Attributes
+
+        + name: NAME (string)
+        + template_content: FILE (file)
+
++ Response 200 (application/json; charset=utf-8)
+    + Attributes (template, fixed)
+
+### Delete template [DELETE]
+
+Delete a template.
+
++ Request (application/json; charset=utf-8)
+    + Headers
+
+            Accept: application/vnd.qb0C80aE+json
+
++ Response 204
+
+### Apply template [PATCH]
+
+Apply and Generate template.
+
++ Request (application/json; charset=utf-8)
+    + Headers
+
+            Accept: application/vnd.qb0C80aE+json
+
++ Response 201
+
+# Data Structures
+## template (object)
+
++ id: *1* (number)
++ name: *NAME* (string)
++ template_content: *FILE* (file)

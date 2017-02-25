@@ -4,9 +4,9 @@ import (
 	"os"
 	"strconv"
 
+	"fmt"
 	"github.com/qb0C80aE/clay/db"
 	"github.com/qb0C80aE/clay/server"
-	"fmt"
 )
 
 func main() {
