@@ -3,6 +3,7 @@ package extension
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 	"github.com/mohae/deepcopy"
 	"net/http"
 	"reflect"
@@ -28,6 +29,8 @@ var methodMap = map[int]map[string]gin.HandlerFunc{
 }
 
 var routePostInitializers = []func(*gin.Engine){}
+
+var designModels = [][]interface{}{}
 
 func RegisterModelType(reflectType reflect.Type) {
 	typeMap[reflectType.String()] = reflectType
@@ -97,4 +100,32 @@ func RegisterRoutePostInitializer(initializer func(*gin.Engine)) {
 
 func GetRoutePostInitializers() []func(*gin.Engine) {
 	return deepcopy.Copy(routePostInitializers).([]func(*gin.Engine))
+}
+
+var designExtractors []func(*gorm.DB, map[string]interface{}) error = []func(*gorm.DB, map[string]interface{}) error{}
+var designDeleters []func(*gorm.DB) error = []func(*gorm.DB) error{}
+var designLoaders []func(*gorm.DB, interface{}) error = []func(*gorm.DB, interface{}) error{}
+
+func RegisterDesignExtractor(extractor func(*gorm.DB, map[string]interface{}) error) {
+	designExtractors = append(designExtractors, extractor)
+}
+
+func RegisterDesignDeleter(deleter func(*gorm.DB) error) {
+	designDeleters = append(designDeleters, deleter)
+}
+
+func RegisterDesignLoader(loader func(*gorm.DB, interface{}) error) {
+	designLoaders = append(designLoaders, loader)
+}
+
+func GetDesignExtractors() []func(*gorm.DB, map[string]interface{}) error {
+	return deepcopy.Copy(designExtractors).([]func(*gorm.DB, map[string]interface{}) error)
+}
+
+func GetDesignDeleters() []func(*gorm.DB) error {
+	return deepcopy.Copy(designDeleters).([]func(*gorm.DB) error)
+}
+
+func GetDesignLoaders() []func(*gorm.DB, interface{}) error {
+	return deepcopy.Copy(designLoaders).([]func(*gorm.DB, interface{}) error)
 }
