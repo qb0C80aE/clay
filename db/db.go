@@ -7,7 +7,6 @@ import (
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/serenize/snaker"
 	"log"
-	"os"
 	"strings"
 )
 
@@ -25,9 +24,7 @@ func Connect() *gorm.DB {
 		db.LogMode(true)
 	}
 
-	if os.Getenv("AUTOMIGRATE") == "1" {
-		db.AutoMigrate(extension.GetModels()...)
-	}
+	db.AutoMigrate(extension.GetModels()...)
 
 	return db
 }
