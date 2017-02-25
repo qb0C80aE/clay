@@ -10,7 +10,7 @@ import (
 
 func sortNodeIDs(nodeMap map[int]*models.Node) []int {
 	var sortedNodeIDs []int
-	for nodeID, _ := range nodeMap {
+	for nodeID := range nodeMap {
 		sortedNodeIDs = append(sortedNodeIDs, nodeID)
 	}
 	sort.Ints(sortedNodeIDs)
@@ -93,7 +93,7 @@ func tracePort(nodeMap map[int]*models.Node, portMap map[int]*models.Port, consu
 
 }
 
-func createSegments(nodeMap map[int]*models.Node, portMap map[int]*models.Port, consumedPortMap map[int]*models.Port) []*models.Segment {
+func CreateSegments(nodeMap map[int]*models.Node, portMap map[int]*models.Port, consumedPortMap map[int]*models.Port) []*models.Segment {
 
 	sortedNodeIDs := sortNodeIDs(nodeMap)
 
@@ -147,7 +147,7 @@ func GetSegments(db *gorm.DB, queryFields string) ([]interface{}, error) {
 		portMap[port.ID] = port
 	}
 
-	segments := createSegments(nodeMap, portMap, consumedPortMap)
+	segments := CreateSegments(nodeMap, portMap, consumedPortMap)
 
 	result := make([]interface{}, len(segments))
 	for i, data := range segments {

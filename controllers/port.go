@@ -2,28 +2,40 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logics"
 	"github.com/qb0C80aE/clay/models"
 )
 
+func init() {
+	resourceName := "port"
+	extension.RegisterEndpoint(resourceName)
+
+	resourceSingleUrl := extension.GetResourceSingleUrl(resourceName)
+	resourceMultiUrl := extension.GetResourceMultiUrl(resourceName)
+	extension.RegisterRoute(extension.MethodGet, resourceMultiUrl, GetPorts)
+	extension.RegisterRoute(extension.MethodGet, resourceSingleUrl, GetPort)
+	extension.RegisterRoute(extension.MethodPost, resourceMultiUrl, CreatePort)
+	extension.RegisterRoute(extension.MethodPut, resourceSingleUrl, UpdatePort)
+	extension.RegisterRoute(extension.MethodDelete, resourceSingleUrl, DeletePort)
+}
+
 func GetPorts(c *gin.Context) {
-	processMultiGet(c, models.PortModel, logics.GetPorts, OutputJsonError, OutputMultiJsonResult)
+	ProcessMultiGet(c, models.PortModel, logics.GetPorts, OutputJsonError, OutputMultiJsonResult)
 }
 
 func GetPort(c *gin.Context) {
-	processSingleGet(c, models.PortModel, logics.GetPort, OutputJsonError, OutputSingleJsonResult)
+	ProcessSingleGet(c, models.PortModel, logics.GetPort, OutputJsonError, OutputSingleJsonResult)
 }
 
 func CreatePort(c *gin.Context) {
-	container := &models.Port{}
-	processCreate(c, container, logics.CreatePort, OutputJsonError, OutputSingleJsonResult)
+	ProcessCreate(c, &models.Port{}, logics.CreatePort, OutputJsonError, OutputSingleJsonResult)
 }
 
 func UpdatePort(c *gin.Context) {
-	container := &models.Port{}
-	processUpdate(c, container, logics.UpdatePort, OutputJsonError, OutputSingleJsonResult)
+	ProcessUpdate(c, &models.Port{}, logics.UpdatePort, OutputJsonError, OutputSingleJsonResult)
 }
 
 func DeletePort(c *gin.Context) {
-	processDelete(c, logics.DeletePort, OutputJsonError, OutputNothing)
+	ProcessDelete(c, logics.DeletePort, OutputJsonError, OutputNothing)
 }
