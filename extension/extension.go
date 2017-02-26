@@ -28,9 +28,12 @@ var methodMap = map[int]map[string]gin.HandlerFunc{
 	MethodPatch:  {},
 }
 
-var routePostInitializers = []func(*gin.Engine){}
-
-var designModels = [][]interface{}{}
+var routerPreInitializers = []func(*gin.Engine){}
+var routerPostInitializers = []func(*gin.Engine){}
+var endPoints = map[string]string{}
+var designExtractors []func(*gorm.DB, map[string]interface{}) error = []func(*gorm.DB, map[string]interface{}) error{}
+var designDeleters []func(*gorm.DB) error = []func(*gorm.DB) error{}
+var designLoaders []func(*gorm.DB, interface{}) error = []func(*gorm.DB, interface{}) error{}
 
 func RegisterModelType(reflectType reflect.Type) {
 	typeMap[reflectType.String()] = reflectType
@@ -44,8 +47,6 @@ func GetModels() []interface{} {
 	}
 	return result
 }
-
-var endPoints = map[string]string{}
 
 func RegisterEndpoint(resourceName string) {
 	resourceSingleTitle := fmt.Sprintf("%s_url", resourceName)
@@ -94,17 +95,21 @@ func GetResourceMultiUrl(resourceName string) string {
 	return fmt.Sprintf("/%ss", resourceName)
 }
 
-func RegisterRoutePostInitializer(initializer func(*gin.Engine)) {
-	routePostInitializers = append(routePostInitializers, initializer)
+func RegisterRouterPreInitializer(initializer func(*gin.Engine)) {
+	routerPreInitializers = append(routerPreInitializers, initializer)
 }
 
-func GetRoutePostInitializers() []func(*gin.Engine) {
-	return deepcopy.Copy(routePostInitializers).([]func(*gin.Engine))
+func GetRouterPreInitializers() []func(*gin.Engine) {
+	return deepcopy.Copy(routerPreInitializers).([]func(*gin.Engine))
 }
 
-var designExtractors []func(*gorm.DB, map[string]interface{}) error = []func(*gorm.DB, map[string]interface{}) error{}
-var designDeleters []func(*gorm.DB) error = []func(*gorm.DB) error{}
-var designLoaders []func(*gorm.DB, interface{}) error = []func(*gorm.DB, interface{}) error{}
+func RegisterRouterPostInitializer(initializer func(*gin.Engine)) {
+	routerPostInitializers = append(routerPostInitializers, initializer)
+}
+
+func GetRouterPostInitializers() []func(*gin.Engine) {
+	return deepcopy.Copy(routerPostInitializers).([]func(*gin.Engine))
+}
 
 func RegisterDesignExtractor(extractor func(*gorm.DB, map[string]interface{}) error) {
 	designExtractors = append(designExtractors, extractor)
