@@ -6,6 +6,10 @@ import (
 )
 
 func Initialize(r *gin.Engine) {
+	routerPreInitializers := extension.GetRouterPreInitializers()
+	for _, initializer := range routerPreInitializers {
+		initializer(r)
+	}
 
 	r.GET("/", extension.APIEndpoints)
 
@@ -33,9 +37,8 @@ func Initialize(r *gin.Engine) {
 		}
 	}
 
-	routePostInitializers := extension.GetRoutePostInitializers()
+	routePostInitializers := extension.GetRouterPostInitializers()
 	for _, initializer := range routePostInitializers {
 		initializer(r)
 	}
-
 }
