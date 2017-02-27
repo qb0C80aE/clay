@@ -12,6 +12,37 @@ $ ./clay
 
 server runs at http://localhost:8080, unless set HOST and PORT environmental variables.
 
+## Windows build
+
+Due to ``mattn/go-sqlite3``, mingw gcc is required.
+
+  1. Install msys2 https://msys2.github.io/
+  2. Run msys2 shell. i.e. ``C:\mingw64\msys2.exe``
+
+```bash
+$ pacman -S mingw-w64-x86_64-gcc
+$ cd $GOPATH/src/github.com/qb0C80aE/clay
+$ go build
+$ ./clay
+```
+
+Powershell
+
+```powershell
+PS> C:\msys64\usr\bin\pacman -S mingw-w64-x86_64-gcc
+PS> cd $env:GOPATH/src/github.com/qb0C80aE/clay
+PS> powershell { $env:PATH+=";C:\msys64\mingw64\bin"; go build }
+PS> .\clay.exe 
+```
+
+Creating go-sqlite3 build archive makes rebuild time shorter.
+
+```
+PS> powershell { $env:PATH+=";C:\msys64\mingw64\bin"; go install github.com/mattn/go-sqlite3 }
+```
+
+You'll see ``$GOPATH\pkg\windows_amd64\github.com\mattn\go-sqlite3.a``.
+
 # Example model
 
 ```
