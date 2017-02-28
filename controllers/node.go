@@ -14,7 +14,7 @@ func init() {
 	resourceSingleUrl := extension.GetResourceSingleUrl(resourceName)
 	resourceMultiUrl := extension.GetResourceMultiUrl(resourceName)
 	extension.RegisterRoute(extension.MethodGet, resourceMultiUrl, GetNodes)
-	extension.RegisterRoute(extension.MethodGet, resourceSingleUrl, GetNodes)
+	extension.RegisterRoute(extension.MethodGet, resourceSingleUrl, GetNode)
 	extension.RegisterRoute(extension.MethodPost, resourceMultiUrl, CreateNode)
 	extension.RegisterRoute(extension.MethodPut, resourceSingleUrl, UpdateNode)
 	extension.RegisterRoute(extension.MethodDelete, resourceSingleUrl, DeleteNode)
