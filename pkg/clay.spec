@@ -11,7 +11,8 @@ BuildArch: x86_64
 
 BuildRequires: rpmdevtools sqlite-devel
 BuildRequires: golang >= 1.6
-
+Requires: firewalld-filesystem
+Requires(post): firewalld-filesystem
 %{systemd_requires}
 
 %description
@@ -30,9 +31,15 @@ cd "${GOPATH}/src/github.com/qb0C80aE/clay"
 cd "${GOPATH}/src/github.com/qb0C80aE/clay"
 mkdir -p "$RPM_BUILD_ROOT"/opt/qb0C80aE/clay/bin
 cp clay "$RPM_BUILD_ROOT"/opt/qb0C80aE/clay/bin
+mkdir -p "$RPM_BUILD_ROOT"%{_prefix}/lib/firewalld/services
+cp pkg/firewalld-clay.xml "$RPM_BUILD_ROOT"%{_prefix}/lib/firewalld/services/clay.xml
 
 %files
 %dir /opt/qb0C80aE
 %dir /opt/qb0C80aE/clay
 %dir /opt/qb0C80aE/clay/bin
 /opt/qb0C80aE/clay/bin/clay
+%{_prefix}/lib/firewalld/services/clay.xml
+
+%post
+%{firewalld_reload}
