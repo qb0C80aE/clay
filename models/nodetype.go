@@ -12,7 +12,7 @@ type NodeType struct {
 	Name string `json:"name" gorm:"not null"`
 }
 
-func extraceNodeTypesFromDesign(db *gorm.DB, designContent map[string]interface{}) error {
+func extractNodeTypesFromDesign(db *gorm.DB, designContent map[string]interface{}) error {
 	nodeTypes := []*NodeType{}
 	if err := db.Select("*").Find(&nodeTypes).Error; err != nil {
 		return err
@@ -43,7 +43,7 @@ func loadNodeTypesFromDesign(db *gorm.DB, data interface{}) error {
 
 func init() {
 	extension.RegisterModelType(reflect.TypeOf(NodeType{}))
-	extension.RegisterDesignExtractor(extraceNodeTypesFromDesign)
+	extension.RegisterDesignExtractor(extractNodeTypesFromDesign)
 	extension.RegisterDesignDeleter(deleteNodeTypesFromDesign)
 	extension.RegisterDesignLoader(loadNodeTypesFromDesign)
 }

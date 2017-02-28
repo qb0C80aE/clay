@@ -22,7 +22,7 @@ type Port struct {
 	Remark            sql.NullString `json:"remark"`
 }
 
-func extracePortsFromDesign(db *gorm.DB, designContent map[string]interface{}) error {
+func extractPortsFromDesign(db *gorm.DB, designContent map[string]interface{}) error {
 	ports := []*Port{}
 	if err := db.Select("*").Find(&ports).Error; err != nil {
 		return err
@@ -64,7 +64,7 @@ func loadPortsFromDesign(db *gorm.DB, data interface{}) error {
 
 func init() {
 	extension.RegisterModelType(reflect.TypeOf(Port{}))
-	extension.RegisterDesignExtractor(extracePortsFromDesign)
+	extension.RegisterDesignExtractor(extractPortsFromDesign)
 	extension.RegisterDesignDeleter(deletePortsFromDesign)
 	extension.RegisterDesignLoader(loadPortsFromDesign)
 }

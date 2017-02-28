@@ -12,7 +12,7 @@ type NodePv struct {
 	Name string `json:"name" gorm:"not null"`
 }
 
-func extraceNodePvsFromDesign(db *gorm.DB, designContent map[string]interface{}) error {
+func extractNodePvsFromDesign(db *gorm.DB, designContent map[string]interface{}) error {
 	nodePvs := []*NodePv{}
 	if err := db.Select("*").Find(&nodePvs).Error; err != nil {
 		return err
@@ -43,7 +43,7 @@ func loadNodePvsFromDesign(db *gorm.DB, data interface{}) error {
 
 func init() {
 	extension.RegisterModelType(reflect.TypeOf(NodePv{}))
-	extension.RegisterDesignExtractor(extraceNodePvsFromDesign)
+	extension.RegisterDesignExtractor(extractNodePvsFromDesign)
 	extension.RegisterDesignDeleter(deleteNodePvsFromDesign)
 	extension.RegisterDesignLoader(loadNodePvsFromDesign)
 }

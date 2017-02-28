@@ -16,7 +16,7 @@ type NodeGroup struct {
 	Nodes  []*Node        `json:"nodes" gorm:"many2many:node_group_association;"`
 }
 
-func extraceNodeGroupsFromDesign(db *gorm.DB, designContent map[string]interface{}) error {
+func extractNodeGroupsFromDesign(db *gorm.DB, designContent map[string]interface{}) error {
 	nodeGroups := []*NodeGroup{}
 	if err := db.Preload("Nodes").Select("*").Find(&nodeGroups).Error; err != nil {
 		return err
@@ -63,7 +63,7 @@ func loadNodeGroupsFromDesign(db *gorm.DB, data interface{}) error {
 
 func init() {
 	extension.RegisterModelType(reflect.TypeOf(NodeGroup{}))
-	extension.RegisterDesignExtractor(extraceNodeGroupsFromDesign)
+	extension.RegisterDesignExtractor(extractNodeGroupsFromDesign)
 	extension.RegisterDesignDeleter(deleteNodeGroupsFromDesign)
 	extension.RegisterDesignLoader(loadNodeGroupsFromDesign)
 }
