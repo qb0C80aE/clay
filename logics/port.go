@@ -76,7 +76,9 @@ func UpdatePort(db *gorm.DB, id string, data interface{}) (interface{}, error) {
 	port := data.(*models.Port)
 	port.ID, _ = strconv.Atoi(id)
 
-	if err := db.Where("destination_port_id = ?", port.ID).Update("destination_port_id", nil).Error; err != nil {
+	destinationPort := &models.Port{}
+
+	if err := db.Model(destinationPort).Where("destination_port_id = ?", port.ID).Update("destination_port_id", nil).Error; err != nil {
 		return nil, err
 	}
 
