@@ -7,11 +7,27 @@ import (
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/serenize/snaker"
 	"log"
+	"os"
 	"strings"
 )
 
 func Connect() *gorm.DB {
-	db, err := gorm.Open("sqlite3", "clay.db")
+	dbMode := os.Getenv("DB_MODE")
+	var dbPath string
+	switch dbMode {
+	case "", "memory":
+		dbPath = ":memory:"
+	case "file":
+		if dbFilePath := os.Getenv("DB_FILE_PATH"); dbFilePath != "" {
+			dbPath = dbFilePath
+		} else {
+			dbPath = "clay.db"
+		}
+	default:
+		log.Fatalf("Invalid DB_MODE '%s'", dbMode)
+	}
+
+	db, err := gorm.Open("sqlite3", dbPath)
 
 	if err != nil {
 		log.Fatalf("Got error when connect database, the error is '%v'", err)
