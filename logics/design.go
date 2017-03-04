@@ -12,9 +12,9 @@ func GetDesign(db *gorm.DB, _ string, queryFields string) (interface{}, error) {
 		Content: map[string]interface{}{},
 	}
 
-	designExtractors := extension.GetDesignExtractors()
-	for _, extractor := range designExtractors {
-		if err := extractor(db, design.Content); err != nil {
+	designAccessors := extension.GetDesignAccessos()
+	for _, accessor := range designAccessors {
+		if err := accessor.ExtractFromDesign(db, design.Content); err != nil {
 			return nil, err
 		}
 	}
@@ -25,16 +25,14 @@ func GetDesign(db *gorm.DB, _ string, queryFields string) (interface{}, error) {
 func UpdateDesign(db *gorm.DB, _ string, data interface{}) (interface{}, error) {
 	design := data.(*models.Design)
 
-	designDeleters := extension.GetDesignDeleters()
-	for _, deleter := range designDeleters {
-		if err := deleter(db); err != nil {
+	designAccessors := extension.GetDesignAccessos()
+	for _, accessor := range designAccessors {
+		if err := accessor.DeleteFromDesign(db); err != nil {
 			return nil, err
 		}
 	}
-
-	designLoaders := extension.GetDesignLoaders()
-	for _, loader := range designLoaders {
-		if err := loader(db, design); err != nil {
+	for _, accessor := range designAccessors {
+		if err := accessor.LoadToDesign(db, design); err != nil {
 			return nil, err
 		}
 	}
@@ -43,9 +41,9 @@ func UpdateDesign(db *gorm.DB, _ string, data interface{}) (interface{}, error) 
 }
 
 func DeleteDesign(db *gorm.DB, _ string) error {
-	designDeleters := extension.GetDesignDeleters()
-	for _, deleter := range designDeleters {
-		if err := deleter(db); err != nil {
+	designAccessors := extension.GetDesignAccessos()
+	for _, accessor := range designAccessors {
+		if err := accessor.DeleteFromDesign(db); err != nil {
 			return err
 		}
 	}

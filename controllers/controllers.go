@@ -17,6 +17,10 @@ import (
 func HookSubmodules() {
 }
 
+type BaseController struct {
+	resourceName string
+}
+
 func bind(c *gin.Context, container interface{}) error {
 	if err := c.Bind(container); err != nil {
 		return err

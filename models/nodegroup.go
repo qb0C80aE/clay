@@ -6,7 +6,6 @@ import (
 	"github.com/mohae/deepcopy"
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/utils/mapstruct"
-	"reflect"
 )
 
 type NodeGroup struct {
@@ -16,7 +15,7 @@ type NodeGroup struct {
 	Nodes  []*Node        `json:"nodes" gorm:"many2many:node_group_association;"`
 }
 
-func extractNodeGroupsFromDesign(db *gorm.DB, designContent map[string]interface{}) error {
+func (_ *NodeGroup) ExtractFromDesign(db *gorm.DB, designContent map[string]interface{}) error {
 	nodeGroups := []*NodeGroup{}
 	if err := db.Preload("Nodes").Select("*").Find(&nodeGroups).Error; err != nil {
 		return err
@@ -24,7 +23,7 @@ func extractNodeGroupsFromDesign(db *gorm.DB, designContent map[string]interface
 	designContent["node_groups"] = nodeGroups
 	return nil
 }
-func deleteNodeGroupsFromDesign(db *gorm.DB) error {
+func (_ *NodeGroup) DeleteFromDesign(db *gorm.DB) error {
 	if err := db.Exec("delete from node_groups;").Error; err != nil {
 		return err
 	}
@@ -34,7 +33,7 @@ func deleteNodeGroupsFromDesign(db *gorm.DB) error {
 	return nil
 }
 
-func loadNodeGroupsFromDesign(db *gorm.DB, data interface{}) error {
+func (_ *NodeGroup) LoadToDesign(db *gorm.DB, data interface{}) error {
 	container := []*NodeGroup{}
 	design := data.(*Design)
 	if value, exists := design.Content["node_groups"]; exists {
@@ -61,11 +60,9 @@ func loadNodeGroupsFromDesign(db *gorm.DB, data interface{}) error {
 	return nil
 }
 
-func init() {
-	extension.RegisterModelType(reflect.TypeOf(NodeGroup{}))
-	extension.RegisterDesignExtractor(extractNodeGroupsFromDesign)
-	extension.RegisterDesignDeleter(deleteNodeGroupsFromDesign)
-	extension.RegisterDesignLoader(loadNodeGroupsFromDesign)
-}
-
 var NodeGroupModel = &NodeGroup{}
+
+func init() {
+	extension.RegisterModelType(NodeGroupModel)
+	extension.RegisterDesignAccessor(NodeGroupModel)
+}

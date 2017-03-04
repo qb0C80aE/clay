@@ -5,7 +5,6 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/utils/mapstruct"
-	"reflect"
 )
 
 type Node struct {
@@ -20,7 +19,7 @@ type Node struct {
 	NodeGroups []*NodeGroup   `json:"node_groups" gorm:"many2many:node_group_association;"`
 }
 
-func extractNodesFromDesign(db *gorm.DB, designContent map[string]interface{}) error {
+func (_ *Node) ExtractFromDesign(db *gorm.DB, designContent map[string]interface{}) error {
 	nodes := []*Node{}
 	if err := db.Preload("Ports").Preload("NodeGroups").Select("*").Find(&nodes).Error; err != nil {
 		return err
@@ -29,11 +28,11 @@ func extractNodesFromDesign(db *gorm.DB, designContent map[string]interface{}) e
 	return nil
 }
 
-func deleteNodesFromDesign(db *gorm.DB) error {
+func (_ *Node) DeleteFromDesign(db *gorm.DB) error {
 	return db.Exec("delete from nodes;").Error
 }
 
-func loadNodesFromDesign(db *gorm.DB, data interface{}) error {
+func (_ *Node) LoadToDesign(db *gorm.DB, data interface{}) error {
 	container := []*Node{}
 	design := data.(*Design)
 	if value, exists := design.Content["nodes"]; exists {
@@ -51,11 +50,9 @@ func loadNodesFromDesign(db *gorm.DB, data interface{}) error {
 	return nil
 }
 
-func init() {
-	extension.RegisterModelType(reflect.TypeOf(Node{}))
-	extension.RegisterDesignExtractor(extractNodesFromDesign)
-	extension.RegisterDesignDeleter(deleteNodesFromDesign)
-	extension.RegisterDesignLoader(loadNodesFromDesign)
-}
-
 var NodeModel = &Node{}
+
+func init() {
+	extension.RegisterModelType(NodeModel)
+	extension.RegisterDesignAccessor(NodeModel)
+}

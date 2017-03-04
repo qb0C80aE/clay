@@ -6,7 +6,6 @@ import (
 	"github.com/mohae/deepcopy"
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/utils/mapstruct"
-	"reflect"
 )
 
 type Port struct {
@@ -22,7 +21,7 @@ type Port struct {
 	Remark            sql.NullString `json:"remark"`
 }
 
-func extractPortsFromDesign(db *gorm.DB, designContent map[string]interface{}) error {
+func (_ *Port) ExtractFromDesign(db *gorm.DB, designContent map[string]interface{}) error {
 	ports := []*Port{}
 	if err := db.Select("*").Find(&ports).Error; err != nil {
 		return err
@@ -31,14 +30,14 @@ func extractPortsFromDesign(db *gorm.DB, designContent map[string]interface{}) e
 	return nil
 }
 
-func deletePortsFromDesign(db *gorm.DB) error {
+func (_ *Port) DeleteFromDesign(db *gorm.DB) error {
 	if err := db.Exec("delete from ports;").Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func loadPortsFromDesign(db *gorm.DB, data interface{}) error {
+func (_ *Port) LoadToDesign(db *gorm.DB, data interface{}) error {
 	container := []*Port{}
 	design := data.(*Design)
 	if value, exists := design.Content["ports"]; exists {
@@ -62,11 +61,9 @@ func loadPortsFromDesign(db *gorm.DB, data interface{}) error {
 	return nil
 }
 
-func init() {
-	extension.RegisterModelType(reflect.TypeOf(Port{}))
-	extension.RegisterDesignExtractor(extractPortsFromDesign)
-	extension.RegisterDesignDeleter(deletePortsFromDesign)
-	extension.RegisterDesignLoader(loadPortsFromDesign)
-}
-
 var PortModel = &Port{}
+
+func init() {
+	extension.RegisterModelType(PortModel)
+	extension.RegisterDesignAccessor(PortModel)
+}
