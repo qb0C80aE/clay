@@ -6,7 +6,7 @@ import (
 	"github.com/qb0C80aE/clay/models"
 )
 
-func GetDesign(db *gorm.DB, _ string, queryFields string) (interface{}, error) {
+func GetDesign(db *gorm.DB, _ string, _ string) (interface{}, error) {
 
 	design := &models.Design{
 		Content: map[string]interface{}{},
