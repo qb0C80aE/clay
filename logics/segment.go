@@ -8,6 +8,13 @@ import (
 	"sort"
 )
 
+type SegmentLogic struct {
+}
+
+func NewSegmentLogic() *SegmentLogic {
+	return &SegmentLogic{}
+}
+
 func sortNodeIDs(nodeMap map[int]*models.Node) []int {
 	var sortedNodeIDs []int
 	for nodeID := range nodeMap {
@@ -93,7 +100,7 @@ func tracePort(nodeMap map[int]*models.Node, portMap map[int]*models.Port, consu
 
 }
 
-func CreateSegments(nodeMap map[int]*models.Node, portMap map[int]*models.Port, consumedPortMap map[int]*models.Port) []*models.Segment {
+func GenerateSegments(nodeMap map[int]*models.Node, portMap map[int]*models.Port, consumedPortMap map[int]*models.Port) []*models.Segment {
 
 	sortedNodeIDs := sortNodeIDs(nodeMap)
 
@@ -113,7 +120,11 @@ func CreateSegments(nodeMap map[int]*models.Node, portMap map[int]*models.Port, 
 	return segments
 }
 
-func GetSegments(db *gorm.DB, queryFields string) ([]interface{}, error) {
+func (_ *SegmentLogic) GetSingle(db *gorm.DB, id string, queryFields string) (interface{}, error) {
+	return nil, nil
+}
+
+func (this *SegmentLogic) GetMulti(db *gorm.DB, queryFields string) ([]interface{}, error) {
 
 	nodePvs := []*models.NodePv{}
 	if err := db.Select(queryFields).Find(&nodePvs).Error; err != nil {
@@ -147,7 +158,7 @@ func GetSegments(db *gorm.DB, queryFields string) ([]interface{}, error) {
 		portMap[port.ID] = port
 	}
 
-	segments := CreateSegments(nodeMap, portMap, consumedPortMap)
+	segments := GenerateSegments(nodeMap, portMap, consumedPortMap)
 
 	result := make([]interface{}, len(segments))
 	for i, data := range segments {
@@ -156,4 +167,24 @@ func GetSegments(db *gorm.DB, queryFields string) ([]interface{}, error) {
 
 	return result, nil
 
+}
+
+func (_ *SegmentLogic) Create(_ *gorm.DB, _ interface{}) (interface{}, error) {
+	return nil, nil
+}
+
+func (_ *SegmentLogic) Update(_ *gorm.DB, _ string, _ interface{}) (interface{}, error) {
+	return nil, nil
+}
+
+func (_ *SegmentLogic) Delete(_ *gorm.DB, _ string) error {
+	return nil
+}
+
+func (_ *SegmentLogic) Patch(_ *gorm.DB, _ string, _ string) (interface{}, error) {
+	return nil, nil
+}
+
+func (_ *SegmentLogic) Options(db *gorm.DB) error {
+	return nil
 }

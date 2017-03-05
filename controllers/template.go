@@ -27,21 +27,20 @@ func NewTemplateExternalParameterController() *TemplateExternalParameterControll
 }
 
 func (this *TemplateExternalParameterController) Initialize() {
-	this.resourceName = "template_external_parameter"
-}
-
-func (this *TemplateExternalParameterController) GetResourceName() string {
-	return this.resourceName
+	this.ResourceName = "template_external_parameter"
+	this.Model = models.TemplateExternalParameterModel
+	this.Logic = logics.NewTemplateExternalParameterLogic()
+	this.Outputter = this
 }
 
 func (this *TemplateExternalParameterController) GetRouteMap() map[int]map[string]gin.HandlerFunc {
-	resourceSingleUrl := extension.GetResourceSingleUrl(this.resourceName)
-	resourceMultiUrl := extension.GetResourceMultiUrl(this.resourceName)
+	resourceSingleUrl := extension.GetResourceSingleUrl(this.ResourceName)
+	resourceMultiUrl := extension.GetResourceMultiUrl(this.ResourceName)
 
 	routeMap := map[int]map[string]gin.HandlerFunc{
 		extension.MethodGet: {
-			resourceMultiUrl:  this.GetSingle,
-			resourceSingleUrl: this.GetMulti,
+			resourceSingleUrl: this.GetSingle,
+			resourceMultiUrl:  this.GetMulti,
 		},
 		extension.MethodPost: {
 			resourceMultiUrl: this.Create,
@@ -63,21 +62,24 @@ func NewTemplateController() *TemplateController {
 }
 
 func (this *TemplateController) Initialize() {
-	this.resourceName = "template"
+	this.ResourceName = "template"
+	this.Model = models.TemplateModel
+	this.Logic = logics.NewTemplateLogic()
+	this.Outputter = this
 }
 
 func (this *TemplateController) GetResourceName() string {
-	return this.resourceName
+	return this.ResourceName
 }
 
 func (this *TemplateController) GetRouteMap() map[int]map[string]gin.HandlerFunc {
-	resourceSingleUrl := extension.GetResourceSingleUrl(this.resourceName)
-	resourceMultiUrl := extension.GetResourceMultiUrl(this.resourceName)
+	resourceSingleUrl := extension.GetResourceSingleUrl(this.ResourceName)
+	resourceMultiUrl := extension.GetResourceMultiUrl(this.ResourceName)
 
 	routeMap := map[int]map[string]gin.HandlerFunc{
 		extension.MethodGet: {
-			resourceMultiUrl:  this.GetSingle,
-			resourceSingleUrl: this.GetMulti,
+			resourceSingleUrl: this.GetSingle,
+			resourceMultiUrl:  this.GetMulti,
 		},
 		extension.MethodPost: {
 			resourceMultiUrl: this.Create,
@@ -95,46 +97,7 @@ func (this *TemplateController) GetRouteMap() map[int]map[string]gin.HandlerFunc
 	return routeMap
 }
 
-func (_ *TemplateExternalParameterController) GetMulti(c *gin.Context) {
-	ProcessMultiGet(c, models.TemplateExternalParameterModel, logics.GetTemplateExternalParameters, OutputJsonError, OutputMultiJsonResult)
-}
-
-func (_ *TemplateExternalParameterController) GetSingle(c *gin.Context) {
-	ProcessSingleGet(c, models.TemplateExternalParameterModel, logics.GetTemplateExternalParameter, OutputJsonError, OutputSingleJsonResult)
-}
-
-func (_ *TemplateExternalParameterController) Create(c *gin.Context) {
-	ProcessCreate(c, &models.TemplateExternalParameter{}, logics.CreateTemplateExternalParameter, OutputJsonError, OutputSingleJsonResult)
-}
-
-func (_ *TemplateExternalParameterController) Update(c *gin.Context) {
-	ProcessUpdate(c, &models.TemplateExternalParameter{}, logics.UpdateTemplateExternalParameter, OutputJsonError, OutputSingleJsonResult)
-}
-
-func (_ *TemplateExternalParameterController) Delete(c *gin.Context) {
-	ProcessDelete(c, logics.DeleteTemplateExternalParameter, OutputJsonError, OutputNothing)
-}
-
-func (_ *TemplateController) GetMulti(c *gin.Context) {
-	ProcessMultiGet(c, models.TemplateModel, logics.GetTemplates, OutputJsonError, OutputMultiJsonResult)
-}
-
-func (_ *TemplateController) GetSingle(c *gin.Context) {
-	ProcessSingleGet(c, models.TemplateModel, logics.GetTemplate, OutputJsonError, OutputSingleJsonResult)
-}
-
-func (_ *TemplateController) Create(c *gin.Context) {
-	ProcessCreate(c, &models.Template{}, logics.CreateTemplate, OutputJsonError, OutputNothing)
-}
-
-func (_ *TemplateController) Update(c *gin.Context) {
-	ProcessUpdate(c, &models.Template{}, logics.UpdateTemplate, OutputJsonError, OutputNothing)
-}
-
-func (_ *TemplateController) Delete(c *gin.Context) {
-	ProcessDelete(c, logics.DeleteTemplate, OutputJsonError, OutputNothing)
-}
-
-func (_ *TemplateController) Patch(c *gin.Context) {
-	ProcessSingleGet(c, &models.Template{}, logics.ApplyTemplate, OutputJsonError, OutputTextResult)
+func (this *TemplateController) OutputPatch(c *gin.Context, code int, result interface{}) {
+	text := result.(string)
+	c.String(code, text)
 }

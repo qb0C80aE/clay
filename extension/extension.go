@@ -16,10 +16,29 @@ const (
 	MethodOptions = 6
 )
 
+var methodNameMap = map[int]string{
+	MethodGet:     "GET",
+	MethodPost:    "POST",
+	MethodPut:     "PUT",
+	MethodDelete:  "DELETE",
+	MethodPatch:   "PATCH",
+	MethodOptions: "OPTIONS",
+}
+
 type Controller interface {
 	Initialize()
 	GetResourceName() string
 	GetRouteMap() map[int]map[string]gin.HandlerFunc
+}
+
+type Logic interface {
+	GetMulti(*gorm.DB, string) ([]interface{}, error)
+	GetSingle(*gorm.DB, string, string) (interface{}, error)
+	Create(*gorm.DB, interface{}) (interface{}, error)
+	Update(*gorm.DB, string, interface{}) (interface{}, error)
+	Delete(*gorm.DB, string) error
+	Patch(*gorm.DB, string, string) (interface{}, error)
+	Options(*gorm.DB) error
 }
 
 type RouterInitializer interface {
@@ -31,15 +50,6 @@ type DesignAccessor interface {
 	ExtractFromDesign(*gorm.DB, map[string]interface{}) error
 	DeleteFromDesign(*gorm.DB) error
 	LoadToDesign(*gorm.DB, interface{}) error
-}
-
-var methodNameMap = map[int]string{
-	MethodGet:     "GET",
-	MethodPost:    "POST",
-	MethodPut:     "PUT",
-	MethodDelete:  "DELETE",
-	MethodPatch:   "PATCH",
-	MethodOptions: "OPTIONS",
 }
 
 var typeMap = map[string]reflect.Type{}

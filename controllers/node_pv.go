@@ -22,21 +22,20 @@ func NewNodePvController() *NodePvController {
 }
 
 func (this *NodePvController) Initialize() {
-	this.resourceName = "node_pv"
-}
-
-func (this *NodePvController) GetResourceName() string {
-	return this.resourceName
+	this.ResourceName = "node_pv"
+	this.Model = models.NodePvModel
+	this.Logic = logics.NewNodePvLogic()
+	this.Outputter = this
 }
 
 func (this *NodePvController) GetRouteMap() map[int]map[string]gin.HandlerFunc {
-	resourceSingleUrl := extension.GetResourceSingleUrl(this.resourceName)
-	resourceMultiUrl := extension.GetResourceMultiUrl(this.resourceName)
+	resourceSingleUrl := extension.GetResourceSingleUrl(this.ResourceName)
+	resourceMultiUrl := extension.GetResourceMultiUrl(this.ResourceName)
 
 	routeMap := map[int]map[string]gin.HandlerFunc{
 		extension.MethodGet: {
-			resourceMultiUrl:  this.GetSingle,
-			resourceSingleUrl: this.GetMulti,
+			resourceSingleUrl: this.GetSingle,
+			resourceMultiUrl:  this.GetMulti,
 		},
 		extension.MethodPost: {
 			resourceMultiUrl: this.Create,
@@ -49,24 +48,4 @@ func (this *NodePvController) GetRouteMap() map[int]map[string]gin.HandlerFunc {
 		},
 	}
 	return routeMap
-}
-
-func (_ *NodePvController) GetMulti(c *gin.Context) {
-	ProcessMultiGet(c, models.NodePvModel, logics.GetNodePvs, OutputJsonError, OutputMultiJsonResult)
-}
-
-func (_ *NodePvController) GetSingle(c *gin.Context) {
-	ProcessSingleGet(c, models.NodePvModel, logics.GetNodePv, OutputJsonError, OutputSingleJsonResult)
-}
-
-func (_ *NodePvController) Create(c *gin.Context) {
-	ProcessCreate(c, &models.NodePv{}, logics.CreateNodePv, OutputJsonError, OutputSingleJsonResult)
-}
-
-func (_ *NodePvController) Update(c *gin.Context) {
-	ProcessUpdate(c, &models.NodePv{}, logics.UpdateNodePv, OutputJsonError, OutputSingleJsonResult)
-}
-
-func (_ *NodePvController) Delete(c *gin.Context) {
-	ProcessDelete(c, logics.DeleteNodePv, OutputJsonError, OutputNothing)
 }

@@ -6,7 +6,26 @@ import (
 	"strconv"
 )
 
-func GetNodeTypes(db *gorm.DB, queryFields string) ([]interface{}, error) {
+type NodeTypeLogic struct {
+}
+
+func NewNodeTypeLogic() *NodeTypeLogic {
+	return &NodeTypeLogic{}
+}
+
+func (_ *NodeTypeLogic) GetSingle(db *gorm.DB, id string, queryFields string) (interface{}, error) {
+
+	nodeType := &models.NodeType{}
+
+	if err := db.Select(queryFields).First(nodeType, id).Error; err != nil {
+		return nil, err
+	}
+
+	return nodeType, nil
+
+}
+
+func (_ *NodeTypeLogic) GetMulti(db *gorm.DB, queryFields string) ([]interface{}, error) {
 
 	nodeTypes := []*models.NodeType{}
 
@@ -23,19 +42,7 @@ func GetNodeTypes(db *gorm.DB, queryFields string) ([]interface{}, error) {
 
 }
 
-func GetNodeType(db *gorm.DB, id string, queryFields string) (interface{}, error) {
-
-	nodeType := &models.NodeType{}
-
-	if err := db.Select(queryFields).First(nodeType, id).Error; err != nil {
-		return nil, err
-	}
-
-	return nodeType, nil
-
-}
-
-func CreateNodeType(db *gorm.DB, data interface{}) (interface{}, error) {
+func (_ *NodeTypeLogic) Create(db *gorm.DB, data interface{}) (interface{}, error) {
 
 	nodeType := data.(*models.NodeType)
 
@@ -47,7 +54,7 @@ func CreateNodeType(db *gorm.DB, data interface{}) (interface{}, error) {
 
 }
 
-func UpdateNodeType(db *gorm.DB, id string, data interface{}) (interface{}, error) {
+func (_ *NodeTypeLogic) Update(db *gorm.DB, id string, data interface{}) (interface{}, error) {
 
 	nodeType := data.(*models.NodeType)
 	nodeType.ID, _ = strconv.Atoi(id)
@@ -60,7 +67,7 @@ func UpdateNodeType(db *gorm.DB, id string, data interface{}) (interface{}, erro
 
 }
 
-func DeleteNodeType(db *gorm.DB, id string) error {
+func (_ *NodeTypeLogic) Delete(db *gorm.DB, id string) error {
 
 	nodeType := &models.NodeType{}
 
@@ -74,4 +81,12 @@ func DeleteNodeType(db *gorm.DB, id string) error {
 
 	return nil
 
+}
+
+func (_ *NodeTypeLogic) Patch(_ *gorm.DB, _ string, _ string) (interface{}, error) {
+	return nil, nil
+}
+
+func (_ *NodeTypeLogic) Options(db *gorm.DB) error {
+	return nil
 }

@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
+	"github.com/qb0C80aE/clay/extension"
 	"io/ioutil"
 	"net/http"
 	"reflect"
@@ -18,10 +18,24 @@ func HookSubmodules() {
 }
 
 type BaseController struct {
-	resourceName string
+	ResourceName string
+	Model        interface{}
+	Logic        extension.Logic
+	Outputter    Outputter
 }
 
-func bind(c *gin.Context, container interface{}) error {
+type Outputter interface {
+	OutputError(c *gin.Context, code int, err error)
+	OutputGetSingle(c *gin.Context, code int, result interface{}, fields map[string]interface{})
+	OutputGetMulti(c *gin.Context, code int, result []interface{}, fields map[string]interface{})
+	OutputCreate(c *gin.Context, code int, result interface{})
+	OutputUpdate(c *gin.Context, code int, result interface{})
+	OutputDelete(c *gin.Context, code int)
+	OutputPatch(c *gin.Context, code int, result interface{})
+	OutputOptions(c *gin.Context, code int)
+}
+
+func (this *BaseController) bind(c *gin.Context, container interface{}) error {
 	if err := c.Bind(container); err != nil {
 		return err
 	}
@@ -67,17 +81,21 @@ func bind(c *gin.Context, container interface{}) error {
 	return nil
 }
 
-func OutputJsonError(c *gin.Context, code int, err error) {
+func (this *BaseController) GetResourceName() string {
+	return this.ResourceName
+}
+
+func (this *BaseController) OutputError(c *gin.Context, code int, err error) {
 	c.JSON(code, gin.H{"error": err.Error()})
 }
 
-func OutputSingleJsonResult(c *gin.Context, code int, result interface{}, fields map[string]interface{}) {
+func (this *BaseController) OutputGetSingle(c *gin.Context, code int, result interface{}, fields map[string]interface{}) {
 	if fields == nil {
 		c.JSON(code, result)
 	} else {
 		fieldMap, err := helper.FieldToMap(result, fields)
 		if err != nil {
-			OutputJsonError(c, http.StatusBadRequest, err)
+			this.OutputError(c, http.StatusBadRequest, err)
 			return
 		}
 
@@ -89,7 +107,7 @@ func OutputSingleJsonResult(c *gin.Context, code int, result interface{}, fields
 	}
 }
 
-func OutputMultiJsonResult(c *gin.Context, code int, result []interface{}, fields map[string]interface{}) {
+func (this *BaseController) OutputGetMulti(c *gin.Context, code int, result []interface{}, fields map[string]interface{}) {
 	if fields == nil {
 		c.JSON(code, result)
 	} else {
@@ -101,12 +119,12 @@ func OutputMultiJsonResult(c *gin.Context, code int, result []interface{}, field
 				fieldMap, err := helper.FieldToMap(item, fields)
 
 				if err != nil {
-					OutputJsonError(c, http.StatusBadRequest, err)
+					this.OutputError(c, http.StatusBadRequest, err)
 					return
 				}
 
 				if err := enc.Encode(fieldMap); err != nil {
-					OutputJsonError(c, http.StatusBadRequest, err)
+					this.OutputError(c, http.StatusBadRequest, err)
 					return
 				}
 			}
@@ -117,7 +135,7 @@ func OutputMultiJsonResult(c *gin.Context, code int, result []interface{}, field
 				fieldMap, err := helper.FieldToMap(item, fields)
 
 				if err != nil {
-					OutputJsonError(c, http.StatusBadRequest, err)
+					this.OutputError(c, http.StatusBadRequest, err)
 					return
 				}
 
@@ -133,127 +151,183 @@ func OutputMultiJsonResult(c *gin.Context, code int, result []interface{}, field
 	}
 }
 
-func OutputTextResult(c *gin.Context, code int, result interface{}, _ map[string]interface{}) {
-	text := result.(string)
-	c.String(code, text)
+func (this *BaseController) OutputCreate(c *gin.Context, code int, result interface{}) {
+	this.OutputGetSingle(c, code, result, nil)
 }
 
-func OutputNothing(c *gin.Context, code int, _ interface{}, _ map[string]interface{}) {
+func (this *BaseController) OutputUpdate(c *gin.Context, code int, result interface{}) {
+	this.OutputGetSingle(c, code, result, nil)
+}
+
+func (this *BaseController) OutputDelete(c *gin.Context, code int) {
 	c.Writer.WriteHeader(code)
 }
 
-func ProcessSingleGet(c *gin.Context,
-	model interface{},
-	actualLogic func(*gorm.DB, string, string) (interface{}, error),
-	errorOutputFunction func(*gin.Context, int, error),
-	resultOutputFunction func(*gin.Context, int, interface{}, map[string]interface{})) {
+func (this *BaseController) OutputPatch(c *gin.Context, code int, result interface{}) {
+	this.OutputGetSingle(c, code, result, nil)
+}
+
+func (this *BaseController) OutputOptions(c *gin.Context, code int) {
+	this.OutputDelete(c, code)
+}
+
+func (this *BaseController) GetSingle(c *gin.Context) {
 
 	id := c.Params.ByName("id")
 	db := dbpkg.DBInstance(c)
 	db = dbpkg.SetPreloads(c.Query("preloads"), db)
 	fields := helper.ParseFields(c.DefaultQuery("fields", "*"))
-	queryFields := helper.QueryFields(model, fields)
+	queryFields := helper.QueryFields(this.Model, fields)
 
-	result, err := actualLogic(db, id, queryFields)
+	result, err := this.Logic.GetSingle(db, id, queryFields)
 	if err != nil {
-		errorOutputFunction(c, http.StatusNotFound, errors.New("item with id#"+id+" not found"))
+		this.OutputError(c, http.StatusNotFound, err)
 		return
 	}
 
-	resultOutputFunction(c, http.StatusOK, result, fields)
+	this.OutputGetSingle(c, http.StatusOK, result, fields)
 }
 
-func ProcessMultiGet(c *gin.Context,
-	model interface{},
-	actualLogic func(*gorm.DB, string) ([]interface{}, error),
-	errorOutputFunction func(*gin.Context, int, error),
-	resultOutputFunction func(*gin.Context, int, []interface{}, map[string]interface{})) {
+func (this *BaseController) GetMulti(c *gin.Context) {
 
 	db := dbpkg.DBInstance(c)
 	db = dbpkg.SetPreloads(c.Query("preloads"), db)
 	db = dbpkg.SortRecords(c.Query("sort"), db)
-	db = dbpkg.FilterFields(c, model, db)
+	db = dbpkg.FilterFields(c, this.Model, db)
 	fields := helper.ParseFields(c.DefaultQuery("fields", "*"))
-	queryFields := helper.QueryFields(model, fields)
+	queryFields := helper.QueryFields(this.Model, fields)
 
-	result, err := actualLogic(db, queryFields)
+	result, err := this.Logic.GetMulti(db, queryFields)
 	if err != nil {
-		errorOutputFunction(c, http.StatusBadRequest, err)
+		this.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
-	resultOutputFunction(c, http.StatusOK, result, fields)
+	this.Outputter.OutputGetMulti(c, http.StatusOK, result, fields)
 }
 
-func ProcessCreate(c *gin.Context,
-	container interface{},
-	actualLogic func(*gorm.DB, interface{}) (interface{}, error),
-	errorOutputFunction func(*gin.Context, int, error),
-	resultOutputFunction func(*gin.Context, int, interface{}, map[string]interface{})) {
-	if err := bind(c, container); err != nil {
-		errorOutputFunction(c, http.StatusBadRequest, err)
+func (this *BaseController) Create(c *gin.Context) {
+	vs := reflect.ValueOf(this.Model)
+	for vs.Kind() == reflect.Ptr {
+		vs = vs.Elem()
+	}
+	if !vs.IsValid() {
+		this.OutputError(c, http.StatusBadRequest, errors.New("Invalid model."))
+		return
+	}
+	if !vs.CanInterface() {
+		this.OutputError(c, http.StatusBadRequest, errors.New("Invalid model."))
+		return
+	}
+	container := reflect.New(reflect.TypeOf(vs.Interface())).Interface()
+
+	if err := this.bind(c, container); err != nil {
+		this.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
 	db := dbpkg.DBInstance(c)
 
 	db = db.Begin()
-	result, err := actualLogic(db, container)
+	result, err := this.Logic.Create(db, container)
 	if err != nil {
 		db.Rollback()
-		errorOutputFunction(c, http.StatusBadRequest, err)
+		this.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
 	db.Commit()
 
-	resultOutputFunction(c, http.StatusCreated, result, nil)
+	this.Outputter.OutputCreate(c, http.StatusCreated, result)
 }
 
-func ProcessUpdate(c *gin.Context,
-	container interface{},
-	actualLogic func(*gorm.DB, string, interface{}) (interface{}, error),
-	errorOutputFunction func(*gin.Context, int, error),
-	resultOutputFunction func(*gin.Context, int, interface{}, map[string]interface{})) {
+func (this *BaseController) Update(c *gin.Context) {
+	vs := reflect.ValueOf(this.Model)
+	for vs.Kind() == reflect.Ptr {
+		vs = vs.Elem()
+	}
+	if !vs.IsValid() {
+		this.OutputError(c, http.StatusBadRequest, errors.New("Invalid model."))
+		return
+	}
+	if !vs.CanInterface() {
+		this.OutputError(c, http.StatusBadRequest, errors.New("Invalid model."))
+		return
+	}
+	container := reflect.New(reflect.TypeOf(vs.Interface())).Interface()
+
 	id := c.Params.ByName("id")
 
-	if err := bind(c, container); err != nil {
-		errorOutputFunction(c, http.StatusBadRequest, err)
+	if err := this.bind(c, container); err != nil {
+		this.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
 	db := dbpkg.DBInstance(c)
 
 	db = db.Begin()
-	result, err := actualLogic(db, id, container)
+	result, err := this.Logic.Update(db, id, container)
 	if err != nil {
 		db.Rollback()
-		errorOutputFunction(c, http.StatusBadRequest, err)
+		this.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
 	db.Commit()
 
-	resultOutputFunction(c, http.StatusOK, result, nil)
+	this.Outputter.OutputUpdate(c, http.StatusOK, result)
 }
 
-func ProcessDelete(c *gin.Context,
-	actualLogic func(*gorm.DB, string) error,
-	errorOutputFunction func(*gin.Context, int, error),
-	resultOutputFunction func(*gin.Context, int, interface{}, map[string]interface{})) {
+func (this *BaseController) Delete(c *gin.Context) {
 	id := c.Params.ByName("id")
 
 	db := dbpkg.DBInstance(c)
 
 	db = db.Begin()
-	err := actualLogic(db, id)
+	err := this.Logic.Delete(db, id)
 	if err != nil {
 		db.Rollback()
-		errorOutputFunction(c, http.StatusBadRequest, err)
+		this.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
 	db.Commit()
 
-	resultOutputFunction(c, http.StatusNoContent, nil, nil)
+	this.Outputter.OutputDelete(c, http.StatusNoContent)
+}
+
+func (this *BaseController) Patch(c *gin.Context) {
+	id := c.Params.ByName("id")
+
+	db := dbpkg.DBInstance(c)
+	fields := helper.ParseFields(c.DefaultQuery("fields", "*"))
+	queryFields := helper.QueryFields(this.Model, fields)
+
+	db = db.Begin()
+	result, err := this.Logic.Patch(db, id, queryFields)
+	if err != nil {
+		db.Rollback()
+		this.OutputError(c, http.StatusBadRequest, err)
+		return
+	}
+
+	db.Commit()
+
+	this.Outputter.OutputPatch(c, http.StatusOK, result)
+}
+
+func (this *BaseController) Options(c *gin.Context) {
+	db := dbpkg.DBInstance(c)
+
+	db = db.Begin()
+	err := this.Logic.Options(db)
+	if err != nil {
+		db.Rollback()
+		this.OutputError(c, http.StatusBadRequest, err)
+		return
+	}
+
+	db.Commit()
+
+	this.Outputter.OutputOptions(c, http.StatusNoContent)
 }

@@ -6,6 +6,13 @@ import (
 	"strconv"
 )
 
+type PortLogic struct {
+}
+
+func NewPortLogic() *PortLogic {
+	return &PortLogic{}
+}
+
 func updateLink(db *gorm.DB, inputPort *models.Port) error {
 
 	port := &models.Port{}
@@ -27,7 +34,19 @@ func updateLink(db *gorm.DB, inputPort *models.Port) error {
 
 }
 
-func GetPorts(db *gorm.DB, queryFields string) ([]interface{}, error) {
+func (_ *PortLogic) GetSingle(db *gorm.DB, id string, queryFields string) (interface{}, error) {
+
+	port := &models.Port{}
+
+	if err := db.Select(queryFields).First(port, id).Error; err != nil {
+		return nil, err
+	}
+
+	return port, nil
+
+}
+
+func (_ *PortLogic) GetMulti(db *gorm.DB, queryFields string) ([]interface{}, error) {
 
 	ports := []*models.Port{}
 
@@ -44,19 +63,7 @@ func GetPorts(db *gorm.DB, queryFields string) ([]interface{}, error) {
 
 }
 
-func GetPort(db *gorm.DB, id string, queryFields string) (interface{}, error) {
-
-	port := &models.Port{}
-
-	if err := db.Select(queryFields).First(port, id).Error; err != nil {
-		return nil, err
-	}
-
-	return port, nil
-
-}
-
-func CreatePort(db *gorm.DB, data interface{}) (interface{}, error) {
+func (this *PortLogic) Create(db *gorm.DB, data interface{}) (interface{}, error) {
 
 	port := data.(*models.Port)
 
@@ -71,7 +78,7 @@ func CreatePort(db *gorm.DB, data interface{}) (interface{}, error) {
 	return port, nil
 }
 
-func UpdatePort(db *gorm.DB, id string, data interface{}) (interface{}, error) {
+func (this *PortLogic) Update(db *gorm.DB, id string, data interface{}) (interface{}, error) {
 
 	port := data.(*models.Port)
 	port.ID, _ = strconv.Atoi(id)
@@ -93,7 +100,7 @@ func UpdatePort(db *gorm.DB, id string, data interface{}) (interface{}, error) {
 	return port, nil
 }
 
-func DeletePort(db *gorm.DB, id string) error {
+func (_ *PortLogic) Delete(db *gorm.DB, id string) error {
 
 	port := &models.Port{}
 
@@ -107,4 +114,12 @@ func DeletePort(db *gorm.DB, id string) error {
 
 	return nil
 
+}
+
+func (_ *PortLogic) Patch(_ *gorm.DB, _ string, _ string) (interface{}, error) {
+	return nil, nil
+}
+
+func (_ *PortLogic) Options(db *gorm.DB) error {
+	return nil
 }

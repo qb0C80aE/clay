@@ -6,6 +6,13 @@ import (
 	"strconv"
 )
 
+type NodeLogic struct {
+}
+
+func NewNodeLogic() *NodeLogic {
+	return &NodeLogic{}
+}
+
 func updateNodeLink(db *gorm.DB, node *models.Node) error {
 
 	for _, inputPort := range node.Ports {
@@ -18,7 +25,19 @@ func updateNodeLink(db *gorm.DB, node *models.Node) error {
 
 }
 
-func GetNodes(db *gorm.DB, queryFields string) ([]interface{}, error) {
+func (_ *NodeLogic) GetSingle(db *gorm.DB, id string, queryFields string) (interface{}, error) {
+
+	node := &models.Node{}
+
+	if err := db.Select(queryFields).First(node, id).Error; err != nil {
+		return nil, err
+	}
+
+	return node, nil
+
+}
+
+func (_ *NodeLogic) GetMulti(db *gorm.DB, queryFields string) ([]interface{}, error) {
 
 	nodes := []*models.Node{}
 
@@ -35,19 +54,7 @@ func GetNodes(db *gorm.DB, queryFields string) ([]interface{}, error) {
 
 }
 
-func GetNode(db *gorm.DB, id string, queryFields string) (interface{}, error) {
-
-	node := &models.Node{}
-
-	if err := db.Select(queryFields).First(node, id).Error; err != nil {
-		return nil, err
-	}
-
-	return node, nil
-
-}
-
-func CreateNode(db *gorm.DB, data interface{}) (interface{}, error) {
+func (this *NodeLogic) Create(db *gorm.DB, data interface{}) (interface{}, error) {
 
 	node := data.(*models.Node)
 
@@ -72,7 +79,7 @@ func CreateNode(db *gorm.DB, data interface{}) (interface{}, error) {
 
 }
 
-func UpdateNode(db *gorm.DB, id string, data interface{}) (interface{}, error) {
+func (this *NodeLogic) Update(db *gorm.DB, id string, data interface{}) (interface{}, error) {
 
 	node := data.(*models.Node)
 	node.ID, _ = strconv.Atoi(id)
@@ -102,7 +109,7 @@ func UpdateNode(db *gorm.DB, id string, data interface{}) (interface{}, error) {
 
 }
 
-func DeleteNode(db *gorm.DB, id string) error {
+func (_ *NodeLogic) Delete(db *gorm.DB, id string) error {
 
 	node := &models.Node{}
 
@@ -122,4 +129,12 @@ func DeleteNode(db *gorm.DB, id string) error {
 
 	return nil
 
+}
+
+func (_ *NodeLogic) Patch(_ *gorm.DB, _ string, _ string) (interface{}, error) {
+	return nil, nil
+}
+
+func (_ *NodeLogic) Options(db *gorm.DB) error {
+	return nil
 }

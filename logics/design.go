@@ -6,7 +6,14 @@ import (
 	"github.com/qb0C80aE/clay/models"
 )
 
-func GetDesign(db *gorm.DB, _ string, _ string) (interface{}, error) {
+type DesignLogic struct {
+}
+
+func NewDesignLogic() *DesignLogic {
+	return &DesignLogic{}
+}
+
+func (_ *DesignLogic) GetSingle(db *gorm.DB, _ string, _ string) (interface{}, error) {
 
 	design := &models.Design{
 		Content: map[string]interface{}{},
@@ -22,7 +29,15 @@ func GetDesign(db *gorm.DB, _ string, _ string) (interface{}, error) {
 	return design, nil
 }
 
-func UpdateDesign(db *gorm.DB, _ string, data interface{}) (interface{}, error) {
+func (_ *DesignLogic) GetMulti(_ *gorm.DB, _ string) ([]interface{}, error) {
+	return nil, nil
+}
+
+func (this *DesignLogic) Create(db *gorm.DB, data interface{}) (interface{}, error) {
+	return nil, nil
+}
+
+func (_ *DesignLogic) Update(db *gorm.DB, _ string, data interface{}) (interface{}, error) {
 	design := data.(*models.Design)
 
 	designAccessors := extension.GetDesignAccessos()
@@ -40,7 +55,7 @@ func UpdateDesign(db *gorm.DB, _ string, data interface{}) (interface{}, error) 
 	return design, nil
 }
 
-func DeleteDesign(db *gorm.DB, _ string) error {
+func (_ *DesignLogic) Delete(db *gorm.DB, _ string) error {
 	designAccessors := extension.GetDesignAccessos()
 	for _, accessor := range designAccessors {
 		if err := accessor.DeleteFromDesign(db); err != nil {
@@ -48,5 +63,13 @@ func DeleteDesign(db *gorm.DB, _ string) error {
 		}
 	}
 
+	return nil
+}
+
+func (_ *DesignLogic) Patch(_ *gorm.DB, _ string, _ string) (interface{}, error) {
+	return nil, nil
+}
+
+func (_ *DesignLogic) Options(db *gorm.DB) error {
 	return nil
 }

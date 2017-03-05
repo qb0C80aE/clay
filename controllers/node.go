@@ -22,21 +22,20 @@ func NewNodeController() *NodeController {
 }
 
 func (this *NodeController) Initialize() {
-	this.resourceName = "node"
-}
-
-func (this *NodeController) GetResourceName() string {
-	return this.resourceName
+	this.ResourceName = "node"
+	this.Model = models.NodeModel
+	this.Logic = logics.NewNodeLogic()
+	this.Outputter = this
 }
 
 func (this *NodeController) GetRouteMap() map[int]map[string]gin.HandlerFunc {
-	resourceSingleUrl := extension.GetResourceSingleUrl(this.resourceName)
-	resourceMultiUrl := extension.GetResourceMultiUrl(this.resourceName)
+	resourceSingleUrl := extension.GetResourceSingleUrl(this.ResourceName)
+	resourceMultiUrl := extension.GetResourceMultiUrl(this.ResourceName)
 
 	routeMap := map[int]map[string]gin.HandlerFunc{
 		extension.MethodGet: {
-			resourceMultiUrl:  this.GetSingle,
-			resourceSingleUrl: this.GetMulti,
+			resourceSingleUrl: this.GetSingle,
+			resourceMultiUrl:  this.GetMulti,
 		},
 		extension.MethodPost: {
 			resourceMultiUrl: this.Create,
@@ -49,24 +48,4 @@ func (this *NodeController) GetRouteMap() map[int]map[string]gin.HandlerFunc {
 		},
 	}
 	return routeMap
-}
-
-func (_ *NodeController) GetSingle(c *gin.Context) {
-	ProcessMultiGet(c, models.NodeModel, logics.GetNodes, OutputJsonError, OutputMultiJsonResult)
-}
-
-func (_ *NodeController) GetMulti(c *gin.Context) {
-	ProcessSingleGet(c, models.NodeModel, logics.GetNode, OutputJsonError, OutputSingleJsonResult)
-}
-
-func (_ *NodeController) Create(c *gin.Context) {
-	ProcessCreate(c, &models.Node{}, logics.CreateNode, OutputJsonError, OutputSingleJsonResult)
-}
-
-func (_ *NodeController) Update(c *gin.Context) {
-	ProcessUpdate(c, &models.Node{}, logics.UpdateNode, OutputJsonError, OutputSingleJsonResult)
-}
-
-func (_ *NodeController) Delete(c *gin.Context) {
-	ProcessDelete(c, logics.DeleteNode, OutputJsonError, OutputNothing)
 }
