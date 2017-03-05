@@ -4,7 +4,6 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/utils/mapstruct"
-	"reflect"
 )
 
 type NodePv struct {
@@ -12,7 +11,7 @@ type NodePv struct {
 	Name string `json:"name" gorm:"not null"`
 }
 
-func extractNodePvsFromDesign(db *gorm.DB, designContent map[string]interface{}) error {
+func (_ *NodePv) ExtractFromDesign(db *gorm.DB, designContent map[string]interface{}) error {
 	nodePvs := []*NodePv{}
 	if err := db.Select("*").Find(&nodePvs).Error; err != nil {
 		return err
@@ -21,11 +20,11 @@ func extractNodePvsFromDesign(db *gorm.DB, designContent map[string]interface{})
 	return nil
 }
 
-func deleteNodePvsFromDesign(db *gorm.DB) error {
+func (_ *NodePv) DeleteFromDesign(db *gorm.DB) error {
 	return db.Exec("delete from node_pvs;").Error
 }
 
-func loadNodePvsFromDesign(db *gorm.DB, data interface{}) error {
+func (_ *NodePv) LoadToDesign(db *gorm.DB, data interface{}) error {
 	container := []*NodePv{}
 	design := data.(*Design)
 	if value, exists := design.Content["node_pvs"]; exists {
@@ -41,11 +40,9 @@ func loadNodePvsFromDesign(db *gorm.DB, data interface{}) error {
 	return nil
 }
 
-func init() {
-	extension.RegisterModelType(reflect.TypeOf(NodePv{}))
-	extension.RegisterDesignExtractor(extractNodePvsFromDesign)
-	extension.RegisterDesignDeleter(deleteNodePvsFromDesign)
-	extension.RegisterDesignLoader(loadNodePvsFromDesign)
-}
-
 var NodePvModel = &NodePv{}
+
+func init() {
+	extension.RegisterModelType(NodePvModel)
+	extension.RegisterDesignAccessor(NodePvModel)
+}

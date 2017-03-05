@@ -5,7 +5,7 @@ type Segment struct {
 	Cidr  string  `json:"cidr"`
 }
 
+var SegmentModel = &Segment{}
+
 func init() {
 }
-
-var SegmentModel = &Segment{}

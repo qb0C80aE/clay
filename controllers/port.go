@@ -7,35 +7,66 @@ import (
 	"github.com/qb0C80aE/clay/models"
 )
 
-func init() {
-	resourceName := "port"
-	extension.RegisterEndpoint(resourceName)
-
-	resourceSingleUrl := extension.GetResourceSingleUrl(resourceName)
-	resourceMultiUrl := extension.GetResourceMultiUrl(resourceName)
-	extension.RegisterRoute(extension.MethodGet, resourceMultiUrl, GetPorts)
-	extension.RegisterRoute(extension.MethodGet, resourceSingleUrl, GetPort)
-	extension.RegisterRoute(extension.MethodPost, resourceMultiUrl, CreatePort)
-	extension.RegisterRoute(extension.MethodPut, resourceSingleUrl, UpdatePort)
-	extension.RegisterRoute(extension.MethodDelete, resourceSingleUrl, DeletePort)
+type PortController struct {
+	BaseController
 }
 
-func GetPorts(c *gin.Context) {
+func init() {
+	extension.RegisterController(NewPortController())
+}
+
+func NewPortController() *PortController {
+	controller := &PortController{}
+	controller.Initialize()
+	return controller
+}
+
+func (this *PortController) Initialize() {
+	this.resourceName = "port"
+}
+
+func (this *PortController) GetResourceName() string {
+	return this.resourceName
+}
+
+func (this *PortController) GetRouteMap() map[int]map[string]gin.HandlerFunc {
+	resourceSingleUrl := extension.GetResourceSingleUrl(this.resourceName)
+	resourceMultiUrl := extension.GetResourceMultiUrl(this.resourceName)
+
+	routeMap := map[int]map[string]gin.HandlerFunc{
+		extension.MethodGet: {
+			resourceMultiUrl:  this.GetSingle,
+			resourceSingleUrl: this.GetMulti,
+		},
+		extension.MethodPost: {
+			resourceMultiUrl: this.Create,
+		},
+		extension.MethodPut: {
+			resourceSingleUrl: this.Update,
+		},
+		extension.MethodDelete: {
+			resourceSingleUrl: this.Delete,
+		},
+	}
+	return routeMap
+}
+
+func (_ *PortController) GetMulti(c *gin.Context) {
 	ProcessMultiGet(c, models.PortModel, logics.GetPorts, OutputJsonError, OutputMultiJsonResult)
 }
 
-func GetPort(c *gin.Context) {
+func (_ *PortController) GetSingle(c *gin.Context) {
 	ProcessSingleGet(c, models.PortModel, logics.GetPort, OutputJsonError, OutputSingleJsonResult)
 }
 
-func CreatePort(c *gin.Context) {
+func (_ *PortController) Create(c *gin.Context) {
 	ProcessCreate(c, &models.Port{}, logics.CreatePort, OutputJsonError, OutputSingleJsonResult)
 }
 
-func UpdatePort(c *gin.Context) {
+func (_ *PortController) Update(c *gin.Context) {
 	ProcessUpdate(c, &models.Port{}, logics.UpdatePort, OutputJsonError, OutputSingleJsonResult)
 }
 
-func DeletePort(c *gin.Context) {
+func (_ *PortController) Delete(c *gin.Context) {
 	ProcessDelete(c, logics.DeletePort, OutputJsonError, OutputNothing)
 }

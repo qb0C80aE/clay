@@ -8,26 +8,55 @@ import (
 	"github.com/qb0C80aE/clay/models"
 )
 
-func init() {
-	url := "designs/present"
-	extension.RegisterUniqueEndpoint(url, url)
-
-	extension.RegisterRoute(extension.MethodGet, url, GetDesign)
-	extension.RegisterRoute(extension.MethodPut, url, UpdateDesign)
-	extension.RegisterRoute(extension.MethodDelete, url, DeleteDesign)
+type DesignController struct {
+	BaseController
 }
 
-func GetDesign(c *gin.Context) {
+func init() {
+	extension.RegisterController(NewDesignController())
+}
+
+func NewDesignController() *DesignController {
+	controller := &DesignController{}
+	controller.Initialize()
+	return controller
+}
+
+func (this *DesignController) Initialize() {
+	this.resourceName = "design"
+}
+
+func (this *DesignController) GetResourceName() string {
+	return this.resourceName
+}
+
+func (this *DesignController) GetRouteMap() map[int]map[string]gin.HandlerFunc {
+	url := "designs/present"
+	routeMap := map[int]map[string]gin.HandlerFunc{
+		extension.MethodGet: {
+			url: this.GetSingle,
+		},
+		extension.MethodPut: {
+			url: this.Update,
+		},
+		extension.MethodDelete: {
+			url: this.Delete,
+		},
+	}
+	return routeMap
+}
+
+func (_ *DesignController) GetSingle(c *gin.Context) {
 	ProcessSingleGet(c, models.DesignModel, logics.GetDesign, OutputJsonError, OutputSingleJsonResult)
 }
 
-func UpdateDesign(c *gin.Context) {
+func (_ *DesignController) Update(c *gin.Context) {
 	db.DBInstance(c).Exec("pragma foreign_keys = off;")
 	ProcessUpdate(c, &models.Design{}, logics.UpdateDesign, OutputJsonError, OutputSingleJsonResult)
 	db.DBInstance(c).Exec("pragma foreign_keys = on;")
 }
 
-func DeleteDesign(c *gin.Context) {
+func (_ *DesignController) Delete(c *gin.Context) {
 	db.DBInstance(c).Exec("pragma foreign_keys = off;")
 	ProcessDelete(c, logics.DeleteDesign, OutputJsonError, OutputNothing)
 	db.DBInstance(c).Exec("pragma foreign_keys = on;")

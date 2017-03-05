@@ -1,44 +1,69 @@
 package router
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/qb0C80aE/clay/extension"
+	"net/http"
 )
 
-func Initialize(r *gin.Engine) {
-	routerPreInitializers := extension.GetRouterPreInitializers()
-	for _, initializer := range routerPreInitializers {
-		initializer(r)
+func getAPIEndpoints(c *gin.Context) {
+	reqScheme := "http"
+
+	if c.Request.TLS != nil {
+		reqScheme = "https"
 	}
 
-	r.GET("/", extension.APIEndpoints)
+	reqHost := c.Request.Host
+	baseURL := fmt.Sprintf("%s://%s/%s", reqScheme, reqHost, "v1")
+	resources := map[string]string{}
+
+	controllers := extension.GetControllers()
+	for _, controller := range controllers {
+		routeMap := controller.GetRouteMap()
+		for method, routes := range routeMap {
+			title := fmt.Sprintf("%s_url [%s]", controller.GetResourceName(), extension.GetMethodName(method))
+			for relativePath := range routes {
+				resources[title] = fmt.Sprintf("%s/%s", baseURL, relativePath)
+			}
+		}
+	}
+	c.IndentedJSON(http.StatusOK, resources)
+}
+
+func Initialize(r *gin.Engine) {
+	routerInitializers := extension.GetRouterInitializers()
+
+	for _, initializer := range routerInitializers {
+		initializer.InitializeEarly(r)
+	}
+
+	r.GET("/", getAPIEndpoints)
 
 	api := r.Group("/v1")
 	{
-		routes := extension.GetRoutes(extension.MethodGet)
-		for relativePath, handlerFunc := range routes {
-			api.GET(relativePath, handlerFunc)
+		var methodFunctionMap map[int]func(string, ...gin.HandlerFunc) gin.IRoutes = map[int]func(string, ...gin.HandlerFunc) gin.IRoutes{
+			extension.MethodGet:     api.GET,
+			extension.MethodPost:    api.POST,
+			extension.MethodPut:     api.PUT,
+			extension.MethodDelete:  api.DELETE,
+			extension.MethodPatch:   api.PATCH,
+			extension.MethodOptions: api.OPTIONS,
 		}
-		routes = extension.GetRoutes(extension.MethodPost)
-		for relativePath, handlerFunc := range routes {
-			api.POST(relativePath, handlerFunc)
-		}
-		routes = extension.GetRoutes(extension.MethodPut)
-		for relativePath, handlerFunc := range routes {
-			api.PUT(relativePath, handlerFunc)
-		}
-		routes = extension.GetRoutes(extension.MethodDelete)
-		for relativePath, handlerFunc := range routes {
-			api.DELETE(relativePath, handlerFunc)
-		}
-		routes = extension.GetRoutes(extension.MethodPatch)
-		for relativePath, handlerFunc := range routes {
-			api.PATCH(relativePath, handlerFunc)
+
+		controllers := extension.GetControllers()
+		for _, controller := range controllers {
+			routeMap := controller.GetRouteMap()
+			for method, routingFunction := range methodFunctionMap {
+				routes := routeMap[method]
+				for relativePath, handlerFunc := range routes {
+					routingFunction(relativePath, handlerFunc)
+				}
+			}
 		}
 	}
 
-	routePostInitializers := extension.GetRouterPostInitializers()
-	for _, initializer := range routePostInitializers {
-		initializer(r)
+	for _, initializer := range routerInitializers {
+		initializer.InitializeLate(r)
 	}
 }
