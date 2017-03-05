@@ -3,7 +3,9 @@ package logics
 import (
 	"bytes"
 	"github.com/jinzhu/gorm"
+	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/models"
+	"github.com/qb0C80aE/clay/utils/mapstruct"
 	"strconv"
 	tplpkg "text/template"
 )
@@ -11,15 +13,7 @@ import (
 type TemplateExternalParameterLogic struct {
 }
 
-func NewTemplateExternalParameterLogic() *TemplateExternalParameterLogic {
-	return &TemplateExternalParameterLogic{}
-}
-
 type TemplateLogic struct {
-}
-
-func NewTemplateLogic() *TemplateLogic {
-	return &TemplateLogic{}
 }
 
 func (_ *TemplateExternalParameterLogic) GetSingle(db *gorm.DB, id string, queryFields string) (interface{}, error) {
@@ -248,4 +242,70 @@ func (_ *TemplateLogic) Patch(db *gorm.DB, id string, _ string) (interface{}, er
 
 func (_ *TemplateLogic) Options(db *gorm.DB) error {
 	return nil
+}
+
+func (_ *TemplateExternalParameterLogic) ExtractFromDesign(db *gorm.DB, designContent map[string]interface{}) error {
+	templateExternalParameters := []*models.TemplateExternalParameter{}
+	if err := db.Select("*").Find(&templateExternalParameters).Error; err != nil {
+		return err
+	}
+	designContent["template_external_parameters"] = templateExternalParameters
+	return nil
+}
+
+func (_ *TemplateExternalParameterLogic) DeleteFromDesign(db *gorm.DB) error {
+	return db.Exec("delete from template_external_parameters;").Error
+}
+
+func (_ *TemplateExternalParameterLogic) LoadToDesign(db *gorm.DB, data interface{}) error {
+	container := []*models.TemplateExternalParameter{}
+	design := data.(*models.Design)
+	if value, exists := design.Content["template_external_parameters"]; exists {
+		if err := mapstruct.MapToStruct(value.([]interface{}), &container); err != nil {
+			return err
+		}
+		for _, template := range container {
+			if err := db.Create(template).Error; err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (_ *TemplateLogic) ExtractFromDesign(db *gorm.DB, designContent map[string]interface{}) error {
+	templates := []*models.Template{}
+	if err := db.Select("*").Find(&templates).Error; err != nil {
+		return err
+	}
+	designContent["templates"] = templates
+	return nil
+}
+
+func (_ *TemplateLogic) DeleteFromDesign(db *gorm.DB) error {
+	return db.Exec("delete from templates;").Error
+}
+
+func (_ *TemplateLogic) LoadToDesign(db *gorm.DB, data interface{}) error {
+	container := []*models.Template{}
+	design := data.(*models.Design)
+	if value, exists := design.Content["templates"]; exists {
+		if err := mapstruct.MapToStruct(value.([]interface{}), &container); err != nil {
+			return err
+		}
+		for _, template := range container {
+			if err := db.Create(template).Error; err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+var TemplateExternalParameterLogicInstance = &TemplateExternalParameterLogic{}
+var TemplateLogicInstance = &TemplateLogic{}
+
+func init() {
+	extension.RegisterDesignAccessor(TemplateExternalParameterLogicInstance)
+	extension.RegisterDesignAccessor(TemplateLogicInstance)
 }

@@ -24,7 +24,7 @@ func NewNodeController() *NodeController {
 func (this *NodeController) Initialize() {
 	this.ResourceName = "node"
 	this.Model = models.NodeModel
-	this.Logic = logics.NewNodeLogic()
+	this.Logic = logics.NodeLogicInstance
 	this.Outputter = this
 }
 

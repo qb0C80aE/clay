@@ -2,15 +2,14 @@ package logics
 
 import (
 	"github.com/jinzhu/gorm"
+	"github.com/mohae/deepcopy"
+	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/models"
+	"github.com/qb0C80aE/clay/utils/mapstruct"
 	"strconv"
 )
 
 type NodeGroupLogic struct {
-}
-
-func NewNodeGroupLogic() *NodeGroupLogic {
-	return &NodeGroupLogic{}
 }
 
 func (_ *NodeGroupLogic) GetSingle(db *gorm.DB, id string, queryFields string) (interface{}, error) {
@@ -117,4 +116,55 @@ func (_ *NodeGroupLogic) Patch(_ *gorm.DB, _ string, _ string) (interface{}, err
 
 func (_ *NodeGroupLogic) Options(db *gorm.DB) error {
 	return nil
+}
+
+func (_ *NodeGroupLogic) ExtractFromDesign(db *gorm.DB, designContent map[string]interface{}) error {
+	nodeGroups := []*models.NodeGroup{}
+	if err := db.Preload("Nodes").Select("*").Find(&nodeGroups).Error; err != nil {
+		return err
+	}
+	designContent["node_groups"] = nodeGroups
+	return nil
+}
+func (_ *NodeGroupLogic) DeleteFromDesign(db *gorm.DB) error {
+	if err := db.Exec("delete from node_groups;").Error; err != nil {
+		return err
+	}
+	if err := db.Exec("delete from node_group_association;").Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (_ *NodeGroupLogic) LoadToDesign(db *gorm.DB, data interface{}) error {
+	container := []*models.NodeGroup{}
+	design := data.(*models.Design)
+	if value, exists := design.Content["node_groups"]; exists {
+		if err := mapstruct.MapToStruct(value.([]interface{}), &container); err != nil {
+			return err
+		}
+		original := deepcopy.Copy(container).([]*models.NodeGroup)
+		for _, nodeGroup := range container {
+			nodeGroup.Nodes = nil
+			if err := db.Create(nodeGroup).Error; err != nil {
+				return err
+			}
+		}
+		nodeGroups := original
+		for _, nodeGroup := range nodeGroups {
+			for _, node := range nodeGroup.Nodes {
+				relatedNode := &models.Node{}
+				if err := db.Preload("NodeGroups").First(&relatedNode, node.ID).Association("NodeGroups").Append(nodeGroup).Error; err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}
+
+var NodeGroupLogicInstance = &NodeGroupLogic{}
+
+func init() {
+	extension.RegisterDesignAccessor(NodeGroupLogicInstance)
 }

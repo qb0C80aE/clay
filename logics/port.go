@@ -1,16 +1,16 @@
 package logics
 
 import (
+	"database/sql"
 	"github.com/jinzhu/gorm"
+	"github.com/mohae/deepcopy"
+	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/models"
+	"github.com/qb0C80aE/clay/utils/mapstruct"
 	"strconv"
 )
 
 type PortLogic struct {
-}
-
-func NewPortLogic() *PortLogic {
-	return &PortLogic{}
 }
 
 func updateLink(db *gorm.DB, inputPort *models.Port) error {
@@ -122,4 +122,50 @@ func (_ *PortLogic) Patch(_ *gorm.DB, _ string, _ string) (interface{}, error) {
 
 func (_ *PortLogic) Options(db *gorm.DB) error {
 	return nil
+}
+
+func (_ *PortLogic) ExtractFromDesign(db *gorm.DB, designContent map[string]interface{}) error {
+	ports := []*models.Port{}
+	if err := db.Select("*").Find(&ports).Error; err != nil {
+		return err
+	}
+	designContent["ports"] = ports
+	return nil
+}
+
+func (_ *PortLogic) DeleteFromDesign(db *gorm.DB) error {
+	if err := db.Exec("delete from ports;").Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (_ *PortLogic) LoadToDesign(db *gorm.DB, data interface{}) error {
+	container := []*models.Port{}
+	design := data.(*models.Design)
+	if value, exists := design.Content["ports"]; exists {
+		if err := mapstruct.MapToStruct(value.([]interface{}), &container); err != nil {
+			return err
+		}
+		original := deepcopy.Copy(container).([]*models.Port)
+		for _, port := range container {
+			port.DestinationPortID = sql.NullInt64{Int64: 0, Valid: false}
+			if err := db.Create(port).Error; err != nil {
+				return err
+			}
+		}
+		ports := original
+		for _, port := range ports {
+			if err := db.Save(port).Error; err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+var PortLogicInstance = &PortLogic{}
+
+func init() {
+	extension.RegisterDesignAccessor(PortLogicInstance)
 }

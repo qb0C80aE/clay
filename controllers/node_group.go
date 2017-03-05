@@ -24,7 +24,7 @@ func NewNodeGroupController() *NodeGroupController {
 func (this *NodeGroupController) Initialize() {
 	this.ResourceName = "node_group"
 	this.Model = models.NodeGroupModel
-	this.Logic = logics.NewNodeGroupLogic()
+	this.Logic = logics.NodeGroupLogicInstance
 	this.Outputter = this
 }
 

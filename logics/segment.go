@@ -3,16 +3,13 @@ package logics
 import (
 	"fmt"
 	"github.com/jinzhu/gorm"
+	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/models"
 	"github.com/qb0C80aE/clay/utils/net"
 	"sort"
 )
 
 type SegmentLogic struct {
-}
-
-func NewSegmentLogic() *SegmentLogic {
-	return &SegmentLogic{}
 }
 
 func sortNodeIDs(nodeMap map[int]*models.Node) []int {
@@ -187,4 +184,27 @@ func (_ *SegmentLogic) Patch(_ *gorm.DB, _ string, _ string) (interface{}, error
 
 func (_ *SegmentLogic) Options(db *gorm.DB) error {
 	return nil
+}
+
+func (this *SegmentLogic) ExtractFromDesign(db *gorm.DB, designContent map[string]interface{}) error {
+	segments, err := this.GetMulti(db, "*")
+	if err != nil {
+		return err
+	}
+	designContent["segments"] = segments
+	return nil
+}
+
+func (_ *SegmentLogic) DeleteFromDesign(db *gorm.DB) error {
+	return nil
+}
+
+func (_ *SegmentLogic) LoadToDesign(db *gorm.DB, data interface{}) error {
+	return nil
+}
+
+var SegmentLogicInstance = &SegmentLogic{}
+
+func init() {
+	extension.RegisterDesignAccessor(SegmentLogicInstance)
 }
