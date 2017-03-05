@@ -6,7 +6,26 @@ import (
 	"strconv"
 )
 
-func GetNodeGroups(db *gorm.DB, queryFields string) ([]interface{}, error) {
+type NodeGroupLogic struct {
+}
+
+func NewNodeGroupLogic() *NodeGroupLogic {
+	return &NodeGroupLogic{}
+}
+
+func (_ *NodeGroupLogic) GetSingle(db *gorm.DB, id string, queryFields string) (interface{}, error) {
+
+	nodeGroup := &models.NodeGroup{}
+
+	if err := db.Select(queryFields).First(nodeGroup, id).Error; err != nil {
+		return nil, err
+	}
+
+	return nodeGroup, nil
+
+}
+
+func (_ *NodeGroupLogic) GetMulti(db *gorm.DB, queryFields string) ([]interface{}, error) {
 
 	nodeGroups := []*models.NodeGroup{}
 
@@ -23,19 +42,7 @@ func GetNodeGroups(db *gorm.DB, queryFields string) ([]interface{}, error) {
 
 }
 
-func GetNodeGroup(db *gorm.DB, id string, queryFields string) (interface{}, error) {
-
-	nodeGroup := &models.NodeGroup{}
-
-	if err := db.Select(queryFields).First(nodeGroup, id).Error; err != nil {
-		return nil, err
-	}
-
-	return nodeGroup, nil
-
-}
-
-func CreateNodeGroup(db *gorm.DB, data interface{}) (interface{}, error) {
+func (_ *NodeGroupLogic) Create(db *gorm.DB, data interface{}) (interface{}, error) {
 
 	nodeGroup := data.(*models.NodeGroup)
 
@@ -56,7 +63,7 @@ func CreateNodeGroup(db *gorm.DB, data interface{}) (interface{}, error) {
 
 }
 
-func UpdateNodeGroup(db *gorm.DB, id string, data interface{}) (interface{}, error) {
+func (_ *NodeGroupLogic) Update(db *gorm.DB, id string, data interface{}) (interface{}, error) {
 
 	nodeGroup := data.(*models.NodeGroup)
 	nodeGroup.ID, _ = strconv.Atoi(id)
@@ -82,7 +89,7 @@ func UpdateNodeGroup(db *gorm.DB, id string, data interface{}) (interface{}, err
 
 }
 
-func DeleteNodeGroup(db *gorm.DB, id string) error {
+func (_ *NodeGroupLogic) Delete(db *gorm.DB, id string) error {
 
 	nodeGroup := &models.NodeGroup{}
 
@@ -102,4 +109,12 @@ func DeleteNodeGroup(db *gorm.DB, id string) error {
 
 	return nil
 
+}
+
+func (_ *NodeGroupLogic) Patch(_ *gorm.DB, _ string, _ string) (interface{}, error) {
+	return nil, nil
+}
+
+func (_ *NodeGroupLogic) Options(db *gorm.DB) error {
+	return nil
 }

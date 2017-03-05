@@ -23,11 +23,10 @@ func NewDesignController() *DesignController {
 }
 
 func (this *DesignController) Initialize() {
-	this.resourceName = "design"
-}
-
-func (this *DesignController) GetResourceName() string {
-	return this.resourceName
+	this.ResourceName = "design"
+	this.Model = models.DesignModel
+	this.Logic = logics.NewDesignLogic()
+	this.Outputter = this
 }
 
 func (this *DesignController) GetRouteMap() map[int]map[string]gin.HandlerFunc {
@@ -46,18 +45,14 @@ func (this *DesignController) GetRouteMap() map[int]map[string]gin.HandlerFunc {
 	return routeMap
 }
 
-func (_ *DesignController) GetSingle(c *gin.Context) {
-	ProcessSingleGet(c, models.DesignModel, logics.GetDesign, OutputJsonError, OutputSingleJsonResult)
-}
-
-func (_ *DesignController) Update(c *gin.Context) {
+func (this *DesignController) Update(c *gin.Context) {
 	db.DBInstance(c).Exec("pragma foreign_keys = off;")
-	ProcessUpdate(c, &models.Design{}, logics.UpdateDesign, OutputJsonError, OutputSingleJsonResult)
+	this.BaseController.Update(c)
 	db.DBInstance(c).Exec("pragma foreign_keys = on;")
 }
 
-func (_ *DesignController) Delete(c *gin.Context) {
+func (this *DesignController) Delete(c *gin.Context) {
 	db.DBInstance(c).Exec("pragma foreign_keys = off;")
-	ProcessDelete(c, logics.DeleteDesign, OutputJsonError, OutputNothing)
+	this.BaseController.Delete(c)
 	db.DBInstance(c).Exec("pragma foreign_keys = on;")
 }

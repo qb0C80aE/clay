@@ -22,21 +22,20 @@ func NewPortController() *PortController {
 }
 
 func (this *PortController) Initialize() {
-	this.resourceName = "port"
-}
-
-func (this *PortController) GetResourceName() string {
-	return this.resourceName
+	this.ResourceName = "port"
+	this.Model = models.PortModel
+	this.Logic = logics.NewPortLogic()
+	this.Outputter = this
 }
 
 func (this *PortController) GetRouteMap() map[int]map[string]gin.HandlerFunc {
-	resourceSingleUrl := extension.GetResourceSingleUrl(this.resourceName)
-	resourceMultiUrl := extension.GetResourceMultiUrl(this.resourceName)
+	resourceSingleUrl := extension.GetResourceSingleUrl(this.ResourceName)
+	resourceMultiUrl := extension.GetResourceMultiUrl(this.ResourceName)
 
 	routeMap := map[int]map[string]gin.HandlerFunc{
 		extension.MethodGet: {
-			resourceMultiUrl:  this.GetSingle,
-			resourceSingleUrl: this.GetMulti,
+			resourceSingleUrl: this.GetSingle,
+			resourceMultiUrl:  this.GetMulti,
 		},
 		extension.MethodPost: {
 			resourceMultiUrl: this.Create,
@@ -49,24 +48,4 @@ func (this *PortController) GetRouteMap() map[int]map[string]gin.HandlerFunc {
 		},
 	}
 	return routeMap
-}
-
-func (_ *PortController) GetMulti(c *gin.Context) {
-	ProcessMultiGet(c, models.PortModel, logics.GetPorts, OutputJsonError, OutputMultiJsonResult)
-}
-
-func (_ *PortController) GetSingle(c *gin.Context) {
-	ProcessSingleGet(c, models.PortModel, logics.GetPort, OutputJsonError, OutputSingleJsonResult)
-}
-
-func (_ *PortController) Create(c *gin.Context) {
-	ProcessCreate(c, &models.Port{}, logics.CreatePort, OutputJsonError, OutputSingleJsonResult)
-}
-
-func (_ *PortController) Update(c *gin.Context) {
-	ProcessUpdate(c, &models.Port{}, logics.UpdatePort, OutputJsonError, OutputSingleJsonResult)
-}
-
-func (_ *PortController) Delete(c *gin.Context) {
-	ProcessDelete(c, logics.DeletePort, OutputJsonError, OutputNothing)
 }

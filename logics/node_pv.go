@@ -6,7 +6,26 @@ import (
 	"strconv"
 )
 
-func GetNodePvs(db *gorm.DB, queryFields string) ([]interface{}, error) {
+type NodePvLogic struct {
+}
+
+func NewNodePvLogic() *NodePvLogic {
+	return &NodePvLogic{}
+}
+
+func (_ *NodePvLogic) GetSingle(db *gorm.DB, id string, queryFields string) (interface{}, error) {
+
+	nodePv := &models.NodePv{}
+
+	if err := db.Select(queryFields).First(nodePv, id).Error; err != nil {
+		return nil, err
+	}
+
+	return nodePv, nil
+
+}
+
+func (_ *NodePvLogic) GetMulti(db *gorm.DB, queryFields string) ([]interface{}, error) {
 
 	nodePvs := []*models.NodePv{}
 
@@ -23,19 +42,7 @@ func GetNodePvs(db *gorm.DB, queryFields string) ([]interface{}, error) {
 
 }
 
-func GetNodePv(db *gorm.DB, id string, queryFields string) (interface{}, error) {
-
-	nodePv := &models.NodePv{}
-
-	if err := db.Select(queryFields).First(nodePv, id).Error; err != nil {
-		return nil, err
-	}
-
-	return nodePv, nil
-
-}
-
-func CreateNodePv(db *gorm.DB, data interface{}) (interface{}, error) {
+func (_ *NodePvLogic) Create(db *gorm.DB, data interface{}) (interface{}, error) {
 
 	nodePv := data.(*models.NodePv)
 
@@ -47,7 +54,7 @@ func CreateNodePv(db *gorm.DB, data interface{}) (interface{}, error) {
 
 }
 
-func UpdateNodePv(db *gorm.DB, id string, data interface{}) (interface{}, error) {
+func (_ *NodePvLogic) Update(db *gorm.DB, id string, data interface{}) (interface{}, error) {
 
 	nodePv := data.(*models.NodePv)
 	nodePv.ID, _ = strconv.Atoi(id)
@@ -60,7 +67,7 @@ func UpdateNodePv(db *gorm.DB, id string, data interface{}) (interface{}, error)
 
 }
 
-func DeleteNodePv(db *gorm.DB, id string) error {
+func (_ *NodePvLogic) Delete(db *gorm.DB, id string) error {
 
 	nodePv := &models.NodePv{}
 
@@ -74,4 +81,12 @@ func DeleteNodePv(db *gorm.DB, id string) error {
 
 	return nil
 
+}
+
+func (_ *NodePvLogic) Patch(_ *gorm.DB, _ string, _ string) (interface{}, error) {
+	return nil, nil
+}
+
+func (_ *NodePvLogic) Options(db *gorm.DB) error {
+	return nil
 }

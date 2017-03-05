@@ -22,21 +22,20 @@ func NewNodeGroupController() *NodeGroupController {
 }
 
 func (this *NodeGroupController) Initialize() {
-	this.resourceName = "node_group"
-}
-
-func (this *NodeGroupController) GetResourceName() string {
-	return this.resourceName
+	this.ResourceName = "node_group"
+	this.Model = models.NodeGroupModel
+	this.Logic = logics.NewNodeGroupLogic()
+	this.Outputter = this
 }
 
 func (this *NodeGroupController) GetRouteMap() map[int]map[string]gin.HandlerFunc {
-	resourceSingleUrl := extension.GetResourceSingleUrl(this.resourceName)
-	resourceMultiUrl := extension.GetResourceMultiUrl(this.resourceName)
+	resourceSingleUrl := extension.GetResourceSingleUrl(this.ResourceName)
+	resourceMultiUrl := extension.GetResourceMultiUrl(this.ResourceName)
 
 	routeMap := map[int]map[string]gin.HandlerFunc{
 		extension.MethodGet: {
-			resourceMultiUrl:  this.GetSingle,
-			resourceSingleUrl: this.GetMulti,
+			resourceSingleUrl: this.GetSingle,
+			resourceMultiUrl:  this.GetMulti,
 		},
 		extension.MethodPost: {
 			resourceMultiUrl: this.Create,
@@ -49,24 +48,4 @@ func (this *NodeGroupController) GetRouteMap() map[int]map[string]gin.HandlerFun
 		},
 	}
 	return routeMap
-}
-
-func (_ *NodeGroupController) GetMulti(c *gin.Context) {
-	ProcessMultiGet(c, models.NodeGroupModel, logics.GetNodeGroups, OutputJsonError, OutputMultiJsonResult)
-}
-
-func (_ *NodeGroupController) GetSingle(c *gin.Context) {
-	ProcessSingleGet(c, models.NodeGroupModel, logics.GetNodeGroup, OutputJsonError, OutputSingleJsonResult)
-}
-
-func (_ *NodeGroupController) Create(c *gin.Context) {
-	ProcessCreate(c, &models.NodeGroup{}, logics.CreateNodeGroup, OutputJsonError, OutputSingleJsonResult)
-}
-
-func (_ *NodeGroupController) Update(c *gin.Context) {
-	ProcessUpdate(c, &models.NodeGroup{}, logics.UpdateNodeGroup, OutputJsonError, OutputSingleJsonResult)
-}
-
-func (_ *NodeGroupController) Delete(c *gin.Context) {
-	ProcessDelete(c, logics.DeleteNodeGroup, OutputJsonError, OutputNothing)
 }

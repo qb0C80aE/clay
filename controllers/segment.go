@@ -22,23 +22,18 @@ func NewSegmentController() *SegmentController {
 }
 
 func (this *SegmentController) Initialize() {
-	this.resourceName = "segment"
-}
-
-func (this *SegmentController) GetResourceName() string {
-	return this.resourceName
+	this.ResourceName = "segment"
+	this.Model = models.SegmentModel
+	this.Logic = logics.NewSegmentLogic()
+	this.Outputter = this
 }
 
 func (this *SegmentController) GetRouteMap() map[int]map[string]gin.HandlerFunc {
-	resourceMultiUrl := extension.GetResourceMultiUrl(this.resourceName)
+	resourceMultiUrl := extension.GetResourceMultiUrl(this.ResourceName)
 	routeMap := map[int]map[string]gin.HandlerFunc{
 		extension.MethodGet: {
 			resourceMultiUrl: this.GetMulti,
 		},
 	}
 	return routeMap
-}
-
-func (_ *SegmentController) GetMulti(c *gin.Context) {
-	ProcessMultiGet(c, models.SegmentModel, logics.GetSegments, OutputJsonError, OutputMultiJsonResult)
 }
