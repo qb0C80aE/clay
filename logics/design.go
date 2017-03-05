@@ -73,3 +73,8 @@ func (_ *DesignLogic) Patch(_ *gorm.DB, _ string, _ string) (interface{}, error)
 func (_ *DesignLogic) Options(db *gorm.DB) error {
 	return nil
 }
+
+var DesignLogicInstance = &DesignLogic{}
+
+func init() {
+}
