@@ -1,0 +1,3 @@
+{{$test := index .Content.TemplateExternalParameters "test"}}
+
+Hello, test's value is {{$test}}!!
