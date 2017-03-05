@@ -161,39 +161,15 @@ func (_ *TemplateLogic) Delete(db *gorm.DB, id string) error {
 }
 
 func (_ *TemplateLogic) Patch(db *gorm.DB, id string, _ string) (interface{}, error) {
-	type templateParameter struct {
-		Nodes                      []*models.Node
-		Ports                      []*models.Port
-		NodePvs                    []*models.NodePv
-		NodeTypes                  []*models.NodeType
-		NodeGroups                 []*models.NodeGroup
-		Segments                   []*models.Segment
-		TemplateExternalParameters map[string]string
+	design := &models.Design{
+		Content: map[string]interface{}{},
 	}
 
-	nodePvs := []*models.NodePv{}
-	if err := db.Select("*").Find(&nodePvs).Error; err != nil {
-		return "", err
-	}
-
-	nodeTypes := []*models.NodeType{}
-	if err := db.Select("*").Find(&nodeTypes).Error; err != nil {
-		return "", err
-	}
-
-	nodes := []*models.Node{}
-	if err := db.Preload("Ports").Select("*").Find(&nodes).Error; err != nil {
-		return "", err
-	}
-
-	ports := []*models.Port{}
-	if err := db.Preload("Node").Select("*").Find(&ports).Error; err != nil {
-		return "", err
-	}
-
-	nodeGroups := []*models.NodeGroup{}
-	if err := db.Preload("Nodes").Select("*").Find(&nodeGroups).Error; err != nil {
-		return "", err
+	designAccessors := extension.GetDesignAccessos()
+	for _, accessor := range designAccessors {
+		if err := accessor.ExtractFromDesign(db, design.Content); err != nil {
+			return nil, err
+		}
 	}
 
 	template := &models.Template{}
@@ -203,38 +179,17 @@ func (_ *TemplateLogic) Patch(db *gorm.DB, id string, _ string) (interface{}, er
 		return nil, err
 	}
 
-	nodeMap := make(map[int]*models.Node)
-	portMap := make(map[int]*models.Port)
-	consumedPortMap := make(map[int]*models.Port)
-
-	for _, node := range nodes {
-		nodeMap[node.ID] = node
-	}
-	for _, port := range ports {
-		portMap[port.ID] = port
-	}
-
-	segments := GenerateSegments(nodeMap, portMap, consumedPortMap)
-
 	templateExternalParameterMap := make(map[string]string)
 	for _, templateExternalParameter := range template.TemplateExternalParameters {
 		templateExternalParameterMap[templateExternalParameter.Name] = templateExternalParameter.Value
 	}
 
-	parameter := &templateParameter{
-		Nodes:                      nodes,
-		Ports:                      ports,
-		NodePvs:                    nodePvs,
-		NodeTypes:                  nodeTypes,
-		NodeGroups:                 nodeGroups,
-		Segments:                   segments,
-		TemplateExternalParameters: templateExternalParameterMap,
-	}
+	design.Content["TemplateExternalParameters"] = templateExternalParameterMap
 
 	tpl, _ := tplpkg.New("template").Parse(template.TemplateContent)
 
 	var doc bytes.Buffer
-	tpl.Execute(&doc, parameter)
+	tpl.Execute(&doc, design)
 	result := doc.String()
 
 	return result, nil
