@@ -29,7 +29,7 @@ func NewTemplateExternalParameterController() *TemplateExternalParameterControll
 func (this *TemplateExternalParameterController) Initialize() {
 	this.ResourceName = "template_external_parameter"
 	this.Model = models.TemplateExternalParameterModel
-	this.Logic = logics.NewTemplateExternalParameterLogic()
+	this.Logic = logics.TemplateExternalParameterLogicInstance
 	this.Outputter = this
 }
 
@@ -64,7 +64,7 @@ func NewTemplateController() *TemplateController {
 func (this *TemplateController) Initialize() {
 	this.ResourceName = "template"
 	this.Model = models.TemplateModel
-	this.Logic = logics.NewTemplateLogic()
+	this.Logic = logics.TemplateLogicInstance
 	this.Outputter = this
 }
 

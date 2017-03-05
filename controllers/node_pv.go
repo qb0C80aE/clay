@@ -24,7 +24,7 @@ func NewNodePvController() *NodePvController {
 func (this *NodePvController) Initialize() {
 	this.ResourceName = "node_pv"
 	this.Model = models.NodePvModel
-	this.Logic = logics.NewNodePvLogic()
+	this.Logic = logics.NodePvLogicInstance
 	this.Outputter = this
 }
 

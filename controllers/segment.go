@@ -24,7 +24,7 @@ func NewSegmentController() *SegmentController {
 func (this *SegmentController) Initialize() {
 	this.ResourceName = "segment"
 	this.Model = models.SegmentModel
-	this.Logic = logics.NewSegmentLogic()
+	this.Logic = logics.SegmentLogicInstance
 	this.Outputter = this
 }
 

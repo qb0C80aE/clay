@@ -24,7 +24,7 @@ func NewPortController() *PortController {
 func (this *PortController) Initialize() {
 	this.ResourceName = "port"
 	this.Model = models.PortModel
-	this.Logic = logics.NewPortLogic()
+	this.Logic = logics.PortLogicInstance
 	this.Outputter = this
 }
 

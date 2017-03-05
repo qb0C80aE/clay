@@ -24,7 +24,7 @@ func NewNodeTypeController() *NodeTypeController {
 func (this *NodeTypeController) Initialize() {
 	this.ResourceName = "node_type"
 	this.Model = models.NodeTypeModel
-	this.Logic = logics.NewNodeTypeLogic()
+	this.Logic = logics.NodeTypeLogicInstance
 	this.Outputter = this
 }
 
