@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"reflect"
+	"text/template"
 )
 
 const (
@@ -57,6 +58,7 @@ var modelMap = map[reflect.Type]interface{}{}
 var controllers = []Controller{}
 var routerInitializers = []RouterInitializer{}
 var designAccessors = []DesignAccessor{}
+var templateFuncMaps = []template.FuncMap{}
 
 func GetMethodName(method int) string {
 	return methodNameMap[method]
@@ -111,5 +113,15 @@ func RegisterDesignAccessor(designAccessor DesignAccessor) {
 func GetDesignAccessos() []DesignAccessor {
 	result := []DesignAccessor{}
 	result = append(result, designAccessors...)
+	return result
+}
+
+func RegisterTemplateFuncMap(templateFuncMap template.FuncMap) {
+	templateFuncMaps = append(templateFuncMaps, templateFuncMap)
+}
+
+func GetTemplateFuncMaps() []template.FuncMap {
+	result := []template.FuncMap{}
+	result = append(result, templateFuncMaps...)
 	return result
 }

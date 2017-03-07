@@ -186,7 +186,15 @@ func (_ *TemplateLogic) Patch(db *gorm.DB, id string, _ string) (interface{}, er
 
 	design.Content["TemplateExternalParameters"] = templateExternalParameterMap
 
-	tpl, _ := tplpkg.New("template").Parse(template.TemplateContent)
+	tpl := tplpkg.New("template")
+	templateFuncMaps := extension.GetTemplateFuncMaps()
+	for _, templateFuncMap := range templateFuncMaps {
+		tpl = tpl.Funcs(templateFuncMap)
+	}
+	tpl, err := tpl.Parse(template.TemplateContent)
+	if err != nil {
+		return nil, err
+	}
 
 	var doc bytes.Buffer
 	tpl.Execute(&doc, design)
