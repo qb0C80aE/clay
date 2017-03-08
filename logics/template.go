@@ -197,7 +197,10 @@ func (_ *TemplateLogic) Patch(db *gorm.DB, id string, _ string) (interface{}, er
 	}
 
 	var doc bytes.Buffer
-	tpl.Execute(&doc, design)
+	if tpl.Execute(&doc, design) != nil {
+		return nil, err
+	}
+
 	result := doc.String()
 
 	return result, nil
