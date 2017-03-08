@@ -47,11 +47,16 @@ func (this *BaseController) bind(c *gin.Context, container interface{}) error {
 			if err != nil {
 				return err
 			}
-			data, _ := ioutil.ReadAll(file)
+
+			data, err := ioutil.ReadAll(file)
 			if err != nil {
 				return err
 			}
-			buffer.Write(data)
+
+			_, err = buffer.Write(data)
+			if err != nil {
+				return err
+			}
 
 			vs := reflect.ValueOf(container)
 			for vs.Kind() == reflect.Ptr {
@@ -61,7 +66,7 @@ func (this *BaseController) bind(c *gin.Context, container interface{}) error {
 				return errors.New("invalid container.")
 			}
 			if !vs.CanInterface() {
-				return nil
+				return errors.New("invalid container.")
 			}
 			value := vs.Interface()
 
