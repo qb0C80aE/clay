@@ -230,8 +230,8 @@ func (_ *TemplateExternalParameterLogic) LoadToDesign(db *gorm.DB, data interfac
 		if err := mapstruct.MapToStruct(value.([]interface{}), &container); err != nil {
 			return err
 		}
-		for _, template := range container {
-			if err := db.Create(template).Error; err != nil {
+		for _, templateExternalParameter := range container {
+			if err := db.Create(templateExternalParameter).Error; err != nil {
 				return err
 			}
 		}
@@ -260,6 +260,7 @@ func (_ *TemplateLogic) LoadToDesign(db *gorm.DB, data interface{}) error {
 			return err
 		}
 		for _, template := range container {
+			template.TemplateExternalParameters = nil
 			if err := db.Create(template).Error; err != nil {
 				return err
 			}
