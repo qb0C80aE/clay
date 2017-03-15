@@ -48,9 +48,13 @@ type RouterInitializer interface {
 }
 
 type DesignAccessor interface {
-	ExtractFromDesign(*gorm.DB, map[string]interface{}) error
+	ExtractFromDesign(*gorm.DB) (string, interface{}, error)
 	DeleteFromDesign(*gorm.DB) error
 	LoadToDesign(*gorm.DB, interface{}) error
+}
+
+type TemplateParameterGenerator interface {
+	GenerateTemplateParameter(*gorm.DB) (string, interface{}, error)
 }
 
 var typeMap = map[string]reflect.Type{}
@@ -58,6 +62,7 @@ var modelMap = map[reflect.Type]interface{}{}
 var controllers = []Controller{}
 var routerInitializers = []RouterInitializer{}
 var designAccessors = []DesignAccessor{}
+var templateParameterGenerators = []TemplateParameterGenerator{}
 var templateFuncMaps = []template.FuncMap{}
 
 func GetMethodName(method int) string {
@@ -113,6 +118,16 @@ func RegisterDesignAccessor(designAccessor DesignAccessor) {
 func GetDesignAccessos() []DesignAccessor {
 	result := []DesignAccessor{}
 	result = append(result, designAccessors...)
+	return result
+}
+
+func RegisterTemplateParameterGenerator(templateParameterGenerator TemplateParameterGenerator) {
+	templateParameterGenerators = append(templateParameterGenerators, templateParameterGenerator)
+}
+
+func GetTemplateParameterGenerators() []TemplateParameterGenerator {
+	result := []TemplateParameterGenerator{}
+	result = append(result, templateParameterGenerators...)
 	return result
 }
 
