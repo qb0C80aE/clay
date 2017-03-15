@@ -21,9 +21,11 @@ func (_ *DesignLogic) GetSingle(db *gorm.DB, _ string, _ string) (interface{}, e
 
 	designAccessors := extension.GetDesignAccessos()
 	for _, accessor := range designAccessors {
-		if err := accessor.ExtractFromDesign(db, design.Content); err != nil {
+		key, value, err := accessor.ExtractFromDesign(db)
+		if err != nil {
 			return nil, err
 		}
+		design.Content[key] = value
 	}
 
 	return design, nil

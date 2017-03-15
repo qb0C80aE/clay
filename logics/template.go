@@ -161,15 +161,15 @@ func (_ *TemplateLogic) Delete(db *gorm.DB, id string) error {
 }
 
 func (_ *TemplateLogic) Patch(db *gorm.DB, id string, _ string) (interface{}, error) {
-	design := &models.Design{
-		Content: map[string]interface{}{},
-	}
+	templateParameter := map[string]interface{}{}
 
-	designAccessors := extension.GetDesignAccessos()
-	for _, accessor := range designAccessors {
-		if err := accessor.ExtractFromDesign(db, design.Content); err != nil {
+	templateParameterGenerators := extension.GetTemplateParameterGenerators()
+	for _, generator := range templateParameterGenerators {
+		key, value, err := generator.GenerateTemplateParameter(db)
+		if err != nil {
 			return nil, err
 		}
+		templateParameter[key] = value
 	}
 
 	template := &models.Template{}
@@ -184,7 +184,7 @@ func (_ *TemplateLogic) Patch(db *gorm.DB, id string, _ string) (interface{}, er
 		templateExternalParameterMap[templateExternalParameter.Name] = templateExternalParameter.Value
 	}
 
-	design.Content["TemplateExternalParameters"] = templateExternalParameterMap
+	templateParameter["TemplateExternalParameters"] = templateExternalParameterMap
 
 	tpl := tplpkg.New("template")
 	templateFuncMaps := extension.GetTemplateFuncMaps()
@@ -197,7 +197,7 @@ func (_ *TemplateLogic) Patch(db *gorm.DB, id string, _ string) (interface{}, er
 	}
 
 	var doc bytes.Buffer
-	if tpl.Execute(&doc, design) != nil {
+	if tpl.Execute(&doc, templateParameter) != nil {
 		return nil, err
 	}
 
@@ -210,13 +210,12 @@ func (_ *TemplateLogic) Options(db *gorm.DB) error {
 	return nil
 }
 
-func (_ *TemplateExternalParameterLogic) ExtractFromDesign(db *gorm.DB, designContent map[string]interface{}) error {
+func (_ *TemplateExternalParameterLogic) ExtractFromDesign(db *gorm.DB) (string, interface{}, error) {
 	templateExternalParameters := []*models.TemplateExternalParameter{}
 	if err := db.Select("*").Find(&templateExternalParameters).Error; err != nil {
-		return err
+		return "", nil, err
 	}
-	designContent["template_external_parameters"] = templateExternalParameters
-	return nil
+	return "template_external_parameters", templateExternalParameters, nil
 }
 
 func (_ *TemplateExternalParameterLogic) DeleteFromDesign(db *gorm.DB) error {
@@ -239,13 +238,12 @@ func (_ *TemplateExternalParameterLogic) LoadToDesign(db *gorm.DB, data interfac
 	return nil
 }
 
-func (_ *TemplateLogic) ExtractFromDesign(db *gorm.DB, designContent map[string]interface{}) error {
+func (_ *TemplateLogic) ExtractFromDesign(db *gorm.DB) (string, interface{}, error) {
 	templates := []*models.Template{}
 	if err := db.Select("*").Find(&templates).Error; err != nil {
-		return err
+		return "", nil, err
 	}
-	designContent["templates"] = templates
-	return nil
+	return "templates", templates, nil
 }
 
 func (_ *TemplateLogic) DeleteFromDesign(db *gorm.DB) error {
