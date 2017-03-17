@@ -1,4 +1,6 @@
-# Summary
+# Clay
+
+[![Build Status](https://travis-ci.org/qb0C80aE/clay.svg?branch=develop)](https://travis-ci.org/qb0C80aE/clay)
 
 Clay is an abstract system model store to automate various kind of operations.
 It provides some APIs to access the system model store.
