@@ -1,0 +1,32 @@
+{
+  "content": {
+    "template_external_parameters": [
+      {
+        "id": 1,
+        "name": "testParameter1",
+        "template_id": 2,
+        "value": "TestParameter1"
+      },
+      {
+        "id": 2,
+        "name": "testParameter2",
+        "template_id": 2,
+        "value": "TestParameter2"
+      }
+    ],
+    "templates": [
+      {
+        "id": 1,
+        "name": "test1",
+        "template_content": "TestTemplate1",
+        "template_external_parameters": null
+      },
+      {
+        "id": 2,
+        "name": "test2",
+        "template_content": "TestTemplate2",
+        "template_external_parameters": null
+      }
+    ]
+  }
+}
