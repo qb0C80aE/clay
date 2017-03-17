@@ -1,0 +1,25 @@
+{
+  "id": 100,
+  "name": "testUpdated",
+  "template_content": "TestTemplateUpdated",
+  "template_external_parameters": [
+    {
+      "id": 1,
+      "template_id": 100,
+      "name": "testParameter1",
+      "value": "TestParameter1"
+    },
+    {
+      "id": 2,
+      "template_id": 100,
+      "name": "testParameter2Updated",
+      "value": "TestParameter2Updated"
+    },
+    {
+      "id": 3,
+      "template_id": 100,
+      "name": "testParameterNew",
+      "value": "TestParameterNew"
+    }
+  ]
+}
