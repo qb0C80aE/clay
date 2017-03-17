@@ -1,0 +1,15 @@
+language: go
+go: 1.7
+
+notifications:
+ email: false
+
+before_install:
+ - go version
+
+install:
+ - go get -t -d -v ./...
+ - go build -v
+
+script:
+ - go test -v -race ./...
