@@ -1,6 +1,6 @@
 {
-  "id": 100,
-  "name": "testUpdated",
-  "template_content": "TestTemplateUpdated",
-  "template_external_parameters": null
+  "id": 101,
+  "name": "test1Updated",
+  "template_content": "TestTemplate1Updated",
+  "template_external_parameters": []
 }

@@ -23,6 +23,11 @@ type ErrorResponseText struct {
 	Error string `json:"error"`
 }
 
+func error(t *testing.T, message string, args ...interface{}) {
+	result := fmt.Sprintf(message, args...)
+	t.Fatalf(result)
+}
+
 func generateQueryParameter(data map[string]string) string {
 	var buffer *bytes.Buffer = &bytes.Buffer{}
 	for key, value := range data {
@@ -65,7 +70,7 @@ func Execute(t *testing.T, method string, resourceUrl string, data interface{}) 
 	byteArray, err := json.Marshal(data)
 
 	if err != nil {
-		t.Fatalf("error Occured %v", err)
+		error(t, "error Occured %v", err)
 	}
 
 	request, err := http.NewRequest(
@@ -76,28 +81,28 @@ func Execute(t *testing.T, method string, resourceUrl string, data interface{}) 
 	request.Header.Set("Content-Type", "application/json")
 
 	if err != nil {
-		t.Fatalf("error Occured %v", err)
+		error(t, "error Occured %v", err)
 	}
 
 	client := &http.Client{Timeout: time.Duration(timeout * time.Second)}
 	response, err := client.Do(request)
 
 	if err != nil {
-		t.Fatalf("%s", err)
+		error(t, "%s", err)
 	}
 
 	defer response.Body.Close()
 
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		t.Fatalf("%s", err)
+		error(t, "%s", err)
 	}
 	return contents, response.StatusCode
 }
 
 func CheckResponseJson(t *testing.T, code int, expectedCode int, responseText []byte, expectedResponseText []byte, model interface{}) {
 	if code != expectedCode {
-		t.Fatalf("code is expected as %d, but %d", expectedCode, code)
+		error(t, "code is expected as %d, but %d", expectedCode, code)
 	}
 
 	vs := reflect.ValueOf(model)
@@ -105,47 +110,47 @@ func CheckResponseJson(t *testing.T, code int, expectedCode int, responseText []
 		vs = vs.Elem()
 	}
 	if !vs.IsValid() {
-		t.Fatalf("invalid model")
+		error(t, "invalid model")
 
 	}
 	if !vs.CanInterface() {
-		t.Fatalf("model cannot interface()")
+		error(t, "model cannot interface()")
 	}
 	responseContainer := reflect.New(reflect.TypeOf(vs.Interface())).Interface()
 	expectationContainer := reflect.New(reflect.TypeOf(vs.Interface())).Interface()
 
 	err := json.Unmarshal(responseText, &responseContainer)
 	if err != nil {
-		t.Fatalf("couldn't marshal the responseText: %s", string(responseText))
+		error(t, "couldn't marshal the responseText: %s", string(responseText))
 	}
 	jsonByteArray, err := json.Marshal(responseContainer)
 	if err != nil {
-		t.Fatalf("couldn't unmarshal the responseContainer: %v", responseContainer)
+		error(t, "couldn't unmarshal the responseContainer: %v", responseContainer)
 	}
 	response := string(jsonByteArray)
 
 	err = json.Unmarshal(expectedResponseText, &expectationContainer)
 	if err != nil {
-		t.Fatalf("couldn't marshal the expectedResponseText: %s", string(expectedResponseText))
+		error(t, "couldn't marshal the expectedResponseText: %s", string(expectedResponseText))
 	}
 	jsonByteArray, err = json.Marshal(expectationContainer)
 	if err != nil {
-		t.Fatalf("couldn't unmarshal the expectationContainer: %v", expectationContainer)
+		error(t, "couldn't unmarshal the expectationContainer: %v", expectationContainer)
 	}
 	expectation := string(jsonByteArray)
 
 	if response != expectation {
-		t.Fatalf("response is expected as '%s', but '%s'", expectation, response)
+		error(t, "response is expected as '%s', but '%s'", expectation, response)
 	}
 }
 
 func CheckResponseText(t *testing.T, code int, expectedCode int, responseText []byte, expectedResponseText []byte) {
 	if code != expectedCode {
-		t.Fatalf("code is expected as %d, but %d", expectedCode, code)
+		error(t, "code is expected as %d, but %d", expectedCode, code)
 	}
 
 	if string(responseText) != string(expectedResponseText) {
-		t.Fatalf("response is expected as '%s', but '%s'", expectedResponseText, responseText)
+		error(t, "response is expected as '%s', but '%s'", expectedResponseText, responseText)
 	}
 }
 
@@ -153,7 +158,7 @@ func LoadExpectation(t *testing.T, testCaseName string) []byte {
 	expectationFile := fmt.Sprintf("expectations/%s", testCaseName)
 	data, err := ioutil.ReadFile(expectationFile)
 	if err != nil {
-		t.Fatalf("couldn't load an expectation file %s", expectationFile)
+		error(t, "couldn't load an expectation file %s", expectationFile)
 	}
 	return data
 }
