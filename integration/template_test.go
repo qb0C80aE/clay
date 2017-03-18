@@ -60,7 +60,7 @@ func TestCreateTemplate(t *testing.T) {
 	responseText, code := Execute(t, http.MethodPost, GenerateMultiResourceUrl(server, "templates", nil), template)
 	CheckResponseJson(t, code, http.StatusCreated, responseText, LoadExpectation(t, "template/TestCreateTemplate_1.json"), &models.Template{})
 
-	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceUrl(server, "templates", strconv.Itoa(id), nil), template)
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceUrl(server, "templates", strconv.Itoa(id), nil), nil)
 	CheckResponseJson(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestCreateTemplate_2.json"), &models.Template{})
 }
 
@@ -78,7 +78,7 @@ func TestCreateTemplateWithID(t *testing.T) {
 	responseText, code := Execute(t, http.MethodPost, GenerateMultiResourceUrl(server, "templates", nil), template)
 	CheckResponseJson(t, code, http.StatusCreated, responseText, LoadExpectation(t, "template/TestCreateTemplateWithID_1.json"), &models.Template{})
 
-	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceUrl(server, "templates", strconv.Itoa(id), nil), template)
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceUrl(server, "templates", strconv.Itoa(id), nil), nil)
 	CheckResponseJson(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestCreateTemplateWithID_2.json"), &models.Template{})
 }
 
@@ -107,13 +107,13 @@ func TestCreateTemplate_WithID_WithTemplateExternalParameters(t *testing.T) {
 	responseText, code := Execute(t, http.MethodPost, GenerateMultiResourceUrl(server, "templates", nil), template)
 	CheckResponseJson(t, code, http.StatusCreated, responseText, LoadExpectation(t, "template/TestCreateTemplate_WithID_WithTemplateExternalParameters_1.json"), &models.Template{})
 
-	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceUrl(server, "templates", strconv.Itoa(id), nil), template)
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceUrl(server, "templates", strconv.Itoa(id), nil), nil)
 	CheckResponseJson(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestCreateTemplate_WithID_WithTemplateExternalParameters_2.json"), &models.Template{})
 
 	parameters := map[string]string{
 		"preloads": "TemplateExternalParameters",
 	}
-	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceUrl(server, "templates", strconv.Itoa(id), parameters), template)
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceUrl(server, "templates", strconv.Itoa(id), parameters), nil)
 	CheckResponseJson(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestCreateTemplate_WithID_WithTemplateExternalParameters_3.json"), &models.Template{})
 }
 
@@ -136,7 +136,7 @@ func TestUpdateTemplate(t *testing.T) {
 	responseText, code = Execute(t, http.MethodPut, GenerateSingleResourceUrl(server, "templates", strconv.Itoa(id), nil), template)
 	CheckResponseJson(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestUpdateTemplate_1.json"), &models.Template{})
 
-	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceUrl(server, "templates", strconv.Itoa(id), nil), template)
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceUrl(server, "templates", strconv.Itoa(id), nil), nil)
 	CheckResponseJson(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestUpdateTemplate_2.json"), &models.Template{})
 }
 
@@ -183,7 +183,7 @@ func TestUpdateTemplate_WithTemplateExternalParameters(t *testing.T) {
 	parameters := map[string]string{
 		"preloads": "TemplateExternalParameters",
 	}
-	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceUrl(server, "templates", strconv.Itoa(id), parameters), template)
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceUrl(server, "templates", strconv.Itoa(id), parameters), nil)
 	CheckResponseJson(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestUpdateTemplate_WithTemplateExternalParameters_2.json"), &models.Template{})
 }
 
@@ -203,7 +203,7 @@ func TestDeleteTemplate(t *testing.T) {
 	responseText, code := Execute(t, http.MethodDelete, GenerateSingleResourceUrl(server, "templates", strconv.Itoa(id), nil), nil)
 	CheckResponseText(t, code, http.StatusNoContent, responseText, []byte{})
 
-	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceUrl(server, "templates", strconv.Itoa(id), nil), template)
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceUrl(server, "templates", strconv.Itoa(id), nil), nil)
 	CheckResponseJson(t, code, http.StatusNotFound, responseText, LoadExpectation(t, "template/TestDeleteTemplate_1.json"), &ErrorResponseText{})
 }
 
@@ -301,6 +301,9 @@ func TestUpdateTemplateExternalParameters(t *testing.T) {
 
 	responseText, code := Execute(t, http.MethodPut, GenerateSingleResourceUrl(server, "template_external_parameters", strconv.Itoa(id), nil), templateExternalParameter1)
 	CheckResponseJson(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestUpdateTemplateExternalParameter_1.json"), &models.TemplateExternalParameter{})
+
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceUrl(server, "template_external_parameters", strconv.Itoa(id), nil), nil)
+	CheckResponseJson(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestUpdateTemplateExternalParameter_2.json"), &models.TemplateExternalParameter{})
 }
 
 func TestDeleteTemplateExternalParameters(t *testing.T) {
@@ -330,7 +333,7 @@ func TestDeleteTemplateExternalParameters(t *testing.T) {
 	responseText, code := Execute(t, http.MethodDelete, GenerateSingleResourceUrl(server, "template_external_parameters", strconv.Itoa(id), nil), nil)
 	CheckResponseText(t, code, http.StatusNoContent, responseText, []byte{})
 
-	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceUrl(server, "template_external_parameters", strconv.Itoa(id), nil), template)
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceUrl(server, "template_external_parameters", strconv.Itoa(id), nil), nil)
 	CheckResponseJson(t, code, http.StatusNotFound, responseText, LoadExpectation(t, "template/TestDeleteTemplateExternalParameter_1.json"), &ErrorResponseText{})
 }
 
@@ -358,6 +361,6 @@ func TestDeleteTemplateExternalParameters_Cascade(t *testing.T) {
 
 	Execute(t, http.MethodDelete, GenerateSingleResourceUrl(server, "templates", strconv.Itoa(templateId), nil), nil)
 
-	responseText, code := Execute(t, http.MethodGet, GenerateSingleResourceUrl(server, "template_external_parameters", strconv.Itoa(id), nil), template)
+	responseText, code := Execute(t, http.MethodGet, GenerateSingleResourceUrl(server, "template_external_parameters", strconv.Itoa(id), nil), nil)
 	CheckResponseJson(t, code, http.StatusNotFound, responseText, LoadExpectation(t, "template/TestDeleteTemplateExternalParameter_Cascade_1.json"), &ErrorResponseText{})
 }
