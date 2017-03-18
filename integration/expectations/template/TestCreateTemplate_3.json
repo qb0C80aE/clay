@@ -1,0 +1,19 @@
+{
+  "id": 100,
+  "name": "test100",
+  "template_content": "TestTemplate100",
+  "template_external_parameters": [
+    {
+      "id": 2,
+      "template_id": 100,
+      "name": "testParameter100",
+      "value": "TestParameter100"
+    },
+    {
+      "id": 10,
+      "template_id": 100,
+      "name": "testParameter110",
+      "value": "TestParameter110"
+    }
+  ]
+}

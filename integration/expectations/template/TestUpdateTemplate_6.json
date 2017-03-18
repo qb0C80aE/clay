@@ -1,0 +1,37 @@
+{
+  "id": 103,
+  "name": "test3",
+  "template_content": "TestTemplate3",
+  "template_external_parameters": [
+    {
+      "id": 2,
+      "template_id": 103,
+      "name": "testParameter31",
+      "value": "TestParameter31"
+    },
+    {
+      "id": 3,
+      "template_id": 103,
+      "name": "testParameter32",
+      "value": "TestParameter32"
+    },
+    {
+      "id": 4,
+      "template_id": 103,
+      "name": "testParameter31",
+      "value": "TestParameter31"
+    },
+    {
+      "id": 5,
+      "template_id": 103,
+      "name": "testParameter32Updated",
+      "value": "TestParameter32Updated"
+    },
+    {
+      "id": 6,
+      "template_id": 103,
+      "name": "testParameter33",
+      "value": "TestParameter33"
+    }
+  ]
+}
