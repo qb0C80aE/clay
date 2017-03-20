@@ -57,10 +57,11 @@ func TestQueryFields_Primitive(t *testing.T) {
 func TestQueryFields_Multiple(t *testing.T) {
 	fields := map[string]interface{}{"id": nil, "name": nil}
 	result := QueryFields(User{}, fields)
-	expected := "id,name"
+	expected1 := "id,name"
+	expected2 := "name,id"
 
-	if result != expected {
-		t.Fatalf("result should be %s. actual: %s", expected, result)
+	if result != expected1 && result != expected2 {
+		t.Fatalf("result should be %s or %s. actual: %s", expected1, expected2, result)
 	}
 }
 
