@@ -8,8 +8,10 @@ before_install:
  - go version
 
 install:
- - go get -t -d -v ./...
- - go build -v
+ - go get github.com/Masterminds/glide
 
 script:
- - go test -v -race ./...
+ - glide install
+ - go build -v
+ - go test -v -race $(glide novendor)
+
