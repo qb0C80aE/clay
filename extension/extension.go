@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"net/http"
 	"reflect"
 	"text/template"
 )
@@ -18,28 +19,38 @@ const (
 )
 
 var methodNameMap = map[int]string{
-	MethodGet:     "GET",
-	MethodPost:    "POST",
-	MethodPut:     "PUT",
-	MethodDelete:  "DELETE",
-	MethodPatch:   "PATCH",
-	MethodOptions: "OPTIONS",
+	MethodGet:     http.MethodGet,
+	MethodPost:    http.MethodPost,
+	MethodPut:     http.MethodPut,
+	MethodDelete:  http.MethodDelete,
+	MethodPatch:   http.MethodPatch,
+	MethodOptions: http.MethodOptions,
+}
+
+type Outputter interface {
+	OutputError(c *gin.Context, code int, err error)
+	OutputGetSingle(c *gin.Context, code int, result interface{}, fields map[string]interface{})
+	OutputGetMulti(c *gin.Context, code int, result []interface{}, fields map[string]interface{})
+	OutputCreate(c *gin.Context, code int, result interface{})
+	OutputUpdate(c *gin.Context, code int, result interface{})
+	OutputDelete(c *gin.Context, code int)
+	OutputPatch(c *gin.Context, code int, result interface{})
+	OutputOptions(c *gin.Context, code int)
 }
 
 type Controller interface {
-	Initialize()
-	GetResourceName() string
-	GetRouteMap() map[int]map[string]gin.HandlerFunc
+	ResourceName() string
+	RouteMap() map[int]map[string]gin.HandlerFunc
 }
 
 type Logic interface {
-	GetMulti(*gorm.DB, string) ([]interface{}, error)
-	GetSingle(*gorm.DB, string, string) (interface{}, error)
-	Create(*gorm.DB, interface{}) (interface{}, error)
-	Update(*gorm.DB, string, interface{}) (interface{}, error)
-	Delete(*gorm.DB, string) error
-	Patch(*gorm.DB, string, string) (interface{}, error)
-	Options(*gorm.DB) error
+	GetMulti(db *gorm.DB, queryString string) ([]interface{}, error)
+	GetSingle(db *gorm.DB, id string, queryString string) (interface{}, error)
+	Create(db *gorm.DB, model interface{}) (interface{}, error)
+	Update(db *gorm.DB, id string, model interface{}) (interface{}, error)
+	Delete(db *gorm.DB, id string) error
+	Patch(db *gorm.DB, id string) (interface{}, error)
+	Options(db *gorm.DB) error
 }
 
 type RouterInitializer interface {

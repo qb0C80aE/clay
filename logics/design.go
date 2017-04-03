@@ -6,14 +6,18 @@ import (
 	"github.com/qb0C80aE/clay/models"
 )
 
-type DesignLogic struct {
+type designLogic struct {
+	*BaseLogic
 }
 
-func NewDesignLogic() *DesignLogic {
-	return &DesignLogic{}
+func newDesignLogic() *designLogic {
+	logic := &designLogic{
+		BaseLogic: SharedBaseLogic(),
+	}
+	return logic
 }
 
-func (_ *DesignLogic) GetSingle(db *gorm.DB, _ string, _ string) (interface{}, error) {
+func (logic *designLogic) GetSingle(db *gorm.DB, _ string, _ string) (interface{}, error) {
 
 	design := &models.Design{
 		Content: map[string]interface{}{},
@@ -31,15 +35,7 @@ func (_ *DesignLogic) GetSingle(db *gorm.DB, _ string, _ string) (interface{}, e
 	return design, nil
 }
 
-func (_ *DesignLogic) GetMulti(_ *gorm.DB, _ string) ([]interface{}, error) {
-	return nil, nil
-}
-
-func (this *DesignLogic) Create(db *gorm.DB, data interface{}) (interface{}, error) {
-	return nil, nil
-}
-
-func (_ *DesignLogic) Update(db *gorm.DB, _ string, data interface{}) (interface{}, error) {
+func (logic *designLogic) Update(db *gorm.DB, _ string, data interface{}) (interface{}, error) {
 	design := data.(*models.Design)
 
 	designAccessors := extension.GetDesignAccessos()
@@ -57,7 +53,7 @@ func (_ *DesignLogic) Update(db *gorm.DB, _ string, data interface{}) (interface
 	return design, nil
 }
 
-func (_ *DesignLogic) Delete(db *gorm.DB, _ string) error {
+func (logic *designLogic) Delete(db *gorm.DB, _ string) error {
 	designAccessors := extension.GetDesignAccessos()
 	for _, accessor := range designAccessors {
 		if err := accessor.DeleteFromDesign(db); err != nil {
@@ -68,15 +64,11 @@ func (_ *DesignLogic) Delete(db *gorm.DB, _ string) error {
 	return nil
 }
 
-func (_ *DesignLogic) Patch(_ *gorm.DB, _ string, _ string) (interface{}, error) {
-	return nil, nil
-}
+var uniqueDesignLogic = newDesignLogic()
 
-func (_ *DesignLogic) Options(db *gorm.DB) error {
-	return nil
+func UniqueDesignLogic() extension.Logic {
+	return uniqueDesignLogic
 }
-
-var DesignLogicInstance = &DesignLogic{}
 
 func init() {
 }

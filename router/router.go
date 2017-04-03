@@ -20,9 +20,9 @@ func getAPIEndpoints(c *gin.Context) {
 
 	controllers := extension.GetControllers()
 	for _, controller := range controllers {
-		routeMap := controller.GetRouteMap()
+		routeMap := controller.RouteMap()
 		for method, routes := range routeMap {
-			title := fmt.Sprintf("%s_url [%s]", controller.GetResourceName(), extension.GetMethodName(method))
+			title := fmt.Sprintf("%s_url [%s]", controller.ResourceName(), extension.GetMethodName(method))
 			for relativePath := range routes {
 				resources[title] = fmt.Sprintf("%s/%s", baseURL, relativePath)
 			}
@@ -53,7 +53,7 @@ func Initialize(r *gin.Engine) {
 
 		controllers := extension.GetControllers()
 		for _, controller := range controllers {
-			routeMap := controller.GetRouteMap()
+			routeMap := controller.RouteMap()
 			for method, routingFunction := range methodFunctionMap {
 				routes := routeMap[method]
 				for relativePath, handlerFunc := range routes {

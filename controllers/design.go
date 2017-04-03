@@ -8,51 +8,52 @@ import (
 	"github.com/qb0C80aE/clay/models"
 )
 
-type DesignController struct {
-	BaseController
+type designController struct {
+	*BaseController
 }
 
-func init() {
-	extension.RegisterController(NewDesignController())
-}
-
-func NewDesignController() *DesignController {
-	controller := &DesignController{}
-	controller.Initialize()
+func newDesignController() extension.Controller {
+	controller := &designController{
+		BaseController: NewBaseController(
+			"design",
+			models.SharedDesignModel(),
+			logics.UniqueDesignLogic(),
+		),
+	}
+	controller.SetOutputter(controller)
 	return controller
 }
 
-func (this *DesignController) Initialize() {
-	this.ResourceName = "design"
-	this.Model = models.DesignModel
-	this.Logic = logics.NewDesignLogic()
-	this.Outputter = this
-}
-
-func (this *DesignController) GetRouteMap() map[int]map[string]gin.HandlerFunc {
+func (controller *designController) RouteMap() map[int]map[string]gin.HandlerFunc {
 	url := "designs/present"
 	routeMap := map[int]map[string]gin.HandlerFunc{
 		extension.MethodGet: {
-			url: this.GetSingle,
+			url: controller.GetSingle,
 		},
 		extension.MethodPut: {
-			url: this.Update,
+			url: controller.Update,
 		},
 		extension.MethodDelete: {
-			url: this.Delete,
+			url: controller.Delete,
 		},
 	}
 	return routeMap
 }
 
-func (this *DesignController) Update(c *gin.Context) {
+func (controller *designController) Update(c *gin.Context) {
 	db.DBInstance(c).Exec("pragma foreign_keys = off;")
-	this.BaseController.Update(c)
+	controller.BaseController.Update(c)
 	db.DBInstance(c).Exec("pragma foreign_keys = on;")
 }
 
-func (this *DesignController) Delete(c *gin.Context) {
+func (controller *designController) Delete(c *gin.Context) {
 	db.DBInstance(c).Exec("pragma foreign_keys = off;")
-	this.BaseController.Delete(c)
+	controller.BaseController.Delete(c)
 	db.DBInstance(c).Exec("pragma foreign_keys = on;")
+}
+
+var uniqueDesignController = newDesignController()
+
+func init() {
+	extension.RegisterController(uniqueDesignController)
 }

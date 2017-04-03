@@ -1,4 +1,0 @@
-package logics
-
-func HookSubmodules() {
-}
