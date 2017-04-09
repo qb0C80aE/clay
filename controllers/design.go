@@ -41,15 +41,15 @@ func (controller *designController) RouteMap() map[int]map[string]gin.HandlerFun
 }
 
 func (controller *designController) Update(c *gin.Context) {
-	db.DBInstance(c).Exec("pragma foreign_keys = off;")
+	db.Instance(c).Exec("pragma foreign_keys = off;")
 	controller.BaseController.Update(c)
-	db.DBInstance(c).Exec("pragma foreign_keys = on;")
+	db.Instance(c).Exec("pragma foreign_keys = on;")
 }
 
 func (controller *designController) Delete(c *gin.Context) {
-	db.DBInstance(c).Exec("pragma foreign_keys = off;")
+	db.Instance(c).Exec("pragma foreign_keys = off;")
 	controller.BaseController.Delete(c)
-	db.DBInstance(c).Exec("pragma foreign_keys = on;")
+	db.Instance(c).Exec("pragma foreign_keys = on;")
 }
 
 var uniqueDesignController = newDesignController()

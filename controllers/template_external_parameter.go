@@ -24,22 +24,22 @@ func newTemplateExternalParameterController() extensions.Controller {
 }
 
 func (controller *templateExternalParameterController) RouteMap() map[int]map[string]gin.HandlerFunc {
-	resourceSingleUrl := extensions.GetResourceSingleUrl(controller.ResourceName())
-	resourceMultiUrl := extensions.GetResourceMultiUrl(controller.ResourceName())
+	resourceSingleURL := extensions.BuildResourceSingleURL(controller.ResourceName())
+	resourceMultiURL := extensions.BuildResourceMultiURL(controller.ResourceName())
 
 	routeMap := map[int]map[string]gin.HandlerFunc{
 		extensions.MethodGet: {
-			resourceSingleUrl: controller.GetSingle,
-			resourceMultiUrl:  controller.GetMulti,
+			resourceSingleURL: controller.GetSingle,
+			resourceMultiURL:  controller.GetMulti,
 		},
 		extensions.MethodPost: {
-			resourceMultiUrl: controller.Create,
+			resourceMultiURL: controller.Create,
 		},
 		extensions.MethodPut: {
-			resourceSingleUrl: controller.Update,
+			resourceSingleURL: controller.Update,
 		},
 		extensions.MethodDelete: {
-			resourceSingleUrl: controller.Delete,
+			resourceSingleURL: controller.Delete,
 		},
 	}
 	return routeMap

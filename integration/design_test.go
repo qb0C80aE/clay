@@ -12,8 +12,8 @@ func TestGetDesign_Empty(t *testing.T) {
 	server := SetupServer()
 	defer server.Close()
 
-	responseText, code := Execute(t, http.MethodGet, GenerateSingleResourceUrl(server, "designs", "present", nil), nil)
-	CheckResponseJson(t, code, http.StatusOK, responseText, LoadExpectation(t, "design/TestGetDesign_Empty_1.json"), &models.Design{})
+	responseText, code := Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "designs", "present", nil), nil)
+	CheckResponseJSON(t, code, http.StatusOK, responseText, LoadExpectation(t, "design/TestGetDesign_Empty_1.json"), &models.Design{})
 }
 
 func TestGetDesign(t *testing.T) {
@@ -44,12 +44,12 @@ func TestGetDesign(t *testing.T) {
 		Value:      "TestParameter2",
 	}
 
-	Execute(t, http.MethodPost, GenerateMultiResourceUrl(server, "templates", nil), template1)
-	Execute(t, http.MethodPost, GenerateMultiResourceUrl(server, "templates", nil), template2)
-	Execute(t, http.MethodPost, GenerateMultiResourceUrl(server, "template_external_parameters", nil), templateExternalParameter22)
+	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template1)
+	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template2)
+	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_external_parameters", nil), templateExternalParameter22)
 
-	responseText, code := Execute(t, http.MethodGet, GenerateSingleResourceUrl(server, "designs", "present", nil), nil)
-	CheckResponseJson(t, code, http.StatusOK, responseText, LoadExpectation(t, "design/TestGetDesign_1.json"), &models.Design{})
+	responseText, code := Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "designs", "present", nil), nil)
+	CheckResponseJSON(t, code, http.StatusOK, responseText, LoadExpectation(t, "design/TestGetDesign_1.json"), &models.Design{})
 }
 
 func TestUpdateDesign(t *testing.T) {
@@ -87,11 +87,11 @@ func TestUpdateDesign(t *testing.T) {
 		},
 	}
 
-	responseText, code := Execute(t, http.MethodPut, GenerateSingleResourceUrl(server, "designs", "present", nil), design)
-	CheckResponseJson(t, code, http.StatusOK, responseText, LoadExpectation(t, "design/TestUpdateDesign_1.json"), &models.Design{})
+	responseText, code := Execute(t, http.MethodPut, GenerateSingleResourceURL(server, "designs", "present", nil), design)
+	CheckResponseJSON(t, code, http.StatusOK, responseText, LoadExpectation(t, "design/TestUpdateDesign_1.json"), &models.Design{})
 
-	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceUrl(server, "designs", "present", nil), nil)
-	CheckResponseJson(t, code, http.StatusOK, responseText, LoadExpectation(t, "design/TestUpdateDesign_2.json"), &models.Design{})
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "designs", "present", nil), nil)
+	CheckResponseJSON(t, code, http.StatusOK, responseText, LoadExpectation(t, "design/TestUpdateDesign_2.json"), &models.Design{})
 }
 
 func TestDeleteDesign(t *testing.T) {
@@ -129,12 +129,12 @@ func TestDeleteDesign(t *testing.T) {
 		},
 	}
 
-	responseText, code := Execute(t, http.MethodPut, GenerateSingleResourceUrl(server, "designs", "present", nil), design)
-	CheckResponseJson(t, code, http.StatusOK, responseText, LoadExpectation(t, "design/TestDeleteDesign_1.json"), &models.Design{})
+	responseText, code := Execute(t, http.MethodPut, GenerateSingleResourceURL(server, "designs", "present", nil), design)
+	CheckResponseJSON(t, code, http.StatusOK, responseText, LoadExpectation(t, "design/TestDeleteDesign_1.json"), &models.Design{})
 
-	responseText, code = Execute(t, http.MethodDelete, GenerateSingleResourceUrl(server, "designs", "present", nil), nil)
+	responseText, code = Execute(t, http.MethodDelete, GenerateSingleResourceURL(server, "designs", "present", nil), nil)
 	CheckResponseText(t, code, http.StatusNoContent, responseText, []byte{})
 
-	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceUrl(server, "designs", "present", nil), nil)
-	CheckResponseJson(t, code, http.StatusOK, responseText, LoadExpectation(t, "design/TestDeleteDesign_2.json"), &models.Design{})
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "designs", "present", nil), nil)
+	CheckResponseJSON(t, code, http.StatusOK, responseText, LoadExpectation(t, "design/TestDeleteDesign_2.json"), &models.Design{})
 }

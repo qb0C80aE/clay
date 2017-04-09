@@ -17,8 +17,10 @@ import (
 const version = "v1"
 const timeout = 15
 
+// EmptyArrayString represents an empty JSON array in string type
 var EmptyArrayString = []byte("[]")
 
+// ErrorResponseText is the struct represents error JSON responses
 type ErrorResponseText struct {
 	Error string `json:"error"`
 }
@@ -29,7 +31,7 @@ func error(t *testing.T, message string, args ...interface{}) {
 }
 
 func generateQueryParameter(data map[string]string) string {
-	var buffer *bytes.Buffer = &bytes.Buffer{}
+	buffer := &bytes.Buffer{}
 	for key, value := range data {
 		buffer.WriteString(key)
 		buffer.WriteByte('=')
@@ -40,7 +42,8 @@ func generateQueryParameter(data map[string]string) string {
 	return queryParameter[0 : len(queryParameter)-1]
 }
 
-func GenerateMultiResourceUrl(ts *httptest.Server, resource string, parameters map[string]string) string {
+// GenerateMultiResourceURL generates a resource url what represents multi resources based on the arguments
+func GenerateMultiResourceURL(ts *httptest.Server, resource string, parameters map[string]string) string {
 	var url string
 	if 0 < len(parameters) {
 		url = fmt.Sprintf("%s/%s/%s?%s", ts.URL, version, resource, generateQueryParameter(parameters))
@@ -50,7 +53,8 @@ func GenerateMultiResourceUrl(ts *httptest.Server, resource string, parameters m
 	return url
 }
 
-func GenerateSingleResourceUrl(ts *httptest.Server, resource string, id string, parameters map[string]string) string {
+// GenerateSingleResourceURL generates a resource url what represents a single resource based on the arguments
+func GenerateSingleResourceURL(ts *httptest.Server, resource string, id string, parameters map[string]string) string {
 	var url string
 	if 0 < len(parameters) {
 		url = fmt.Sprintf("%s/%s/%s/%s?%s", ts.URL, version, resource, id, generateQueryParameter(parameters))
@@ -60,13 +64,15 @@ func GenerateSingleResourceUrl(ts *httptest.Server, resource string, id string, 
 	return url
 }
 
+// SetupServer setups server for integration tests
 func SetupServer() *httptest.Server {
 	database := db.Connect()
 	s := server.Setup(database)
 	return httptest.NewServer(s)
 }
 
-func Execute(t *testing.T, method string, resourceUrl string, data interface{}) ([]byte, int) {
+// Execute send a HTTP request to the test server and receive a response
+func Execute(t *testing.T, method string, resourceURL string, data interface{}) ([]byte, int) {
 	byteArray, err := json.Marshal(data)
 
 	if err != nil {
@@ -75,7 +81,7 @@ func Execute(t *testing.T, method string, resourceUrl string, data interface{}) 
 
 	request, err := http.NewRequest(
 		method,
-		resourceUrl,
+		resourceURL,
 		bytes.NewBuffer(byteArray),
 	)
 	request.Header.Set("Content-Type", "application/json")
@@ -100,7 +106,8 @@ func Execute(t *testing.T, method string, resourceUrl string, data interface{}) 
 	return contents, response.StatusCode
 }
 
-func CheckResponseJson(t *testing.T, code int, expectedCode int, responseText []byte, expectedResponseText []byte, model interface{}) {
+// CheckResponseJSON checks given response JSON text
+func CheckResponseJSON(t *testing.T, code int, expectedCode int, responseText []byte, expectedResponseText []byte, model interface{}) {
 	if code != expectedCode {
 		error(t, "code is expected as %d, but %d", expectedCode, code)
 	}
@@ -144,6 +151,7 @@ func CheckResponseJson(t *testing.T, code int, expectedCode int, responseText []
 	}
 }
 
+// CheckResponseText checks given response text
 func CheckResponseText(t *testing.T, code int, expectedCode int, responseText []byte, expectedResponseText []byte) {
 	if code != expectedCode {
 		error(t, "code is expected as %d, but %d", expectedCode, code)
@@ -154,6 +162,7 @@ func CheckResponseText(t *testing.T, code int, expectedCode int, responseText []
 	}
 }
 
+// LoadExpectation loads expectation files to test automatically
 func LoadExpectation(t *testing.T, testCaseName string) []byte {
 	expectationFile := fmt.Sprintf("expectations/%s", testCaseName)
 	data, err := ioutil.ReadFile(expectationFile)

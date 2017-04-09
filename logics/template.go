@@ -87,10 +87,11 @@ func (logic *templateLogic) Delete(db *gorm.DB, id string) error {
 
 }
 
+// Patch generates text data based on registered templates
 func (logic *templateLogic) Patch(db *gorm.DB, id string) (interface{}, error) {
 	templateParameter := map[string]interface{}{}
 
-	templateParameterGenerators := extensions.GetTemplateParameterGenerators()
+	templateParameterGenerators := extensions.RegisteredTemplateParameterGenerators()
 	for _, generator := range templateParameterGenerators {
 		key, value, err := generator.GenerateTemplateParameter(db)
 		if err != nil {
@@ -114,7 +115,7 @@ func (logic *templateLogic) Patch(db *gorm.DB, id string) (interface{}, error) {
 	templateParameter["TemplateExternalParameters"] = templateExternalParameterMap
 
 	tpl := tplpkg.New("template")
-	templateFuncMaps := extensions.GetTemplateFuncMaps()
+	templateFuncMaps := extensions.RegisteredTemplateFuncMaps()
 	for _, templateFuncMap := range templateFuncMaps {
 		tpl = tpl.Funcs(templateFuncMap)
 	}
@@ -164,6 +165,7 @@ func (logic *templateLogic) LoadToDesign(db *gorm.DB, data interface{}) error {
 
 var uniqueTemplateLogic = newTemplateLogic()
 
+// UniqueTemplateLogic returns the unique template logic instance
 func UniqueTemplateLogic() extensions.Logic {
 	return uniqueTemplateLogic
 }

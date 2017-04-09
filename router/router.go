@@ -18,11 +18,11 @@ func getAPIEndpoints(c *gin.Context) {
 	baseURL := fmt.Sprintf("%s://%s/%s", reqScheme, reqHost, "v1")
 	resources := map[string]string{}
 
-	controllers := extensions.GetControllers()
+	controllers := extensions.RegisteredControllers()
 	for _, controller := range controllers {
 		routeMap := controller.RouteMap()
 		for method, routes := range routeMap {
-			title := fmt.Sprintf("%s_url [%s]", controller.ResourceName(), extensions.GetMethodName(method))
+			title := fmt.Sprintf("%s_url [%s]", controller.ResourceName(), extensions.LookUpMethodName(method))
 			for relativePath := range routes {
 				resources[title] = fmt.Sprintf("%s/%s", baseURL, relativePath)
 			}
@@ -31,8 +31,9 @@ func getAPIEndpoints(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, resources)
 }
 
+// Initialize initializes the router
 func Initialize(r *gin.Engine) {
-	routerInitializers := extensions.GetRouterInitializers()
+	routerInitializers := extensions.RegisteredRouterInitializers()
 
 	for _, initializer := range routerInitializers {
 		initializer.InitializeEarly(r)
@@ -42,7 +43,7 @@ func Initialize(r *gin.Engine) {
 
 	api := r.Group("/v1")
 	{
-		var methodFunctionMap map[int]func(string, ...gin.HandlerFunc) gin.IRoutes = map[int]func(string, ...gin.HandlerFunc) gin.IRoutes{
+		methodFunctionMap := map[int]func(string, ...gin.HandlerFunc) gin.IRoutes{
 			extensions.MethodGet:     api.GET,
 			extensions.MethodPost:    api.POST,
 			extensions.MethodPut:     api.PUT,
@@ -51,7 +52,7 @@ func Initialize(r *gin.Engine) {
 			extensions.MethodOptions: api.OPTIONS,
 		}
 
-		controllers := extensions.GetControllers()
+		controllers := extensions.RegisteredControllers()
 		for _, controller := range controllers {
 			routeMap := controller.RouteMap()
 			for method, routingFunction := range methodFunctionMap {
