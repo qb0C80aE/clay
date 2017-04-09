@@ -1,5 +1,5 @@
-hash: aa5e239b381419421009d6cc3508f842cfc8b0b749d040a0cd8088c391b58b92
-updated: 2017-03-20T14:30:40.311655481+09:00
+hash: 2ab2a9c068373e9b0b574a9d9d78a6ea9f40fd672f031bfe88e56426b8cbb2bd
+updated: 2017-04-10T00:31:55.321767366+09:00
 imports:
 - name: github.com/gin-gonic/gin
   version: e2212d40c62a98b388a5eb48ecbdcf88534688ba
@@ -22,10 +22,6 @@ imports:
   version: 57fdcb988a5c543893cc61bce354a6e24ab70022
 - name: github.com/mattn/go-sqlite3
   version: ca5e3819723d8eeaf170ad510e7da1d6d2e94a08
-- name: github.com/qb0C80aE/loam
-  version: d5a80a4497a3789ed33c846a2908aa82e5a18d04
-- name: github.com/qb0C80aE/pottery
-  version: 71146fd7300498282693a76b9d828f0c9a5202aa
 - name: github.com/serenize/snaker
   version: 543781d2b79bd95c51ffe70e70a55c946ca211ff
 - name: golang.org/x/net
