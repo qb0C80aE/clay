@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	"github.com/qb0C80aE/clay/extension"
+	"github.com/qb0C80aE/clay/extensions"
 	"github.com/serenize/snaker"
 	"log"
 	"os"
@@ -40,7 +40,7 @@ func Connect() *gorm.DB {
 		db.LogMode(true)
 	}
 
-	db.AutoMigrate(extension.GetModels()...)
+	db.AutoMigrate(extensions.GetModels()...)
 
 	return db
 }

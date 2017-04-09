@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/qb0C80aE/clay/extension"
+	"github.com/qb0C80aE/clay/extensions"
 	"io/ioutil"
 	"net/http"
 	"reflect"
@@ -17,11 +17,11 @@ import (
 type BaseController struct {
 	resourceName string
 	model        interface{}
-	logic        extension.Logic
-	outputter    extension.Outputter
+	logic        extensions.Logic
+	outputter    extensions.Outputter
 }
 
-func NewBaseController(resourceName string, model interface{}, logic extension.Logic) *BaseController {
+func NewBaseController(resourceName string, model interface{}, logic extensions.Logic) *BaseController {
 	controller := &BaseController{
 		resourceName: resourceName,
 		model:        model,
@@ -328,6 +328,6 @@ func (controller *BaseController) Options(c *gin.Context) {
 	controller.outputter.OutputOptions(c, http.StatusNoContent)
 }
 
-func (controller *BaseController) SetOutputter(outputter extension.Outputter) {
+func (controller *BaseController) SetOutputter(outputter extensions.Outputter) {
 	controller.outputter = outputter
 }

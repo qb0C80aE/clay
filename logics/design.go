@@ -2,7 +2,7 @@ package logics
 
 import (
 	"github.com/jinzhu/gorm"
-	"github.com/qb0C80aE/clay/extension"
+	"github.com/qb0C80aE/clay/extensions"
 	"github.com/qb0C80aE/clay/models"
 )
 
@@ -23,7 +23,7 @@ func (logic *designLogic) GetSingle(db *gorm.DB, _ string, _ string) (interface{
 		Content: map[string]interface{}{},
 	}
 
-	designAccessors := extension.GetDesignAccessos()
+	designAccessors := extensions.GetDesignAccessos()
 	for _, accessor := range designAccessors {
 		key, value, err := accessor.ExtractFromDesign(db)
 		if err != nil {
@@ -38,7 +38,7 @@ func (logic *designLogic) GetSingle(db *gorm.DB, _ string, _ string) (interface{
 func (logic *designLogic) Update(db *gorm.DB, _ string, data interface{}) (interface{}, error) {
 	design := data.(*models.Design)
 
-	designAccessors := extension.GetDesignAccessos()
+	designAccessors := extensions.GetDesignAccessos()
 	for _, accessor := range designAccessors {
 		if err := accessor.DeleteFromDesign(db); err != nil {
 			return nil, err
@@ -54,7 +54,7 @@ func (logic *designLogic) Update(db *gorm.DB, _ string, data interface{}) (inter
 }
 
 func (logic *designLogic) Delete(db *gorm.DB, _ string) error {
-	designAccessors := extension.GetDesignAccessos()
+	designAccessors := extensions.GetDesignAccessos()
 	for _, accessor := range designAccessors {
 		if err := accessor.DeleteFromDesign(db); err != nil {
 			return err
@@ -66,7 +66,7 @@ func (logic *designLogic) Delete(db *gorm.DB, _ string) error {
 
 var uniqueDesignLogic = newDesignLogic()
 
-func UniqueDesignLogic() extension.Logic {
+func UniqueDesignLogic() extensions.Logic {
 	return uniqueDesignLogic
 }
 

@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/qb0C80aE/clay/extension"
+	"github.com/qb0C80aE/clay/extensions"
 	"github.com/qb0C80aE/clay/logics"
 	"github.com/qb0C80aE/clay/models"
 )
@@ -11,7 +11,7 @@ type templateExternalParameterController struct {
 	*BaseController
 }
 
-func newTemplateExternalParameterController() extension.Controller {
+func newTemplateExternalParameterController() extensions.Controller {
 	controller := &templateExternalParameterController{
 		BaseController: NewBaseController(
 			"template_external_parameter",
@@ -24,21 +24,21 @@ func newTemplateExternalParameterController() extension.Controller {
 }
 
 func (controller *templateExternalParameterController) RouteMap() map[int]map[string]gin.HandlerFunc {
-	resourceSingleUrl := extension.GetResourceSingleUrl(controller.ResourceName())
-	resourceMultiUrl := extension.GetResourceMultiUrl(controller.ResourceName())
+	resourceSingleUrl := extensions.GetResourceSingleUrl(controller.ResourceName())
+	resourceMultiUrl := extensions.GetResourceMultiUrl(controller.ResourceName())
 
 	routeMap := map[int]map[string]gin.HandlerFunc{
-		extension.MethodGet: {
+		extensions.MethodGet: {
 			resourceSingleUrl: controller.GetSingle,
 			resourceMultiUrl:  controller.GetMulti,
 		},
-		extension.MethodPost: {
+		extensions.MethodPost: {
 			resourceMultiUrl: controller.Create,
 		},
-		extension.MethodPut: {
+		extensions.MethodPut: {
 			resourceSingleUrl: controller.Update,
 		},
-		extension.MethodDelete: {
+		extensions.MethodDelete: {
 			resourceSingleUrl: controller.Delete,
 		},
 	}
@@ -48,5 +48,5 @@ func (controller *templateExternalParameterController) RouteMap() map[int]map[st
 var uniqueTemplateExternalParameterController = newTemplateExternalParameterController()
 
 func init() {
-	extension.RegisterController(uniqueTemplateExternalParameterController)
+	extensions.RegisterController(uniqueTemplateExternalParameterController)
 }

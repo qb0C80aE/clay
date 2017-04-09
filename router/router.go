@@ -3,7 +3,7 @@ package router
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/qb0C80aE/clay/extension"
+	"github.com/qb0C80aE/clay/extensions"
 	"net/http"
 )
 
@@ -18,11 +18,11 @@ func getAPIEndpoints(c *gin.Context) {
 	baseURL := fmt.Sprintf("%s://%s/%s", reqScheme, reqHost, "v1")
 	resources := map[string]string{}
 
-	controllers := extension.GetControllers()
+	controllers := extensions.GetControllers()
 	for _, controller := range controllers {
 		routeMap := controller.RouteMap()
 		for method, routes := range routeMap {
-			title := fmt.Sprintf("%s_url [%s]", controller.ResourceName(), extension.GetMethodName(method))
+			title := fmt.Sprintf("%s_url [%s]", controller.ResourceName(), extensions.GetMethodName(method))
 			for relativePath := range routes {
 				resources[title] = fmt.Sprintf("%s/%s", baseURL, relativePath)
 			}
@@ -32,7 +32,7 @@ func getAPIEndpoints(c *gin.Context) {
 }
 
 func Initialize(r *gin.Engine) {
-	routerInitializers := extension.GetRouterInitializers()
+	routerInitializers := extensions.GetRouterInitializers()
 
 	for _, initializer := range routerInitializers {
 		initializer.InitializeEarly(r)
@@ -43,15 +43,15 @@ func Initialize(r *gin.Engine) {
 	api := r.Group("/v1")
 	{
 		var methodFunctionMap map[int]func(string, ...gin.HandlerFunc) gin.IRoutes = map[int]func(string, ...gin.HandlerFunc) gin.IRoutes{
-			extension.MethodGet:     api.GET,
-			extension.MethodPost:    api.POST,
-			extension.MethodPut:     api.PUT,
-			extension.MethodDelete:  api.DELETE,
-			extension.MethodPatch:   api.PATCH,
-			extension.MethodOptions: api.OPTIONS,
+			extensions.MethodGet:     api.GET,
+			extensions.MethodPost:    api.POST,
+			extensions.MethodPut:     api.PUT,
+			extensions.MethodDelete:  api.DELETE,
+			extensions.MethodPatch:   api.PATCH,
+			extensions.MethodOptions: api.OPTIONS,
 		}
 
-		controllers := extension.GetControllers()
+		controllers := extensions.GetControllers()
 		for _, controller := range controllers {
 			routeMap := controller.RouteMap()
 			for method, routingFunction := range methodFunctionMap {

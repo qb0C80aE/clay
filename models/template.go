@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/qb0C80aE/clay/extension"
+	"github.com/qb0C80aE/clay/extensions"
 )
 
 type Template struct {
@@ -22,5 +22,5 @@ func SharedTemplateModel() *Template {
 }
 
 func init() {
-	extension.RegisterModelType(sharedTemplateModel)
+	extensions.RegisterModelType(sharedTemplateModel)
 }

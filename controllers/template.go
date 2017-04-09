@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/qb0C80aE/clay/extension"
+	"github.com/qb0C80aE/clay/extensions"
 	"github.com/qb0C80aE/clay/logics"
 	"github.com/qb0C80aE/clay/models"
 )
@@ -11,7 +11,7 @@ type templateController struct {
 	*BaseController
 }
 
-func newTemplateController() extension.Controller {
+func newTemplateController() extensions.Controller {
 	controller := &templateController{
 		BaseController: NewBaseController(
 			"template",
@@ -24,24 +24,24 @@ func newTemplateController() extension.Controller {
 }
 
 func (controller *templateController) RouteMap() map[int]map[string]gin.HandlerFunc {
-	resourceSingleUrl := extension.GetResourceSingleUrl(controller.ResourceName())
-	resourceMultiUrl := extension.GetResourceMultiUrl(controller.ResourceName())
+	resourceSingleUrl := extensions.GetResourceSingleUrl(controller.ResourceName())
+	resourceMultiUrl := extensions.GetResourceMultiUrl(controller.ResourceName())
 
 	routeMap := map[int]map[string]gin.HandlerFunc{
-		extension.MethodGet: {
+		extensions.MethodGet: {
 			resourceSingleUrl: controller.GetSingle,
 			resourceMultiUrl:  controller.GetMulti,
 		},
-		extension.MethodPost: {
+		extensions.MethodPost: {
 			resourceMultiUrl: controller.Create,
 		},
-		extension.MethodPut: {
+		extensions.MethodPut: {
 			resourceSingleUrl: controller.Update,
 		},
-		extension.MethodDelete: {
+		extensions.MethodDelete: {
 			resourceSingleUrl: controller.Delete,
 		},
-		extension.MethodPatch: {
+		extensions.MethodPatch: {
 			resourceSingleUrl: controller.Patch,
 		},
 	}
@@ -56,5 +56,5 @@ func (controller *templateController) OutputPatch(c *gin.Context, code int, resu
 var uniqueTemplateController = newTemplateController()
 
 func init() {
-	extension.RegisterController(uniqueTemplateController)
+	extensions.RegisterController(uniqueTemplateController)
 }

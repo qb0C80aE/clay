@@ -2,7 +2,7 @@ package logics
 
 import (
 	"github.com/jinzhu/gorm"
-	"github.com/qb0C80aE/clay/extension"
+	"github.com/qb0C80aE/clay/extensions"
 	"github.com/qb0C80aE/clay/models"
 	"github.com/qb0C80aE/clay/utils/mapstruct"
 	"strconv"
@@ -119,10 +119,10 @@ func (logic *templateExternalParameterLogic) LoadToDesign(db *gorm.DB, data inte
 
 var uniqueTemplateExternalParameterLogic = newTemplateExternalParameterLogic()
 
-func UniqueTemplateExternalParameterLogic() extension.Logic {
+func UniqueTemplateExternalParameterLogic() extensions.Logic {
 	return uniqueTemplateExternalParameterLogic
 }
 
 func init() {
-	extension.RegisterDesignAccessor(uniqueTemplateExternalParameterLogic)
+	extensions.RegisterDesignAccessor(uniqueTemplateExternalParameterLogic)
 }

@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/qb0C80aE/clay/extension"
+	"github.com/qb0C80aE/clay/extensions"
 )
 
 type TemplateExternalParameter struct {
@@ -22,5 +22,5 @@ func SharedTemplateExternalParameterModel() *TemplateExternalParameter {
 }
 
 func init() {
-	extension.RegisterModelType(sharedTemplateExternalParameterModel)
+	extensions.RegisterModelType(sharedTemplateExternalParameterModel)
 }

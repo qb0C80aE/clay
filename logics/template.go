@@ -3,7 +3,7 @@ package logics
 import (
 	"bytes"
 	"github.com/jinzhu/gorm"
-	"github.com/qb0C80aE/clay/extension"
+	"github.com/qb0C80aE/clay/extensions"
 	"github.com/qb0C80aE/clay/models"
 	"github.com/qb0C80aE/clay/utils/mapstruct"
 	"strconv"
@@ -90,7 +90,7 @@ func (logic *templateLogic) Delete(db *gorm.DB, id string) error {
 func (logic *templateLogic) Patch(db *gorm.DB, id string) (interface{}, error) {
 	templateParameter := map[string]interface{}{}
 
-	templateParameterGenerators := extension.GetTemplateParameterGenerators()
+	templateParameterGenerators := extensions.GetTemplateParameterGenerators()
 	for _, generator := range templateParameterGenerators {
 		key, value, err := generator.GenerateTemplateParameter(db)
 		if err != nil {
@@ -114,7 +114,7 @@ func (logic *templateLogic) Patch(db *gorm.DB, id string) (interface{}, error) {
 	templateParameter["TemplateExternalParameters"] = templateExternalParameterMap
 
 	tpl := tplpkg.New("template")
-	templateFuncMaps := extension.GetTemplateFuncMaps()
+	templateFuncMaps := extensions.GetTemplateFuncMaps()
 	for _, templateFuncMap := range templateFuncMaps {
 		tpl = tpl.Funcs(templateFuncMap)
 	}
@@ -164,10 +164,10 @@ func (logic *templateLogic) LoadToDesign(db *gorm.DB, data interface{}) error {
 
 var uniqueTemplateLogic = newTemplateLogic()
 
-func UniqueTemplateLogic() extension.Logic {
+func UniqueTemplateLogic() extensions.Logic {
 	return uniqueTemplateLogic
 }
 
 func init() {
-	extension.RegisterDesignAccessor(uniqueTemplateLogic)
+	extensions.RegisterDesignAccessor(uniqueTemplateLogic)
 }

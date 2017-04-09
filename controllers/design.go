@@ -3,7 +3,7 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/qb0C80aE/clay/db"
-	"github.com/qb0C80aE/clay/extension"
+	"github.com/qb0C80aE/clay/extensions"
 	"github.com/qb0C80aE/clay/logics"
 	"github.com/qb0C80aE/clay/models"
 )
@@ -12,7 +12,7 @@ type designController struct {
 	*BaseController
 }
 
-func newDesignController() extension.Controller {
+func newDesignController() extensions.Controller {
 	controller := &designController{
 		BaseController: NewBaseController(
 			"design",
@@ -27,13 +27,13 @@ func newDesignController() extension.Controller {
 func (controller *designController) RouteMap() map[int]map[string]gin.HandlerFunc {
 	url := "designs/present"
 	routeMap := map[int]map[string]gin.HandlerFunc{
-		extension.MethodGet: {
+		extensions.MethodGet: {
 			url: controller.GetSingle,
 		},
-		extension.MethodPut: {
+		extensions.MethodPut: {
 			url: controller.Update,
 		},
-		extension.MethodDelete: {
+		extensions.MethodDelete: {
 			url: controller.Delete,
 		},
 	}
@@ -55,5 +55,5 @@ func (controller *designController) Delete(c *gin.Context) {
 var uniqueDesignController = newDesignController()
 
 func init() {
-	extension.RegisterController(uniqueDesignController)
+	extensions.RegisterController(uniqueDesignController)
 }
