@@ -119,6 +119,7 @@ func (logic *templateExternalParameterLogic) LoadToDesign(db *gorm.DB, data inte
 
 var uniqueTemplateExternalParameterLogic = newTemplateExternalParameterLogic()
 
+// UniqueTemplateExternalParameterLogic returns the unique template external parameter logic instance
 func UniqueTemplateExternalParameterLogic() extensions.Logic {
 	return uniqueTemplateExternalParameterLogic
 }

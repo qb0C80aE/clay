@@ -8,6 +8,7 @@ import (
 	"github.com/serenize/snaker"
 )
 
+// AssociationType is the association type of GORM
 type AssociationType int
 
 const (
@@ -37,6 +38,7 @@ func merge(m1, m2 map[string]interface{}) map[string]interface{} {
 	return result
 }
 
+// QueryFields builds a query field string based on arguments
 func QueryFields(model interface{}, fields map[string]interface{}) string {
 	var jsonTag, jsonKey string
 
@@ -100,6 +102,7 @@ func QueryFields(model interface{}, fields map[string]interface{}) string {
 	return strings.Join(result, ",")
 }
 
+// ParseFields parses the argument and generate a map based on that
 func ParseFields(fields string) map[string]interface{} {
 	result := make(map[string]interface{})
 
@@ -143,6 +146,7 @@ func isEmptyValue(v reflect.Value) bool {
 	return false
 }
 
+// FieldToMap generates a map from the model in argument
 func FieldToMap(model interface{}, fields map[string]interface{}) (map[string]interface{}, error) {
 	u := make(map[string]interface{})
 	vs := reflect.ValueOf(model)
@@ -152,17 +156,17 @@ func FieldToMap(model interface{}, fields map[string]interface{}) (map[string]in
 	}
 
 	if !vs.IsValid() {
-		return nil, errors.New("Invalid Parameter. The model is pointing nil.")
+		return nil, errors.New("Invalid Parameter. The model is pointing nil")
 	}
 
 	if vs.Kind() != reflect.Struct {
-		return nil, errors.New("Invalid Parameter. The specified parameter does not have a structure.")
+		return nil, errors.New("Invalid Parameter. The specified parameter does not have a structure")
 	}
 
 	if !contains(fields, "*") {
 		for field := range fields {
 			if !vs.FieldByName(snaker.SnakeToCamel(field)).IsValid() {
-				return nil, errors.New("Invalid Parameter. The specified field does not exist.")
+				return nil, errors.New("Invalid Parameter. The specified field does not exist")
 			}
 		}
 	}
@@ -215,7 +219,7 @@ func FieldToMap(model interface{}, fields map[string]interface{}) (map[string]in
 					if v == nil {
 						u[jsonKey] = nil
 					} else {
-						return nil, errors.New("Invalid Parameter. The structure is null.")
+						return nil, errors.New("Invalid Parameter. The structure is null")
 					}
 				}
 			} else if vs.Field(i).Kind() == reflect.Slice {

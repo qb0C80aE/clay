@@ -9,11 +9,11 @@ import (
 func convertPrefixToQuery(sort string) string {
 	if strings.HasPrefix(sort, "-") {
 		return strings.TrimLeft(sort, "-") + " desc"
-	} else {
-		return strings.TrimLeft(sort, " ") + " asc"
 	}
+	return strings.TrimLeft(sort, " ") + " asc"
 }
 
+// SortRecords configures the order of retrieved records from db
 func SortRecords(sorts string, db *gorm.DB) *gorm.DB {
 	if sorts == "" {
 		return db

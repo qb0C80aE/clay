@@ -28,6 +28,7 @@ func filterToMap(c *gin.Context, model interface{}) map[string]string {
 	return filters
 }
 
+// FilterFields filters fields
 func FilterFields(c *gin.Context, model interface{}, db *gorm.DB) *gorm.DB {
 	vs := reflect.ValueOf(model)
 	for vs.Kind() == reflect.Ptr {

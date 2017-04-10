@@ -17,13 +17,14 @@ func newDesignLogic() *designLogic {
 	return logic
 }
 
+// GetSingle returns all models to store into versioning repositories
 func (logic *designLogic) GetSingle(db *gorm.DB, _ string, _ string) (interface{}, error) {
 
 	design := &models.Design{
 		Content: map[string]interface{}{},
 	}
 
-	designAccessors := extensions.GetDesignAccessos()
+	designAccessors := extensions.RegisteredDesignAccessors()
 	for _, accessor := range designAccessors {
 		key, value, err := accessor.ExtractFromDesign(db)
 		if err != nil {
@@ -35,10 +36,11 @@ func (logic *designLogic) GetSingle(db *gorm.DB, _ string, _ string) (interface{
 	return design, nil
 }
 
+// Update deletes and updates all models bases on the given data
 func (logic *designLogic) Update(db *gorm.DB, _ string, data interface{}) (interface{}, error) {
 	design := data.(*models.Design)
 
-	designAccessors := extensions.GetDesignAccessos()
+	designAccessors := extensions.RegisteredDesignAccessors()
 	for _, accessor := range designAccessors {
 		if err := accessor.DeleteFromDesign(db); err != nil {
 			return nil, err
@@ -53,8 +55,9 @@ func (logic *designLogic) Update(db *gorm.DB, _ string, data interface{}) (inter
 	return design, nil
 }
 
+// Delete deletes all models
 func (logic *designLogic) Delete(db *gorm.DB, _ string) error {
-	designAccessors := extensions.GetDesignAccessos()
+	designAccessors := extensions.RegisteredDesignAccessors()
 	for _, accessor := range designAccessors {
 		if err := accessor.DeleteFromDesign(db); err != nil {
 			return err
@@ -66,6 +69,7 @@ func (logic *designLogic) Delete(db *gorm.DB, _ string) error {
 
 var uniqueDesignLogic = newDesignLogic()
 
+// UniqueDesignLogic returns the unique design logic instance
 func UniqueDesignLogic() extensions.Logic {
 	return uniqueDesignLogic
 }

@@ -9,9 +9,11 @@ before_install:
 
 install:
  - go get github.com/Masterminds/glide
+ - go get -u github.com/golang/lint/golint
 
 script:
  - glide install
+ - golint $(glide novendor)
  - go build -v
  - go test -v -race $(glide novendor)
 
