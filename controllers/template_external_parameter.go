@@ -7,23 +7,23 @@ import (
 	"github.com/qb0C80aE/clay/models"
 )
 
-type templateController struct {
+type templateExternalParameterController struct {
 	*BaseController
 }
 
-func newTemplateController() extensions.Controller {
-	controller := &templateController{
+func newTemplateExternalParameterController() extensions.Controller {
+	controller := &templateExternalParameterController{
 		BaseController: NewBaseController(
-			"template",
-			models.SharedTemplateModel(),
-			logics.UniqueTemplateLogic(),
+			"template_external_parameter",
+			models.SharedTemplateExternalParameterModel(),
+			logics.UniqueTemplateExternalParameterLogic(),
 		),
 	}
 	controller.SetOutputter(controller)
 	return controller
 }
 
-func (controller *templateController) RouteMap() map[int]map[string]gin.HandlerFunc {
+func (controller *templateExternalParameterController) RouteMap() map[int]map[string]gin.HandlerFunc {
 	resourceSingleUrl := extensions.GetResourceSingleUrl(controller.ResourceName())
 	resourceMultiUrl := extensions.GetResourceMultiUrl(controller.ResourceName())
 
@@ -41,20 +41,12 @@ func (controller *templateController) RouteMap() map[int]map[string]gin.HandlerF
 		extensions.MethodDelete: {
 			resourceSingleUrl: controller.Delete,
 		},
-		extensions.MethodPatch: {
-			resourceSingleUrl: controller.Patch,
-		},
 	}
 	return routeMap
 }
 
-func (controller *templateController) OutputPatch(c *gin.Context, code int, result interface{}) {
-	text := result.(string)
-	c.String(code, text)
-}
-
-var uniqueTemplateController = newTemplateController()
+var uniqueTemplateExternalParameterController = newTemplateExternalParameterController()
 
 func init() {
-	extensions.RegisterController(uniqueTemplateController)
+	extensions.RegisterController(uniqueTemplateExternalParameterController)
 }

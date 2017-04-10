@@ -1,15 +1,8 @@
 package models
 
 import (
-	"github.com/qb0C80aE/clay/extension"
+	"github.com/qb0C80aE/clay/extensions"
 )
-
-type TemplateExternalParameter struct {
-	ID         int    `json:"id" gorm:"primary_key;AUTO_INCREMENT"`
-	TemplateID int    `json:"template_id" gorm:"index" sql:"type:integer references templates(id) on delete cascade"`
-	Name       string `json:"name"`
-	Value      string `json:"value"`
-}
 
 type Template struct {
 	ID                         int                          `json:"id" form:"id" gorm:"primary_key;AUTO_INCREMENT"`
@@ -18,10 +11,16 @@ type Template struct {
 	TemplateExternalParameters []*TemplateExternalParameter `json:"template_external_parameters"`
 }
 
-var TemplateExternalParameterModel = &TemplateExternalParameter{}
-var TemplateModel = &Template{}
+func NewTemplateModel() *Template {
+	return &Template{}
+}
+
+var sharedTemplateModel = NewTemplateModel()
+
+func SharedTemplateModel() *Template {
+	return sharedTemplateModel
+}
 
 func init() {
-	extension.RegisterModelType(TemplateExternalParameterModel)
-	extension.RegisterModelType(TemplateModel)
+	extensions.RegisterModelType(sharedTemplateModel)
 }

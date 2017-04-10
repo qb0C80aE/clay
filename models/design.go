@@ -4,7 +4,15 @@ type Design struct {
 	Content map[string]interface{} `json:"content"`
 }
 
-var DesignModel = &Design{}
+func NewDesignModel() *Design {
+	return &Design{}
+}
+
+var designModel = NewDesignModel()
+
+func SharedDesignModel() *Design {
+	return designModel
+}
 
 func init() {
 }
