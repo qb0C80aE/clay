@@ -125,7 +125,7 @@ func (logic *templateLogic) Patch(db *gorm.DB, id string) (interface{}, error) {
 	}
 
 	var doc bytes.Buffer
-	if tpl.Execute(&doc, templateParameter) != nil {
+	if err := tpl.Execute(&doc, templateParameter); err != nil {
 		return nil, err
 	}
 
