@@ -7,7 +7,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extensions"
 	"io/ioutil"
 	"net/http"
@@ -182,6 +184,83 @@ func (controller *BaseController) OutputOptions(c *gin.Context, code int) {
 	controller.OutputDelete(c, code)
 }
 
+func (controller *BaseController) getSingle(db *gorm.DB, id string, queryFields string) (result interface{}, err error) {
+	defer func() {
+		if recoverResult := recover(); recoverResult != nil {
+			err = fmt.Errorf("%v", recoverResult)
+		}
+	}()
+
+	result, err = controller.logic.GetSingle(db, id, queryFields)
+	return result, err
+}
+
+func (controller *BaseController) getMulti(db *gorm.DB, queryFields string) (result []interface{}, err error) {
+	defer func() {
+		if recoverResult := recover(); recoverResult != nil {
+			err = fmt.Errorf("%v", recoverResult)
+		}
+	}()
+
+	result, err = controller.logic.GetMulti(db, queryFields)
+	return result, err
+}
+
+func (controller *BaseController) create(db *gorm.DB, data interface{}) (result interface{}, err error) {
+	defer func() {
+		if recoverResult := recover(); recoverResult != nil {
+			err = fmt.Errorf("%v", recoverResult)
+		}
+	}()
+
+	result, err = controller.logic.Create(db, data)
+	return result, err
+}
+
+func (controller *BaseController) update(db *gorm.DB, id string, data interface{}) (result interface{}, err error) {
+	defer func() {
+		if recoverResult := recover(); recoverResult != nil {
+			err = fmt.Errorf("%v", recoverResult)
+		}
+	}()
+
+	result, err = controller.logic.Update(db, id, data)
+	return result, err
+}
+
+func (controller *BaseController) delete(db *gorm.DB, id string) (err error) {
+	defer func() {
+		if recoverResult := recover(); recoverResult != nil {
+			err = fmt.Errorf("%v", recoverResult)
+		}
+	}()
+
+	err = controller.logic.Delete(db, id)
+	return err
+}
+
+func (controller *BaseController) patch(db *gorm.DB, id string) (result interface{}, err error) {
+	defer func() {
+		if recoverResult := recover(); recoverResult != nil {
+			err = fmt.Errorf("%v", recoverResult)
+		}
+	}()
+
+	result, err = controller.logic.Patch(db, id)
+	return result, err
+}
+
+func (controller *BaseController) options(db *gorm.DB) (err error) {
+	defer func() {
+		if recoverResult := recover(); recoverResult != nil {
+			err = fmt.Errorf("%v", recoverResult)
+		}
+	}()
+
+	err = controller.logic.Options(db)
+	return err
+}
+
 // GetSingle corresponds HTTP GET message and handles a request for a single resource to get the information
 func (controller *BaseController) GetSingle(c *gin.Context) {
 	id := c.Params.ByName("id")
@@ -190,7 +269,7 @@ func (controller *BaseController) GetSingle(c *gin.Context) {
 	fields := helper.ParseFields(c.DefaultQuery("fields", "*"))
 	queryFields := helper.QueryFields(controller.model, fields)
 
-	result, err := controller.logic.GetSingle(db, id, queryFields)
+	result, err := controller.getSingle(db, id, queryFields)
 	if err != nil {
 		controller.OutputError(c, http.StatusNotFound, err)
 		return
@@ -208,7 +287,7 @@ func (controller *BaseController) GetMulti(c *gin.Context) {
 	fields := helper.ParseFields(c.DefaultQuery("fields", "*"))
 	queryFields := helper.QueryFields(controller.model, fields)
 
-	result, err := controller.logic.GetMulti(db, queryFields)
+	result, err := controller.getMulti(db, queryFields)
 	if err != nil {
 		controller.OutputError(c, http.StatusBadRequest, err)
 		return
@@ -241,7 +320,7 @@ func (controller *BaseController) Create(c *gin.Context) {
 	db := dbpkg.Instance(c)
 
 	db = db.Begin()
-	result, err := controller.logic.Create(db, container)
+	result, err := controller.create(db, container)
 	if err != nil {
 		db.Rollback()
 		controller.OutputError(c, http.StatusBadRequest, err)
@@ -279,7 +358,7 @@ func (controller *BaseController) Update(c *gin.Context) {
 	db := dbpkg.Instance(c)
 
 	db = db.Begin()
-	result, err := controller.logic.Update(db, id, container)
+	result, err := controller.update(db, id, container)
 	if err != nil {
 		db.Rollback()
 		controller.OutputError(c, http.StatusBadRequest, err)
@@ -298,7 +377,7 @@ func (controller *BaseController) Delete(c *gin.Context) {
 	db := dbpkg.Instance(c)
 
 	db = db.Begin()
-	err := controller.logic.Delete(db, id)
+	err := controller.delete(db, id)
 	if err != nil {
 		db.Rollback()
 		controller.OutputError(c, http.StatusBadRequest, err)
@@ -317,7 +396,7 @@ func (controller *BaseController) Patch(c *gin.Context) {
 	db := dbpkg.Instance(c)
 
 	db = db.Begin()
-	result, err := controller.logic.Patch(db, id)
+	result, err := controller.patch(db, id)
 	if err != nil {
 		db.Rollback()
 		controller.OutputError(c, http.StatusBadRequest, err)
@@ -334,7 +413,7 @@ func (controller *BaseController) Options(c *gin.Context) {
 	db := dbpkg.Instance(c)
 
 	db = db.Begin()
-	err := controller.logic.Options(db)
+	err := controller.options(db)
 	if err != nil {
 		db.Rollback()
 		controller.OutputError(c, http.StatusBadRequest, err)
