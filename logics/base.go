@@ -18,7 +18,7 @@ func (logic *BaseLogic) GetSingle(db *gorm.DB, id string, queryFields string) (i
 }
 
 // GetMulti corresponds HTTP GET message and handles a request for multi resource to get the list of information
-func (logic *BaseLogic) GetMulti(db *gorm.DB, queryFields string) ([]interface{}, error) {
+func (logic *BaseLogic) GetMulti(db *gorm.DB, queryFields string) (interface{}, error) {
 	return nil, nil
 }
 

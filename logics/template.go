@@ -33,7 +33,7 @@ func (logic *templateLogic) GetSingle(db *gorm.DB, id string, queryFields string
 
 }
 
-func (logic *templateLogic) GetMulti(db *gorm.DB, queryFields string) ([]interface{}, error) {
+func (logic *templateLogic) GetMulti(db *gorm.DB, queryFields string) (interface{}, error) {
 
 	templates := []*models.Template{}
 
