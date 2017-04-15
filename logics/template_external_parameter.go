@@ -31,7 +31,7 @@ func (logic *templateExternalParameterLogic) GetSingle(db *gorm.DB, id string, q
 
 }
 
-func (logic *templateExternalParameterLogic) GetMulti(db *gorm.DB, queryFields string) ([]interface{}, error) {
+func (logic *templateExternalParameterLogic) GetMulti(db *gorm.DB, queryFields string) (interface{}, error) {
 
 	templateExternalParameters := []*models.TemplateExternalParameter{}
 

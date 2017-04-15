@@ -115,16 +115,32 @@ func (controller *BaseController) OutputGetSingle(c *gin.Context, code int, resu
 }
 
 // OutputGetMulti corresponds HTTP GET message and handles the output of multiple result from logic classes
-func (controller *BaseController) OutputGetMulti(c *gin.Context, code int, result []interface{}, fields map[string]interface{}) {
+func (controller *BaseController) OutputGetMulti(c *gin.Context, code int, result interface{}, fields map[string]interface{}) {
 	if fields == nil {
 		c.JSON(code, result)
 	} else {
+		v := reflect.ValueOf(result)
+
+		if v.Kind() != reflect.Slice && v.Kind() != reflect.Array {
+			controller.OutputError(c, http.StatusBadRequest, errors.New("given argument is neither a slice nor an array"))
+			return
+		}
+
+		size := v.Len()
+
 		if _, ok := c.GetQuery("stream"); ok {
 			enc := json.NewEncoder(c.Writer)
 			c.Status(code)
 
-			for _, item := range result {
-				fieldMap, err := helper.FieldToMap(item, fields)
+			for i := 0; i < size; i++ {
+				item := v.Index(i)
+
+				if !item.CanInterface() {
+					controller.OutputError(c, http.StatusBadRequest, fmt.Errorf("the original item indexed %d in given slice cannot interface", i))
+					return
+				}
+
+				fieldMap, err := helper.FieldToMap(item.Interface(), fields)
 
 				if err != nil {
 					controller.OutputError(c, http.StatusBadRequest, err)
@@ -139,8 +155,15 @@ func (controller *BaseController) OutputGetMulti(c *gin.Context, code int, resul
 		} else {
 			fieldMaps := []map[string]interface{}{}
 
-			for _, item := range result {
-				fieldMap, err := helper.FieldToMap(item, fields)
+			for i := 0; i < size; i++ {
+				item := v.Index(i)
+
+				if !item.CanInterface() {
+					controller.OutputError(c, http.StatusBadRequest, fmt.Errorf("the original item indexed %d in given slice cannot interface", i))
+					return
+				}
+
+				fieldMap, err := helper.FieldToMap(item.Interface(), fields)
 
 				if err != nil {
 					controller.OutputError(c, http.StatusBadRequest, err)
@@ -195,7 +218,7 @@ func (controller *BaseController) getSingle(db *gorm.DB, id string, queryFields 
 	return result, err
 }
 
-func (controller *BaseController) getMulti(db *gorm.DB, queryFields string) (result []interface{}, err error) {
+func (controller *BaseController) getMulti(db *gorm.DB, queryFields string) (result interface{}, err error) {
 	defer func() {
 		if recoverResult := recover(); recoverResult != nil {
 			err = fmt.Errorf("%v", recoverResult)

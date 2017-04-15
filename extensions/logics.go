@@ -11,7 +11,7 @@ import "github.com/jinzhu/gorm"
 // * Patch corresponds HTTP PATCH message and handles a request for a single resource to update partially the specific information
 // * Options corresponds HTTP OPTIONS message and handles a request for multi resources to retrieve its supported options
 type Logic interface {
-	GetMulti(db *gorm.DB, queryString string) ([]interface{}, error)
+	GetMulti(db *gorm.DB, queryString string) (interface{}, error)
 	GetSingle(db *gorm.DB, id string, queryString string) (interface{}, error)
 	Create(db *gorm.DB, model interface{}) (interface{}, error)
 	Update(db *gorm.DB, id string, model interface{}) (interface{}, error)
