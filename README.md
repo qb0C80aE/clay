@@ -12,10 +12,26 @@ It provides some APIs to access the system model store.
 * [Pottery](https://github.com/qb0C80aE/pottery)
   * A simple GUI module works with Loam on Clay
 
+### Pottery UI
+
+#### UI - network design
+![Network design](https://github.com/qb0C80aE/pottery/raw/develop/images/sample1.png)
+
+#### UI - physial diagram from the system model store
+![Physical diagram](https://github.com/qb0C80aE/pottery/raw/develop/images/sample2.png)
+
+#### UI - logical diagram from the system model store
+![Logical diagram](https://github.com/qb0C80aE/pottery/raw/develop/images/sample3.png)
+
 # How to build and run
 
 ```
 $ cd $GOPATH/src/github.com/qb0C80aE/clay
+$ # note: if you have any modules what you install into Clay, add lines to the import section of submodules/submodules.go like below.
+$ # _ "github.com/qb0C80aE/loam" // Install Loam sub module by importing
+$ # _ "github.com/qb0C80aE/pottery" // Install Pottery sub module by importing
+$ go get github.com/Masterminds/glide
+$ glide install
 $ go build
 $ ./clay
 ```
