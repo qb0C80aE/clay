@@ -109,7 +109,7 @@ func Execute(t *testing.T, method string, resourceURL string, data interface{}) 
 // CheckResponseJSON checks given response JSON text
 func CheckResponseJSON(t *testing.T, code int, expectedCode int, responseText []byte, expectedResponseText []byte, model interface{}) {
 	if code != expectedCode {
-		error(t, "code is expected as %d, but %d\nresponseTest: %s", expectedCode, code, string(responseText))
+		error(t, "code is expected as %d, but %d\nresponseText: %s", expectedCode, code, string(responseText))
 	}
 
 	vs := reflect.ValueOf(model)
@@ -154,7 +154,7 @@ func CheckResponseJSON(t *testing.T, code int, expectedCode int, responseText []
 // CheckResponseText checks given response text
 func CheckResponseText(t *testing.T, code int, expectedCode int, responseText []byte, expectedResponseText []byte) {
 	if code != expectedCode {
-		error(t, "code is expected as %d, but %dresponseTest: %s", expectedCode, code, string(responseText))
+		error(t, "code is expected as %d, but %d\nresponseText: %s", expectedCode, code, string(responseText))
 	}
 
 	if string(responseText) != string(expectedResponseText) {
