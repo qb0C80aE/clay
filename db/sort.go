@@ -13,13 +13,13 @@ func convertPrefixToQuery(sort string) string {
 	return strings.TrimLeft(sort, " ") + " asc"
 }
 
-// SortRecords configures the order of retrieved records from db
-func SortRecords(sorts string, db *gorm.DB) *gorm.DB {
-	if sorts == "" {
+// SortRecords set the sort method to the db
+func (parameter *Parameter) SortRecords(db *gorm.DB) *gorm.DB {
+	if parameter.Sort == "" {
 		return db
 	}
 
-	for _, sort := range strings.Split(sorts, ",") {
+	for _, sort := range strings.Split(parameter.Sort, ",") {
 		db = db.Order(convertPrefixToQuery(sort))
 	}
 

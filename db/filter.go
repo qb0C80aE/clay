@@ -29,26 +29,25 @@ func filterToMap(c *gin.Context, model interface{}) map[string]string {
 }
 
 // FilterFields filters fields
-func FilterFields(c *gin.Context, model interface{}, db *gorm.DB) *gorm.DB {
-	vs := reflect.ValueOf(model)
-	for vs.Kind() == reflect.Ptr {
-		vs = vs.Elem()
-	}
-	if !vs.IsValid() {
-		return nil
-	}
-	if !vs.CanInterface() {
-		return nil
-	}
-	value := vs.Interface()
-
-	filters := filterToMap(c, value)
-
-	for k, v := range filters {
+func (parameter *Parameter) FilterFields(db *gorm.DB) *gorm.DB {
+	for k, v := range parameter.Filters {
 		if v != "" {
 			db = db.Where(fmt.Sprintf("%s IN (?)", k), strings.Split(v, ","))
 		}
 	}
 
 	return db
+}
+
+// GetRawFilterQuery generates a filter query string
+func (parameter *Parameter) GetRawFilterQuery() string {
+	var s string
+
+	for k, v := range parameter.Filters {
+		if v != "" {
+			s += "&q[" + k + "]=" + v
+		}
+	}
+
+	return s
 }
