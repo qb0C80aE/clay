@@ -1,14 +1,15 @@
 package db
 
 import (
+	"log"
+	"os"
+	"strings"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite" // Need to avoid "Got error when connect database, the error is 'sql: unknown driver "sqlite3" (forgotten import?)'"
 	"github.com/qb0C80aE/clay/extensions"
 	"github.com/serenize/snaker"
-	"log"
-	"os"
-	"strings"
 )
 
 // Connect connects to its database and returns the instance
@@ -52,12 +53,12 @@ func Instance(c *gin.Context) *gorm.DB {
 }
 
 // SetPreloads configures the preload settings of the connected db
-func SetPreloads(preloads string, db *gorm.DB) *gorm.DB {
-	if preloads == "" {
+func (parameter *Parameter) SetPreloads(db *gorm.DB) *gorm.DB {
+	if parameter.Preloads == "" {
 		return db
 	}
 
-	for _, preload := range strings.Split(preloads, ",") {
+	for _, preload := range strings.Split(parameter.Preloads, ",") {
 		var a []string
 
 		for _, s := range strings.Split(preload, ".") {

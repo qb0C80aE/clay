@@ -286,9 +286,15 @@ func (controller *BaseController) options(db *gorm.DB) (err error) {
 
 // GetSingle corresponds HTTP GET message and handles a request for a single resource to get the information
 func (controller *BaseController) GetSingle(c *gin.Context) {
-	id := c.Params.ByName("id")
 	db := dbpkg.Instance(c)
-	db = dbpkg.SetPreloads(c.Query("preloads"), db)
+	parameter, err := dbpkg.NewParameter(c, controller.model)
+	if err != nil {
+		controller.OutputError(c, http.StatusBadRequest, err)
+		return
+	}
+
+	db = parameter.SetPreloads(db)
+	id := c.Params.ByName("id")
 	fields := helper.ParseFields(c.DefaultQuery("fields", "*"))
 	queryFields := helper.QueryFields(controller.model, fields)
 
@@ -304,9 +310,21 @@ func (controller *BaseController) GetSingle(c *gin.Context) {
 // GetMulti corresponds HTTP GET message and handles a request for multi resource to get the list of information
 func (controller *BaseController) GetMulti(c *gin.Context) {
 	db := dbpkg.Instance(c)
-	db = dbpkg.SetPreloads(c.Query("preloads"), db)
-	db = dbpkg.SortRecords(c.Query("sort"), db)
-	db = dbpkg.FilterFields(c, controller.model, db)
+	parameter, err := dbpkg.NewParameter(c, controller.model)
+	if err != nil {
+		controller.OutputError(c, http.StatusBadRequest, err)
+		return
+	}
+
+	db, err = parameter.Paginate(db)
+	if err != nil {
+		controller.OutputError(c, http.StatusBadRequest, err)
+		return
+	}
+
+	db = parameter.SetPreloads(db)
+	db = parameter.SortRecords(db)
+	db = parameter.FilterFields(db)
 	fields := helper.ParseFields(c.DefaultQuery("fields", "*"))
 	queryFields := helper.QueryFields(controller.model, fields)
 
