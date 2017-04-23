@@ -5,11 +5,11 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"net/url"
 )
 
-func filterToMap(c *gin.Context, model interface{}) map[string]string {
+func filterToMap(query url.Values, model interface{}) map[string]string {
 	var jsonTag, jsonKey string
 	filters := make(map[string]string)
 	ts := reflect.TypeOf(model)
@@ -22,7 +22,7 @@ func filterToMap(c *gin.Context, model interface{}) map[string]string {
 			jsonKey = strings.Split(jsonTag, ",")[0]
 		}
 
-		filters[jsonKey] = c.Query("q[" + jsonKey + "]")
+		filters[jsonKey] = query.Get("q[" + jsonKey + "]")
 	}
 
 	return filters

@@ -24,7 +24,7 @@ func TestFilterToMap(t *testing.T) {
 	c := &gin.Context{
 		Request: req,
 	}
-	value := filterToMap(c, User{})
+	value := filterToMap(c.Request.URL.Query(), User{})
 
 	if !contains(value, "id") {
 		t.Fatalf("Filter should have `id` key.")

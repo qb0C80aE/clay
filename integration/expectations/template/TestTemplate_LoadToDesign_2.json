@@ -5,25 +5,85 @@
         "id": 1,
         "name": "testParameter11",
         "template_id": 1,
-        "value": "TestParameter11"
+        "value_bool": {
+          "Bool": false,
+          "Valid": false
+        },
+        "value_float": {
+          "Float64": 0,
+          "Valid": false
+        },
+        "value_int": {
+          "Int64": 0,
+          "Valid": false
+        },
+        "value_string": {
+          "String": "TestParameter11",
+          "Valid": true
+        }
       },
       {
         "id": 2,
         "name": "testParameter12",
         "template_id": 1,
-        "value": "TestParameter12"
+        "value_bool": {
+          "Bool": false,
+          "Valid": false
+        },
+        "value_float": {
+          "Float64": 0,
+          "Valid": false
+        },
+        "value_int": {
+          "Int64": 0,
+          "Valid": false
+        },
+        "value_string": {
+          "String": "TestParameter12",
+          "Valid": true
+        }
       },
       {
         "id": 3,
         "name": "testParameter21",
         "template_id": 2,
-        "value": "TestParameter21"
+        "value_bool": {
+          "Bool": false,
+          "Valid": false
+        },
+        "value_float": {
+          "Float64": 0,
+          "Valid": false
+        },
+        "value_int": {
+          "Int64": 0,
+          "Valid": false
+        },
+        "value_string": {
+          "String": "TestParameter21",
+          "Valid": true
+        }
       },
       {
         "id": 4,
         "name": "testParameter22",
         "template_id": 2,
-        "value": "TestParameter22"
+        "value_bool": {
+          "Bool": false,
+          "Valid": false
+        },
+        "value_float": {
+          "Float64": 0,
+          "Valid": false
+        },
+        "value_int": {
+          "Int64": 0,
+          "Valid": false
+        },
+        "value_string": {
+          "String": "TestParameter22",
+          "Valid": true
+        }
       }
     ],
     "templates": [

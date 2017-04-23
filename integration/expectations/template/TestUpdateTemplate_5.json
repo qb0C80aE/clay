@@ -4,22 +4,67 @@
   "template_content": "TestTemplate3",
   "template_external_parameters": [
     {
-      "id": 4,
+      "id": 1000,
       "template_id": 103,
       "name": "testParameter31",
-      "value": "TestParameter31"
+      "value_int": {
+        "Int64": 0,
+        "Valid": false
+      },
+      "value_float": {
+        "Float64": 0,
+        "Valid": false
+      },
+      "value_bool": {
+        "Bool": false,
+        "Valid": false
+      },
+      "value_string": {
+        "String": "TestParameter31",
+        "Valid": true
+      }
     },
     {
-      "id": 5,
+      "id": 1001,
       "template_id": 103,
       "name": "testParameter32Updated",
-      "value": "TestParameter32Updated"
+      "value_int": {
+        "Int64": 0,
+        "Valid": false
+      },
+      "value_float": {
+        "Float64": 0,
+        "Valid": false
+      },
+      "value_bool": {
+        "Bool": false,
+        "Valid": false
+      },
+      "value_string": {
+        "String": "TestParameter32Updated",
+        "Valid": true
+      }
     },
     {
-      "id": 6,
+      "id": 1003,
       "template_id": 103,
-      "name": "testParameter33",
-      "value": "TestParameter33"
+      "name": "testParameter34",
+      "value_int": {
+        "Int64": 0,
+        "Valid": false
+      },
+      "value_float": {
+        "Float64": 0,
+        "Valid": false
+      },
+      "value_bool": {
+        "Bool": false,
+        "Valid": false
+      },
+      "value_string": {
+        "String": "TestParameter34",
+        "Valid": true
+      }
     }
   ]
 }

@@ -126,4 +126,5 @@ func UniqueTemplateExternalParameterLogic() extensions.Logic {
 
 func init() {
 	extensions.RegisterDesignAccessor(uniqueTemplateExternalParameterLogic)
+	extensions.RegisterTemplateParameterGenerator("TemplateExternalParameter", uniqueTemplateExternalParameterLogic)
 }

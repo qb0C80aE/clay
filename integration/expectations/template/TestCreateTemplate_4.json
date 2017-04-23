@@ -14,7 +14,22 @@
         "id": 1,
         "template_id": 2,
         "name": "testParameter1",
-        "value": "TestParameter1"
+        "value_int": {
+          "Int64": 0,
+          "Valid": false
+        },
+        "value_float": {
+          "Float64": 0,
+          "Valid": false
+        },
+        "value_bool": {
+          "Bool": false,
+          "Valid": false
+        },
+        "value_string": {
+          "String": "TestParameter1",
+          "Valid": true
+        }
       }
     ]
   },
@@ -27,13 +42,43 @@
         "id": 2,
         "template_id": 100,
         "name": "testParameter100",
-        "value": "TestParameter100"
+        "value_int": {
+          "Int64": 0,
+          "Valid": false
+        },
+        "value_float": {
+          "Float64": 0,
+          "Valid": false
+        },
+        "value_bool": {
+          "Bool": false,
+          "Valid": false
+        },
+        "value_string": {
+          "String": "TestParameter100",
+          "Valid": true
+        }
       },
       {
         "id": 10,
         "template_id": 100,
         "name": "testParameter110",
-        "value": "TestParameter110"
+        "value_int": {
+          "Int64": 0,
+          "Valid": false
+        },
+        "value_float": {
+          "Float64": 0,
+          "Valid": false
+        },
+        "value_bool": {
+          "Bool": false,
+          "Valid": false
+        },
+        "value_string": {
+          "String": "TestParameter110",
+          "Valid": true
+        }
       }
     ]
   }
