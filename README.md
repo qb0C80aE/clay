@@ -140,7 +140,7 @@ GET    /template_external_parameters/:id
 POST   /template_external_parameters
 PUT    /template_external_parameters/:id
 DELETE /template_external_parameters/:id
-PATCH /template_external_parameters/:id
+PATCH  /template_external_parameters/:id
 ```
 
 ### Template Resource
@@ -151,7 +151,7 @@ GET    /templates/:id
 POST   /templates
 PUT    /templates/:id
 DELETE /templates/:id
-PATCH /templates/:id
+PATCH  /templates/:id
 ```
 
 # Thanks
