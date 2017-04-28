@@ -1,0 +1,124 @@
+--- calc ---
+i = 100
+
+i = i + 2
+102
+
+i = i - 4
+98
+
+i = i * 6
+588
+
+i = i / 2
+294
+
+i = i mod 5
+4
+
+--- slice ---
+slice init
+slice1: []
+
+slice init
+slice2: [1 2 3 4 5]
+
+slice init
+slice3: [3 4 5 6 7]
+
+subslice
+[3 4 5]
+
+subslice
+[4 5 6 7]
+
+subslice
+[3 4 5 6 7]
+
+subslice
+[4 5]
+
+append
+[3 4 5 6 7 8 9 10]
+
+concatenate
+[1 2 3 4 5 3 4 5 6 7 8 9 10]
+
+--- map ---
+map
+map1: map[]
+
+map init get
+map2[1]: A
+map2[2]: B
+
+map init get
+map3[1]: C
+map3[3]: D
+
+map exists
+false
+TRUE!!
+
+
+map put
+map1[4]: E
+map1[5]: F
+map1[6]: G
+
+map delete
+map1[3]: <no value>
+map1[4]: E
+map1[5]: <no value>
+map1[6]: G
+map1[7]: <no value>
+
+map merge
+map1[0]: <no value>
+map1[1]: C
+map1[2]: B
+map1[3]: D
+map1[4]: E
+map1[5]: <no value>
+map1[6]: G
+map1[7]: <no value>
+
+--- model store ---
+multi
+test1
+testParameter11=TestParameter11
+testParameter12=TestParameter12
+
+single
+test1
+testParameter11=TestParameter11
+testParameter12=TestParameter12
+
+total
+5
+
+--- hash ---
+hash
+hash[testParameter11]={1 1 testParameter11 {1 true} {0 false} {false false} {TestParameter11 true}}
+hash[testParameter12]={2 1 testParameter12 {0 false} {0 false} {false false} {TestParameter12 true}}
+
+--- slicemap ---
+slicemap
+slicemap[testParameter1][0]={1 1 testParameter11 {1 true} {0 false} {false false} {TestParameter11 true}}
+slicemap[testParameter2][0]={2 1 testParameter12 {0 false} {0 false} {false false} {TestParameter12 true}}
+slicemap[testParameter1X][0]={3 1 testParameter1X {100 true} {0 false} {false false} { false}}
+slicemap[testParameter1X][1]={4 2 testParameter1X {200 true} {0 false} {false false} { false}}
+slicemap[testParameter1X][2]={5 3 testParameter1X {300 true} {0 false} {false false} { false}}
+
+--- sequence ---
+sequence
+sequence[0]=1
+sequence[1]=2
+sequence[2]=3
+sequence[3]=4
+sequence[4]=5
+sequence[5]=6
+sequence[6]=7
+sequence[7]=8
+sequence[8]=9
+sequence[9]=10

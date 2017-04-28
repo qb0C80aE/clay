@@ -1,6 +1,7 @@
 package integration
 
 import (
+	"database/sql"
 	"github.com/qb0C80aE/clay/models"
 	"net/http"
 	"testing"
@@ -32,8 +33,11 @@ func TestGetDesign(t *testing.T) {
 		TemplateContent: "TestTemplate2",
 		TemplateExternalParameters: []*models.TemplateExternalParameter{
 			{
-				Name:  "testParameter1",
-				Value: "TestParameter1",
+				Name: "testParameter1",
+				ValueString: sql.NullString{
+					String: "TestParameter1",
+					Valid:  true,
+				},
 			},
 		},
 	}
@@ -41,7 +45,10 @@ func TestGetDesign(t *testing.T) {
 	templateExternalParameter22 := &models.TemplateExternalParameter{
 		TemplateID: 2,
 		Name:       "testParameter2",
-		Value:      "TestParameter2",
+		ValueString: sql.NullString{
+			String: "TestParameter2",
+			Valid:  true,
+		},
 	}
 
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template1)
@@ -63,13 +70,19 @@ func TestUpdateDesign(t *testing.T) {
 					ID:         1,
 					TemplateID: 1,
 					Name:       "testParameter11",
-					Value:      "TestParameter11",
+					ValueString: sql.NullString{
+						String: "TestParameter11",
+						Valid:  true,
+					},
 				},
 				{
 					ID:         2,
 					TemplateID: 1,
 					Name:       "testParameter12",
-					Value:      "TestParameter12",
+					ValueString: sql.NullString{
+						String: "TestParameter12",
+						Valid:  true,
+					},
 				},
 			},
 			"templates": []*models.Template{
@@ -105,13 +118,19 @@ func TestDeleteDesign(t *testing.T) {
 					ID:         1,
 					TemplateID: 1,
 					Name:       "testParameter11",
-					Value:      "TestParameter11",
+					ValueString: sql.NullString{
+						String: "TestParameter11",
+						Valid:  true,
+					},
 				},
 				{
 					ID:         2,
 					TemplateID: 1,
 					Name:       "testParameter12",
-					Value:      "TestParameter12",
+					ValueString: sql.NullString{
+						String: "TestParameter12",
+						Valid:  true,
+					},
 				},
 			},
 			"templates": []*models.Template{

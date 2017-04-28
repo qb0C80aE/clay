@@ -2,5 +2,20 @@
   "id": 1,
   "template_id": 1,
   "name": "testParameter1",
-  "value": "TestParameter1"
+  "value_int": {
+    "Int64": 100,
+    "Valid": true
+  },
+  "value_float": {
+    "Float64": 123.456,
+    "Valid": true
+  },
+  "value_bool": {
+    "Bool": true,
+    "Valid": true
+  },
+  "value_string": {
+    "String": "TestParameter1",
+    "Valid": true
+  }
 }

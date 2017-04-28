@@ -100,8 +100,12 @@ You can register some text templates and generate something using the models in 
 
 ```
 $ # register template and external parameters
-$ curl -X POST "localhost:8080/v1/templates" -H "Content-Type: multipart/form-data" -F name=terraform -F template_content=@examples/sample.template
-$ curl -X POST "localhost:8080/v1/template_external_parameters" -H "Content-Type: application/json" -d '{"template_id": 1, "name": "test", "value": "100"}'
+$ curl -X POST "localhost:8080/v1/templates" -H "Content-Type: multipart/form-data" -F name=sample -F template_content=@examples/sample.template
+$ curl -X POST "localhost:8080/v1/template_external_parameters" -H "Content-Type: application/json" -d '{"template_id": 1, "name": "TestParameter11", "value_string": {"String": "testParameter11", "Valid": true}, "value_int": {"Int64": 1}}'
+$ curl -X POST "localhost:8080/v1/template_external_parameters" -H "Content-Type: application/json" -d '{"template_id": 1, "name": "TestParameter12", "value_string": {"String": "testParameter12", "Valid": true}}'
+$ curl -X POST "localhost:8080/v1/template_external_parameters" -H "Content-Type: application/json" -d '{"template_id": 1, "name": "TestParameter1X", "value_int": {"Int64": 100}}'
+$ curl -X POST "localhost:8080/v1/template_external_parameters" -H "Content-Type: application/json" -d '{"template_id": 1, "name": "TestParameter1X", "value_int": {"Int64": 200}}'
+$ curl -X POST "localhost:8080/v1/template_external_parameters" -H "Content-Type: application/json" -d '{"template_id": 1, "name": "TestParameter1X", "value_int": {"Int64": 300}}'
 $ # show generated template
 $ curl -X GET "localhost:8080/v1/templates/1"
 $ # Geenrate a text from the tempalte

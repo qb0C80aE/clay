@@ -7,7 +7,22 @@
       "id": 1,
       "template_id": 2,
       "name": "testParameter1",
-      "value": "TestParameter1"
+      "value_int": {
+        "Int64": 0,
+        "Valid": false
+      },
+      "value_float": {
+        "Float64": 0,
+        "Valid": false
+      },
+      "value_bool": {
+        "Bool": false,
+        "Valid": false
+      },
+      "value_string": {
+        "String": "TestParameter1",
+        "Valid": true
+      }
     }
   ]
 }

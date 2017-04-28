@@ -5,13 +5,43 @@
         "id": 1,
         "name": "testParameter1",
         "template_id": 2,
-        "value": "TestParameter1"
+        "value_bool": {
+          "Bool": false,
+          "Valid": false
+        },
+        "value_float": {
+          "Float64": 0,
+          "Valid": false
+        },
+        "value_int": {
+          "Int64": 0,
+          "Valid": false
+        },
+        "value_string": {
+          "String": "TestParameter1",
+          "Valid": true
+        }
       },
       {
         "id": 2,
         "name": "testParameter2",
         "template_id": 2,
-        "value": "TestParameter2"
+        "value_bool": {
+          "Bool": false,
+          "Valid": false
+        },
+        "value_float": {
+          "Float64": 0,
+          "Valid": false
+        },
+        "value_int": {
+          "Int64": 0,
+          "Valid": false
+        },
+        "value_string": {
+          "String": "TestParameter2",
+          "Valid": true
+        }
       }
     ],
     "templates": [
