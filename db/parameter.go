@@ -10,7 +10,8 @@ import (
 )
 
 const (
-	defaultLimit = "25"
+	defaultLimit = "10"
+	maxLimit     = int(^uint(0) >> 1)
 	defaultPage  = "1"
 	defaultOrder = "desc"
 )
@@ -82,7 +83,7 @@ func (parameter *Parameter) initialize(query url.Values, model interface{}) erro
 		return err
 	}
 
-	parameter.Limit = int(math.Max(1, math.Min(10000, float64(limit))))
+	parameter.Limit = int(math.Max(1, math.Min(float64(maxLimit), float64(limit))))
 	page, err := validate(parameter.DefaultQuery(query, "page", defaultPage))
 	if err != nil {
 		return err
