@@ -77,19 +77,13 @@ func (logic *templateLogic) GetSingle(db *gorm.DB, id string, queryFields string
 }
 
 func (logic *templateLogic) GetMulti(db *gorm.DB, queryFields string) (interface{}, error) {
-
 	templates := []*models.Template{}
 
 	if err := db.Select(queryFields).Find(&templates).Error; err != nil {
 		return nil, err
 	}
 
-	result := make([]interface{}, len(templates))
-	for i, data := range templates {
-		result[i] = data
-	}
-
-	return result, nil
+	return templates, nil
 
 }
 

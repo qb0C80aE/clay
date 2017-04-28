@@ -32,20 +32,13 @@ func (logic *templateExternalParameterLogic) GetSingle(db *gorm.DB, id string, q
 }
 
 func (logic *templateExternalParameterLogic) GetMulti(db *gorm.DB, queryFields string) (interface{}, error) {
-
 	templateExternalParameters := []*models.TemplateExternalParameter{}
 
 	if err := db.Select(queryFields).Find(&templateExternalParameters).Error; err != nil {
 		return nil, err
 	}
 
-	result := make([]interface{}, len(templateExternalParameters))
-	for i, data := range templateExternalParameters {
-		result[i] = data
-	}
-
-	return result, nil
-
+	return templateExternalParameters, nil
 }
 
 func (logic *templateExternalParameterLogic) Create(db *gorm.DB, data interface{}) (interface{}, error) {
