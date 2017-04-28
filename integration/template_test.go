@@ -1,3 +1,5 @@
+// +build integration
+
 package integration
 
 import (
@@ -7,8 +9,6 @@ import (
 	"strconv"
 	"testing"
 )
-
-// +build integration
 
 func TestGetTemplates_Empty(t *testing.T) {
 	server := SetupServer()

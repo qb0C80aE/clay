@@ -1,3 +1,5 @@
+// +build integration
+
 package integration
 
 import (
@@ -6,8 +8,6 @@ import (
 	"net/http"
 	"testing"
 )
-
-// +build integration
 
 func TestGetDesign_Empty(t *testing.T) {
 	server := SetupServer()
