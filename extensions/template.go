@@ -3,10 +3,11 @@ package extensions
 import (
 	"fmt"
 	"github.com/jinzhu/gorm"
+	"reflect"
 	"text/template"
 )
 
-var templateParameterGeneratorMap = map[string]TemplateParameterGenerator{}
+var templateParameterGeneratorMap = map[reflect.Type]TemplateParameterGenerator{}
 var templateFuncMaps = []template.FuncMap{}
 
 // TemplateParameterGenerator is the interface what extracts the models from db and generates parameters used in template processes
@@ -18,24 +19,17 @@ type TemplateParameterGenerator interface {
 }
 
 // RegisterTemplateParameterGenerator registers a template parameter generator used in the template logic
-func RegisterTemplateParameterGenerator(name string, templateParameterGenerator TemplateParameterGenerator) {
-	templateParameterGeneratorMap[name] = templateParameterGenerator
-}
-
-// RegisteredTemplateParameterGeneratorMap returns the map what contains registered template parameter generators
-func RegisteredTemplateParameterGeneratorMap() map[string]TemplateParameterGenerator {
-	result := map[string]TemplateParameterGenerator{}
-	for key, value := range templateParameterGeneratorMap {
-		result[key] = value
-	}
-	return result
+func RegisterTemplateParameterGenerator(model interface{}, templateParameterGenerator TemplateParameterGenerator) {
+	modelType := ModelType(model)
+	templateParameterGeneratorMap[modelType] = templateParameterGenerator
 }
 
 // RegisteredTemplateParameterGenerator returns the registered template parameter generator related to given name
-func RegisteredTemplateParameterGenerator(name string) (TemplateParameterGenerator, error) {
-	result, exist := templateParameterGeneratorMap[name]
+func RegisteredTemplateParameterGenerator(model interface{}) (TemplateParameterGenerator, error) {
+	modelType := ModelType(model)
+	result, exist := templateParameterGeneratorMap[modelType]
 	if !exist {
-		return nil, fmt.Errorf("the TemplateParameterGenerator related to given name %s does not exist", name)
+		return nil, fmt.Errorf("the TemplateParameterGenerator related to given name %s does not exist", modelType.Name())
 	}
 	return result, nil
 }

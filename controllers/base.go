@@ -19,18 +19,16 @@ import (
 
 // BaseController is the base class that all controller classes inherit
 type BaseController struct {
-	resourceName string
-	model        interface{}
-	logic        extensions.Logic
-	outputter    extensions.Outputter
+	model     interface{}
+	logic     extensions.Logic
+	outputter extensions.Outputter
 }
 
 // NewBaseController creates a new instance of BaseController
-func NewBaseController(resourceName string, model interface{}, logic extensions.Logic) *BaseController {
+func NewBaseController(model interface{}, logic extensions.Logic) *BaseController {
 	controller := &BaseController{
-		resourceName: resourceName,
-		model:        model,
-		logic:        logic,
+		model: model,
+		logic: logic,
 	}
 	return controller
 }
@@ -88,7 +86,17 @@ func (controller *BaseController) bind(c *gin.Context, container interface{}) er
 
 // ResourceName returns its resource name in REST
 func (controller *BaseController) ResourceName() string {
-	return controller.resourceName
+	return extensions.RegisteredResourceName(controller.model)
+}
+
+// ResourceSingleURL builds a resource url what represents a single resource based on the argument
+func (controller *BaseController) ResourceSingleURL() string {
+	return fmt.Sprintf("/%s/:id", controller.ResourceName())
+}
+
+// ResourceMultiURL builds a resource url what represents multi resources based on the argument
+func (controller *BaseController) ResourceMultiURL() string {
+	return fmt.Sprintf("/%s", controller.ResourceName())
 }
 
 // OutputError handles an error output

@@ -87,17 +87,17 @@ func (logic *templateExternalParameterLogic) ExtractFromDesign(db *gorm.DB) (str
 	if err := db.Select("*").Find(&templateExternalParameters).Error; err != nil {
 		return "", nil, err
 	}
-	return "template_external_parameters", templateExternalParameters, nil
+	return extensions.RegisteredResourceName(models.SharedTemplateExternalParameterModel()), templateExternalParameters, nil
 }
 
 func (logic *templateExternalParameterLogic) DeleteFromDesign(db *gorm.DB) error {
-	return db.Exec("delete from template_external_parameters;").Error
+	return db.Delete(models.SharedTemplateExternalParameterModel()).Error
 }
 
 func (logic *templateExternalParameterLogic) LoadToDesign(db *gorm.DB, data interface{}) error {
 	container := []*models.TemplateExternalParameter{}
 	design := data.(*models.Design)
-	if value, exists := design.Content["template_external_parameters"]; exists {
+	if value, exists := design.Content[extensions.RegisteredResourceName(models.SharedTemplateExternalParameterModel())]; exists {
 		if err := mapstruct.MapToStruct(value.([]interface{}), &container); err != nil {
 			return err
 		}
@@ -119,5 +119,5 @@ func UniqueTemplateExternalParameterLogic() extensions.Logic {
 
 func init() {
 	extensions.RegisterDesignAccessor(uniqueTemplateExternalParameterLogic)
-	extensions.RegisterTemplateParameterGenerator("TemplateExternalParameter", uniqueTemplateExternalParameterLogic)
+	extensions.RegisterTemplateParameterGenerator(models.SharedTemplateExternalParameterModel(), uniqueTemplateExternalParameterLogic)
 }

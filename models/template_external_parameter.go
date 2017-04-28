@@ -29,5 +29,5 @@ func SharedTemplateExternalParameterModel() *TemplateExternalParameter {
 }
 
 func init() {
-	extensions.RegisterModel("TemplateExternalParameter", sharedTemplateExternalParameterModel)
+	extensions.RegisterModel(sharedTemplateExternalParameterModel)
 }

@@ -1,7 +1,6 @@
 package extensions
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -29,25 +28,19 @@ var methodStringMap = map[int]string{
 
 // Controller is the interface what is mapped into specific urls and handles the requests from HTTP clients
 // * ResourceName returns its resource name in REST
+// * ResourceSingleURL builds a resource url what represents a single resource based on the argument
+// * ResourceMultiURL builds a resource url what represents multi resources based on the argument
 // * RouteMap returns the map its key is resource url and its value is request handler of the controller
 type Controller interface {
 	ResourceName() string
+	ResourceSingleURL() string
+	ResourceMultiURL() string
 	RouteMap() map[int]map[string]gin.HandlerFunc
 }
 
 // LookUpMethodName returns the HTTP method name string corresponded to the argument
 func LookUpMethodName(method int) string {
 	return methodStringMap[method]
-}
-
-// BuildResourceSingleURL builds a resource url what represents a single resource based on the argument
-func BuildResourceSingleURL(resourceName string) string {
-	return fmt.Sprintf("/%ss/:id", resourceName)
-}
-
-// BuildResourceMultiURL builds a resource url what represents multi resources based on the argument
-func BuildResourceMultiURL(resourceName string) string {
-	return fmt.Sprintf("/%ss", resourceName)
 }
 
 // RegisterController registers a controller used in the router

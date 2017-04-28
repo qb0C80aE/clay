@@ -14,7 +14,6 @@ type templateExternalParameterController struct {
 func newTemplateExternalParameterController() extensions.Controller {
 	controller := &templateExternalParameterController{
 		BaseController: NewBaseController(
-			"template_external_parameter",
 			models.SharedTemplateExternalParameterModel(),
 			logics.UniqueTemplateExternalParameterLogic(),
 		),
@@ -24,8 +23,8 @@ func newTemplateExternalParameterController() extensions.Controller {
 }
 
 func (controller *templateExternalParameterController) RouteMap() map[int]map[string]gin.HandlerFunc {
-	resourceSingleURL := extensions.BuildResourceSingleURL(controller.ResourceName())
-	resourceMultiURL := extensions.BuildResourceMultiURL(controller.ResourceName())
+	resourceSingleURL := controller.ResourceSingleURL()
+	resourceMultiURL := controller.ResourceMultiURL()
 
 	routeMap := map[int]map[string]gin.HandlerFunc{
 		extensions.MethodGet: {

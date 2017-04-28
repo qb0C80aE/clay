@@ -99,16 +99,22 @@ $ curl -X PUT 'localhost:8080/v1/designs/present' -H 'Content-Type: application/
 You can register some text templates and generate something using the models in clay.
 
 ```
-$ # register template and external parameters
-$ curl -X POST "localhost:8080/v1/templates" -H "Content-Type: multipart/form-data" -F name=sample -F template_content=@examples/sample.template
-$ curl -X POST "localhost:8080/v1/template_external_parameters" -H "Content-Type: application/json" -d '{"template_id": 1, "name": "TestParameter11", "value_string": {"String": "testParameter11", "Valid": true}, "value_int": {"Int64": 1}}'
-$ curl -X POST "localhost:8080/v1/template_external_parameters" -H "Content-Type: application/json" -d '{"template_id": 1, "name": "TestParameter12", "value_string": {"String": "testParameter12", "Valid": true}}'
-$ curl -X POST "localhost:8080/v1/template_external_parameters" -H "Content-Type: application/json" -d '{"template_id": 1, "name": "TestParameter1X", "value_int": {"Int64": 100}}'
-$ curl -X POST "localhost:8080/v1/template_external_parameters" -H "Content-Type: application/json" -d '{"template_id": 1, "name": "TestParameter1X", "value_int": {"Int64": 200}}'
-$ curl -X POST "localhost:8080/v1/template_external_parameters" -H "Content-Type: application/json" -d '{"template_id": 1, "name": "TestParameter1X", "value_int": {"Int64": 300}}'
+$ # register template1 and external parameters
+$ curl -X POST "localhost:8080/v1/templates" -H "Content-Type: multipart/form-data" -F name=sample1 -F template_content=@examples/sample.template
+$ curl -X POST "localhost:8080/v1/templates" -H "Content-Type: application/json" -d '{"name": "sample2", "template_content": "sample2"}'
+$ curl -X POST "localhost:8080/v1/templates" -H "Content-Type: application/json" -d '{"name": "sample3", "template_content": "sample3"}'
+$ curl -X POST "localhost:8080/v1/template_external_parameters" -H "Content-Type: application/json" -d '{"template_id": 1, "name": "testParameter11", "value_string": {"String": "TestParameter11", "Valid": true}, "value_int": {"Int64": 1, "Valid": true}}'
+$ curl -X POST "localhost:8080/v1/template_external_parameters" -H "Content-Type: application/json" -d '{"template_id": 1, "name": "testParameter12", "value_string": {"String": "TestParameter12", "Valid": true}}'
+$ curl -X POST "localhost:8080/v1/template_external_parameters" -H "Content-Type: application/json" -d '{"template_id": 1, "name": "testParameter1X", "value_int": {"Int64": 100, "Valid": true}}'
+$ # register template2 and external parameters
+$ curl -X POST "localhost:8080/v1/templates" -H "Content-Type: application/json" -d '{"name": "sample2", "template_content": "{{.testParameter1X}}"}'
+$ curl -X POST "localhost:8080/v1/template_external_parameters" -H "Content-Type: application/json" -d '{"template_id": 2, "name": "testParameter1X", "value_int": {"Int64": 200, "Valid": true}}'
+$ # register template3 and external parameters
+$ curl -X POST "localhost:8080/v1/templates" -H "Content-Type: application/json" -d '{"name": "sample3", "template_content": "{{.testParameter1X}}"}'
+$ curl -X POST "localhost:8080/v1/template_external_parameters" -H "Content-Type: application/json" -d '{"template_id": 3, "name": "testParameter1X", "value_int": {"Int64": 300, "Valid": true}}'
 $ # show generated template
 $ curl -X GET "localhost:8080/v1/templates/1"
-$ # Geenrate a text from the tempalte
+$ # Generate a text from the tempalte
 $ curl -X PATCH "localhost:8080/v1/templates/1"
 ```
 

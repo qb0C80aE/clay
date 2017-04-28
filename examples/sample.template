@@ -106,7 +106,7 @@ map1[7]: {{get $map1 7}}
 
 --- model store ---
 multi
-{{- $m := multi .ModelStore "Template" "preloads=TemplateExternalParameters"}}
+{{- $m := multi .ModelStore "templates" "preloads=TemplateExternalParameters"}}
 {{- $t := index $m 0}}
 {{$t.Name}}
 {{- $p1 := index $t.TemplateExternalParameters 0}}
@@ -115,12 +115,16 @@ multi
 {{$p2.Name}}={{$p2.ValueString.String}}
 
 single
-{{- $s := single .ModelStore "Template" .testParameter11.ValueInt.Int64 "preloads=TemplateExternalParameters"}}
+{{- $s := single .ModelStore "templates" .testParameter11.ValueInt.Int64 "preloads=TemplateExternalParameters"}}
 {{$s.Name}}
 {{- $p1 := index $s.TemplateExternalParameters 0}}
 {{$p1.Name}}={{$p1.ValueString.String}}
 {{- $p2 := index $s.TemplateExternalParameters 1}}
 {{$p2.Name}}={{$p2.ValueString.String}}
+
+total
+{{- $t := total .ModelStore "template_external_parameters"}}
+{{$t}}
 
 --- hash ---
 hash
@@ -130,7 +134,7 @@ hash[testParameter12]={{get $h "testParameter12"}}
 
 --- slicemap ---
 slicemap
-{{- $p := multi .ModelStore "TemplateExternalParameter" ""}}
+{{- $p := multi .ModelStore "template_external_parameters" ""}}
 {{- $z := slicemap $p "Name"}}
 {{- $z1 := get $z "testParameter11"}}
 {{- $z2 := get $z "testParameter12"}}
@@ -143,4 +147,11 @@ slicemap[testParameter2][{{$i}}]={{$v}}
 {{- end}}
 {{- range $i, $v := $z3 }}
 slicemap[testParameter1X][{{$i}}]={{$v}}
+{{- end}}
+
+--- sequence ---
+sequence
+{{- $s := sequence 1 10}}
+{{- range $i, $v := $s}}
+sequence[{{$i}}]={{$v}}
 {{- end}}

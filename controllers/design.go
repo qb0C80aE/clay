@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/qb0C80aE/clay/db"
 	"github.com/qb0C80aE/clay/extensions"
@@ -15,7 +16,6 @@ type designController struct {
 func newDesignController() extensions.Controller {
 	controller := &designController{
 		BaseController: NewBaseController(
-			"design",
 			models.SharedDesignModel(),
 			logics.UniqueDesignLogic(),
 		),
@@ -25,7 +25,7 @@ func newDesignController() extensions.Controller {
 }
 
 func (controller *designController) RouteMap() map[int]map[string]gin.HandlerFunc {
-	url := "designs/present"
+	url := fmt.Sprintf("%s/present", controller.ResourceName())
 	routeMap := map[int]map[string]gin.HandlerFunc{
 		extensions.MethodGet: {
 			url: controller.GetSingle,
