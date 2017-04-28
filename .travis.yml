@@ -13,7 +13,8 @@ install:
 
 script:
  - glide install
+ - go vet $(glide novendor)
  - golint $(glide novendor)
  - go build -v
- - go test -v -race $(glide novendor)
+ - go test -tags=integration -v -race $(glide novendor)
 
