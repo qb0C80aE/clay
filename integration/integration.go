@@ -14,7 +14,6 @@ import (
 	"time"
 )
 
-const version = "v1"
 const timeout = 15
 
 // EmptyArrayString represents an empty JSON array in string type
@@ -46,9 +45,9 @@ func generateQueryParameter(data map[string]string) string {
 func GenerateMultiResourceURL(ts *httptest.Server, resource string, parameters map[string]string) string {
 	var url string
 	if 0 < len(parameters) {
-		url = fmt.Sprintf("%s/%s/%s?%s", ts.URL, version, resource, generateQueryParameter(parameters))
+		url = fmt.Sprintf("%s/%s?%s", ts.URL, resource, generateQueryParameter(parameters))
 	} else {
-		url = fmt.Sprintf("%s/%s/%s", ts.URL, version, resource)
+		url = fmt.Sprintf("%s/%s", ts.URL, resource)
 	}
 	return url
 }
@@ -57,9 +56,9 @@ func GenerateMultiResourceURL(ts *httptest.Server, resource string, parameters m
 func GenerateSingleResourceURL(ts *httptest.Server, resource string, id string, parameters map[string]string) string {
 	var url string
 	if 0 < len(parameters) {
-		url = fmt.Sprintf("%s/%s/%s/%s?%s", ts.URL, version, resource, id, generateQueryParameter(parameters))
+		url = fmt.Sprintf("%s/%s/%s?%s", ts.URL, resource, id, generateQueryParameter(parameters))
 	} else {
-		url = fmt.Sprintf("%s/%s/%s/%s", ts.URL, version, resource, id)
+		url = fmt.Sprintf("%s/%s/%s", ts.URL, resource, id)
 	}
 	return url
 }
