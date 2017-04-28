@@ -14,7 +14,6 @@ type templateController struct {
 func newTemplateController() extensions.Controller {
 	controller := &templateController{
 		BaseController: NewBaseController(
-			"template",
 			models.SharedTemplateModel(),
 			logics.UniqueTemplateLogic(),
 		),
@@ -24,8 +23,8 @@ func newTemplateController() extensions.Controller {
 }
 
 func (controller *templateController) RouteMap() map[int]map[string]gin.HandlerFunc {
-	resourceSingleURL := extensions.BuildResourceSingleURL(controller.ResourceName())
-	resourceMultiURL := extensions.BuildResourceMultiURL(controller.ResourceName())
+	resourceSingleURL := controller.ResourceSingleURL()
+	resourceMultiURL := controller.ResourceMultiURL()
 
 	routeMap := map[int]map[string]gin.HandlerFunc{
 		extensions.MethodGet: {

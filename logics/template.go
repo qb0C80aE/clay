@@ -134,17 +134,17 @@ func (logic *templateLogic) ExtractFromDesign(db *gorm.DB) (string, interface{},
 	if err := db.Select("*").Find(&templates).Error; err != nil {
 		return "", nil, err
 	}
-	return "templates", templates, nil
+	return extensions.RegisteredResourceName(models.SharedTemplateModel()), templates, nil
 }
 
 func (logic *templateLogic) DeleteFromDesign(db *gorm.DB) error {
-	return db.Exec("delete from templates;").Error
+	return db.Delete(models.SharedTemplateModel()).Error
 }
 
 func (logic *templateLogic) LoadToDesign(db *gorm.DB, data interface{}) error {
 	container := []*models.Template{}
 	design := data.(*models.Design)
-	if value, exists := design.Content["templates"]; exists {
+	if value, exists := design.Content[extensions.RegisteredResourceName(models.SharedTemplateModel())]; exists {
 		if err := mapstruct.MapToStruct(value.([]interface{}), &container); err != nil {
 			return err
 		}
@@ -167,7 +167,7 @@ func UniqueTemplateLogic() extensions.Logic {
 
 func init() {
 	extensions.RegisterDesignAccessor(uniqueTemplateLogic)
-	extensions.RegisterTemplateParameterGenerator("Template", uniqueTemplateLogic)
+	extensions.RegisterTemplateParameterGenerator(models.SharedTemplateModel(), uniqueTemplateLogic)
 
 	funcMap := tplpkg.FuncMap{
 		"add": func(a, b int) int { return a + b },
@@ -279,7 +279,7 @@ func init() {
 			if err != nil {
 				return nil, err
 			}
-			templateParameterGenerator, err := extensions.RegisteredTemplateParameterGenerator(name)
+			templateParameterGenerator, err := extensions.RegisteredTemplateParameterGenerator(model)
 			if err != nil {
 				return nil, err
 			}
@@ -319,7 +319,7 @@ func init() {
 			if err != nil {
 				return nil, err
 			}
-			templateParameterGenerator, err := extensions.RegisteredTemplateParameterGenerator(name)
+			templateParameterGenerator, err := extensions.RegisteredTemplateParameterGenerator(model)
 			if err != nil {
 				return nil, err
 			}

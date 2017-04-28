@@ -42,7 +42,12 @@ func Connect() *gorm.DB {
 		db.LogMode(true)
 	}
 
-	db.AutoMigrate(extensions.RegisteredModels()...)
+	registeredModels := extensions.RegisteredModels()
+	db.AutoMigrate(registeredModels...)
+
+	for _, model := range registeredModels {
+		extensions.RegisterResourceName(model, db.NewScope(model).TableName())
+	}
 
 	return db
 }
