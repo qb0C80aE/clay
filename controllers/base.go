@@ -14,6 +14,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"reflect"
+	"strconv"
 )
 
 // BaseController is the base class that all controller classes inherit
@@ -115,7 +116,8 @@ func (controller *BaseController) OutputGetSingle(c *gin.Context, code int, resu
 }
 
 // OutputGetMulti corresponds HTTP GET message and handles the output of multiple result from logic classes
-func (controller *BaseController) OutputGetMulti(c *gin.Context, code int, result interface{}, fields map[string]interface{}) {
+func (controller *BaseController) OutputGetMulti(c *gin.Context, code int, result interface{}, total int, fields map[string]interface{}) {
+	c.Header("Total", strconv.Itoa(total))
 	if fields == nil {
 		c.JSON(code, result)
 	} else {
@@ -334,7 +336,10 @@ func (controller *BaseController) GetMulti(c *gin.Context) {
 		return
 	}
 
-	controller.outputter.OutputGetMulti(c, http.StatusOK, result, fields)
+	var total = 0
+	db.Model(controller.model).Count(&total)
+
+	controller.outputter.OutputGetMulti(c, http.StatusOK, result, total, fields)
 }
 
 // Create corresponds HTTP POST message and handles a request for multi resource to create a new information
