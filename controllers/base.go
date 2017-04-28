@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extensions"
+	"github.com/qb0C80aE/clay/version"
 	"io/ioutil"
 	"net/http"
 	"reflect"
@@ -296,6 +297,12 @@ func (controller *BaseController) options(db *gorm.DB) (err error) {
 
 // GetSingle corresponds HTTP GET message and handles a request for a single resource to get the information
 func (controller *BaseController) GetSingle(c *gin.Context) {
+	ver, err := version.New(c)
+	if err != nil {
+		controller.OutputError(c, http.StatusBadRequest, err)
+		return
+	}
+
 	db := dbpkg.Instance(c)
 	parameter, err := dbpkg.NewParameter(c.Request.URL.Query(), controller.model)
 	if err != nil {
@@ -314,11 +321,22 @@ func (controller *BaseController) GetSingle(c *gin.Context) {
 		return
 	}
 
+	if version.Range("1.0.0", "<=", ver) && version.Range(ver, "<", "2.0.0") {
+		// conditional branch by version.
+		// 1.0.0 <= this version < 2.0.0 !!
+	}
+
 	controller.OutputGetSingle(c, http.StatusOK, result, fields)
 }
 
 // GetMulti corresponds HTTP GET message and handles a request for multi resource to get the list of information
 func (controller *BaseController) GetMulti(c *gin.Context) {
+	ver, err := version.New(c)
+	if err != nil {
+		controller.OutputError(c, http.StatusBadRequest, err)
+		return
+	}
+
 	db := dbpkg.Instance(c)
 	parameter, err := dbpkg.NewParameter(c.Request.URL.Query(), controller.model)
 	if err != nil {
@@ -347,11 +365,22 @@ func (controller *BaseController) GetMulti(c *gin.Context) {
 	var total = 0
 	db.Model(controller.model).Count(&total)
 
+	if version.Range("1.0.0", "<=", ver) && version.Range(ver, "<", "2.0.0") {
+		// conditional branch by version.
+		// 1.0.0 <= this version < 2.0.0 !!
+	}
+
 	controller.outputter.OutputGetMulti(c, http.StatusOK, result, total, fields)
 }
 
 // Create corresponds HTTP POST message and handles a request for multi resource to create a new information
 func (controller *BaseController) Create(c *gin.Context) {
+	ver, err := version.New(c)
+	if err != nil {
+		controller.OutputError(c, http.StatusBadRequest, err)
+		return
+	}
+
 	vs := reflect.ValueOf(controller.model)
 	for vs.Kind() == reflect.Ptr {
 		vs = vs.Elem()
@@ -383,11 +412,22 @@ func (controller *BaseController) Create(c *gin.Context) {
 
 	db.Commit()
 
+	if version.Range("1.0.0", "<=", ver) && version.Range(ver, "<", "2.0.0") {
+		// conditional branch by version.
+		// 1.0.0 <= this version < 2.0.0 !!
+	}
+
 	controller.outputter.OutputCreate(c, http.StatusCreated, result)
 }
 
 // Update corresponds HTTP PUT message and handles a request for a single resource to update the specific information
 func (controller *BaseController) Update(c *gin.Context) {
+	ver, err := version.New(c)
+	if err != nil {
+		controller.OutputError(c, http.StatusBadRequest, err)
+		return
+	}
+
 	vs := reflect.ValueOf(controller.model)
 	for vs.Kind() == reflect.Ptr {
 		vs = vs.Elem()
@@ -421,17 +461,28 @@ func (controller *BaseController) Update(c *gin.Context) {
 
 	db.Commit()
 
+	if version.Range("1.0.0", "<=", ver) && version.Range(ver, "<", "2.0.0") {
+		// conditional branch by version.
+		// 1.0.0 <= this version < 2.0.0 !!
+	}
+
 	controller.outputter.OutputUpdate(c, http.StatusOK, result)
 }
 
 // Delete corresponds HTTP DELETE message and handles a request for a single resource to delete the specific information
 func (controller *BaseController) Delete(c *gin.Context) {
+	ver, err := version.New(c)
+	if err != nil {
+		controller.OutputError(c, http.StatusBadRequest, err)
+		return
+	}
+
 	id := c.Params.ByName("id")
 
 	db := dbpkg.Instance(c)
 
 	db = db.Begin()
-	err := controller.delete(db, id)
+	err = controller.delete(db, id)
 	if err != nil {
 		db.Rollback()
 		controller.OutputError(c, http.StatusBadRequest, err)
@@ -440,11 +491,22 @@ func (controller *BaseController) Delete(c *gin.Context) {
 
 	db.Commit()
 
+	if version.Range("1.0.0", "<=", ver) && version.Range(ver, "<", "2.0.0") {
+		// conditional branch by version.
+		// 1.0.0 <= this version < 2.0.0 !!
+	}
+
 	controller.outputter.OutputDelete(c, http.StatusNoContent)
 }
 
 // Patch corresponds HTTP PATCH message and handles a request for a single resource to update partially the specific information
 func (controller *BaseController) Patch(c *gin.Context) {
+	ver, err := version.New(c)
+	if err != nil {
+		controller.OutputError(c, http.StatusBadRequest, err)
+		return
+	}
+
 	id := c.Params.ByName("id")
 
 	db := dbpkg.Instance(c)
@@ -459,15 +521,26 @@ func (controller *BaseController) Patch(c *gin.Context) {
 
 	db.Commit()
 
+	if version.Range("1.0.0", "<=", ver) && version.Range(ver, "<", "2.0.0") {
+		// conditional branch by version.
+		// 1.0.0 <= this version < 2.0.0 !!
+	}
+
 	controller.outputter.OutputPatch(c, http.StatusOK, result)
 }
 
 // Options corresponds HTTP OPTIONS message and handles a request for multi resources to retrieve its supported options
 func (controller *BaseController) Options(c *gin.Context) {
+	ver, err := version.New(c)
+	if err != nil {
+		controller.OutputError(c, http.StatusBadRequest, err)
+		return
+	}
+
 	db := dbpkg.Instance(c)
 
 	db = db.Begin()
-	err := controller.options(db)
+	err = controller.options(db)
 	if err != nil {
 		db.Rollback()
 		controller.OutputError(c, http.StatusBadRequest, err)
@@ -475,6 +548,11 @@ func (controller *BaseController) Options(c *gin.Context) {
 	}
 
 	db.Commit()
+
+	if version.Range("1.0.0", "<=", ver) && version.Range(ver, "<", "2.0.0") {
+		// conditional branch by version.
+		// 1.0.0 <= this version < 2.0.0 !!
+	}
 
 	controller.outputter.OutputOptions(c, http.StatusNoContent)
 }
