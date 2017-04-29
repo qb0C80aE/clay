@@ -362,8 +362,12 @@ func (controller *BaseController) GetMulti(c *gin.Context) {
 		return
 	}
 
+	db = db.New()
 	var total = 0
-	db.Model(controller.model).Count(&total)
+	if db.Model(controller.model).Count(&total).Error != nil {
+		controller.OutputError(c, http.StatusBadRequest, err)
+		return
+	}
 
 	if version.Range("1.0.0", "<=", ver) && version.Range(ver, "<", "2.0.0") {
 		// conditional branch by version.
