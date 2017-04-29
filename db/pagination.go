@@ -10,6 +10,10 @@ import (
 
 // Paginate sets the parameter related to pagination to db
 func (parameter *Parameter) Paginate(db *gorm.DB) (*gorm.DB, error) {
+	if !parameter.IsPaginationEnabled {
+		return db, nil
+	}
+
 	if parameter == nil {
 		return nil, errors.New("Parameter struct got nil")
 	}
