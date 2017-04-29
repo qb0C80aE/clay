@@ -15,6 +15,7 @@ script:
  - glide install
  - go vet $(glide novendor)
  - golint $(glide novendor)
+ - go generate -tags=generate ./...
  - go build -v
  - go test -tags=integration -v -race $(glide novendor)
 
