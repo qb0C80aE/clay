@@ -57,7 +57,50 @@ You can give the environmental variables to Clay.
 |DB_MODE     |The indentifier how the db is managed.                                           |memory/file|memory   |
 |DB_FILE_PATH|The path where the db file is located. This value is used if DB_MODE=file is set.|-          |clay.db  |
 
-## Windows build
+## Build on Ubuntu for Windows
+
+Due to ``mattn/go-sqlite3``, a cross-compiler (mingw gcc) is required.
+For example, you can build Clay for Windows 32bit and 64bit on Ubuntu 16.04.2 LTS 64bit.
+
+```
+$ cd $HOME
+$ # Update first.
+$ sudo apt-get update
+$ sudo apt-get upgrade -y
+$ # Install required packages.
+$ sudo apt-get install -y git tar gcc wget binutils-mingw-w64 mingw-w64
+$ # Install go, and go 1.4 to build go cross-compile environments.
+$ wget https://storage.googleapis.com/golang/go1.7.5.linux-amd64.tar.gz
+$ wget https://storage.googleapis.com/golang/go1.4.3.linux-amd64.tar.gz
+$ sudo tar -C /usr/local -xzf  go1.7.5.linux-amd64.tar.gz
+$ tar -C $HOME -xzf go1.4.3.linux-amd64.tar.gz
+$ mv $HOME/go $HOME/go1.4
+$ cd /usr/local/go/src
+$ ## For 64bit Windows
+$ GOOS=windows GOARCH=amd64 ./make.bash
+$ ## For 32bit Windows
+$ GOOS=windows GOARCH=386 ./make.bash
+$ # Prepare go directories.
+$ export GOPATH=$HOME/go
+$ cd $HOME
+$ mkdir -p $GOPATH/{src, bin}
+$ # Install glide, and go-bindata if you needed to build Pottery.
+$ go get github.com/Masterminds/glide
+$ ## go get github.com/jteeuwen/go-bindata/...
+$ # Build clay
+$ mkdir -p $GOPATH/src/github.com/qb0C80aE
+$ cd $GOPATH/src/github.com/qb0C80aE
+$ git clone https://github.com/qb0C80aE/clay.git
+$ cd $GOPATH/src/github.com/qb0C80aE/clay
+$ glide install
+$ go generate -tags=generate ./...
+$ ## For 64bit Windows
+$ CC=x86_64-w64-mingw32-gcc LD=x86_64-w64-mingw32-ld CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build --ldflags '-extldflags "-static"' -o clay64.exe
+$ ## For 32bit Windows
+$ CC=i686-w64-mingw32-gcc LD=i686-w64-mingw32-ld CGO_ENABLED=1 GOOS=windows GOARCH=386 go build --ldflags '-extldflags "-static"' -o clay32.exe
+```
+
+## Build on Windows
 
 Due to ``mattn/go-sqlite3``, mingw gcc is required.
 
