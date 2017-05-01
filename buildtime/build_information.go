@@ -1,4 +1,4 @@
-package revisions
+package buildtime
 
 import "github.com/qb0C80aE/clay/extensions"
 

@@ -1,15 +1,10 @@
 package main
 
 import (
-	"os"
-	"strconv"
-
 	"flag"
 	"fmt"
-	"github.com/qb0C80aE/clay/db"
 	"github.com/qb0C80aE/clay/extensions"
-	_ "github.com/qb0C80aE/clay/revisions"
-	"github.com/qb0C80aE/clay/server"
+	_ "github.com/qb0C80aE/clay/runtime" // Import runtime package to register Clay runtime
 )
 
 var showVersion = flag.Bool("version", false, "show version")
@@ -26,25 +21,5 @@ func main() {
 		return
 	}
 
-	host := "localhost"
-	port := "8080"
-
-	if h := os.Getenv("HOST"); h != "" {
-		host = h
-	}
-
-	if p := os.Getenv("PORT"); p != "" {
-		if _, err := strconv.Atoi(p); err == nil {
-			port = p
-		}
-	}
-
-	os.Setenv("HOST", host)
-	os.Setenv("PORT", port)
-
-	database := db.Connect()
-	s := server.Setup(database)
-
-	s.Run(fmt.Sprintf("%s:%s", host, port))
-
+	extensions.RegisteredRuntime().Run()
 }
