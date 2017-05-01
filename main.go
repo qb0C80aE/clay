@@ -7,8 +7,9 @@ import (
 	"flag"
 	"fmt"
 	"github.com/qb0C80aE/clay/db"
+	"github.com/qb0C80aE/clay/extensions"
+	_ "github.com/qb0C80aE/clay/revisions"
 	"github.com/qb0C80aE/clay/server"
-	"github.com/qb0C80aE/clay/submodules"
 )
 
 var showVersion = flag.Bool("version", false, "show version")
@@ -16,10 +17,11 @@ var showVersion = flag.Bool("version", false, "show version")
 func main() {
 	flag.Parse()
 	if *showVersion {
-		programInformation := submodules.BuildInformation()
-		fmt.Printf("Clay build %s\n", programInformation.BuildTime)
-		for _, subModuleInformation := range programInformation.SubModuleInformationList {
-			fmt.Printf("  module %s\n    version: %s\n", subModuleInformation.Name, subModuleInformation.Revision)
+		programInformation := extensions.RegisteredProgramInformation()
+		fmt.Printf("Clay build-%s\n", programInformation.BuildTime())
+		subModuleInformationList := programInformation.SubModuleInformationList()
+		for _, subModuleInformation := range subModuleInformationList {
+			fmt.Printf("  module %s\n    revision: %s\n", subModuleInformation.Name(), subModuleInformation.Revision())
 		}
 		return
 	}
