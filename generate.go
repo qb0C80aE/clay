@@ -16,18 +16,23 @@ import (
 
 //go:generate go run generate.go
 
-var clayVersionTemplate = template.Must(template.New("template").Parse(`package submodules
+var clayVersionTemplate = template.Must(template.New("template").Parse(`package revisions
 
-var programInformation = &ProgramInformation{
-	BuildTime: "{{.BuildTime}}",
-	SubModuleInformationList: []*SubModuleInformation{
-		{{- range $i, $subModule := .SubModules}}
-		{
-			Name:     "{{$subModule.Name}}",
-			Revision: "{{$subModule.Version}}",
+import "github.com/qb0C80aE/clay/extensions"
+
+func init() {
+	var programInformation = &clayProgramInformation{
+		buildTime: "{{.BuildTime}}",
+		claySubModuleInformationList: []*claySubModuleInformation{
+			{{- range $i, $subModule := .SubModules}}
+			{
+				name:     "{{$subModule.Name}}",
+				revision: "{{$subModule.Version}}",
+			},
+			{{- end }}
 		},
-		{{- end }}
-	},
+	}
+	extensions.RegisterProgramInformation(programInformation)
 }
 `))
 
@@ -88,7 +93,7 @@ func main() {
 	const layout = "20060102150405"
 	now := t.Format(layout)
 
-	f, err := os.Create(filepath.Join(cwd, "submodules", "submodule_version.go"))
+	f, err := os.Create(filepath.Join(cwd, "revisions", "build_information.go"))
 	defer f.Close()
 
 	if err != nil {
