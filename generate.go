@@ -16,7 +16,7 @@ import (
 
 //go:generate go run generate.go
 
-var clayVersionTemplate = template.Must(template.New("template").Parse(`package revisions
+var clayVersionTemplate = template.Must(template.New("template").Parse(`package buildtime
 
 import "github.com/qb0C80aE/clay/extensions"
 
@@ -93,7 +93,7 @@ func main() {
 	const layout = "20060102150405"
 	now := t.Format(layout)
 
-	f, err := os.Create(filepath.Join(cwd, "revisions", "build_information.go"))
+	f, err := os.Create(filepath.Join(cwd, "buildtime", "build_information.go"))
 	defer f.Close()
 
 	if err != nil {
