@@ -1,4 +1,5 @@
-// +build generate
+// +build prebuild
+// execute 'go generate -tags=prebuild prebuild/generate.go' or 'go generate -tags=prebuild ./...' or 'go generate -tags=prebuild prebuild/...' to generate build_information.go manually
 
 package main
 
@@ -59,7 +60,7 @@ func claySubModules(cwd string, glideLockImports []*glideLockImport) ([]*glideLo
 	result = append(result, clayInfo)
 
 	for _, glideLockImport := range glideLockImports {
-		_, err := os.Stat(filepath.Join(cwd, "vendor", glideLockImport.Name, "clay_submodule.go"))
+		_, err := os.Stat(filepath.Join(cwd, "vendor", glideLockImport.Name, "clay_module.go"))
 		if err != nil {
 			continue
 		}
@@ -69,7 +70,7 @@ func claySubModules(cwd string, glideLockImports []*glideLockImport) ([]*glideLo
 }
 
 func main() {
-	cwd, err := filepath.Abs(".")
+	cwd, err := filepath.Abs("..")
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
