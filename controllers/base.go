@@ -113,7 +113,7 @@ func (controller *BaseController) OutputGetSingle(c *gin.Context, code int, resu
 	} else {
 		fieldMap, err := helper.FieldToMap(result, fields)
 		if err != nil {
-			controller.OutputError(c, http.StatusBadRequest, err)
+			controller.outputter.OutputError(c, http.StatusBadRequest, err)
 			return
 		}
 
@@ -134,7 +134,7 @@ func (controller *BaseController) OutputGetMulti(c *gin.Context, code int, resul
 		v := reflect.ValueOf(result)
 
 		if v.Kind() != reflect.Slice && v.Kind() != reflect.Array {
-			controller.OutputError(c, http.StatusBadRequest, errors.New("given argument is neither a slice nor an array"))
+			controller.outputter.OutputError(c, http.StatusBadRequest, errors.New("given argument is neither a slice nor an array"))
 			return
 		}
 
@@ -148,19 +148,19 @@ func (controller *BaseController) OutputGetMulti(c *gin.Context, code int, resul
 				item := v.Index(i)
 
 				if !item.CanInterface() {
-					controller.OutputError(c, http.StatusBadRequest, fmt.Errorf("the original item indexed %d in given slice cannot interface", i))
+					controller.outputter.OutputError(c, http.StatusBadRequest, fmt.Errorf("the original item indexed %d in given slice cannot interface", i))
 					return
 				}
 
 				fieldMap, err := helper.FieldToMap(item.Interface(), fields)
 
 				if err != nil {
-					controller.OutputError(c, http.StatusBadRequest, err)
+					controller.outputter.OutputError(c, http.StatusBadRequest, err)
 					return
 				}
 
 				if err := enc.Encode(fieldMap); err != nil {
-					controller.OutputError(c, http.StatusBadRequest, err)
+					controller.outputter.OutputError(c, http.StatusBadRequest, err)
 					return
 				}
 			}
@@ -171,14 +171,14 @@ func (controller *BaseController) OutputGetMulti(c *gin.Context, code int, resul
 				item := v.Index(i)
 
 				if !item.CanInterface() {
-					controller.OutputError(c, http.StatusBadRequest, fmt.Errorf("the original item indexed %d in given slice cannot interface", i))
+					controller.outputter.OutputError(c, http.StatusBadRequest, fmt.Errorf("the original item indexed %d in given slice cannot interface", i))
 					return
 				}
 
 				fieldMap, err := helper.FieldToMap(item.Interface(), fields)
 
 				if err != nil {
-					controller.OutputError(c, http.StatusBadRequest, err)
+					controller.outputter.OutputError(c, http.StatusBadRequest, err)
 					return
 				}
 
@@ -196,12 +196,12 @@ func (controller *BaseController) OutputGetMulti(c *gin.Context, code int, resul
 
 // OutputCreate corresponds HTTP POST message and handles the output of a single result from logic classes
 func (controller *BaseController) OutputCreate(c *gin.Context, code int, result interface{}) {
-	controller.OutputGetSingle(c, code, result, nil)
+	controller.outputter.OutputGetSingle(c, code, result, nil)
 }
 
 // OutputUpdate corresponds HTTP PUT message and handles the output of a single result from logic classes
 func (controller *BaseController) OutputUpdate(c *gin.Context, code int, result interface{}) {
-	controller.OutputGetSingle(c, code, result, nil)
+	controller.outputter.OutputGetSingle(c, code, result, nil)
 }
 
 // OutputDelete corresponds HTTP DELETE message and handles the code result from logic classes
@@ -211,12 +211,12 @@ func (controller *BaseController) OutputDelete(c *gin.Context, code int) {
 
 // OutputPatch corresponds HTTP PATCH message and handles the output of a single result from logic classes
 func (controller *BaseController) OutputPatch(c *gin.Context, code int, result interface{}) {
-	controller.OutputGetSingle(c, code, result, nil)
+	controller.outputter.OutputGetSingle(c, code, result, nil)
 }
 
 // OutputOptions corresponds HTTP DELETE message and handles the code result from logic classes, as well as OutputDelete
 func (controller *BaseController) OutputOptions(c *gin.Context, code int) {
-	controller.OutputDelete(c, code)
+	controller.outputter.OutputDelete(c, code)
 }
 
 func (controller *BaseController) getSingle(db *gorm.DB, id string, parameters url.Values, queryFields string) (result interface{}, err error) {
@@ -300,14 +300,14 @@ func (controller *BaseController) options(db *gorm.DB, parameters url.Values) (e
 func (controller *BaseController) GetSingle(c *gin.Context) {
 	ver, err := version.New(c)
 	if err != nil {
-		controller.OutputError(c, http.StatusBadRequest, err)
+		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
 	db := dbpkg.Instance(c)
 	parameter, err := dbpkg.NewParameter(c.Request.URL.Query(), controller.model)
 	if err != nil {
-		controller.OutputError(c, http.StatusBadRequest, err)
+		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
@@ -318,7 +318,7 @@ func (controller *BaseController) GetSingle(c *gin.Context) {
 
 	result, err := controller.getSingle(db, id, c.Request.URL.Query(), queryFields)
 	if err != nil {
-		controller.OutputError(c, http.StatusNotFound, err)
+		controller.outputter.OutputError(c, http.StatusNotFound, err)
 		return
 	}
 
@@ -327,27 +327,27 @@ func (controller *BaseController) GetSingle(c *gin.Context) {
 		// 1.0.0 <= this version < 2.0.0 !!
 	}
 
-	controller.OutputGetSingle(c, http.StatusOK, result, fields)
+	controller.outputter.OutputGetSingle(c, http.StatusOK, result, fields)
 }
 
 // GetMulti corresponds HTTP GET message and handles a request for multi resource to get the list of information
 func (controller *BaseController) GetMulti(c *gin.Context) {
 	ver, err := version.New(c)
 	if err != nil {
-		controller.OutputError(c, http.StatusBadRequest, err)
+		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
 	db := dbpkg.Instance(c)
 	parameter, err := dbpkg.NewParameter(c.Request.URL.Query(), controller.model)
 	if err != nil {
-		controller.OutputError(c, http.StatusBadRequest, err)
+		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
 	db, err = parameter.Paginate(db)
 	if err != nil {
-		controller.OutputError(c, http.StatusBadRequest, err)
+		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
@@ -359,14 +359,14 @@ func (controller *BaseController) GetMulti(c *gin.Context) {
 
 	result, err := controller.getMulti(db, c.Request.URL.Query(), queryFields)
 	if err != nil {
-		controller.OutputError(c, http.StatusBadRequest, err)
+		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
 	db = db.New()
 	var total = 0
 	if db.Model(controller.model).Count(&total).Error != nil {
-		controller.OutputError(c, http.StatusBadRequest, err)
+		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
@@ -382,7 +382,7 @@ func (controller *BaseController) GetMulti(c *gin.Context) {
 func (controller *BaseController) Create(c *gin.Context) {
 	ver, err := version.New(c)
 	if err != nil {
-		controller.OutputError(c, http.StatusBadRequest, err)
+		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
@@ -391,17 +391,17 @@ func (controller *BaseController) Create(c *gin.Context) {
 		vs = vs.Elem()
 	}
 	if !vs.IsValid() {
-		controller.OutputError(c, http.StatusBadRequest, errors.New("Invalid model"))
+		controller.outputter.OutputError(c, http.StatusBadRequest, errors.New("Invalid model"))
 		return
 	}
 	if !vs.CanInterface() {
-		controller.OutputError(c, http.StatusBadRequest, errors.New("Invalid model"))
+		controller.outputter.OutputError(c, http.StatusBadRequest, errors.New("Invalid model"))
 		return
 	}
 	container := reflect.New(reflect.TypeOf(vs.Interface())).Interface()
 
 	if err := controller.bind(c, container); err != nil {
-		controller.OutputError(c, http.StatusBadRequest, err)
+		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
@@ -411,7 +411,7 @@ func (controller *BaseController) Create(c *gin.Context) {
 	result, err := controller.create(db, c.Request.URL.Query(), container)
 	if err != nil {
 		db.Rollback()
-		controller.OutputError(c, http.StatusBadRequest, err)
+		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
@@ -429,7 +429,7 @@ func (controller *BaseController) Create(c *gin.Context) {
 func (controller *BaseController) Update(c *gin.Context) {
 	ver, err := version.New(c)
 	if err != nil {
-		controller.OutputError(c, http.StatusBadRequest, err)
+		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
@@ -438,11 +438,11 @@ func (controller *BaseController) Update(c *gin.Context) {
 		vs = vs.Elem()
 	}
 	if !vs.IsValid() {
-		controller.OutputError(c, http.StatusBadRequest, errors.New("Invalid model"))
+		controller.outputter.OutputError(c, http.StatusBadRequest, errors.New("Invalid model"))
 		return
 	}
 	if !vs.CanInterface() {
-		controller.OutputError(c, http.StatusBadRequest, errors.New("Invalid model"))
+		controller.outputter.OutputError(c, http.StatusBadRequest, errors.New("Invalid model"))
 		return
 	}
 	container := reflect.New(reflect.TypeOf(vs.Interface())).Interface()
@@ -450,7 +450,7 @@ func (controller *BaseController) Update(c *gin.Context) {
 	id := c.Params.ByName("id")
 
 	if err := controller.bind(c, container); err != nil {
-		controller.OutputError(c, http.StatusBadRequest, err)
+		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
@@ -460,7 +460,7 @@ func (controller *BaseController) Update(c *gin.Context) {
 	result, err := controller.update(db, id, c.Request.URL.Query(), container)
 	if err != nil {
 		db.Rollback()
-		controller.OutputError(c, http.StatusBadRequest, err)
+		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
@@ -478,7 +478,7 @@ func (controller *BaseController) Update(c *gin.Context) {
 func (controller *BaseController) Delete(c *gin.Context) {
 	ver, err := version.New(c)
 	if err != nil {
-		controller.OutputError(c, http.StatusBadRequest, err)
+		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
@@ -490,7 +490,7 @@ func (controller *BaseController) Delete(c *gin.Context) {
 	err = controller.delete(db, id, c.Request.URL.Query())
 	if err != nil {
 		db.Rollback()
-		controller.OutputError(c, http.StatusBadRequest, err)
+		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
@@ -508,7 +508,7 @@ func (controller *BaseController) Delete(c *gin.Context) {
 func (controller *BaseController) Patch(c *gin.Context) {
 	ver, err := version.New(c)
 	if err != nil {
-		controller.OutputError(c, http.StatusBadRequest, err)
+		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
@@ -520,7 +520,7 @@ func (controller *BaseController) Patch(c *gin.Context) {
 	result, err := controller.patch(db, id, c.Request.URL.Query())
 	if err != nil {
 		db.Rollback()
-		controller.OutputError(c, http.StatusBadRequest, err)
+		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
@@ -538,7 +538,7 @@ func (controller *BaseController) Patch(c *gin.Context) {
 func (controller *BaseController) Options(c *gin.Context) {
 	ver, err := version.New(c)
 	if err != nil {
-		controller.OutputError(c, http.StatusBadRequest, err)
+		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
@@ -548,7 +548,7 @@ func (controller *BaseController) Options(c *gin.Context) {
 	err = controller.options(db, c.Request.URL.Query())
 	if err != nil {
 		db.Rollback()
-		controller.OutputError(c, http.StatusBadRequest, err)
+		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
