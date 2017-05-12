@@ -2,20 +2,37 @@ language: go
 go: 1.7
 
 notifications:
- email: false
+  email: false
+
+env:
+  global:
+   - TAGS=()
 
 before_install:
- - go version
+  - TAGS+=(debug)
+  - TAGS+=(integration)
+  - TAGS+=(prebuild)
+  - go version
 
 install:
- - go get github.com/Masterminds/glide
- - go get -u github.com/golang/lint/golint
+  - go get github.com/Masterminds/glide
+  - go get -u github.com/golang/lint/golint
 
 script:
- - glide install
- - go vet $(glide novendor)
- - golint $(glide novendor)
- - go generate -tags=generate ./...
- - go build -v
- - go test -tags=integration -v -race $(glide novendor)
+  - glide install
+  - result="`find . -type d -name vendor -prune -o -type f -name '*.go' -exec golint {} \;`"
+  - |
+    if [[ -n ${result} ]]; then
+      echo "${result}"
+      exit 1
+    fi
+  - go vet -tags="`echo ${TAGS[@]}`" $(glide novendor)
+  - go generate -tags=prebuild ./...
+  - |
+    for tag in ${TAGS[@]}; do
+      echo "go build -v -tags=${tag} $(glide novendor)"
+      go build -v -tags=${tag} $(glide novendor)
+    done
+  - go build -v
+  - go test -tags=integration -v -race $(glide novendor)
 

@@ -29,20 +29,20 @@ It provides some APIs to access the system model store.
 $ # Suppose that $HOME is /home/user, and $GOPATH is /home/user/go.
 $ # Note: Please install glide first.
 $ go get github.com/Masterminds/glide
-$ # Note: If there are any tools what submodules you want to install into clay depend on, please install first like below.
+$ # Note: If there are any tools what modules that you want to install into clay depend on, please install first like below.
 $ # go get github.com/jteeuwen/go-bindata/...
 $ mkdir -p $GOPATH/src/github.com/qb0C80aE/
 $ cd $GOPATH/src/github.com/qb0C80aE/
 $ git clone https://github.com/qb0C80aE/clay.git
 $ cd $GOPATH/src/github.com/qb0C80aE/clay
-$ # Edit: If you have modules what you want to install into Clay, add lines like below into the import section of submodules/submodules.go.
-$ # _ "github.com/qb0C80aE/loam" // Install Loam sub module by importing
-$ # _ "github.com/qb0C80aE/pottery" // Install Pottery sub module by importing
-$ # Note: If you have added modules into submodules/submodules.go, execute glide get to retrieve those modules like below.
+$ # Edit: If you have modules what you want to install into Clay, add lines like below into the import section of main.go.
+$ # _ "github.com/qb0C80aE/loam" // Install Loam module by importing
+$ # _ "github.com/qb0C80aE/pottery" // Install Pottery module by importing
+$ # Note: If you have added modules into main.go, execute glide get to retrieve those modules like below.
 $ # glide get github.com/qb0C80aE/loam
 $ # glide get github.com/qb0C80aE/pottery
 $ glide install
-$ go generate -tags=generate ./...
+$ go generate -tags=prebuild ./...
 $ go build
 $ # Note: If you want to build Clay as a statically linked single binary file, add the flag like below.
 $ # go build --ldflags '-extldflags "-static"'
