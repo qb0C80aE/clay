@@ -10,6 +10,7 @@ import (
 	"github.com/qb0C80aE/clay/models"
 	"github.com/qb0C80aE/clay/utils/mapstruct"
 	"net/http"
+	"net/url"
 	"strconv"
 	tplpkg "text/template"
 )
@@ -64,7 +65,7 @@ func GenerateTemplate(db *gorm.DB, id string, templateInternalParameterMap map[s
 	return result, nil
 }
 
-func (logic *templateLogic) GetSingle(db *gorm.DB, id string, queryFields string) (interface{}, error) {
+func (logic *templateLogic) GetSingle(db *gorm.DB, id string, _ url.Values, queryFields string) (interface{}, error) {
 
 	template := &models.Template{}
 
@@ -76,7 +77,7 @@ func (logic *templateLogic) GetSingle(db *gorm.DB, id string, queryFields string
 
 }
 
-func (logic *templateLogic) GetMulti(db *gorm.DB, queryFields string) (interface{}, error) {
+func (logic *templateLogic) GetMulti(db *gorm.DB, _ url.Values, queryFields string) (interface{}, error) {
 	templates := []*models.Template{}
 
 	if err := db.Select(queryFields).Find(&templates).Error; err != nil {
@@ -87,7 +88,7 @@ func (logic *templateLogic) GetMulti(db *gorm.DB, queryFields string) (interface
 
 }
 
-func (logic *templateLogic) Create(db *gorm.DB, data interface{}) (interface{}, error) {
+func (logic *templateLogic) Create(db *gorm.DB, _ url.Values, data interface{}) (interface{}, error) {
 	template := data.(*models.Template)
 
 	if err := db.Create(template).Error; err != nil {
@@ -97,7 +98,7 @@ func (logic *templateLogic) Create(db *gorm.DB, data interface{}) (interface{}, 
 	return template, nil
 }
 
-func (logic *templateLogic) Update(db *gorm.DB, id string, data interface{}) (interface{}, error) {
+func (logic *templateLogic) Update(db *gorm.DB, id string, _ url.Values, data interface{}) (interface{}, error) {
 	template := data.(*models.Template)
 	template.ID, _ = strconv.Atoi(id)
 
@@ -108,7 +109,7 @@ func (logic *templateLogic) Update(db *gorm.DB, id string, data interface{}) (in
 	return template, nil
 }
 
-func (logic *templateLogic) Delete(db *gorm.DB, id string) error {
+func (logic *templateLogic) Delete(db *gorm.DB, id string, _ url.Values) error {
 
 	template := &models.Template{}
 
@@ -125,7 +126,7 @@ func (logic *templateLogic) Delete(db *gorm.DB, id string) error {
 }
 
 // Patch generates text data based on registered templates
-func (logic *templateLogic) Patch(db *gorm.DB, id string) (interface{}, error) {
+func (logic *templateLogic) Patch(db *gorm.DB, id string, _ url.Values) (interface{}, error) {
 	return GenerateTemplate(db, id, nil)
 }
 
@@ -292,7 +293,7 @@ func init() {
 			db = parameter.FilterFields(db)
 			fields := helper.ParseFields(parameter.DefaultQuery(urlQuery, "fields", "*"))
 			queryFields := helper.QueryFields(model, fields)
-			result, err := templateParameterGenerator.GetSingle(db, strconv.Itoa(id), queryFields)
+			result, err := templateParameterGenerator.GetSingle(db, strconv.Itoa(id), requestForParameter.URL.Query(), queryFields)
 			if err != nil {
 				return nil, err
 			}
@@ -333,7 +334,7 @@ func init() {
 			db = parameter.FilterFields(db)
 			fields := helper.ParseFields(parameter.DefaultQuery(urlQuery, "fields", "*"))
 			queryFields := helper.QueryFields(model, fields)
-			result, err := templateParameterGenerator.GetMulti(db, queryFields)
+			result, err := templateParameterGenerator.GetMulti(db, requestForParameter.URL.Query(), queryFields)
 			if err != nil {
 				return nil, err
 			}

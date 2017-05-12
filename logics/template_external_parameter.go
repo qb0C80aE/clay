@@ -5,6 +5,7 @@ import (
 	"github.com/qb0C80aE/clay/extensions"
 	"github.com/qb0C80aE/clay/models"
 	"github.com/qb0C80aE/clay/utils/mapstruct"
+	"net/url"
 	"strconv"
 )
 
@@ -19,7 +20,7 @@ func newTemplateExternalParameterLogic() *templateExternalParameterLogic {
 	return logic
 }
 
-func (logic *templateExternalParameterLogic) GetSingle(db *gorm.DB, id string, queryFields string) (interface{}, error) {
+func (logic *templateExternalParameterLogic) GetSingle(db *gorm.DB, id string, _ url.Values, queryFields string) (interface{}, error) {
 
 	templateExternalParameter := &models.TemplateExternalParameter{}
 
@@ -31,7 +32,7 @@ func (logic *templateExternalParameterLogic) GetSingle(db *gorm.DB, id string, q
 
 }
 
-func (logic *templateExternalParameterLogic) GetMulti(db *gorm.DB, queryFields string) (interface{}, error) {
+func (logic *templateExternalParameterLogic) GetMulti(db *gorm.DB, _ url.Values, queryFields string) (interface{}, error) {
 	templateExternalParameters := []*models.TemplateExternalParameter{}
 
 	if err := db.Select(queryFields).Find(&templateExternalParameters).Error; err != nil {
@@ -41,7 +42,7 @@ func (logic *templateExternalParameterLogic) GetMulti(db *gorm.DB, queryFields s
 	return templateExternalParameters, nil
 }
 
-func (logic *templateExternalParameterLogic) Create(db *gorm.DB, data interface{}) (interface{}, error) {
+func (logic *templateExternalParameterLogic) Create(db *gorm.DB, _ url.Values, data interface{}) (interface{}, error) {
 
 	templateExternalParameter := data.(*models.TemplateExternalParameter)
 
@@ -53,7 +54,7 @@ func (logic *templateExternalParameterLogic) Create(db *gorm.DB, data interface{
 
 }
 
-func (logic *templateExternalParameterLogic) Update(db *gorm.DB, id string, data interface{}) (interface{}, error) {
+func (logic *templateExternalParameterLogic) Update(db *gorm.DB, id string, _ url.Values, data interface{}) (interface{}, error) {
 
 	templateExternalParameter := data.(*models.TemplateExternalParameter)
 	templateExternalParameter.ID, _ = strconv.Atoi(id)
@@ -66,7 +67,7 @@ func (logic *templateExternalParameterLogic) Update(db *gorm.DB, id string, data
 
 }
 
-func (logic *templateExternalParameterLogic) Delete(db *gorm.DB, id string) error {
+func (logic *templateExternalParameterLogic) Delete(db *gorm.DB, id string, _ url.Values) error {
 
 	templateExternalParameter := &models.TemplateExternalParameter{}
 
