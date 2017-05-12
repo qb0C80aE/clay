@@ -4,6 +4,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extensions"
 	"github.com/qb0C80aE/clay/models"
+	"net/url"
 )
 
 type designLogic struct {
@@ -18,7 +19,7 @@ func newDesignLogic() *designLogic {
 }
 
 // GetSingle returns all models to store into versioning repositories
-func (logic *designLogic) GetSingle(db *gorm.DB, _ string, _ string) (interface{}, error) {
+func (logic *designLogic) GetSingle(db *gorm.DB, _ string, _ url.Values, _ string) (interface{}, error) {
 	db = db.New()
 
 	design := &models.Design{
@@ -38,7 +39,7 @@ func (logic *designLogic) GetSingle(db *gorm.DB, _ string, _ string) (interface{
 }
 
 // Update deletes and updates all models bases on the given data
-func (logic *designLogic) Update(db *gorm.DB, _ string, data interface{}) (interface{}, error) {
+func (logic *designLogic) Update(db *gorm.DB, _ string, _ url.Values, data interface{}) (interface{}, error) {
 	design := data.(*models.Design)
 
 	designAccessors := extensions.RegisteredDesignAccessors()
@@ -57,7 +58,7 @@ func (logic *designLogic) Update(db *gorm.DB, _ string, data interface{}) (inter
 }
 
 // Delete deletes all models
-func (logic *designLogic) Delete(db *gorm.DB, _ string) error {
+func (logic *designLogic) Delete(db *gorm.DB, _ string, _ url.Values) error {
 	designAccessors := extensions.RegisteredDesignAccessors()
 	for _, accessor := range designAccessors {
 		if err := accessor.DeleteFromDesign(db); err != nil {
