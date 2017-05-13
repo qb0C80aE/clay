@@ -7,22 +7,22 @@ import (
 	"github.com/qb0C80aE/clay/models"
 )
 
-type templateExternalParameterController struct {
+type templatePersistentParameterController struct {
 	*BaseController
 }
 
-func newTemplateExternalParameterController() extensions.Controller {
-	controller := &templateExternalParameterController{
+func newTemplatePersistentParameterController() extensions.Controller {
+	controller := &templatePersistentParameterController{
 		BaseController: NewBaseController(
-			models.SharedTemplateExternalParameterModel(),
-			logics.UniqueTemplateExternalParameterLogic(),
+			models.SharedTemplatePersistentParameterModel(),
+			logics.UniqueTemplatePersistentParameterLogic(),
 		),
 	}
 	controller.SetOutputter(controller)
 	return controller
 }
 
-func (controller *templateExternalParameterController) RouteMap() map[int]map[string]gin.HandlerFunc {
+func (controller *templatePersistentParameterController) RouteMap() map[int]map[string]gin.HandlerFunc {
 	resourceSingleURL := controller.ResourceSingleURL()
 	resourceMultiURL := controller.ResourceMultiURL()
 
@@ -44,8 +44,8 @@ func (controller *templateExternalParameterController) RouteMap() map[int]map[st
 	return routeMap
 }
 
-var uniqueTemplateExternalParameterController = newTemplateExternalParameterController()
+var uniqueTemplatePersistentParameterController = newTemplatePersistentParameterController()
 
 func init() {
-	extensions.RegisterController(uniqueTemplateExternalParameterController)
+	extensions.RegisterController(uniqueTemplatePersistentParameterController)
 }

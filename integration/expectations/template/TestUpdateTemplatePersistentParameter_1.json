@@ -1,7 +1,7 @@
 {
   "id": 1,
   "template_id": 1,
-  "name": "templateExternalParameter1Updated",
+  "name": "templatePersistentParameter1Updated",
   "value_int": {
     "Int64": 999,
     "Valid": true

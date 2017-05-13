@@ -2,5 +2,5 @@
   "id": 101,
   "name": "test1Updated",
   "template_content": "TestTemplate1Updated",
-  "template_external_parameters": []
+  "template_persistent_parameters": []
 }

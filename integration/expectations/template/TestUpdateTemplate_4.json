@@ -2,7 +2,7 @@
   "id": 102,
   "name": "test2",
   "template_content": "TestTemplate2",
-  "template_external_parameters": [
+  "template_persistent_parameters": [
     {
       "id": 1,
       "template_id": 102,

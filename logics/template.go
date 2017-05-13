@@ -100,7 +100,7 @@ func (logic *templateLogic) LoadToDesign(db *gorm.DB, data interface{}) error {
 			return err
 		}
 		for _, template := range container {
-			template.TemplateExternalParameters = nil
+			template.TemplatePersistentParameters = nil
 			if err := db.Create(template).Error; err != nil {
 				return err
 			}

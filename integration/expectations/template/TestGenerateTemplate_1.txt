@@ -1,0 +1,10 @@
+TestParameter1 is TestParameter1, TestParameter2 is TestParameter2
+urlParam1 is [100]
+urlParam2 is [200 201]
+urlParam3 is [300 301 302]
+100
+200
+201
+300
+301
+302

@@ -6,10 +6,10 @@ import (
 
 // Template is the model class what represents templates to generate texts from models
 type Template struct {
-	ID                         int                          `json:"id" form:"id" gorm:"primary_key;AUTO_INCREMENT"`
-	Name                       string                       `json:"name" form:"name"`
-	TemplateContent            string                       `json:"template_content" form:"template_content"`
-	TemplateExternalParameters []*TemplateExternalParameter `json:"template_external_parameters"`
+	ID                           int                            `json:"id" form:"id" gorm:"primary_key;AUTO_INCREMENT"`
+	Name                         string                         `json:"name" form:"name"`
+	TemplateContent              string                         `json:"template_content" form:"template_content"`
+	TemplatePersistentParameters []*TemplatePersistentParameter `json:"template_persistent_parameters"`
 }
 
 // NewTemplateModel creates a Template model instance

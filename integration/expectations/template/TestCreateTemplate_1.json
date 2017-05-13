@@ -2,5 +2,5 @@
   "id": 1,
   "name": "test1",
   "template_content": "TestTemplate1",
-  "template_external_parameters": null
+  "template_persistent_parameters": null
 }
