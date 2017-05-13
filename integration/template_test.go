@@ -4,6 +4,7 @@ package integration
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/qb0C80aE/clay/models"
 	"net/http"
 	"strconv"
@@ -232,7 +233,7 @@ func TestPatchTemplate(t *testing.T) {
 
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template)
 
-	responseText, code := Execute(t, http.MethodPatch, GenerateSingleResourceURL(server, "templates", strconv.Itoa(id), nil), nil)
+	responseText, code := Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%d", id), "generation", nil), nil)
 	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestPatchTemplate_1.txt"))
 }
 
@@ -878,6 +879,6 @@ sequence[{{$i}}]={{$v}}
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template3)
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_external_parameters", nil), templateExternalParameter31)
 
-	responseText, code := Execute(t, http.MethodPatch, GenerateSingleResourceURL(server, "templates", strconv.Itoa(id), nil), nil)
+	responseText, code := Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%d", id), "generation", nil), nil)
 	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_FuncMaps_1.txt"))
 }

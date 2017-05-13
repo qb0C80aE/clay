@@ -40,16 +40,8 @@ func (controller *templateController) RouteMap() map[int]map[string]gin.HandlerF
 		extensions.MethodDelete: {
 			resourceSingleURL: controller.Delete,
 		},
-		extensions.MethodPatch: {
-			resourceSingleURL: controller.Patch,
-		},
 	}
 	return routeMap
-}
-
-func (controller *templateController) OutputPatch(c *gin.Context, code int, result interface{}) {
-	text := result.(string)
-	c.String(code, text)
 }
 
 var uniqueTemplateController = newTemplateController()
