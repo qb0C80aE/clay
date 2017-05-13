@@ -31,7 +31,7 @@ func TestGetDesign(t *testing.T) {
 		ID:              2,
 		Name:            "test2",
 		TemplateContent: "TestTemplate2",
-		TemplateExternalParameters: []*models.TemplateExternalParameter{
+		TemplatePersistentParameters: []*models.TemplatePersistentParameter{
 			{
 				Name: "testParameter1",
 				ValueString: sql.NullString{
@@ -42,7 +42,7 @@ func TestGetDesign(t *testing.T) {
 		},
 	}
 
-	templateExternalParameter22 := &models.TemplateExternalParameter{
+	templatePersistentParameter22 := &models.TemplatePersistentParameter{
 		TemplateID: 2,
 		Name:       "testParameter2",
 		ValueString: sql.NullString{
@@ -53,7 +53,7 @@ func TestGetDesign(t *testing.T) {
 
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template1)
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template2)
-	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_external_parameters", nil), templateExternalParameter22)
+	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_persistent_parameters", nil), templatePersistentParameter22)
 
 	responseText, code := Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "designs", "present", nil), nil)
 	CheckResponseJSON(t, code, http.StatusOK, responseText, LoadExpectation(t, "design/TestGetDesign_1.json"), &models.Design{})
@@ -65,7 +65,7 @@ func TestUpdateDesign(t *testing.T) {
 
 	design := &models.Design{
 		Content: map[string]interface{}{
-			"template_external_parameters": []*models.TemplateExternalParameter{
+			"template_persistent_parameters": []*models.TemplatePersistentParameter{
 				{
 					ID:         1,
 					TemplateID: 1,
@@ -113,7 +113,7 @@ func TestDeleteDesign(t *testing.T) {
 
 	design := &models.Design{
 		Content: map[string]interface{}{
-			"template_external_parameters": []*models.TemplateExternalParameter{
+			"template_persistent_parameters": []*models.TemplatePersistentParameter{
 				{
 					ID:         1,
 					TemplateID: 1,

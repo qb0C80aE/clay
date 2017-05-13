@@ -173,23 +173,30 @@ You can register some text templates and generate something using the models in 
 Some functions are provided in template processing, see [the example template in Clay](https://github.com/qb0C80aE/clay/blob/develop/examples/sample.template).
 
 ```
-$ # register template1 and external parameters
+$ # register template1 and persistent parameters
 $ curl -X POST "localhost:8080/templates" -H "Content-Type: multipart/form-data" -F name=sample1 -F template_content=@examples/sample.template
 $ curl -X POST "localhost:8080/templates" -H "Content-Type: application/json" -d '{"name": "sample2", "template_content": "sample2"}'
 $ curl -X POST "localhost:8080/templates" -H "Content-Type: application/json" -d '{"name": "sample3", "template_content": "sample3"}'
-$ curl -X POST "localhost:8080/template_external_parameters" -H "Content-Type: application/json" -d '{"template_id": 1, "name": "testParameter11", "value_string": {"String": "TestParameter11", "Valid": true}, "value_int": {"Int64": 1, "Valid": true}}'
-$ curl -X POST "localhost:8080/template_external_parameters" -H "Content-Type: application/json" -d '{"template_id": 1, "name": "testParameter12", "value_string": {"String": "TestParameter12", "Valid": true}}'
-$ curl -X POST "localhost:8080/template_external_parameters" -H "Content-Type: application/json" -d '{"template_id": 1, "name": "testParameter1X", "value_int": {"Int64": 100, "Valid": true}}'
-$ # register template2 and external parameters
+$ curl -X POST "localhost:8080/template_persistent_parameters" -H "Content-Type: application/json" -d '{"template_id": 1, "name": "testParameter11", "value_string": {"String": "TestParameter11", "Valid": true}, "value_int": {"Int64": 1, "Valid": true}}'
+$ curl -X POST "localhost:8080/template_persistent_parameters" -H "Content-Type: application/json" -d '{"template_id": 1, "name": "testParameter12", "value_string": {"String": "TestParameter12", "Valid": true}}'
+$ curl -X POST "localhost:8080/template_persistent_parameters" -H "Content-Type: application/json" -d '{"template_id": 1, "name": "testParameter1X", "value_int": {"Int64": 100, "Valid": true}}'
+$ # register template2 and persistent parameters
 $ curl -X POST "localhost:8080/templates" -H "Content-Type: application/json" -d '{"name": "sample2", "template_content": "{{.testParameter1X}}"}'
-$ curl -X POST "localhost:8080/template_external_parameters" -H "Content-Type: application/json" -d '{"template_id": 2, "name": "testParameter1X", "value_int": {"Int64": 200, "Valid": true}}'
-$ # register template3 and external parameters
+$ curl -X POST "localhost:8080/template_persistent_parameters" -H "Content-Type: application/json" -d '{"template_id": 2, "name": "testParameter1X", "value_int": {"Int64": 200, "Valid": true}}'
+$ # register template3 and persistent parameters
 $ curl -X POST "localhost:8080/templates" -H "Content-Type: application/json" -d '{"name": "sample3", "template_content": "{{.testParameter1X}}"}'
-$ curl -X POST "localhost:8080/template_external_parameters" -H "Content-Type: application/json" -d '{"template_id": 3, "name": "testParameter1X", "value_int": {"Int64": 300, "Valid": true}}'
+$ curl -X POST "localhost:8080/template_persistent_parameters" -H "Content-Type: application/json" -d '{"template_id": 3, "name": "testParameter1X", "value_int": {"Int64": 300, "Valid": true}}'
 $ # show generated template
 $ curl -X GET "localhost:8080/templates/1"
 $ # Geenrate a text from the tempalte
-$ curl -X PATCH "localhost:8080/templates/1"
+$ curl -X GET "localhost:8080/templates/1/generation"
+```
+
+When you generate a text from template, you can give volatile parameters with query parameter to templates, and templates can use those as slice.
+
+```
+$ curl -X GET "localhost:8080/templates/1/generation?param1=100&param1=101&param2=200"
+$ # In template, those parameters can be accessed as {{.param1}} and {{.param2}}, as slices [100 101] and [200].
 ```
 
 If you added some models like [Loam](https://github.com/qb0C80aE/loam), you will be able to use those models in templates.
@@ -209,15 +216,14 @@ PUT    /designs/present
 DELETE /designs/present
 ```
 
-### TemplateExternalParameter Resource
+### TemplatePersistentParameter Resource
 
 ```
-GET    /template_external_parameters
-GET    /template_external_parameters/:id
-POST   /template_external_parameters
-PUT    /template_external_parameters/:id
-DELETE /template_external_parameters/:id
-PATCH  /template_external_parameters/:id
+GET    /template_persistent_parameters
+GET    /template_persistent_parameters/:id
+POST   /template_persistent_parameters
+PUT    /template_persistent_parameters/:id
+DELETE /template_persistent_parameters/:id
 ```
 
 ### Template Resource
@@ -228,7 +234,7 @@ GET    /templates/:id
 POST   /templates
 PUT    /templates/:id
 DELETE /templates/:id
-PATCH  /templates/:id
+GET    /templates/:id/generation
 ```
 
 # Thanks
