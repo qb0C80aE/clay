@@ -93,12 +93,12 @@ func (controller *BaseController) ResourceName() string {
 
 // ResourceSingleURL builds a resource url what represents a single resource based on the argument
 func (controller *BaseController) ResourceSingleURL() string {
-	return fmt.Sprintf("/%s/:id", controller.ResourceName())
+	return fmt.Sprintf("%s/:id", controller.ResourceName())
 }
 
 // ResourceMultiURL builds a resource url what represents multi resources based on the argument
 func (controller *BaseController) ResourceMultiURL() string {
-	return fmt.Sprintf("/%s", controller.ResourceName())
+	return fmt.Sprintf("%s", controller.ResourceName())
 }
 
 // OutputError handles an error output
