@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/qb0C80aE/clay/extensions"
 	"net/http"
+	"sort"
 )
 
 // APIEndpoints returns endpoints of Clay API
@@ -17,7 +18,7 @@ func APIEndpoints(c *gin.Context) {
 
 	reqHost := c.Request.Host
 	baseURL := fmt.Sprintf("%s://%s", reqScheme, reqHost)
-	resources := map[string]string{}
+	resources := []string{}
 
 	controllers := extensions.RegisteredControllers()
 	for _, controller := range controllers {
@@ -25,9 +26,10 @@ func APIEndpoints(c *gin.Context) {
 		for method, routes := range routeMap {
 			title := fmt.Sprintf("%s_url [%s]", controller.ResourceName(), extensions.LookUpMethodName(method))
 			for relativePath := range routes {
-				resources[title] = fmt.Sprintf("%s/%s", baseURL, relativePath)
+				resources = append(resources, fmt.Sprintf("%s %s/%s", title, baseURL, relativePath))
 			}
 		}
 	}
+	sort.Strings(resources)
 	c.IndentedJSON(http.StatusOK, resources)
 }
