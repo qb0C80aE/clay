@@ -7,7 +7,7 @@ import (
 // Template is the model class what represents templates to generate texts from models
 type Template struct {
 	ID                           int                            `json:"id" form:"id" gorm:"primary_key;AUTO_INCREMENT"`
-	Name                         string                         `json:"name" form:"name"`
+	Name                         string                         `json:"name" form:"name" gorm:"not null;unique"`
 	TemplateContent              string                         `json:"template_content" form:"template_content"`
 	TemplatePersistentParameters []*TemplatePersistentParameter `json:"template_persistent_parameters"`
 }
