@@ -75,9 +75,16 @@ func (controller *BaseController) bind(c *gin.Context, container interface{}) er
 				field := t.Field(i)
 				jsonTag := field.Tag.Get("json")
 				formTag := field.Tag.Get("form")
-				if (jsonTag == name || formTag == name) && (field.Type.Kind() == reflect.String) {
-					vs.FieldByName(field.Name).SetString(buffer.String())
-					break
+				if jsonTag == name || formTag == name {
+					if field.Type.Kind() == reflect.String {
+						vs.FieldByName(field.Name).SetString(buffer.String())
+						break
+					} else if field.Type.Kind() == reflect.Slice {
+						vs.FieldByName(field.Name).SetBytes(buffer.Bytes())
+						break
+					} else {
+						return errors.New("invalid field definition, the field must be string or slice of bytes")
+					}
 				}
 			}
 
