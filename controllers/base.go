@@ -414,15 +414,15 @@ func (controller *BaseController) Create(c *gin.Context) {
 
 	db := dbpkg.Instance(c)
 
-	db = db.Begin()
-	result, err := controller.create(db, c.Request.URL.Query(), container)
+	tx := db.Begin()
+	result, err := controller.create(tx, c.Request.URL.Query(), container)
 	if err != nil {
-		db.Rollback()
+		tx.Rollback()
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
-	db.Commit()
+	tx.Commit()
 
 	if version.Range("1.0.0", "<=", ver) && version.Range(ver, "<", "2.0.0") {
 		// conditional branch by version.
@@ -463,15 +463,15 @@ func (controller *BaseController) Update(c *gin.Context) {
 
 	db := dbpkg.Instance(c)
 
-	db = db.Begin()
-	result, err := controller.update(db, id, c.Request.URL.Query(), container)
+	tx := db.Begin()
+	result, err := controller.update(tx, id, c.Request.URL.Query(), container)
 	if err != nil {
-		db.Rollback()
+		tx.Rollback()
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
-	db.Commit()
+	tx.Commit()
 
 	if version.Range("1.0.0", "<=", ver) && version.Range(ver, "<", "2.0.0") {
 		// conditional branch by version.
@@ -493,15 +493,15 @@ func (controller *BaseController) Delete(c *gin.Context) {
 
 	db := dbpkg.Instance(c)
 
-	db = db.Begin()
-	err = controller.delete(db, id, c.Request.URL.Query())
+	tx := db.Begin()
+	err = controller.delete(tx, id, c.Request.URL.Query())
 	if err != nil {
-		db.Rollback()
+		tx.Rollback()
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
-	db.Commit()
+	tx.Commit()
 
 	if version.Range("1.0.0", "<=", ver) && version.Range(ver, "<", "2.0.0") {
 		// conditional branch by version.
@@ -523,15 +523,15 @@ func (controller *BaseController) Patch(c *gin.Context) {
 
 	db := dbpkg.Instance(c)
 
-	db = db.Begin()
-	result, err := controller.patch(db, id, c.Request.URL.Query())
+	tx := db.Begin()
+	result, err := controller.patch(tx, id, c.Request.URL.Query())
 	if err != nil {
-		db.Rollback()
+		tx.Rollback()
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
-	db.Commit()
+	tx.Commit()
 
 	if version.Range("1.0.0", "<=", ver) && version.Range(ver, "<", "2.0.0") {
 		// conditional branch by version.
@@ -551,15 +551,15 @@ func (controller *BaseController) Options(c *gin.Context) {
 
 	db := dbpkg.Instance(c)
 
-	db = db.Begin()
-	err = controller.options(db, c.Request.URL.Query())
+	tx := db.Begin()
+	err = controller.options(tx, c.Request.URL.Query())
 	if err != nil {
-		db.Rollback()
+		tx.Rollback()
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
-	db.Commit()
+	tx.Commit()
 
 	if version.Range("1.0.0", "<=", ver) && version.Range(ver, "<", "2.0.0") {
 		// conditional branch by version.

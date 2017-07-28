@@ -20,6 +20,7 @@ func newDesignLogic() *designLogic {
 
 // GetSingle returns all models to store into versioning repositories
 func (logic *designLogic) GetSingle(db *gorm.DB, _ string, _ url.Values, _ string) (interface{}, error) {
+	// Reset previous conditions
 	db = db.New()
 
 	design := &models.Design{

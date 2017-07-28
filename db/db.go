@@ -49,6 +49,24 @@ func Connect() *gorm.DB {
 		extensions.RegisterResourceName(model, db.NewScope(model).TableName())
 	}
 
+	initialDataLoaders := extensions.RegisteredInitialDataLoaders()
+	// Caution: Even if you input the inconsistent data like foreign keys do not exist,
+	//          it will be registered, and never be checked this time.
+	//          Todo: It requires order resolution logic like "depends on" between models.
+	db.Exec("pragma foreign_keys = off;")
+
+	tx := db.Begin()
+	for _, initialDataLoader := range initialDataLoaders {
+		err := initialDataLoader.SetupInitialData(tx)
+		if err != nil {
+			tx.Rollback()
+			log.Fatalf("Failed to load the initial data: %s", err)
+		}
+	}
+	tx.Commit()
+
+	db.Exec("pragma foreign_keys = on;")
+
 	return db
 }
 

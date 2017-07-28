@@ -2,6 +2,7 @@ package extensions
 
 import (
 	"fmt"
+	"github.com/jinzhu/gorm"
 	"reflect"
 )
 
@@ -9,6 +10,13 @@ var models = []interface{}{}
 var typeMap = map[string]reflect.Type{}
 var modelMap = map[string]interface{}{}
 var resourceNameMap = map[reflect.Type]string{}
+var initialDataLoaders = []InitialDataLoader{}
+
+// InitialDataLoader is the interface what setups the initial data
+// * SetupInitialData setups the initial data
+type InitialDataLoader interface {
+	SetupInitialData(db *gorm.DB) error
+}
 
 // ModelType returns the type of given model stripping pointer and interface
 func ModelType(model interface{}) reflect.Type {
@@ -55,4 +63,18 @@ func CreateModel(name string) (interface{}, error) {
 		return nil, fmt.Errorf("the type named '%s' has not been registered yet", name)
 	}
 	return reflect.New(reflectType).Elem().Addr().Interface(), nil
+}
+
+// RegisterInitialDataLoader registers an initial data loader
+func RegisterInitialDataLoader(initialDataLoader InitialDataLoader) {
+	initialDataLoaders = append(initialDataLoaders, initialDataLoader)
+}
+
+// RegisteredInitialDataLoaders returns the registered initial data loaders
+func RegisteredInitialDataLoaders() []InitialDataLoader {
+	result := make([]InitialDataLoader, len(initialDataLoaders))
+	for i, initialDataLoader := range initialDataLoaders {
+		result[i] = initialDataLoader
+	}
+	return result
 }
