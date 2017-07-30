@@ -202,6 +202,21 @@ $ # In template, those parameters can be accessed as {{.param1}} and {{.param2}}
 If you added some models like [Loam](https://github.com/qb0C80aE/loam), you will be able to use those models in templates.
 See [the example template in Loam](https://github.com/qb0C80aE/loam/blob/develop/examples/terraform.template).
 
+### Note
+
+If you want to implement the automatic data operation like cascade deletion with models of another modules, you can ``create trigger`` to sqlite instead of ``on delete`` or ``on update`` statement.
+
+```
+# Ex. In InitialDataLoader#SetupInitialData
+// node_extra_attribute_options is the model in Loam, and template is the model in Clay.
+// If you want to delete some related templates.id to the node_extra_attribute_options.value_int only if it has int 3 of old.node_extra_attribute_field_id:
+db.Exec(`create trigger if not exists DeleteServerInitializationConfig delete on node_extra_attribute_options when old.node_extra_attribute_field_id = 3
+	begin
+		delete from templates where id = old.value_int;
+	end;
+`)
+```
+
 # API Server
 
 Simple Rest API using [Gin](https://github.com/gin-gonic/gin)(framework) & [GORM](https://github.com/jinzhu/gorm)(orm)
