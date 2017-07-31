@@ -40,9 +40,10 @@ func SliceToInterfaceSlice(slice interface{}) ([]interface{}, error) {
 		if !itemForField.IsValid() {
 			return nil, fmt.Errorf("the actual item indexed %d in given slice is not valid", i)
 		}
-		if itemForField.Kind() != reflect.Struct {
-			return nil, errors.New("given slice isn't a slice of struct")
-		}
+		// This method does not require the field name of struct
+		//if itemForField.Kind() != reflect.Struct {
+		//	return nil, errors.New("given slice isn't a slice of struct")
+		//}
 
 		if !item.CanInterface() {
 			return nil, fmt.Errorf("the original item indexed %d in given slice cannot interface", i)
@@ -52,9 +53,9 @@ func SliceToInterfaceSlice(slice interface{}) ([]interface{}, error) {
 	return result, nil
 }
 
-// SliceToInterfaceMap creates a map[interface{}]interface{} from a slice of a struct with key defined in the struct
+// StructSliceToInterfaceMap creates a map[interface{}]interface{} from a slice of a struct with key defined in the struct
 // It doesn't modify the raw type of elements like strpping pointer or something
-func SliceToInterfaceMap(structSlice interface{}, keyFieldName string) (map[interface{}]interface{}, error) {
+func StructSliceToInterfaceMap(structSlice interface{}, keyFieldName string) (map[interface{}]interface{}, error) {
 	v := reflect.ValueOf(structSlice)
 
 	if v.Kind() != reflect.Slice && v.Kind() != reflect.Array {
@@ -72,6 +73,7 @@ func SliceToInterfaceMap(structSlice interface{}, keyFieldName string) (map[inte
 		if !itemForField.IsValid() {
 			return nil, fmt.Errorf("the actual item indexed %d in given slice is not valid", i)
 		}
+		// This method requires the field name of struct
 		if itemForField.Kind() != reflect.Struct {
 			return nil, errors.New("given slice isn't a slice of struct")
 		}
@@ -88,9 +90,9 @@ func SliceToInterfaceMap(structSlice interface{}, keyFieldName string) (map[inte
 	return result, nil
 }
 
-// SliceToInterfaceSliceMap creates a map[interface{}][]interface{} from a slice of a struct with key defined in the struct
+// StructSliceToInterfaceSliceMap creates a map[interface{}][]interface{} from a slice of a struct with key defined in the struct
 // It doesn't modify the raw type of elements like strpping pointer or something
-func SliceToInterfaceSliceMap(structSlice interface{}, keyFieldName string) (map[interface{}][]interface{}, error) {
+func StructSliceToInterfaceSliceMap(structSlice interface{}, keyFieldName string) (map[interface{}][]interface{}, error) {
 	v := reflect.ValueOf(structSlice)
 
 	if v.Kind() != reflect.Slice && v.Kind() != reflect.Array {
@@ -108,6 +110,7 @@ func SliceToInterfaceSliceMap(structSlice interface{}, keyFieldName string) (map
 		if !itemForField.IsValid() {
 			return nil, fmt.Errorf("the actual item indexed %d in given slice is not valid", i)
 		}
+		// This method requires the field name of struct
 		if itemForField.Kind() != reflect.Struct {
 			return nil, errors.New("given slice isn't a slice of struct")
 		}

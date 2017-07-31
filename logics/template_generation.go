@@ -88,27 +88,43 @@ func init() {
 		"mul": func(a, b int) int { return a * b },
 		"div": func(a, b int) int { return a / b },
 		"mod": func(a, b int) int { return a % b },
-		"slice": func(items ...interface{}) []interface{} {
+		"slice": func(items ...interface{}) interface{} {
 			slice := []interface{}{}
 			return append(slice, items...)
 		},
-		"subslice": func(slice []interface{}, begin int, end int) []interface{} {
+		"subslice": func(sliceInterface interface{}, begin int, end int) (interface{}, error) {
+			slice, err := mapstruct.SliceToInterfaceSlice(sliceInterface)
+			if err != nil {
+				return nil, err
+			}
 			if begin < 0 {
 				if end < 0 {
-					return slice[:]
+					return slice[:], nil
 				}
-				return slice[:end]
+				return slice[:end], nil
 			}
 			if end < 0 {
-				return slice[begin:]
+				return slice[begin:], nil
 			}
-			return slice[begin:end]
+			return slice[begin:end], nil
 		},
-		"append": func(slice []interface{}, item ...interface{}) []interface{} {
-			return append(slice, item...)
+		"append": func(sliceInterface interface{}, item ...interface{}) (interface{}, error) {
+			slice, err := mapstruct.SliceToInterfaceSlice(sliceInterface)
+			if err != nil {
+				return nil, err
+			}
+			return append(slice, item...), nil
 		},
-		"concatenate": func(slice1 []interface{}, slice2 []interface{}) []interface{} {
-			return append(slice1, slice2...)
+		"concatenate": func(sliceInterface1 interface{}, sliceInterface2 interface{}) (interface{}, error) {
+			slice1, err := mapstruct.SliceToInterfaceSlice(sliceInterface1)
+			if err != nil {
+				return nil, err
+			}
+			slice2, err := mapstruct.SliceToInterfaceSlice(sliceInterface2)
+			if err != nil {
+				return nil, err
+			}
+			return append(slice1, slice2...), nil
 		},
 		"map": func(pairs ...interface{}) (map[interface{}]interface{}, error) {
 			if len(pairs)%2 == 1 {
@@ -142,10 +158,10 @@ func init() {
 			return destination
 		},
 		"hash": func(slice interface{}, keyField string) (map[interface{}]interface{}, error) {
-			return mapstruct.SliceToInterfaceMap(slice, keyField)
+			return mapstruct.StructSliceToInterfaceMap(slice, keyField)
 		},
 		"slicemap": func(slice interface{}, keyField string) (map[interface{}]interface{}, error) {
-			sliceMap, err := mapstruct.SliceToInterfaceSliceMap(slice, keyField)
+			sliceMap, err := mapstruct.StructSliceToInterfaceSliceMap(slice, keyField)
 			if err != nil {
 				return nil, err
 			}
