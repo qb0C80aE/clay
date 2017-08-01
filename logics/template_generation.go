@@ -8,6 +8,7 @@ import (
 	"github.com/qb0C80aE/clay/extensions"
 	"github.com/qb0C80aE/clay/helper"
 	"github.com/qb0C80aE/clay/models"
+	"github.com/qb0C80aE/clay/utils/conversion"
 	"github.com/qb0C80aE/clay/utils/mapstruct"
 	"net/http"
 	"net/url"
@@ -88,6 +89,48 @@ func init() {
 		"mul": func(a, b int) int { return a * b },
 		"div": func(a, b int) int { return a / b },
 		"mod": func(a, b int) int { return a % b },
+		"int": func(value interface{}) (interface{}, error) {
+			return conversion.ToIntInterface(value)
+		},
+		"int8": func(value interface{}) (interface{}, error) {
+			return conversion.ToInt8Interface(value)
+		},
+		"int16": func(value interface{}) (interface{}, error) {
+			return conversion.ToInt16Interface(value)
+		},
+		"int32": func(value interface{}) (interface{}, error) {
+			return conversion.ToInt32Interface(value)
+		},
+		"int64": func(value interface{}) (interface{}, error) {
+			return conversion.ToInt64Interface(value)
+		},
+		"uint": func(value interface{}) (interface{}, error) {
+			return conversion.ToUintInterface(value)
+		},
+		"uint8": func(value interface{}) (interface{}, error) {
+			return conversion.ToUint8Interface(value)
+		},
+		"uint16": func(value interface{}) (interface{}, error) {
+			return conversion.ToUint16Interface(value)
+		},
+		"uint32": func(value interface{}) (interface{}, error) {
+			return conversion.ToUint32Interface(value)
+		},
+		"uint64": func(value interface{}) (interface{}, error) {
+			return conversion.ToUint64Interface(value)
+		},
+		"float32": func(value interface{}) (interface{}, error) {
+			return conversion.ToFloat32Interface(value)
+		},
+		"float64": func(value interface{}) (interface{}, error) {
+			return conversion.ToFloat64Interface(value)
+		},
+		"string": func(value interface{}) (interface{}, error) {
+			return conversion.ToStringInterface(value)
+		},
+		"boolean": func(value interface{}) (interface{}, error) {
+			return conversion.ToBooleanInterface(value)
+		},
 		"slice": func(items ...interface{}) interface{} {
 			slice := []interface{}{}
 			return append(slice, items...)
