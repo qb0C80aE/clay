@@ -690,6 +690,204 @@ i = i mod 5
 {{- $i := mod $i 5}}
 {{$i}}
 
+--- conversion ---
+{{- $vint := int "100" }}
+{{- $vint8 := int8 "101" }}
+{{- $vint16 := int16 "102" }}
+{{- $vint32 := int32 "103" }}
+{{- $vint64 := int64 "104" }}
+{{- $vuint := uint "200" }}
+{{- $vuint8 := uint8 "201" }}
+{{- $vuint16 := uint16 "202" }}
+{{- $vuint32 := uint32 "203" }}
+{{- $vuint64 := uint64 "204" }}
+{{- $vfloat32 := float32 "300.1" }}
+{{- $vfloat64 := float64 "300.2" }}
+{{- $vboolean := boolean "false" }}
+{{ $vint }}
+{{ $vint8 }}
+{{ $vint16 }}
+{{ $vint32 }}
+{{ $vint64 }}
+{{ $vuint }}
+{{ $vuint8 }}
+{{ $vuint16 }}
+{{ $vuint32 }}
+{{ $vuint64 }}
+{{ $vfloat32 }}
+{{ $vfloat64 }}
+{{ $vboolean }}
+{{- $sint := string $vint }}
+{{- $sint8 := string $vint8 }}
+{{- $sint16 := string $vint16 }}
+{{- $sint32 := string $vint32 }}
+{{- $sint64 := string $vint64 }}
+{{- $suint := string $vuint }}
+{{- $suint8 := string $vuint8 }}
+{{- $suint16 := string $vuint16 }}
+{{- $suint32 := string $vuint32 }}
+{{- $suint64 := string $vuint64 }}
+{{- $sfloat32:= string $vfloat32 }}
+{{- $sfloat64 := string $vfloat64 }}
+{{- $sboolean := string $vboolean }}
+{{ $sint }}
+{{ $sint8 }}
+{{ $sint16 }}
+{{ $sint32 }}
+{{ $sint64 }}
+{{ $suint }}
+{{ $suint8 }}
+{{ $suint16 }}
+{{ $suint32 }}
+{{ $suint64 }}
+{{ $sfloat32 }}
+{{ $sfloat64 }}
+{{ $sboolean }}
+{{ int $vint }}
+{{ int $vint8 }}
+{{ int $vint16 }}
+{{ int $vint32 }}
+{{ int $vint64 }}
+{{ int $vuint }}
+{{ int $vuint8 }}
+{{ int $vuint16 }}
+{{ int $vuint32 }}
+{{ int $vuint64 }}
+{{ int $vfloat32 }}
+{{ int $vfloat64 }}
+{{ int8 $vint }}
+{{ int8 $vint8 }}
+{{ int8 $vint16 }}
+{{ int8 $vint32 }}
+{{ int8 $vint64 }}
+{{ int8 $vuint }}
+{{ int8 $vuint8 }}
+{{ int8 $vuint16 }}
+{{ int8 $vuint32 }}
+{{ int8 $vuint64 }}
+{{ int8 $vfloat32 }}
+{{ int8 $vfloat64 }}
+{{ int16 $vint }}
+{{ int16 $vint8 }}
+{{ int16 $vint16 }}
+{{ int16 $vint32 }}
+{{ int16 $vint64 }}
+{{ int16 $vuint }}
+{{ int16 $vuint8 }}
+{{ int16 $vuint16 }}
+{{ int16 $vuint32 }}
+{{ int16 $vuint64 }}
+{{ int16 $vfloat32 }}
+{{ int16 $vfloat64 }}
+{{ int32 $vint }}
+{{ int32 $vint8 }}
+{{ int32 $vint16 }}
+{{ int32 $vint32 }}
+{{ int32 $vint64 }}
+{{ int32 $vuint }}
+{{ int32 $vuint8 }}
+{{ int32 $vuint16 }}
+{{ int32 $vuint32 }}
+{{ int32 $vuint64 }}
+{{ int32 $vfloat32 }}
+{{ int32 $vfloat64 }}
+{{ int64 $vint }}
+{{ int64 $vint8 }}
+{{ int64 $vint16 }}
+{{ int64 $vint32 }}
+{{ int64 $vint64 }}
+{{ int64 $vuint }}
+{{ int64 $vuint8 }}
+{{ int64 $vuint16 }}
+{{ int64 $vuint32 }}
+{{ int64 $vuint64 }}
+{{ int64 $vfloat32 }}
+{{ int64 $vfloat64 }}
+{{ uint $vint }}
+{{ uint $vint8 }}
+{{ uint $vint16 }}
+{{ uint $vint32 }}
+{{ uint $vint64 }}
+{{ uint $vuint }}
+{{ uint $vuint8 }}
+{{ uint $vuint16 }}
+{{ uint $vuint32 }}
+{{ uint $vuint64 }}
+{{ uint $vfloat32 }}
+{{ uint $vfloat64 }}
+{{ uint8 $vint }}
+{{ uint8 $vint8 }}
+{{ uint8 $vint16 }}
+{{ uint8 $vint32 }}
+{{ uint8 $vint64 }}
+{{ uint8 $vuint }}
+{{ uint8 $vuint8 }}
+{{ uint8 $vuint16 }}
+{{ uint8 $vuint32 }}
+{{ uint8 $vuint64 }}
+{{ uint8 $vfloat32 }}
+{{ uint8 $vfloat64 }}
+{{ uint16 $vint }}
+{{ uint16 $vint8 }}
+{{ uint16 $vint16 }}
+{{ uint16 $vint32 }}
+{{ uint16 $vint64 }}
+{{ uint16 $vuint }}
+{{ uint16 $vuint8 }}
+{{ uint16 $vuint16 }}
+{{ uint16 $vuint32 }}
+{{ uint16 $vuint64 }}
+{{ uint16 $vfloat32 }}
+{{ uint16 $vfloat64 }}
+{{ uint32 $vint }}
+{{ uint32 $vint8 }}
+{{ uint32 $vint16 }}
+{{ uint32 $vint32 }}
+{{ uint32 $vint64 }}
+{{ uint32 $vuint }}
+{{ uint32 $vuint8 }}
+{{ uint32 $vuint16 }}
+{{ uint32 $vuint32 }}
+{{ uint32 $vuint64 }}
+{{ uint32 $vfloat32 }}
+{{ uint32 $vfloat64 }}
+{{ uint64 $vint }}
+{{ uint64 $vint8 }}
+{{ uint64 $vint16 }}
+{{ uint64 $vint32 }}
+{{ uint64 $vint64 }}
+{{ uint64 $vuint }}
+{{ uint64 $vuint8 }}
+{{ uint64 $vuint16 }}
+{{ uint64 $vuint32 }}
+{{ uint64 $vuint64 }}
+{{ uint64 $vfloat32 }}
+{{ uint64 $vfloat64 }}
+{{ float32 $vint }}
+{{ float32 $vint8 }}
+{{ float32 $vint16 }}
+{{ float32 $vint32 }}
+{{ float32 $vint64 }}
+{{ float32 $vuint }}
+{{ float32 $vuint8 }}
+{{ float32 $vuint16 }}
+{{ float32 $vuint32 }}
+{{ float32 $vuint64 }}
+{{ float32 $vfloat32 }}
+{{ float32 $vfloat64 }}
+{{ float64 $vint }}
+{{ float64 $vint8 }}
+{{ float64 $vint16 }}
+{{ float64 $vint32 }}
+{{ float64 $vint64 }}
+{{ float64 $vuint }}
+{{ float64 $vuint8 }}
+{{ float64 $vuint16 }}
+{{ float64 $vuint32 }}
+{{ float64 $vuint64 }}
+{{ float64 $vfloat32 }}
+{{ float64 $vfloat64 }}
+
 --- slice ---
 slice init
 {{- $slice1 := slice}}
