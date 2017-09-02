@@ -28,9 +28,6 @@ func (clayRuntime *clayRuntime) Run() {
 		}
 	}
 
-	os.Setenv("HOST", host)
-	os.Setenv("PORT", port)
-
 	database := db.Connect()
 	s := server.Setup(database)
 
