@@ -36,12 +36,11 @@ func Connect() *gorm.DB {
 		log.Fatalf("Got error when connect database, the error is '%v'", err)
 	}
 
-	db.Exec("pragma foreign_keys = on")
-	db.LogMode(true)
-
 	if gin.IsDebugging() {
 		db.LogMode(true)
 	}
+
+	db.Exec("pragma foreign_keys = on")
 
 	registeredModels := extensions.RegisteredModels()
 	db.AutoMigrate(registeredModels...)
