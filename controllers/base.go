@@ -312,7 +312,7 @@ func (controller *BaseController) GetSingle(c *gin.Context) {
 	}
 
 	db := dbpkg.Instance(c)
-	parameter, err := dbpkg.NewParameter(c.Request.URL.Query(), controller.model)
+	parameter, err := dbpkg.NewParameter(c.Request.URL.Query())
 	if err != nil {
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
@@ -346,7 +346,7 @@ func (controller *BaseController) GetMulti(c *gin.Context) {
 	}
 
 	db := dbpkg.Instance(c)
-	parameter, err := dbpkg.NewParameter(c.Request.URL.Query(), controller.model)
+	parameter, err := dbpkg.NewParameter(c.Request.URL.Query())
 	if err != nil {
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return

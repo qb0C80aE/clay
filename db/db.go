@@ -5,6 +5,7 @@ import (
 	"os"
 	"strings"
 
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite" // Need to avoid "Got error when connect database, the error is 'sql: unknown driver "sqlite3" (forgotten import?)'"
@@ -88,7 +89,17 @@ func (parameter *Parameter) SetPreloads(db *gorm.DB) *gorm.DB {
 			a = append(a, snaker.SnakeToCamel(s))
 		}
 
-		db = db.Preload(strings.Join(a, "."))
+		if m, exists := parameter.PreloadsFilterMap[preload]; exists {
+			db = db.Preload(strings.Join(a, "."), func(db *gorm.DB) *gorm.DB {
+				for k, v := range m {
+					columnName := snaker.CamelToSnake(k)
+					db = db.Where(fmt.Sprintf("%s IN (?)", columnName), strings.Split(v, ","))
+				}
+				return db
+			})
+		} else {
+			db = db.Preload(strings.Join(a, "."))
+		}
 	}
 
 	return db

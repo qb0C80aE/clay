@@ -247,7 +247,7 @@ func init() {
 				return nil, err
 			}
 			urlQuery := requestForParameter.URL.Query()
-			parameter, err := dbpkg.NewParameter(urlQuery, model)
+			parameter, err := dbpkg.NewParameter(urlQuery)
 			if err != nil {
 				return nil, err
 			}
@@ -287,7 +287,7 @@ func init() {
 				return nil, err
 			}
 			urlQuery := requestForParameter.URL.Query()
-			parameter, err := dbpkg.NewParameter(urlQuery, model)
+			parameter, err := dbpkg.NewParameter(urlQuery)
 			if err != nil {
 				return nil, err
 			}

@@ -2,37 +2,46 @@ package db
 
 import (
 	"fmt"
-	"reflect"
 	"strings"
 
 	"github.com/jinzhu/gorm"
+	"github.com/serenize/snaker"
 	"net/url"
+	"regexp"
 )
 
-func filterToMap(query url.Values, model interface{}) map[string]string {
-	var jsonTag, jsonKey string
+func filterToMap(query url.Values) (map[string]string, map[string]map[string]string) {
+	p, _ := regexp.Compile("^q\\[[a-zA-Z\\._]+\\]$")
 	filters := make(map[string]string)
-	ts := reflect.TypeOf(model)
-
-	for i := 0; i < ts.NumField(); i++ {
-		f := ts.Field(i)
-		jsonKey = f.Name
-
-		if jsonTag = f.Tag.Get("json"); jsonTag != "" {
-			jsonKey = strings.Split(jsonTag, ",")[0]
+	preloadsFilterMap := make(map[string]map[string]string)
+	for queryKey := range query {
+		if p.MatchString(queryKey) {
+			if strings.Contains(queryKey, ".") {
+				s := queryKey[2 : len(queryKey)-1]
+				a := strings.Split(s, ".")
+				filterKey := a[len(a)-1]
+				a = a[:len(a)-1]
+				fieldName := strings.Join(a, ".")
+				if _, exists := preloadsFilterMap[fieldName]; !exists {
+					preloadsFilterMap[fieldName] = make(map[string]string)
+				}
+				preloadsFilterMap[fieldName][filterKey] = query.Get(queryKey)
+			} else {
+				filterKey := queryKey[2 : len(queryKey)-1]
+				filters[filterKey] = query.Get(queryKey)
+			}
 		}
-
-		filters[jsonKey] = query.Get("q[" + jsonKey + "]")
 	}
 
-	return filters
+	return filters, preloadsFilterMap
 }
 
 // FilterFields filters fields
 func (parameter *Parameter) FilterFields(db *gorm.DB) *gorm.DB {
 	for k, v := range parameter.Filters {
-		if v != "" {
-			db = db.Where(fmt.Sprintf("%s IN (?)", k), strings.Split(v, ","))
+		if (v != "") && !(strings.Contains(k, ".")) {
+			columnName := snaker.CamelToSnake(k)
+			db = db.Where(fmt.Sprintf("%s IN (?)", columnName), strings.Split(v, ","))
 		}
 	}
 

@@ -20,11 +20,11 @@ func contains(ss map[string]string, s string) bool {
 }
 
 func TestFilterToMap(t *testing.T) {
-	req, _ := http.NewRequest("GET", "/?q[id]=1,5,100&q[name]=hoge,fuga&q[unexisted_field]=null", nil)
+	req, _ := http.NewRequest("GET", "/?q[id]=1,5,100&q[name]=hoge,fuga&q[unexisted_field]=null&q[nested.id]=1,2,3", nil)
 	c := &gin.Context{
 		Request: req,
 	}
-	value := filterToMap(c.Request.URL.Query(), User{})
+	value, preloadFilter := filterToMap(c.Request.URL.Query())
 
 	if !contains(value, "id") {
 		t.Fatalf("Filter should have `id` key.")
@@ -34,9 +34,15 @@ func TestFilterToMap(t *testing.T) {
 		t.Fatalf("Filter should have `name` key.")
 	}
 
-	if contains(value, "unexisted_field") {
-		t.Fatalf("Filter should not have `unexisted_field` key.")
+	if contains(value, "nested.id") {
+		t.Fatalf("Filter should not have `nested.id` key.")
 	}
+
+	if !contains(preloadFilter["nested"], "id") {
+		t.Fatalf("Preload Filter should have `id` key.")
+	}
+
+	// unexisted keys should be allowed because those are ignored in GORM.
 
 	if value["id"] != "1,5,100" {
 		t.Fatalf("filters[\"id\"] expected: `1,5,100`, actual: %s", value["id"])
@@ -44,5 +50,9 @@ func TestFilterToMap(t *testing.T) {
 
 	if value["name"] != "hoge,fuga" {
 		t.Fatalf("filters[\"name\"] expected: `hoge,fuga`, actual: %s", value["id"])
+	}
+
+	if preloadFilter["nested"]["id"] != "1,2,3" {
+		t.Fatalf("nested_filters[\"id\"] expected: `1,2,3`, actual: %s", value["id"])
 	}
 }
