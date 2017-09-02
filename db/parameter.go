@@ -4,9 +4,7 @@ import (
 	"math"
 	"strconv"
 
-	"errors"
 	"net/url"
-	"reflect"
 )
 
 const (
@@ -20,6 +18,7 @@ const (
 type Parameter struct {
 	Filters             map[string]string
 	Preloads            string
+	PreloadsFilterMap   map[string]map[string]string
 	Sort                string
 	Limit               int
 	Page                int
@@ -30,10 +29,10 @@ type Parameter struct {
 }
 
 // NewParameter creates a new Parameter instance
-func NewParameter(query url.Values, model interface{}) (*Parameter, error) {
+func NewParameter(query url.Values) (*Parameter, error) {
 	parameter := &Parameter{}
 
-	if err := parameter.initialize(query, model); err != nil {
+	if err := parameter.initialize(query); err != nil {
 		return nil, err
 	}
 
@@ -62,20 +61,8 @@ func (parameter *Parameter) DefaultQuery(query url.Values, key string, defaultVa
 	return defaultValue
 }
 
-func (parameter *Parameter) initialize(query url.Values, model interface{}) error {
-	vs := reflect.ValueOf(model)
-	for vs.Kind() == reflect.Ptr {
-		vs = vs.Elem()
-	}
-	if !vs.IsValid() {
-		return errors.New("the model is invalid")
-	}
-	if !vs.CanInterface() {
-		return errors.New("the model cannot interface")
-	}
-	value := vs.Interface()
-
-	parameter.Filters = filterToMap(query, value)
+func (parameter *Parameter) initialize(query url.Values) error {
+	parameter.Filters, parameter.PreloadsFilterMap = filterToMap(query)
 	parameter.Preloads = query.Get("preloads")
 	parameter.Sort = query.Get("sort")
 
