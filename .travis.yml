@@ -20,12 +20,7 @@ install:
 
 script:
   - glide install
-  - result="`find . -type d -name vendor -prune -o -type f -name '*.go' -exec golint {} \;`"
-  - |
-    if [[ -n ${result} ]]; then
-      echo "${result}"
-      exit 1
-    fi
+  - (result="`find . -type d -name vendor -prune -o -type f -name '*.go' -exec golint {} \;`"; if [ ! -z "${result}" ]; then echo "${result}"; exit 1; fi)
   - go vet -tags="`echo ${TAGS[@]}`" $(glide novendor)
   - go generate -tags=prebuild ./...
   - |
