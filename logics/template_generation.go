@@ -169,6 +169,12 @@ func init() {
 			}
 			return append(slice1, slice2...), nil
 		},
+		"fieldslice": func(slice interface{}, fieldName string) ([]interface{}, error) {
+			return mapstruct.StructSliceToFieldValueInterfaceSlice(slice, fieldName)
+		},
+		"sort": func(slice interface{}, order string) ([]interface{}, error) {
+			return mapstruct.SortSlice(slice, order)
+		},
 		"map": func(pairs ...interface{}) (map[interface{}]interface{}, error) {
 			if len(pairs)%2 == 1 {
 				return nil, fmt.Errorf("numebr of arguments must be even")
@@ -199,6 +205,9 @@ func init() {
 				destination[key] = value
 			}
 			return destination
+		},
+		"keys": func(target map[interface{}]interface{}) ([]interface{}, error) {
+			return mapstruct.MapToKeySlice(target)
 		},
 		"hash": func(slice interface{}, keyField string) (map[interface{}]interface{}, error) {
 			return mapstruct.StructSliceToInterfaceMap(slice, keyField)
