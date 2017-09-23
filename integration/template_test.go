@@ -921,6 +921,160 @@ append
 concatenate
 {{concatenate $slice2 $slice3}}
 
+fieldslice
+{{- $tpp := multi .ModelStore "template_persistent_parameters" ""}}
+{{- $idfields := fieldslice $tpp "ID"}}
+{{- $namefields := fieldslice $tpp "Name"}}
+{{- $idfields := sort $idfields "asc"}}
+{{- $namefields := sort $namefields "asc"}}
+{{$idfields}}
+{{$namefields}}
+
+sort
+{{- $sliceint := slice}}
+{{- $v1 := int 3}}
+{{- $v2 := int 1}}
+{{- $v3 := int -5}}
+{{- $v4 := int 2}}
+{{- $v5 := int 4}}
+{{- $sliceint := append $sliceint $v1 $v2 $v3 $v4 $v5}}
+{{- $sliceint := sort $sliceint "asc" }}
+sliceint asc: {{$sliceint}}
+{{- $sliceint := sort $sliceint "desc" }}
+sliceint desc: {{$sliceint}}
+{{- $sliceint8 := slice}}
+{{- $v1 := int8 3}}
+{{- $v2 := int8 1}}
+{{- $v3 := int8 -5}}
+{{- $v4 := int8 2}}
+{{- $v5 := int8 4}}
+{{- $sliceint8 := append $sliceint8 $v1 $v2 $v3 $v4 $v5}}
+{{- $sliceint8 := sort $sliceint8 "asc" }}
+sliceint8 asc: {{$sliceint8}}
+{{- $sliceint8 := sort $sliceint8 "desc" }}
+sliceint8 desc: {{$sliceint8}}
+{{- $sliceint16 := slice}}
+{{- $v1 := int16 3}}
+{{- $v2 := int16 1}}
+{{- $v3 := int16 -5}}
+{{- $v4 := int16 2}}
+{{- $v5 := int16 4}}
+{{- $sliceint16 := append $sliceint16 $v1 $v2 $v3 $v4 $v5}}
+{{- $sliceint16 := sort $sliceint16 "asc" }}
+sliceint16 asc: {{$sliceint16}}
+{{- $sliceint16 := sort $sliceint16 "desc" }}
+sliceint16 desc: {{$sliceint16}}
+{{- $sliceint32 := slice}}
+{{- $v1 := int32 3}}
+{{- $v2 := int32 1}}
+{{- $v3 := int32 -5}}
+{{- $v4 := int32 2}}
+{{- $v5 := int32 4}}
+{{- $sliceint32 := append $sliceint32 $v1 $v2 $v3 $v4 $v5}}
+{{- $sliceint32 := sort $sliceint32 "asc" }}
+sliceint32 asc: {{$sliceint32}}
+{{- $sliceint32 := sort $sliceint32 "desc" }}
+sliceint32 desc: {{$sliceint32}}
+{{- $sliceint64 := slice}}
+{{- $v1 := int64 3}}
+{{- $v2 := int64 1}}
+{{- $v3 := int64 -5}}
+{{- $v4 := int64 2}}
+{{- $v5 := int64 4}}
+{{- $sliceint64 := append $sliceint64 $v1 $v2 $v3 $v4 $v5}}
+{{- $sliceint64 := sort $sliceint64 "asc" }}
+sliceint64 asc: {{$sliceint64}}
+{{- $sliceint64 := sort $sliceint64 "desc" }}
+sliceint64 desc: {{$sliceint64}}
+{{- $sliceuint := slice}}
+{{- $v1 := uint 3}}
+{{- $v2 := uint 1}}
+{{- $v3 := uint 5}}
+{{- $v4 := uint 2}}
+{{- $v5 := uint 4}}
+{{- $sliceuint := append $sliceuint $v1 $v2 $v3 $v4 $v5}}
+{{- $sliceuint := sort $sliceuint "asc" }}
+sliceuint asc: {{$sliceuint}}
+{{- $sliceuint := sort $sliceuint "desc" }}
+sliceuint desc: {{$sliceuint}}
+{{- $sliceuint8 := slice}}
+{{- $v1 := uint8 3}}
+{{- $v2 := uint8 1}}
+{{- $v3 := uint8 5}}
+{{- $v4 := uint8 2}}
+{{- $v5 := uint8 4}}
+{{- $sliceuint8 := append $sliceuint8 $v1 $v2 $v3 $v4 $v5}}
+{{- $sliceuint8 := sort $sliceuint8 "asc" }}
+sliceuint8 asc: {{$sliceuint8}}
+{{- $sliceuint8 := sort $sliceuint8 "desc" }}
+sliceuint8 desc: {{$sliceuint8}}
+{{- $sliceuint16 := slice}}
+{{- $v1 := uint16 3}}
+{{- $v2 := uint16 1}}
+{{- $v3 := uint16 5}}
+{{- $v4 := uint16 2}}
+{{- $v5 := uint16 4}}
+{{- $sliceuint16 := append $sliceuint16 $v1 $v2 $v3 $v4 $v5}}
+{{- $sliceuint16 := sort $sliceuint16 "asc" }}
+sliceuint16 asc: {{$sliceuint16}}
+{{- $sliceuint16 := sort $sliceuint16 "desc" }}
+sliceuint16 desc: {{$sliceuint16}}
+{{- $sliceuint32 := slice}}
+{{- $v1 := uint32 3}}
+{{- $v2 := uint32 1}}
+{{- $v3 := uint32 5}}
+{{- $v4 := uint32 2}}
+{{- $v5 := uint32 4}}
+{{- $sliceuint32 := append $sliceuint32 $v1 $v2 $v3 $v4 $v5}}
+{{- $sliceuint32 := sort $sliceuint32 "asc" }}
+sliceuint32 asc: {{$sliceuint32}}
+{{- $sliceuint32 := sort $sliceuint32 "desc" }}
+sliceuint32 desc: {{$sliceuint32}}
+{{- $sliceuint64 := slice}}
+{{- $v1 := uint64 3}}
+{{- $v2 := uint64 1}}
+{{- $v3 := uint64 5}}
+{{- $v4 := uint64 2}}
+{{- $v5 := uint64 4}}
+{{- $sliceuint64 := append $sliceuint64 $v1 $v2 $v3 $v4 $v5}}
+{{- $sliceuint64 := sort $sliceuint64 "asc" }}
+sliceuint64 asc: {{$sliceuint64}}
+{{- $sliceuint64 := sort $sliceuint64 "desc" }}
+sliceuint64 desc: {{$sliceuint64}}
+{{- $slicefloat32 := slice}}
+{{- $v1 := float32 3.3}}
+{{- $v2 := float32 1}}
+{{- $v3 := float32 -5.1}}
+{{- $v4 := float32 2.2}}
+{{- $v5 := float32 4}}
+{{- $slicefloat32 := append $slicefloat32 $v1 $v2 $v3 $v4 $v5}}
+{{- $slicefloat32 := sort $slicefloat32 "asc" }}
+slicefloat32 asc: {{$slicefloat32}}
+{{- $slicefloat32 := sort $slicefloat32 "desc" }}
+slicefloat32 desc: {{$slicefloat32}}
+{{- $slicefloat64 := slice}}
+{{- $v1 := float64 3.3}}
+{{- $v2 := float64 1}}
+{{- $v3 := float64 -5.1}}
+{{- $v4 := float64 2.2}}
+{{- $v5 := float64 4}}
+{{- $slicefloat64 := append $slicefloat64 $v1 $v2 $v3 $v4 $v5}}
+{{- $slicefloat64 := sort $slicefloat64 "asc" }}
+slicefloat64 asc: {{$slicefloat64}}
+{{- $slicefloat64 := sort $slicefloat64 "desc" }}
+slicefloat64 desc: {{$slicefloat64}}
+{{- $slicestring := slice}}
+{{- $v1 := "3.3"}}
+{{- $v2 := "ABC"}}
+{{- $v3 := "-5.1"}}
+{{- $v4 := "012"}}
+{{- $v5 := "def"}}
+{{- $slicestring := append $slicestring $v1 $v2 $v3 $v4 $v5}}
+{{- $slicestring := sort $slicestring "asc" }}
+slicestring asc: {{$slicestring}}
+{{- $slicestring := sort $slicestring "desc" }}
+slicestring desc: {{$slicestring}}
+
 --- map ---
 map
 {{- $map1 := map}}
@@ -940,7 +1094,6 @@ map exists
 {{exists $map2 0}}
 {{- $e := exists $map2 1}}
 {{if eq $e true}}TRUE!!{{else}}FALSE!!{{end}}
-
 
 map put
 {{- $null := put $map1 4 "E"}}
@@ -969,6 +1122,11 @@ map1[4]: {{get $map1 4}}
 map1[5]: {{get $map1 5}}
 map1[6]: {{get $map1 6}}
 map1[7]: {{get $map1 7}}
+
+map keys
+{{- $keys := keys $map1}}
+{{- $keys := sort $keys "asc"}}
+keys of map1: {{$keys}}
 
 --- model store ---
 multi

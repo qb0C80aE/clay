@@ -216,6 +216,38 @@ append
 concatenate
 [1 2 3 4 5 3 4 5 6 7 8 9 10]
 
+fieldslice
+[1 2 3 4 5]
+[testParameter11 testParameter12 testParameter1X testParameter1X testParameter1X]
+
+sort
+sliceint asc: [-5 1 2 3 4]
+sliceint desc: [4 3 2 1 -5]
+sliceint8 asc: [-5 1 2 3 4]
+sliceint8 desc: [4 3 2 1 -5]
+sliceint16 asc: [-5 1 2 3 4]
+sliceint16 desc: [4 3 2 1 -5]
+sliceint32 asc: [-5 1 2 3 4]
+sliceint32 desc: [4 3 2 1 -5]
+sliceint64 asc: [-5 1 2 3 4]
+sliceint64 desc: [4 3 2 1 -5]
+sliceuint asc: [1 2 3 4 5]
+sliceuint desc: [5 4 3 2 1]
+sliceuint8 asc: [1 2 3 4 5]
+sliceuint8 desc: [5 4 3 2 1]
+sliceuint16 asc: [1 2 3 4 5]
+sliceuint16 desc: [5 4 3 2 1]
+sliceuint32 asc: [1 2 3 4 5]
+sliceuint32 desc: [5 4 3 2 1]
+sliceuint64 asc: [1 2 3 4 5]
+sliceuint64 desc: [5 4 3 2 1]
+slicefloat32 asc: [-5.1 1 2.2 3.3 4]
+slicefloat32 desc: [4 3.3 2.2 1 -5.1]
+slicefloat64 asc: [-5.1 1 2.2 3.3 4]
+slicefloat64 desc: [4 3.3 2.2 1 -5.1]
+slicestring asc: [-5.1 012 3.3 ABC def]
+slicestring desc: [def ABC 3.3 012 -5.1]
+
 --- map ---
 map
 map1: map[]
@@ -231,7 +263,6 @@ map3[3]: D
 map exists
 false
 TRUE!!
-
 
 map put
 map1[4]: E
@@ -254,6 +285,9 @@ map1[4]: E
 map1[5]: <no value>
 map1[6]: G
 map1[7]: <no value>
+
+map keys
+keys of map1: [1 2 3 4 6]
 
 --- model store ---
 multi
