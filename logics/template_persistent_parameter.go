@@ -75,12 +75,7 @@ func (logic *templatePersistentParameterLogic) Delete(db *gorm.DB, id string, _ 
 		return err
 	}
 
-	if err := db.Delete(&templatePersistentParameter).Error; err != nil {
-		return err
-	}
-
-	return nil
-
+	return db.Delete(&templatePersistentParameter).Error
 }
 
 func (logic *templatePersistentParameterLogic) ExtractFromDesign(db *gorm.DB) (string, interface{}, error) {
