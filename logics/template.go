@@ -72,12 +72,7 @@ func (logic *templateLogic) Delete(db *gorm.DB, id string, _ url.Values) error {
 		return err
 	}
 
-	if err := db.Delete(&template).Error; err != nil {
-		return err
-	}
-
-	return nil
-
+	return db.Delete(&template).Error
 }
 
 func (logic *templateLogic) ExtractFromDesign(db *gorm.DB) (string, interface{}, error) {
