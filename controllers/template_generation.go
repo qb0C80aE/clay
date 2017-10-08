@@ -15,7 +15,7 @@ type templateGenerationController struct {
 func newTemplateGenerationController() extensions.Controller {
 	controller := &templateGenerationController{
 		BaseController: NewBaseController(
-			models.SharedTemplateModel(),
+			models.SharedTemplateGenerationModel(),
 			logics.UniqueTemplateGenerationLogic(),
 		),
 	}
@@ -23,12 +23,15 @@ func newTemplateGenerationController() extensions.Controller {
 	return controller
 }
 
-func (controller *templateGenerationController) RouteMap() map[int]map[string]gin.HandlerFunc {
-	resourceSingleURL := fmt.Sprintf("%s/%s", controller.ResourceSingleURL(), "generation")
+func (controller *templateGenerationController) ResourceSingleURL() string {
+	templateResourceName := extensions.RegisteredResourceName(models.SharedTemplateModel())
+	return fmt.Sprintf("%s/:id/generation", templateResourceName)
+}
 
-	routeMap := map[int]map[string]gin.HandlerFunc{
+func (controller *templateGenerationController) RouteMap() map[int]map[int]gin.HandlerFunc {
+	routeMap := map[int]map[int]gin.HandlerFunc{
 		extensions.MethodGet: {
-			resourceSingleURL: controller.GetSingle,
+			extensions.URLSingle: controller.GetSingle,
 		},
 	}
 	return routeMap

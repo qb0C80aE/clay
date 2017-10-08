@@ -226,80 +226,80 @@ func (controller *BaseController) OutputOptions(c *gin.Context, code int) {
 	controller.outputter.OutputDelete(c, code)
 }
 
-func (controller *BaseController) getSingle(db *gorm.DB, id string, parameters url.Values, queryFields string) (result interface{}, err error) {
+func (controller *BaseController) getSingle(db *gorm.DB, parameters gin.Params, urlValues url.Values, queryFields string) (result interface{}, err error) {
 	defer func() {
 		if recoverResult := recover(); recoverResult != nil {
 			err = fmt.Errorf("%v", recoverResult)
 		}
 	}()
 
-	result, err = controller.logic.GetSingle(db, id, parameters, queryFields)
+	result, err = controller.logic.GetSingle(db, parameters, urlValues, queryFields)
 	return result, err
 }
 
-func (controller *BaseController) getMulti(db *gorm.DB, parameters url.Values, queryFields string) (result interface{}, err error) {
+func (controller *BaseController) getMulti(db *gorm.DB, parameters gin.Params, urlValues url.Values, queryFields string) (result interface{}, err error) {
 	defer func() {
 		if recoverResult := recover(); recoverResult != nil {
 			err = fmt.Errorf("%v", recoverResult)
 		}
 	}()
 
-	result, err = controller.logic.GetMulti(db, parameters, queryFields)
+	result, err = controller.logic.GetMulti(db, parameters, urlValues, queryFields)
 	return result, err
 }
 
-func (controller *BaseController) create(db *gorm.DB, parameters url.Values, data interface{}) (result interface{}, err error) {
+func (controller *BaseController) create(db *gorm.DB, parameters gin.Params, urlValues url.Values, data interface{}) (result interface{}, err error) {
 	defer func() {
 		if recoverResult := recover(); recoverResult != nil {
 			err = fmt.Errorf("%v", recoverResult)
 		}
 	}()
 
-	result, err = controller.logic.Create(db, parameters, data)
+	result, err = controller.logic.Create(db, parameters, urlValues, data)
 	return result, err
 }
 
-func (controller *BaseController) update(db *gorm.DB, id string, parameters url.Values, data interface{}) (result interface{}, err error) {
+func (controller *BaseController) update(db *gorm.DB, parameters gin.Params, urlValues url.Values, data interface{}) (result interface{}, err error) {
 	defer func() {
 		if recoverResult := recover(); recoverResult != nil {
 			err = fmt.Errorf("%v", recoverResult)
 		}
 	}()
 
-	result, err = controller.logic.Update(db, id, parameters, data)
+	result, err = controller.logic.Update(db, parameters, urlValues, data)
 	return result, err
 }
 
-func (controller *BaseController) delete(db *gorm.DB, id string, parameters url.Values) (err error) {
+func (controller *BaseController) delete(db *gorm.DB, parameters gin.Params, urlValues url.Values) (err error) {
 	defer func() {
 		if recoverResult := recover(); recoverResult != nil {
 			err = fmt.Errorf("%v", recoverResult)
 		}
 	}()
 
-	err = controller.logic.Delete(db, id, parameters)
+	err = controller.logic.Delete(db, parameters, urlValues)
 	return err
 }
 
-func (controller *BaseController) patch(db *gorm.DB, id string, parameters url.Values) (result interface{}, err error) {
+func (controller *BaseController) patch(db *gorm.DB, parameters gin.Params, urlValues url.Values) (result interface{}, err error) {
 	defer func() {
 		if recoverResult := recover(); recoverResult != nil {
 			err = fmt.Errorf("%v", recoverResult)
 		}
 	}()
 
-	result, err = controller.logic.Patch(db, id, parameters)
+	result, err = controller.logic.Patch(db, parameters, urlValues)
 	return result, err
 }
 
-func (controller *BaseController) options(db *gorm.DB, parameters url.Values) (err error) {
+func (controller *BaseController) options(db *gorm.DB, parameters gin.Params, urlValues url.Values) (err error) {
 	defer func() {
 		if recoverResult := recover(); recoverResult != nil {
 			err = fmt.Errorf("%v", recoverResult)
 		}
 	}()
 
-	err = controller.logic.Options(db, parameters)
+	err = controller.logic.Options(db, parameters, urlValues)
 	return err
 }
 
@@ -319,11 +319,10 @@ func (controller *BaseController) GetSingle(c *gin.Context) {
 	}
 
 	db = parameter.SetPreloads(db)
-	id := c.Params.ByName("id")
 	fields := helper.ParseFields(c.DefaultQuery("fields", "*"))
 	queryFields := helper.QueryFields(controller.model, fields)
 
-	result, err := controller.getSingle(db, id, c.Request.URL.Query(), queryFields)
+	result, err := controller.getSingle(db, c.Params, c.Request.URL.Query(), queryFields)
 	if err != nil {
 		controller.outputter.OutputError(c, http.StatusNotFound, err)
 		return
@@ -364,7 +363,7 @@ func (controller *BaseController) GetMulti(c *gin.Context) {
 	fields := helper.ParseFields(c.DefaultQuery("fields", "*"))
 	queryFields := helper.QueryFields(controller.model, fields)
 
-	result, err := controller.getMulti(db, c.Request.URL.Query(), queryFields)
+	result, err := controller.getMulti(db, c.Params, c.Request.URL.Query(), queryFields)
 	if err != nil {
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
@@ -415,7 +414,7 @@ func (controller *BaseController) Create(c *gin.Context) {
 	db := dbpkg.Instance(c)
 
 	tx := db.Begin()
-	result, err := controller.create(tx, c.Request.URL.Query(), container)
+	result, err := controller.create(tx, c.Params, c.Request.URL.Query(), container)
 	if err != nil {
 		tx.Rollback()
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
@@ -454,8 +453,6 @@ func (controller *BaseController) Update(c *gin.Context) {
 	}
 	container := reflect.New(reflect.TypeOf(vs.Interface())).Interface()
 
-	id := c.Params.ByName("id")
-
 	if err := controller.bind(c, container); err != nil {
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
@@ -464,7 +461,7 @@ func (controller *BaseController) Update(c *gin.Context) {
 	db := dbpkg.Instance(c)
 
 	tx := db.Begin()
-	result, err := controller.update(tx, id, c.Request.URL.Query(), container)
+	result, err := controller.update(tx, c.Params, c.Request.URL.Query(), container)
 	if err != nil {
 		tx.Rollback()
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
@@ -489,12 +486,10 @@ func (controller *BaseController) Delete(c *gin.Context) {
 		return
 	}
 
-	id := c.Params.ByName("id")
-
 	db := dbpkg.Instance(c)
 
 	tx := db.Begin()
-	err = controller.delete(tx, id, c.Request.URL.Query())
+	err = controller.delete(tx, c.Params, c.Request.URL.Query())
 	if err != nil {
 		tx.Rollback()
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
@@ -519,12 +514,10 @@ func (controller *BaseController) Patch(c *gin.Context) {
 		return
 	}
 
-	id := c.Params.ByName("id")
-
 	db := dbpkg.Instance(c)
 
 	tx := db.Begin()
-	result, err := controller.patch(tx, id, c.Request.URL.Query())
+	result, err := controller.patch(tx, c.Params, c.Request.URL.Query())
 	if err != nil {
 		tx.Rollback()
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
@@ -552,7 +545,7 @@ func (controller *BaseController) Options(c *gin.Context) {
 	db := dbpkg.Instance(c)
 
 	tx := db.Begin()
-	err = controller.options(tx, c.Request.URL.Query())
+	err = controller.options(tx, c.Params, c.Request.URL.Query())
 	if err != nil {
 		tx.Rollback()
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)

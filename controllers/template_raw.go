@@ -15,7 +15,7 @@ type templateRawController struct {
 func newTemplateRawController() extensions.Controller {
 	controller := &templateRawController{
 		BaseController: NewBaseController(
-			models.SharedTemplateModel(),
+			models.SharedTemplateRawModel(),
 			logics.UniqueTemplateRawLogic(),
 		),
 	}
@@ -23,12 +23,15 @@ func newTemplateRawController() extensions.Controller {
 	return controller
 }
 
-func (controller *templateRawController) RouteMap() map[int]map[string]gin.HandlerFunc {
-	resourceSingleURL := fmt.Sprintf("%s/%s", controller.ResourceSingleURL(), "raw")
+func (controller *templateRawController) ResourceSingleURL() string {
+	templateResourceName := extensions.RegisteredResourceName(models.SharedTemplateModel())
+	return fmt.Sprintf("%s/:id/raw", templateResourceName)
+}
 
-	routeMap := map[int]map[string]gin.HandlerFunc{
+func (controller *templateRawController) RouteMap() map[int]map[int]gin.HandlerFunc {
+	routeMap := map[int]map[int]gin.HandlerFunc{
 		extensions.MethodGet: {
-			resourceSingleURL: controller.GetSingle,
+			extensions.URLSingle: controller.GetSingle,
 		},
 	}
 	return routeMap

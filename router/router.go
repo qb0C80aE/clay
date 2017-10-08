@@ -29,11 +29,19 @@ func Initialize(r *gin.Engine) {
 
 		controllers := extensions.RegisteredControllers()
 		for _, controller := range controllers {
+			extensions.AssociateControllerWithResourceName(controller.ResourceName(), controller)
 			routeMap := controller.RouteMap()
 			for method, routingFunction := range methodFunctionMap {
 				routes := routeMap[method]
-				for relativePath, handlerFunc := range routes {
-					routingFunction(relativePath, handlerFunc)
+				for pathType, handlerFunc := range routes {
+					switch pathType {
+					case extensions.URLSingle:
+						routingFunction(controller.ResourceSingleURL(), handlerFunc)
+					case extensions.URLMulti:
+						routingFunction(controller.ResourceMultiURL(), handlerFunc)
+					default:
+						panic("invalid url type")
+					}
 				}
 			}
 		}

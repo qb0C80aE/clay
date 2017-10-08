@@ -1,6 +1,7 @@
 package logics
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extensions"
 	"github.com/qb0C80aE/clay/models"
@@ -13,13 +14,15 @@ type designLogic struct {
 
 func newDesignLogic() *designLogic {
 	logic := &designLogic{
-		BaseLogic: SharedBaseLogic(),
+		BaseLogic: NewBaseLogic(
+			models.SharedDesignModel(),
+		),
 	}
 	return logic
 }
 
 // GetSingle returns all models to store into versioning repositories
-func (logic *designLogic) GetSingle(db *gorm.DB, _ string, _ url.Values, _ string) (interface{}, error) {
+func (logic *designLogic) GetSingle(db *gorm.DB, _ gin.Params, _ url.Values, _ string) (interface{}, error) {
 	// Reset previous conditions
 	db = db.New()
 
@@ -40,7 +43,7 @@ func (logic *designLogic) GetSingle(db *gorm.DB, _ string, _ url.Values, _ strin
 }
 
 // Update deletes and updates all models bases on the given data
-func (logic *designLogic) Update(db *gorm.DB, _ string, _ url.Values, data interface{}) (interface{}, error) {
+func (logic *designLogic) Update(db *gorm.DB, _ gin.Params, _ url.Values, data interface{}) (interface{}, error) {
 	design := data.(*models.Design)
 
 	designAccessors := extensions.RegisteredDesignAccessors()
@@ -59,7 +62,7 @@ func (logic *designLogic) Update(db *gorm.DB, _ string, _ url.Values, data inter
 }
 
 // Delete deletes all models
-func (logic *designLogic) Delete(db *gorm.DB, _ string, _ url.Values) error {
+func (logic *designLogic) Delete(db *gorm.DB, _ gin.Params, _ url.Values) error {
 	designAccessors := extensions.RegisteredDesignAccessors()
 	for _, accessor := range designAccessors {
 		if err := accessor.DeleteFromDesign(db); err != nil {

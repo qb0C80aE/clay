@@ -3,6 +3,7 @@ package logics
 import (
 	"bytes"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	dbpkg "github.com/qb0C80aE/clay/db"
 	"github.com/qb0C80aE/clay/extensions"
@@ -13,6 +14,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	tplpkg "text/template"
 )
 
@@ -22,7 +24,9 @@ type templateGenerationLogic struct {
 
 func newTemplateGenerationLogic() *templateGenerationLogic {
 	logic := &templateGenerationLogic{
-		BaseLogic: &BaseLogic{},
+		BaseLogic: NewBaseLogic(
+			models.SharedTemplateGenerationModel(),
+		),
 	}
 	return logic
 }
@@ -67,12 +71,12 @@ func GenerateTemplate(db *gorm.DB, id string, templateVolatileParameterMap map[s
 }
 
 // GetSingle generates text data based on registered templates
-func (logic *templateGenerationLogic) GetSingle(db *gorm.DB, id string, parameters url.Values, queryFields string) (interface{}, error) {
-	templateVolatileParameterMap := make(map[string]interface{}, len(parameters))
-	for key, value := range parameters {
+func (logic *templateGenerationLogic) GetSingle(db *gorm.DB, parameters gin.Params, urlValues url.Values, queryFields string) (interface{}, error) {
+	templateVolatileParameterMap := make(map[string]interface{}, len(urlValues))
+	for key, value := range urlValues {
 		templateVolatileParameterMap[key] = value
 	}
-	return GenerateTemplate(db, id, templateVolatileParameterMap)
+	return GenerateTemplate(db, parameters.ByName("id"), templateVolatileParameterMap)
 }
 
 var uniqueTemplateGenerationLogic = newTemplateGenerationLogic()
@@ -231,13 +235,25 @@ func init() {
 			}
 			return result
 		},
-		"single": func(dbObject interface{}, nameInterface interface{}, idInterface interface{}, queryInterface interface{}) (interface{}, error) {
-			name := nameInterface.(string)
-			var id int
-			id, ok := idInterface.(int)
-			if !ok {
-				id = int(idInterface.(int64))
+		"single": func(dbObject interface{}, pathInterface interface{}, queryInterface interface{}) (interface{}, error) {
+			path := pathInterface.(string)
+			pathElements := strings.Split(strings.Trim(path, "/"), "/")
+			resourceName := pathElements[0]
+			controller := extensions.AssociatedControllerWithResourceName(resourceName)
+			singleURL := controller.ResourceSingleURL()
+			routeElements := strings.Split(strings.Trim(singleURL, "/"), "/")
+
+			parameters := gin.Params{}
+			for index, routeElement := range routeElements {
+				if routeElement[:1] == ":" {
+					parameter := gin.Param{
+						Key:   routeElement[1:],
+						Value: pathElements[index],
+					}
+					parameters = append(parameters, parameter)
+				}
 			}
+
 			query := queryInterface.(string)
 			URL := "/"
 			if query != "" {
@@ -251,7 +267,7 @@ func init() {
 			if err != nil {
 				return nil, err
 			}
-			model, err := extensions.CreateModel(name)
+			model, err := extensions.CreateModel(resourceName)
 			if err != nil {
 				return nil, err
 			}
@@ -273,14 +289,33 @@ func init() {
 			db = parameter.FilterFields(db)
 			fields := helper.ParseFields(parameter.DefaultQuery(urlQuery, "fields", "*"))
 			queryFields := helper.QueryFields(model, fields)
-			result, err := templateParameterGenerator.GetSingle(db, strconv.Itoa(id), requestForParameter.URL.Query(), queryFields)
+
+			result, err := templateParameterGenerator.GetSingle(db, parameters, requestForParameter.URL.Query(), queryFields)
 			if err != nil {
 				return nil, err
 			}
 			return result, nil
 		},
-		"multi": func(dbObject interface{}, nameInterface interface{}, queryInterface interface{}) (interface{}, error) {
-			name := nameInterface.(string)
+		"multi": func(dbObject interface{}, pathInterface interface{}, queryInterface interface{}) (interface{}, error) {
+			path := pathInterface.(string)
+			pathElements := strings.Split(strings.Trim(path, "/"), "/")
+			resourceName := pathElements[0]
+
+			controller := extensions.AssociatedControllerWithResourceName(resourceName)
+			singleURL := controller.ResourceMultiURL()
+			routeElements := strings.Split(strings.Trim(singleURL, "/"), "/")
+
+			parameters := gin.Params{}
+			for index, routeElement := range routeElements {
+				if routeElement[:1] == ":" {
+					parameter := gin.Param{
+						Key:   routeElement[1:],
+						Value: pathElements[index],
+					}
+					parameters = append(parameters, parameter)
+				}
+			}
+
 			query := queryInterface.(string)
 			URL := "/"
 			if query != "" {
@@ -291,7 +326,7 @@ func init() {
 				URL,
 				nil,
 			)
-			model, err := extensions.CreateModel(name)
+			model, err := extensions.CreateModel(resourceName)
 			if err != nil {
 				return nil, err
 			}
@@ -314,15 +349,18 @@ func init() {
 			db = parameter.FilterFields(db)
 			fields := helper.ParseFields(parameter.DefaultQuery(urlQuery, "fields", "*"))
 			queryFields := helper.QueryFields(model, fields)
-			result, err := templateParameterGenerator.GetMulti(db, requestForParameter.URL.Query(), queryFields)
+			result, err := templateParameterGenerator.GetMulti(db, parameters, requestForParameter.URL.Query(), queryFields)
 			if err != nil {
 				return nil, err
 			}
 			return result, nil
 		},
-		"total": func(dbObject interface{}, nameInterface interface{}) (interface{}, error) {
-			name := nameInterface.(string)
-			model, err := extensions.CreateModel(name)
+		"total": func(dbObject interface{}, pathInterface interface{}) (interface{}, error) {
+			path := pathInterface.(string)
+			pathElements := strings.Split(strings.Trim(path, "/"), "/")
+			resourceName := pathElements[0]
+
+			model, err := extensions.CreateModel(resourceName)
 			if err != nil {
 				return nil, err
 			}
