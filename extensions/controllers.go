@@ -6,6 +6,7 @@ import (
 )
 
 var controllers = []Controller{}
+var controllerMapByResourceName = map[string]Controller{}
 
 // MethodSomething integer constants are used as the key value of HTTP methods in maps
 const (
@@ -15,6 +16,8 @@ const (
 	MethodDelete  = 4
 	MethodPatch   = 5
 	MethodOptions = 6
+	URLSingle     = 1
+	URLMulti      = 2
 )
 
 var methodStringMap = map[int]string{
@@ -35,7 +38,7 @@ type Controller interface {
 	ResourceName() string
 	ResourceSingleURL() string
 	ResourceMultiURL() string
-	RouteMap() map[int]map[string]gin.HandlerFunc
+	RouteMap() map[int]map[int]gin.HandlerFunc
 }
 
 // LookUpMethodName returns the HTTP method name string corresponded to the argument
@@ -53,4 +56,14 @@ func RegisteredControllers() []Controller {
 	result := []Controller{}
 	result = append(result, controllers...)
 	return result
+}
+
+// AssociateControllerWithResourceName associates a resource name and a controller
+func AssociateControllerWithResourceName(resourceName string, controller Controller) {
+	controllerMapByResourceName[resourceName] = controller
+}
+
+// AssociatedControllerWithResourceName returns the registered controller related to the given resource name
+func AssociatedControllerWithResourceName(resourceName string) Controller {
+	return controllerMapByResourceName[resourceName]
 }

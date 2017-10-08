@@ -2,6 +2,7 @@ package extensions
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"net/url"
 	"reflect"
@@ -15,8 +16,8 @@ var templateFuncMaps = []template.FuncMap{}
 // * GetSingle corresponds HTTP GET message and handles a request for a single resource to get the information
 // * GetMulti corresponds HTTP GET message and handles a request for multi resource to get the list of information
 type TemplateParameterGenerator interface {
-	GetMulti(db *gorm.DB, parameters url.Values, queryString string) (interface{}, error)
-	GetSingle(db *gorm.DB, id string, parameters url.Values, queryString string) (interface{}, error)
+	GetMulti(db *gorm.DB, parameters gin.Params, urlValues url.Values, queryString string) (interface{}, error)
+	GetSingle(db *gorm.DB, parameters gin.Params, urlValues url.Values, queryString string) (interface{}, error)
 }
 
 // RegisterTemplateParameterGenerator registers a template parameter generator used in the template logic

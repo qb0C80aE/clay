@@ -1,6 +1,7 @@
 package logics
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extensions"
 	"github.com/qb0C80aE/clay/models"
@@ -13,15 +14,17 @@ type templateRawLogic struct {
 
 func newTemplateRawLogic() *templateRawLogic {
 	logic := &templateRawLogic{
-		BaseLogic: &BaseLogic{},
+		BaseLogic: NewBaseLogic(
+			models.SharedTemplateRawModel(),
+		),
 	}
 	return logic
 }
 
-func (logic *templateRawLogic) GetSingle(db *gorm.DB, id string, parameters url.Values, queryFields string) (interface{}, error) {
+func (logic *templateRawLogic) GetSingle(db *gorm.DB, parameters gin.Params, _ url.Values, queryFields string) (interface{}, error) {
 	template := &models.Template{}
 
-	if err := db.Select(queryFields).First(template, id).Error; err != nil {
+	if err := db.Select(queryFields).First(template, parameters.ByName("id")).Error; err != nil {
 		return nil, err
 	}
 

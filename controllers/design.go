@@ -24,17 +24,20 @@ func newDesignController() extensions.Controller {
 	return controller
 }
 
-func (controller *designController) RouteMap() map[int]map[string]gin.HandlerFunc {
-	url := fmt.Sprintf("%s/present", controller.ResourceName())
-	routeMap := map[int]map[string]gin.HandlerFunc{
+func (controller *designController) ResourceSingleURL() string {
+	return fmt.Sprintf("%s/present", controller.ResourceName())
+}
+
+func (controller *designController) RouteMap() map[int]map[int]gin.HandlerFunc {
+	routeMap := map[int]map[int]gin.HandlerFunc{
 		extensions.MethodGet: {
-			url: controller.GetSingle,
+			extensions.URLSingle: controller.GetSingle,
 		},
 		extensions.MethodPut: {
-			url: controller.Update,
+			extensions.URLSingle: controller.Update,
 		},
 		extensions.MethodDelete: {
-			url: controller.Delete,
+			extensions.URLSingle: controller.Delete,
 		},
 	}
 	return routeMap

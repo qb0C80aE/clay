@@ -1,6 +1,7 @@
 package logics
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extensions"
 	"github.com/qb0C80aE/clay/models"
@@ -15,16 +16,18 @@ type templateLogic struct {
 
 func newTemplateLogic() *templateLogic {
 	logic := &templateLogic{
-		BaseLogic: &BaseLogic{},
+		BaseLogic: NewBaseLogic(
+			models.SharedTemplateModel(),
+		),
 	}
 	return logic
 }
 
-func (logic *templateLogic) GetSingle(db *gorm.DB, id string, _ url.Values, queryFields string) (interface{}, error) {
+func (logic *templateLogic) GetSingle(db *gorm.DB, parameters gin.Params, _ url.Values, queryFields string) (interface{}, error) {
 
 	template := &models.Template{}
 
-	if err := db.Select(queryFields).First(template, id).Error; err != nil {
+	if err := db.Select(queryFields).First(template, parameters.ByName("id")).Error; err != nil {
 		return nil, err
 	}
 
@@ -32,7 +35,7 @@ func (logic *templateLogic) GetSingle(db *gorm.DB, id string, _ url.Values, quer
 
 }
 
-func (logic *templateLogic) GetMulti(db *gorm.DB, _ url.Values, queryFields string) (interface{}, error) {
+func (logic *templateLogic) GetMulti(db *gorm.DB, _ gin.Params, _ url.Values, queryFields string) (interface{}, error) {
 	templates := []*models.Template{}
 
 	if err := db.Select(queryFields).Find(&templates).Error; err != nil {
@@ -43,7 +46,7 @@ func (logic *templateLogic) GetMulti(db *gorm.DB, _ url.Values, queryFields stri
 
 }
 
-func (logic *templateLogic) Create(db *gorm.DB, _ url.Values, data interface{}) (interface{}, error) {
+func (logic *templateLogic) Create(db *gorm.DB, _ gin.Params, _ url.Values, data interface{}) (interface{}, error) {
 	template := data.(*models.Template)
 
 	if err := db.Create(template).Error; err != nil {
@@ -53,9 +56,9 @@ func (logic *templateLogic) Create(db *gorm.DB, _ url.Values, data interface{}) 
 	return template, nil
 }
 
-func (logic *templateLogic) Update(db *gorm.DB, id string, _ url.Values, data interface{}) (interface{}, error) {
+func (logic *templateLogic) Update(db *gorm.DB, parameters gin.Params, _ url.Values, data interface{}) (interface{}, error) {
 	template := data.(*models.Template)
-	template.ID, _ = strconv.Atoi(id)
+	template.ID, _ = strconv.Atoi(parameters.ByName("id"))
 
 	if err := db.Save(template).Error; err != nil {
 		return nil, err
@@ -64,11 +67,11 @@ func (logic *templateLogic) Update(db *gorm.DB, id string, _ url.Values, data in
 	return template, nil
 }
 
-func (logic *templateLogic) Delete(db *gorm.DB, id string, _ url.Values) error {
+func (logic *templateLogic) Delete(db *gorm.DB, parameters gin.Params, _ url.Values) error {
 
 	template := &models.Template{}
 
-	if err := db.First(&template, id).Error; err != nil {
+	if err := db.First(&template, parameters.ByName("id")).Error; err != nil {
 		return err
 	}
 

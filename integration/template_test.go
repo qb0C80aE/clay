@@ -1139,7 +1139,8 @@ multi
 {{$p2.Name}}={{$p2.ValueString.String}}
 
 single
-{{- $s := single .ModelStore "templates" .testParameter11.ValueInt.Int64 "preloads=TemplatePersistentParameters"}}
+{{- $path := printf "/templates/%d" .testParameter11.ValueInt.Int64}}
+{{- $s := single .ModelStore $path "preloads=TemplatePersistentParameters"}}
 {{$s.Name}}
 {{- $p1 := index $s.TemplatePersistentParameters 0}}
 {{$p1.Name}}={{$p1.ValueString.String}}
@@ -1147,7 +1148,7 @@ single
 {{$p2.Name}}={{$p2.ValueString.String}}
 
 total
-{{- $t := total .ModelStore "template_persistent_parameters"}}
+{{- $t := total .ModelStore "/template_persistent_parameters"}}
 {{$t}}
 
 --- hash ---

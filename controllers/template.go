@@ -22,23 +22,20 @@ func newTemplateController() extensions.Controller {
 	return controller
 }
 
-func (controller *templateController) RouteMap() map[int]map[string]gin.HandlerFunc {
-	resourceSingleURL := controller.ResourceSingleURL()
-	resourceMultiURL := controller.ResourceMultiURL()
-
-	routeMap := map[int]map[string]gin.HandlerFunc{
+func (controller *templateController) RouteMap() map[int]map[int]gin.HandlerFunc {
+	routeMap := map[int]map[int]gin.HandlerFunc{
 		extensions.MethodGet: {
-			resourceSingleURL: controller.GetSingle,
-			resourceMultiURL:  controller.GetMulti,
+			extensions.URLSingle: controller.GetSingle,
+			extensions.URLMulti:  controller.GetMulti,
 		},
 		extensions.MethodPost: {
-			resourceMultiURL: controller.Create,
+			extensions.URLMulti: controller.Create,
 		},
 		extensions.MethodPut: {
-			resourceSingleURL: controller.Update,
+			extensions.URLSingle: controller.Update,
 		},
 		extensions.MethodDelete: {
-			resourceSingleURL: controller.Delete,
+			extensions.URLSingle: controller.Delete,
 		},
 	}
 	return routeMap
