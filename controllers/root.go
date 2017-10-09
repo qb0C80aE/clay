@@ -25,8 +25,15 @@ func APIEndpoints(c *gin.Context) {
 		routeMap := controller.RouteMap()
 		for method, routes := range routeMap {
 			title := fmt.Sprintf("%s_url [%s]", controller.ResourceName(), extensions.LookUpMethodName(method))
-			for relativePath := range routes {
-				resources = append(resources, fmt.Sprintf("%s %s/%s", title, baseURL, relativePath))
+			for pathType := range routes {
+				switch pathType {
+				case extensions.URLSingle:
+					resources = append(resources, fmt.Sprintf("%s %s/%s", title, baseURL, controller.ResourceSingleURL()))
+				case extensions.URLMulti:
+					resources = append(resources, fmt.Sprintf("%s %s/%s", title, baseURL, controller.ResourceMultiURL()))
+				default:
+					panic("invalid url type")
+				}
 			}
 		}
 	}
