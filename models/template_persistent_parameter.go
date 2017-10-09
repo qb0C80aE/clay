@@ -31,14 +31,12 @@ func SharedTemplatePersistentParameterModel() *TemplatePersistentParameter {
 
 // SetupInitialData setups the initial data
 func (templatePersistentParameter *TemplatePersistentParameter) SetupInitialData(db *gorm.DB) error {
-	db.Exec(`
+	return db.Exec(`
 		create trigger if not exists DeleteTemplatePersistentParameterAfterTemplateDeletion after delete on templates
 		begin
 			delete from template_persistent_parameters where template_id = old.id;
 		end;
-	`)
-
-	return nil
+	`).Error
 }
 
 func init() {
