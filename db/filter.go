@@ -41,7 +41,14 @@ func (parameter *Parameter) FilterFields(db *gorm.DB) *gorm.DB {
 	for k, v := range parameter.Filters {
 		if (v != "") && !(strings.Contains(k, ".")) {
 			columnName := snaker.CamelToSnake(k)
-			db = db.Where(fmt.Sprintf("%s IN (?)", columnName), strings.Split(v, ","))
+			switch v {
+			case "null":
+				db = db.Where(fmt.Sprintf("%s is null", columnName))
+			case "not_null":
+				db = db.Where(fmt.Sprintf("%s is not null", columnName))
+			default:
+				db = db.Where(fmt.Sprintf("%s IN (?)", columnName), strings.Split(v, ","))
+			}
 		}
 	}
 
