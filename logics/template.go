@@ -71,11 +71,11 @@ func (logic *templateLogic) Delete(db *gorm.DB, parameters gin.Params, _ url.Val
 
 	template := &models.Template{}
 
-	if err := db.First(&template, parameters.ByName("id")).Error; err != nil {
+	if err := db.First(template, parameters.ByName("id")).Error; err != nil {
 		return err
 	}
 
-	return db.Delete(&template).Error
+	return db.Delete(template).Error
 }
 
 func (logic *templateLogic) ExtractFromDesign(db *gorm.DB) (string, interface{}, error) {

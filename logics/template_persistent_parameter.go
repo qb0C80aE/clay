@@ -62,7 +62,7 @@ func (logic *templatePersistentParameterLogic) Update(db *gorm.DB, parameters gi
 	templatePersistentParameter := data.(*models.TemplatePersistentParameter)
 	templatePersistentParameter.ID, _ = strconv.Atoi(parameters.ByName("id"))
 
-	if err := db.Save(&templatePersistentParameter).Error; err != nil {
+	if err := db.Save(templatePersistentParameter).Error; err != nil {
 		return nil, err
 	}
 
@@ -74,11 +74,11 @@ func (logic *templatePersistentParameterLogic) Delete(db *gorm.DB, parameters gi
 
 	templatePersistentParameter := &models.TemplatePersistentParameter{}
 
-	if err := db.First(&templatePersistentParameter, parameters.ByName("id")).Error; err != nil {
+	if err := db.First(templatePersistentParameter, parameters.ByName("id")).Error; err != nil {
 		return err
 	}
 
-	return db.Delete(&templatePersistentParameter).Error
+	return db.Delete(templatePersistentParameter).Error
 }
 
 func (logic *templatePersistentParameterLogic) ExtractFromDesign(db *gorm.DB) (string, interface{}, error) {
