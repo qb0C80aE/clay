@@ -20,5 +20,5 @@ func SharedTemplateGenerationModel() *TemplateGeneration {
 }
 
 func init() {
-	extensions.RegisterModel(sharedTemplateGenerationModel)
+	extensions.RegisterModel(sharedTemplateGenerationModel, true)
 }

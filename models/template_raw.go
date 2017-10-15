@@ -20,5 +20,5 @@ func SharedTemplateRawModel() *TemplateRaw {
 }
 
 func init() {
-	extensions.RegisterModel(sharedTemplateRawModel)
+	extensions.RegisterModel(sharedTemplateRawModel, true)
 }

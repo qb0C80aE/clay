@@ -7,6 +7,7 @@ import (
 )
 
 var models = []interface{}{}
+var modelsToBeMigrated = []interface{}{}
 var typeMap = map[string]reflect.Type{}
 var modelMap = map[string]interface{}{}
 var resourceNameMap = map[reflect.Type]string{}
@@ -28,15 +29,28 @@ func ModelType(model interface{}) reflect.Type {
 }
 
 // RegisterModel registers a model to migrate automatically, and to generate new instances in processing requests
-func RegisterModel(model interface{}) {
+func RegisterModel(model interface{}, autoMigration bool) {
 	reflectType := ModelType(model)
-	models = append(models, reflect.New(reflectType).Elem().Interface())
+	newModel := reflect.New(reflectType).Elem().Interface()
+	models = append(models, newModel)
+	if autoMigration {
+		modelsToBeMigrated = append(modelsToBeMigrated, newModel)
+	}
 }
 
 // RegisteredModels returns the registered models
 func RegisteredModels() []interface{} {
 	result := make([]interface{}, len(models))
 	for i, model := range models {
+		result[i] = model
+	}
+	return result
+}
+
+// RegisteredModelsToBeMigrated returns the registered models to be migrated
+func RegisteredModelsToBeMigrated() []interface{} {
+	result := make([]interface{}, len(modelsToBeMigrated))
+	for i, model := range modelsToBeMigrated {
 		result[i] = model
 	}
 	return result

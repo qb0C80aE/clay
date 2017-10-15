@@ -41,5 +41,5 @@ func (templatePersistentParameter *TemplatePersistentParameter) SetupInitialData
 
 func init() {
 	extensions.RegisterInitialDataLoader(sharedTemplatePersistentParameterModel)
-	extensions.RegisterModel(sharedTemplatePersistentParameterModel)
+	extensions.RegisterModel(sharedTemplatePersistentParameterModel, true)
 }
