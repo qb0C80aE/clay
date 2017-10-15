@@ -42,11 +42,14 @@ func Connect() *gorm.DB {
 
 	db.Exec("pragma foreign_keys = on")
 
-	registeredModels := extensions.RegisteredModels()
-	db.AutoMigrate(registeredModels...)
+	registeredModelsToBeMigrated := extensions.RegisteredModelsToBeMigrated()
+	if err := db.AutoMigrate(registeredModelsToBeMigrated...).Error; err != nil {
+		log.Fatalf("AutoMigration failed: '%s'", err.Error())
+	}
 
-	for _, model := range registeredModels {
-		extensions.RegisterResourceName(model, db.NewScope(model).TableName())
+	for _, model := range extensions.RegisteredModels() {
+		tableName := db.NewScope(model).TableName()
+		extensions.RegisterResourceName(model, tableName)
 	}
 
 	initialDataLoaders := extensions.RegisteredInitialDataLoaders()

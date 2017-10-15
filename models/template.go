@@ -25,5 +25,5 @@ func SharedTemplateModel() *Template {
 }
 
 func init() {
-	extensions.RegisterModel(sharedTemplateModel)
+	extensions.RegisterModel(sharedTemplateModel, true)
 }

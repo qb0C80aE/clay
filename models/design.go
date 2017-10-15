@@ -21,5 +21,5 @@ func SharedDesignModel() *Design {
 }
 
 func init() {
-	extensions.RegisterModel(sharedDesignModel)
+	extensions.RegisterModel(sharedDesignModel, false)
 }
