@@ -18,6 +18,7 @@ var logicMapByResourceName = map[string]Logic{}
 // * Delete corresponds HTTP DELETE message and handles a request for a single resource to delete the specific information
 // * Patch corresponds HTTP PATCH message and handles a request for a single resource to update partially the specific information
 // * Options corresponds HTTP OPTIONS message and handles a request for multi resources to retrieve its supported options
+// * Total returns the count of for multi resource
 type Logic interface {
 	ResourceName() string
 	GetMulti(db *gorm.DB, parameters gin.Params, urlValues url.Values, queryString string) (interface{}, error)
@@ -27,6 +28,7 @@ type Logic interface {
 	Delete(db *gorm.DB, parameters gin.Params, urlValues url.Values) error
 	Patch(db *gorm.DB, parameters gin.Params, urlValues url.Values) (interface{}, error)
 	Options(db *gorm.DB, parameters gin.Params, urlValues url.Values) error
+	Total(db *gorm.DB, model interface{}) (int, error)
 }
 
 // RegisterLogic registers a logic used in the router
