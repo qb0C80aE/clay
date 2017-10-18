@@ -62,7 +62,7 @@ func (logic *BaseLogic) Options(_ *gorm.DB, _ gin.Params, _ url.Values) error {
 
 // Total returns the count of for multi resource
 func (logic *BaseLogic) Total(db *gorm.DB, model interface{}) (int, error) {
-	var total int = 0
+	var total int
 	if err := db.Model(model).Count(&total).Error; err != nil {
 		return 0, err
 	}
