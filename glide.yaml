@@ -4,6 +4,7 @@ import:
 - package: github.com/jinzhu/gorm
   subpackages:
   - dialects/sqlite
+- package: github.com/spf13/cobra
 - package: github.com/serenize/snaker
 - package: github.com/mattn/go-sqlite3
   version: ~1.2.0

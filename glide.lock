@@ -1,5 +1,5 @@
-hash: 2ab2a9c068373e9b0b574a9d9d78a6ea9f40fd672f031bfe88e56426b8cbb2bd
-updated: 2017-04-15T12:16:41.569560108+09:00
+hash: f2da26d652cb419d7a8f997f33b3774ef1f47354fbe3975b830029ae2da007c3
+updated: 2017-10-20T16:30:39.617286229+09:00
 imports:
 - name: github.com/gin-gonic/gin
   version: e2212d40c62a98b388a5eb48ecbdcf88534688ba
@@ -10,6 +10,8 @@ imports:
   version: 2402d76f3d41f928c7902a765dfc872356dd3aad
   subpackages:
   - proto
+- name: github.com/inconshreveable/mousetrap
+  version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
 - name: github.com/jinzhu/gorm
   version: 45ccb134373e7d9fa76d5987a6fed6cd5a5adfd4
   subpackages:
@@ -24,6 +26,10 @@ imports:
   version: ca5e3819723d8eeaf170ad510e7da1d6d2e94a08
 - name: github.com/serenize/snaker
   version: 543781d2b79bd95c51ffe70e70a55c946ca211ff
+- name: github.com/spf13/cobra
+  version: 7b2c5ac9fc04fc5efafb60700713d4fa609b777b
+- name: github.com/spf13/pflag
+  version: 1f33b80956cde38911d1f23d764deb8d77a649ce
 - name: golang.org/x/net
   version: f315505cf3349909cdf013ea56690da34e96a451
   subpackages:
