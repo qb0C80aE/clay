@@ -303,6 +303,17 @@ func (controller *BaseController) options(db *gorm.DB, parameters gin.Params, ur
 	return err
 }
 
+func (controller *BaseController) total(db *gorm.DB, model interface{}) (total int, err error) {
+	defer func() {
+		if recoverResult := recover(); recoverResult != nil {
+			err = fmt.Errorf("%v", recoverResult)
+		}
+	}()
+
+	total, err = controller.logic.Total(db, model)
+	return total, err
+}
+
 // GetSingle corresponds HTTP GET message and handles a request for a single resource to get the information
 func (controller *BaseController) GetSingle(c *gin.Context) {
 	ver, err := version.New(c)
@@ -369,9 +380,8 @@ func (controller *BaseController) GetMulti(c *gin.Context) {
 		return
 	}
 
-	db = db.New()
-	var total = 0
-	if db.Model(controller.model).Count(&total).Error != nil {
+	total, err := controller.total(db, controller.model)
+	if err != nil {
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
