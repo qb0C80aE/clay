@@ -20,7 +20,6 @@ func newDesignController() extensions.Controller {
 			logics.UniqueDesignLogic(),
 		),
 	}
-	controller.SetOutputter(controller)
 	return controller
 }
 

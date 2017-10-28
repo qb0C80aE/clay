@@ -18,7 +18,6 @@ func newTemplateController() extensions.Controller {
 			logics.UniqueTemplateLogic(),
 		),
 	}
-	controller.SetOutputter(controller)
 	return controller
 }
 

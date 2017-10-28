@@ -19,7 +19,6 @@ func newCommandExecutionController() extensions.Controller {
 			logics.UniqueCommandExecutionLogic(),
 		),
 	}
-	controller.SetOutputter(controller)
 	return controller
 }
 
