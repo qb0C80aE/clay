@@ -21,9 +21,10 @@ import (
 
 // BaseController is the base class that all controller classes inherit
 type BaseController struct {
-	model     interface{}
-	logic     extensions.Logic
-	outputter extensions.Outputter
+	model           interface{}
+	logic           extensions.Logic
+	outputter       extensions.Outputter
+	queryCustomizer extensions.QueryCustomizer
 }
 
 // NewBaseController creates a new instance of BaseController
@@ -32,6 +33,8 @@ func NewBaseController(model interface{}, logic extensions.Logic) *BaseControlle
 		model: model,
 		logic: logic,
 	}
+	controller.outputter = controller
+	controller.queryCustomizer = controller
 	return controller
 }
 
@@ -226,6 +229,11 @@ func (controller *BaseController) OutputOptions(c *gin.Context, code int) {
 	controller.outputter.OutputDelete(c, code)
 }
 
+// Queries returns query parameters
+func (controller *BaseController) Queries(c *gin.Context) url.Values {
+	return c.Request.URL.Query()
+}
+
 func (controller *BaseController) getSingle(db *gorm.DB, parameters gin.Params, urlValues url.Values, queryFields string) (result interface{}, err error) {
 	defer func() {
 		if recoverResult := recover(); recoverResult != nil {
@@ -323,7 +331,7 @@ func (controller *BaseController) GetSingle(c *gin.Context) {
 	}
 
 	db := dbpkg.Instance(c)
-	parameter, err := dbpkg.NewParameter(c.Request.URL.Query())
+	parameter, err := dbpkg.NewParameter(controller.queryCustomizer.Queries(c))
 	if err != nil {
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
@@ -356,7 +364,7 @@ func (controller *BaseController) GetMulti(c *gin.Context) {
 	}
 
 	db := dbpkg.Instance(c)
-	parameter, err := dbpkg.NewParameter(c.Request.URL.Query())
+	parameter, err := dbpkg.NewParameter(controller.queryCustomizer.Queries(c))
 	if err != nil {
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
@@ -575,4 +583,9 @@ func (controller *BaseController) Options(c *gin.Context) {
 // SetOutputter sets an outputter for this controller
 func (controller *BaseController) SetOutputter(outputter extensions.Outputter) {
 	controller.outputter = outputter
+}
+
+// SetQueryCustomizer sets a query customizer for this controller
+func (controller *BaseController) SetQueryCustomizer(queryCustomizer extensions.QueryCustomizer) {
+	controller.queryCustomizer = queryCustomizer
 }

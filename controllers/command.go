@@ -18,7 +18,6 @@ func newCommandController() extensions.Controller {
 			logics.UniqueCommandLogic(),
 		),
 	}
-	controller.SetOutputter(controller)
 	return controller
 }
 

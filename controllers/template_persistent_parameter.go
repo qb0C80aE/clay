@@ -18,7 +18,6 @@ func newTemplatePersistentParameterController() extensions.Controller {
 			logics.UniqueTemplatePersistentParameterLogic(),
 		),
 	}
-	controller.SetOutputter(controller)
 	return controller
 }
 
