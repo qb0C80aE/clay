@@ -318,6 +318,7 @@ func (controller *BaseController) total(db *gorm.DB, model interface{}) (total i
 		}
 	}()
 
+	db = db.New()
 	total, err = controller.logic.Total(db, model)
 	return total, err
 }
