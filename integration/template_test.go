@@ -704,6 +704,7 @@ i = i mod 5
 {{- $vfloat32 := float32 "300.1" }}
 {{- $vfloat64 := float64 "300.2" }}
 {{- $vboolean := boolean "false" }}
+{{- $vmap := map "key" "value" }}
 {{ $vint }}
 {{ $vint8 }}
 {{ $vint16 }}
@@ -717,6 +718,7 @@ i = i mod 5
 {{ $vfloat32 }}
 {{ $vfloat64 }}
 {{ $vboolean }}
+{{ $vmap }}
 {{- $sint := string $vint }}
 {{- $sint8 := string $vint8 }}
 {{- $sint16 := string $vint16 }}
@@ -730,6 +732,7 @@ i = i mod 5
 {{- $sfloat32:= string $vfloat32 }}
 {{- $sfloat64 := string $vfloat64 }}
 {{- $sboolean := string $vboolean }}
+{{- $sobject := string $vmap }}
 {{ $sint }}
 {{ $sint8 }}
 {{ $sint16 }}
@@ -743,6 +746,7 @@ i = i mod 5
 {{ $sfloat32 }}
 {{ $sfloat64 }}
 {{ $sboolean }}
+{{ $sobject }}
 {{ int $vint }}
 {{ int $vint8 }}
 {{ int $vint16 }}
