@@ -30,6 +30,7 @@ i = i mod 5
 300.1
 300.2
 false
+map[key:value]
 100
 101
 102
@@ -43,6 +44,7 @@ false
 3.001E+02
 3.002E+02
 false
+map[key:value]
 100
 101
 102

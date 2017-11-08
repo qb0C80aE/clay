@@ -129,7 +129,7 @@ func init() {
 		"float64": func(value interface{}) (interface{}, error) {
 			return conversion.ToFloat64Interface(value)
 		},
-		"string": func(value interface{}) (interface{}, error) {
+		"string": func(value interface{}) interface{} {
 			return conversion.ToStringInterface(value)
 		},
 		"boolean": func(value interface{}) (interface{}, error) {
