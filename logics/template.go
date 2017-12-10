@@ -1,13 +1,10 @@
 package logics
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extensions"
 	"github.com/qb0C80aE/clay/models"
 	"github.com/qb0C80aE/clay/utils/mapstruct"
-	"net/url"
-	"strconv"
 )
 
 type templateLogic struct {
@@ -21,61 +18,6 @@ func newTemplateLogic() *templateLogic {
 		),
 	}
 	return logic
-}
-
-func (logic *templateLogic) GetSingle(db *gorm.DB, parameters gin.Params, _ url.Values, queryFields string) (interface{}, error) {
-
-	template := &models.Template{}
-
-	if err := db.Select(queryFields).First(template, parameters.ByName("id")).Error; err != nil {
-		return nil, err
-	}
-
-	return template, nil
-
-}
-
-func (logic *templateLogic) GetMulti(db *gorm.DB, _ gin.Params, _ url.Values, queryFields string) (interface{}, error) {
-	templates := []*models.Template{}
-
-	if err := db.Select(queryFields).Find(&templates).Error; err != nil {
-		return nil, err
-	}
-
-	return templates, nil
-
-}
-
-func (logic *templateLogic) Create(db *gorm.DB, _ gin.Params, _ url.Values, data interface{}) (interface{}, error) {
-	template := data.(*models.Template)
-
-	if err := db.Create(template).Error; err != nil {
-		return nil, err
-	}
-
-	return template, nil
-}
-
-func (logic *templateLogic) Update(db *gorm.DB, parameters gin.Params, _ url.Values, data interface{}) (interface{}, error) {
-	template := data.(*models.Template)
-	template.ID, _ = strconv.Atoi(parameters.ByName("id"))
-
-	if err := db.Save(template).Error; err != nil {
-		return nil, err
-	}
-
-	return template, nil
-}
-
-func (logic *templateLogic) Delete(db *gorm.DB, parameters gin.Params, _ url.Values) error {
-
-	template := &models.Template{}
-
-	if err := db.First(template, parameters.ByName("id")).Error; err != nil {
-		return err
-	}
-
-	return db.Delete(template).Error
 }
 
 func (logic *templateLogic) ExtractFromDesign(db *gorm.DB) (string, interface{}, error) {

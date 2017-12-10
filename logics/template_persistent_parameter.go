@@ -1,13 +1,10 @@
 package logics
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extensions"
 	"github.com/qb0C80aE/clay/models"
 	"github.com/qb0C80aE/clay/utils/mapstruct"
-	"net/url"
-	"strconv"
 )
 
 type templatePersistentParameterLogic struct {
@@ -21,64 +18,6 @@ func newTemplatePersistentParameterLogic() *templatePersistentParameterLogic {
 		),
 	}
 	return logic
-}
-
-func (logic *templatePersistentParameterLogic) GetSingle(db *gorm.DB, parameters gin.Params, _ url.Values, queryFields string) (interface{}, error) {
-
-	templatePersistentParameter := &models.TemplatePersistentParameter{}
-
-	if err := db.Select(queryFields).First(templatePersistentParameter, parameters.ByName("id")).Error; err != nil {
-		return nil, err
-	}
-
-	return templatePersistentParameter, nil
-
-}
-
-func (logic *templatePersistentParameterLogic) GetMulti(db *gorm.DB, _ gin.Params, _ url.Values, queryFields string) (interface{}, error) {
-	templatePersistentParameters := []*models.TemplatePersistentParameter{}
-
-	if err := db.Select(queryFields).Find(&templatePersistentParameters).Error; err != nil {
-		return nil, err
-	}
-
-	return templatePersistentParameters, nil
-}
-
-func (logic *templatePersistentParameterLogic) Create(db *gorm.DB, _ gin.Params, _ url.Values, data interface{}) (interface{}, error) {
-
-	templatePersistentParameter := data.(*models.TemplatePersistentParameter)
-
-	if err := db.Create(templatePersistentParameter).Error; err != nil {
-		return nil, err
-	}
-
-	return templatePersistentParameter, nil
-
-}
-
-func (logic *templatePersistentParameterLogic) Update(db *gorm.DB, parameters gin.Params, _ url.Values, data interface{}) (interface{}, error) {
-
-	templatePersistentParameter := data.(*models.TemplatePersistentParameter)
-	templatePersistentParameter.ID, _ = strconv.Atoi(parameters.ByName("id"))
-
-	if err := db.Save(templatePersistentParameter).Error; err != nil {
-		return nil, err
-	}
-
-	return templatePersistentParameter, nil
-
-}
-
-func (logic *templatePersistentParameterLogic) Delete(db *gorm.DB, parameters gin.Params, _ url.Values) error {
-
-	templatePersistentParameter := &models.TemplatePersistentParameter{}
-
-	if err := db.First(templatePersistentParameter, parameters.ByName("id")).Error; err != nil {
-		return err
-	}
-
-	return db.Delete(templatePersistentParameter).Error
 }
 
 func (logic *templatePersistentParameterLogic) ExtractFromDesign(db *gorm.DB) (string, interface{}, error) {
