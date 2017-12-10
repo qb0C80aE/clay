@@ -1,10 +1,8 @@
 package logics
 
 import (
-	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extensions"
 	"github.com/qb0C80aE/clay/models"
-	"github.com/qb0C80aE/clay/utils/mapstruct"
 )
 
 type templatePersistentParameterLogic struct {
@@ -18,34 +16,6 @@ func newTemplatePersistentParameterLogic() *templatePersistentParameterLogic {
 		),
 	}
 	return logic
-}
-
-func (logic *templatePersistentParameterLogic) ExtractFromDesign(db *gorm.DB) (string, interface{}, error) {
-	templatePersistentParameters := []*models.TemplatePersistentParameter{}
-	if err := db.Select("*").Find(&templatePersistentParameters).Error; err != nil {
-		return "", nil, err
-	}
-	return extensions.RegisteredResourceName(models.SharedTemplatePersistentParameterModel()), templatePersistentParameters, nil
-}
-
-func (logic *templatePersistentParameterLogic) DeleteFromDesign(db *gorm.DB) error {
-	return db.Delete(models.SharedTemplatePersistentParameterModel()).Error
-}
-
-func (logic *templatePersistentParameterLogic) LoadToDesign(db *gorm.DB, data interface{}) error {
-	container := []*models.TemplatePersistentParameter{}
-	design := data.(*models.Design)
-	if value, exists := design.Content[extensions.RegisteredResourceName(models.SharedTemplatePersistentParameterModel())]; exists {
-		if err := mapstruct.MapToStruct(value.([]interface{}), &container); err != nil {
-			return err
-		}
-		for _, templatePersistentParameter := range container {
-			if err := db.Create(templatePersistentParameter).Error; err != nil {
-				return err
-			}
-		}
-	}
-	return nil
 }
 
 var uniqueTemplatePersistentParameterLogic = newTemplatePersistentParameterLogic()

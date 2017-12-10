@@ -4,6 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extensions"
+	"github.com/qb0C80aE/clay/models"
+	"github.com/qb0C80aE/clay/utils/mapstruct"
 	"net/url"
 	"reflect"
 	"strconv"
@@ -121,6 +123,79 @@ func (logic *BaseLogic) Total(db *gorm.DB, model interface{}) (int, error) {
 	}
 
 	return total, nil
+}
+
+// ExtractFromDesign extracts the model related to this logic from db
+func (logic *BaseLogic) ExtractFromDesign(db *gorm.DB) (string, interface{}, error) {
+	model, err := extensions.CreateModel(logic.ResourceName())
+	if err != nil {
+		return "", nil, err
+	}
+
+	modelType := extensions.ModelType(model)
+	modelPointerType := reflect.PtrTo(modelType)
+	sliceType := reflect.SliceOf(modelPointerType)
+	slice := reflect.MakeSlice(sliceType, 0, 0)
+
+	slicePointer := reflect.New(sliceType)
+	slicePointer.Elem().Set(slice)
+
+	if err := db.Select("*").Find(slicePointer.Interface()).Error; err != nil {
+		return "", nil, err
+	}
+	return logic.ResourceName(), slicePointer.Elem().Interface(), nil
+}
+
+// DeleteFromDesign deletes the model related to this logic in db
+func (logic *BaseLogic) DeleteFromDesign(db *gorm.DB) error {
+	model, err := extensions.CreateModel(logic.ResourceName())
+	if err != nil {
+		return err
+	}
+
+	return db.Delete(model).Error
+}
+
+// LoadToDesign loads the model related to this logic into db
+func (logic *BaseLogic) LoadToDesign(db *gorm.DB, data interface{}) error {
+	model, err := extensions.CreateModel(logic.ResourceName())
+	if err != nil {
+		return err
+	}
+
+	modelType := extensions.ModelType(model)
+	modelPointerType := reflect.PtrTo(modelType)
+	sliceType := reflect.SliceOf(modelPointerType)
+	slice := reflect.MakeSlice(sliceType, 0, 0)
+
+	slicePointer := reflect.New(sliceType)
+	slicePointer.Elem().Set(slice)
+
+	design := data.(*models.Design)
+	if value, exists := design.Content[logic.ResourceName()]; exists {
+		if err := mapstruct.MapToStruct(value.([]interface{}), slicePointer.Interface()); err != nil {
+			return err
+		}
+
+		slice = slicePointer.Elem()
+		size := slice.Len()
+		for i := 0; i < size; i++ {
+			modelValue := slice.Index(i).Elem()
+			fieldCount := modelValue.NumField()
+			for j := 0; j < fieldCount; j++ {
+				modelFieldValue := modelValue.Field(j)
+				switch modelFieldValue.Kind() {
+				case reflect.Array, reflect.Slice, reflect.Ptr:
+					modelFieldValue.Set(reflect.Zero(modelFieldValue.Type()))
+				}
+			}
+			model := modelValue.Interface()
+			if err := db.Create(model).Error; err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 func init() {
