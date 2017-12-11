@@ -1,6 +1,7 @@
 package logics
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extensions"
@@ -13,13 +14,17 @@ import (
 
 // BaseLogic is the base class that all logic classes inherit
 type BaseLogic struct {
-	model interface{}
+	model            interface{}
+	keyParameterName string
+	keyFieldName     string
 }
 
 // NewBaseLogic creates a new instance of BaseLogic
 func NewBaseLogic(model interface{}) *BaseLogic {
 	logic := &BaseLogic{
-		model: model,
+		model:            model,
+		keyParameterName: "id",
+		keyFieldName:     "ID",
 	}
 	return logic
 }
@@ -36,7 +41,7 @@ func (logic *BaseLogic) GetSingle(db *gorm.DB, parameters gin.Params, _ url.Valu
 		return nil, err
 	}
 
-	if err := db.Select(queryFields).First(result, parameters.ByName("id")).Error; err != nil {
+	if err := db.Select(queryFields).First(result, fmt.Sprintf("%s = ?", logic.keyParameterName), parameters.ByName(logic.keyParameterName)).Error; err != nil {
 		return nil, err
 	}
 
@@ -76,13 +81,20 @@ func (logic *BaseLogic) Create(db *gorm.DB, parameters gin.Params, _ url.Values,
 
 // Update corresponds HTTP PUT message and handles a request for a single resource to update the specific information
 func (logic *BaseLogic) Update(db *gorm.DB, parameters gin.Params, _ url.Values, data interface{}) (interface{}, error) {
-	id, err := strconv.Atoi(parameters.ByName("id"))
-	if err != nil {
-		return nil, err
-	}
-
 	value := reflect.ValueOf(data)
-	value.Elem().FieldByName("ID").SetInt(int64(id))
+
+	switch value.Elem().FieldByName(logic.keyFieldName).Kind() {
+	case reflect.String:
+		value.Elem().FieldByName(logic.keyFieldName).SetString(parameters.ByName(logic.keyParameterName))
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		id, err := strconv.Atoi(parameters.ByName(logic.keyParameterName))
+		if err != nil {
+			return nil, err
+		}
+		value.Elem().FieldByName(logic.keyFieldName).SetInt(int64(id))
+	default:
+		return nil, fmt.Errorf("the field %s does not exist, or is neither int nor string", logic.keyFieldName)
+	}
 
 	if err := db.Save(value.Interface()).Error; err != nil {
 		return nil, err
@@ -98,7 +110,7 @@ func (logic *BaseLogic) Delete(db *gorm.DB, parameters gin.Params, _ url.Values)
 		return err
 	}
 
-	if err := db.First(model, parameters.ByName("id")).Error; err != nil {
+	if err := db.First(model, fmt.Sprintf("%s = ?", logic.keyParameterName), parameters.ByName(logic.keyParameterName)).Error; err != nil {
 		return err
 	}
 
@@ -196,6 +208,12 @@ func (logic *BaseLogic) LoadToDesign(db *gorm.DB, data interface{}) error {
 		}
 	}
 	return nil
+}
+
+// SetKeys sets its KeyParameterName and KeyFieldName
+func (logic *BaseLogic) SetKeys(KeyParameterName, keyFieldName string) {
+	logic.keyParameterName = KeyParameterName
+	logic.keyFieldName = keyFieldName
 }
 
 func init() {
