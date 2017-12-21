@@ -32,8 +32,8 @@ func newTemplateGenerationLogic() *templateGenerationLogic {
 }
 
 // GenerateTemplate generates text data based on registered templates
-func GenerateTemplate(db *gorm.DB, id string, templateVolatileParameterMap map[string]interface{}) (interface{}, error) {
-	templateParameter := map[string]interface{}{}
+func GenerateTemplate(db *gorm.DB, id string, templateVolatileParameterMap map[interface{}]interface{}) (interface{}, error) {
+	templateParameter := map[interface{}]interface{}{}
 
 	template := &models.Template{}
 	template.ID, _ = strconv.Atoi(id)
@@ -72,7 +72,7 @@ func GenerateTemplate(db *gorm.DB, id string, templateVolatileParameterMap map[s
 
 // GetSingle generates text data based on registered templates
 func (logic *templateGenerationLogic) GetSingle(db *gorm.DB, parameters gin.Params, urlValues url.Values, queryFields string) (interface{}, error) {
-	templateVolatileParameterMap := make(map[string]interface{}, len(urlValues))
+	templateVolatileParameterMap := make(map[interface{}]interface{}, len(urlValues))
 	for key, value := range urlValues {
 		templateVolatileParameterMap[key] = value
 	}
@@ -368,6 +368,18 @@ func init() {
 			var total = 0
 			db.Model(model).Count(&total)
 			return total, nil
+		},
+		"include": func(dbObject interface{}, templateName string, templateVolatileParameterMap map[interface{}]interface{}) (interface{}, error) {
+			db := dbObject.(*gorm.DB)
+			template := models.NewTemplateModel()
+			if err := db.Select("*").First(template, "name = ?", templateName).Error; err != nil {
+				return nil, fmt.Errorf("template %s does not exist", templateName)
+			}
+			result, err := GenerateTemplate(db, strconv.Itoa(template.ID), templateVolatileParameterMap)
+			if err != nil {
+				return nil, err
+			}
+			return result, nil
 		},
 	}
 	extensions.RegisterTemplateFuncMap(funcMap)
