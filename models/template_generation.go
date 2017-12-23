@@ -4,7 +4,6 @@ import "github.com/qb0C80aE/clay/extensions"
 
 // TemplateGeneration is the mock model class what represents template generations
 type TemplateGeneration struct {
-	ID int `json:"id" gorm:"primary_key;AUTO_INCREMENT"`
 }
 
 // NewTemplateGenerationModel creates a TemplateGeneration model instance
@@ -20,5 +19,5 @@ func SharedTemplateGenerationModel() *TemplateGeneration {
 }
 
 func init() {
-	extensions.RegisterModel(sharedTemplateGenerationModel, true)
+	extensions.RegisterModel(sharedTemplateGenerationModel, false)
 }

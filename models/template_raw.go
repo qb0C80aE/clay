@@ -4,7 +4,6 @@ import "github.com/qb0C80aE/clay/extensions"
 
 // TemplateRaw is the mock model class what represents template raws
 type TemplateRaw struct {
-	ID int `json:"id" gorm:"primary_key;AUTO_INCREMENT"`
 }
 
 // NewTemplateRawModel creates a TemplateRaw model instance
@@ -20,5 +19,5 @@ func SharedTemplateRawModel() *TemplateRaw {
 }
 
 func init() {
-	extensions.RegisterModel(sharedTemplateRawModel, true)
+	extensions.RegisterModel(sharedTemplateRawModel, false)
 }
