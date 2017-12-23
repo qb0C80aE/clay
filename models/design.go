@@ -4,8 +4,7 @@ import "github.com/qb0C80aE/clay/extensions"
 
 // Design is the model class what represents the whole object model store
 type Design struct {
-	ID      int                    `json:"-,omitempty" gorm:"primary_key"`
-	Content map[string]interface{} `json:"content" gorm:"-"`
+	Content map[string]interface{} `json:"content"`
 }
 
 // NewDesignModel creates a Design model instance

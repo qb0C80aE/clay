@@ -8,6 +8,7 @@ import (
 // Command is the model class what represents command to execute something
 type Command struct {
 	ID               int       `json:"id" form:"id"`
+	Description      string    `json:"description" form:"description"`
 	WorkingDirectory string    `json:"working_directory" form:"working_directory"`
 	CommandLine      string    `json:"command_line" form:"command_line"`
 	Status           string    `json:"status" form:"status"`
