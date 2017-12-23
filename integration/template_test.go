@@ -1247,6 +1247,27 @@ sequence[{{$i}}]={{$v}}
 		},
 	}
 
+	id4 := 4
+	template4 := &models.Template{
+		ID:              id4,
+		Name:            "test14",
+		TemplateContent: `volatile1 = {{.volatile1}}, volatile2 = {{.volatile2}}`,
+	}
+
+	id5 := 5
+	template5 := &models.Template{
+		ID:   id5,
+		Name: "test15",
+		TemplateContent: `include test
+{{- $volatile := map }}
+{{- $volatile := put $volatile "volatile1" "abc" }}
+{{- $volatile := put $volatile "volatile2" 123 }}
+{{ include .ModelStore "test12" nil }}
+{{ include .ModelStore "test13" nil }}
+{{ include .ModelStore "test14" $volatile }}
+`,
+	}
+
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template1)
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_persistent_parameters", nil), templatePersistentParameter11)
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_persistent_parameters", nil), templatePersistentParameter12)
@@ -1258,6 +1279,18 @@ sequence[{{$i}}]={{$v}}
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template3)
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_persistent_parameters", nil), templatePersistentParameter31)
 
+	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template4)
+	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template5)
+
 	responseText, code := Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%d", id), "generation", nil), nil)
 	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_FuncMaps_1.txt"))
+
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%d", id2), "generation", nil), nil)
+	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_FuncMaps_2.txt"))
+
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%d", id3), "generation", nil), nil)
+	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_FuncMaps_3.txt"))
+
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%d", id5), "generation", nil), nil)
+	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_FuncMaps_4.txt"))
 }
