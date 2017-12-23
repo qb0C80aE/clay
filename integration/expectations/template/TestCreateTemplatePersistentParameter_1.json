@@ -2,6 +2,7 @@
   "id": 1,
   "template_id": 1,
   "name": "testParameter1",
+  "description": "testParameter1desc",
   "value_int": {
     "Int64": 100,
     "Valid": true

@@ -1,4 +1,5 @@
 {
+  "description": "test2desc",
   "id": 102,
   "name": "test2",
   "template_content": "TestTemplate2",
@@ -7,6 +8,7 @@
       "id": 1,
       "template_id": 102,
       "name": "testParameter21",
+      "description": "testParameter21desc",
       "value_int": {
         "Int64": 0,
         "Valid": false

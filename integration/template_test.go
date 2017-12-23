@@ -30,11 +30,13 @@ func TestCreateTemplate(t *testing.T) {
 	template1 := &models.Template{
 		Name:            "test1",
 		TemplateContent: "TestTemplate1",
+		Description:     "test1desc",
 	}
 
 	template2 := &models.Template{
 		Name:            "test2",
 		TemplateContent: "TestTemplate2",
+		Description:     "test2desc",
 		TemplatePersistentParameters: []*models.TemplatePersistentParameter{
 			{
 				Name: "testParameter1",
@@ -42,6 +44,7 @@ func TestCreateTemplate(t *testing.T) {
 					String: "TestParameter1",
 					Valid:  true,
 				},
+				Description: "testParameter1desc",
 			},
 		},
 	}
@@ -50,6 +53,7 @@ func TestCreateTemplate(t *testing.T) {
 		ID:              100,
 		Name:            "test100",
 		TemplateContent: "TestTemplate100",
+		Description:     "test100desc",
 		TemplatePersistentParameters: []*models.TemplatePersistentParameter{
 			{
 				Name: "testParameter100",
@@ -57,6 +61,7 @@ func TestCreateTemplate(t *testing.T) {
 					String: "TestParameter100",
 					Valid:  true,
 				},
+				Description: "testParameter100desc",
 			},
 			{
 				ID:   10,
@@ -65,6 +70,7 @@ func TestCreateTemplate(t *testing.T) {
 					String: "TestParameter110",
 					Valid:  true,
 				},
+				Description: "testParameter110desc",
 			},
 		},
 	}
@@ -95,6 +101,7 @@ func TestUpdateTemplate(t *testing.T) {
 		ID:              id1,
 		Name:            "test1",
 		TemplateContent: "TestTemplate1",
+		Description:     "test1desc",
 	}
 
 	id2 := 102
@@ -102,6 +109,7 @@ func TestUpdateTemplate(t *testing.T) {
 		ID:              id2,
 		Name:            "test2",
 		TemplateContent: "TestTemplate2",
+		Description:     "test2desc",
 		TemplatePersistentParameters: []*models.TemplatePersistentParameter{
 			{
 				Name: "testParameter21",
@@ -109,6 +117,7 @@ func TestUpdateTemplate(t *testing.T) {
 					String: "TestParameter21",
 					Valid:  true,
 				},
+				Description: "testParameter21desc",
 			},
 		},
 	}
@@ -118,6 +127,7 @@ func TestUpdateTemplate(t *testing.T) {
 		ID:              id3,
 		Name:            "test3",
 		TemplateContent: "TestTemplate3",
+		Description:     "test3desc",
 		TemplatePersistentParameters: []*models.TemplatePersistentParameter{
 			{
 				ID:   1000,
@@ -126,6 +136,7 @@ func TestUpdateTemplate(t *testing.T) {
 					String: "TestParameter31",
 					Valid:  true,
 				},
+				Description: "testParameter31desc",
 			},
 			{
 				ID:   1001,
@@ -134,6 +145,7 @@ func TestUpdateTemplate(t *testing.T) {
 					String: "TestParameter32",
 					Valid:  true,
 				},
+				Description: "testParameter31desc",
 			},
 		},
 	}
@@ -164,6 +176,7 @@ func TestUpdateTemplate(t *testing.T) {
 		String: "TestParameter32Updated",
 		Valid:  true,
 	}
+	template3.TemplatePersistentParameters[1].Description = "testParameter32descUpdated"
 
 	template3.TemplatePersistentParameters = append(
 		template3.TemplatePersistentParameters,
@@ -193,6 +206,7 @@ func TestDeleteTemplate(t *testing.T) {
 		ID:              id,
 		Name:            "test",
 		TemplateContent: "TestTemplate",
+		Description:     "testdesc",
 	}
 
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template)
@@ -220,6 +234,7 @@ func TestCreateTemplatePersistentParameters(t *testing.T) {
 		ID:              1,
 		Name:            "test",
 		TemplateContent: "TestTemplate",
+		Description:     "testdesc",
 	}
 
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template)
@@ -243,6 +258,7 @@ func TestCreateTemplatePersistentParameters(t *testing.T) {
 			String: "TestParameter1",
 			Valid:  true,
 		},
+		Description: "testParameter1desc",
 	}
 	templatePersistentParameter2 := &models.TemplatePersistentParameter{
 		TemplateID: 1,
@@ -263,6 +279,7 @@ func TestCreateTemplatePersistentParameters(t *testing.T) {
 			String: "TestParameter2",
 			Valid:  true,
 		},
+		Description: "testParameter2desc",
 	}
 
 	responseText, code := Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_persistent_parameters", nil), templatePersistentParameter1)
@@ -283,6 +300,7 @@ func TestUpdateTemplatePersistentParameters(t *testing.T) {
 		ID:              1,
 		Name:            "test",
 		TemplateContent: "TestTemplate",
+		Description:     "testdesc",
 	}
 
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template)
@@ -307,6 +325,7 @@ func TestUpdateTemplatePersistentParameters(t *testing.T) {
 			String: "TestParameter1",
 			Valid:  true,
 		},
+		Description: "testParameter1desc",
 	}
 
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_persistent_parameters", nil), templatePersistentParameter1)
@@ -320,6 +339,7 @@ func TestUpdateTemplatePersistentParameters(t *testing.T) {
 		String: "TestParameter1Updated",
 		Valid:  true,
 	}
+	templatePersistentParameter1.Description = "testParameter1descUpdated"
 
 	responseText, code := Execute(t, http.MethodPut, GenerateSingleResourceURL(server, "template_persistent_parameters", strconv.Itoa(id), nil), templatePersistentParameter1)
 	CheckResponseJSON(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestUpdateTemplatePersistentParameter_1.json"), &models.TemplatePersistentParameter{})
@@ -336,6 +356,7 @@ func TestDeleteTemplatePersistentParameters(t *testing.T) {
 		ID:              1,
 		Name:            "test",
 		TemplateContent: "TestTemplate",
+		Description:     "testdesc",
 	}
 
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template)
@@ -348,6 +369,7 @@ func TestDeleteTemplatePersistentParameters(t *testing.T) {
 			String: "TestParameter1",
 			Valid:  true,
 		},
+		Description: "testParameter1desc",
 	}
 
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_persistent_parameters", nil), templatePersistentParameter1)
@@ -357,6 +379,7 @@ func TestDeleteTemplatePersistentParameters(t *testing.T) {
 		String: "TestParameter1Updated",
 		Valid:  true,
 	}
+	templatePersistentParameter1.Description = "TestParameter1descUpdated"
 
 	responseText, code := Execute(t, http.MethodDelete, GenerateSingleResourceURL(server, "template_persistent_parameters", strconv.Itoa(id), nil), nil)
 	CheckResponseText(t, code, http.StatusNoContent, responseText, []byte{})
@@ -374,6 +397,7 @@ func TestDeleteTemplatePersistentParameters_Cascade(t *testing.T) {
 		ID:              templateID,
 		Name:            "test",
 		TemplateContent: "TestTemplate",
+		Description:     "testdesc",
 	}
 
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template)
@@ -386,6 +410,7 @@ func TestDeleteTemplatePersistentParameters_Cascade(t *testing.T) {
 			String: "TestParameter1",
 			Valid:  true,
 		},
+		Description: "testParameter1desc",
 	}
 
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_persistent_parameters", nil), templatePersistentParameter1)
@@ -404,11 +429,13 @@ func TestTemplate_ExtractFromDesign(t *testing.T) {
 		ID:              1,
 		Name:            "test1",
 		TemplateContent: "TestTemplate1",
+		Description:     "test1desc",
 	}
 	template2 := &models.Template{
 		ID:              2,
 		Name:            "test2",
 		TemplateContent: "TestTemplate2",
+		Description:     "test2desc",
 	}
 
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template1)
@@ -421,6 +448,7 @@ func TestTemplate_ExtractFromDesign(t *testing.T) {
 			String: "TestParameter11",
 			Valid:  true,
 		},
+		Description: "testParameter11desc",
 	}
 	templatePersistentParameter12 := &models.TemplatePersistentParameter{
 		TemplateID: 1,
@@ -429,6 +457,7 @@ func TestTemplate_ExtractFromDesign(t *testing.T) {
 			String: "TestParameter12",
 			Valid:  true,
 		},
+		Description: "testParameter12desc",
 	}
 	templatePersistentParameter21 := &models.TemplatePersistentParameter{
 		TemplateID: 2,
@@ -437,6 +466,7 @@ func TestTemplate_ExtractFromDesign(t *testing.T) {
 			String: "TestParameter21",
 			Valid:  true,
 		},
+		Description: "testParameter21desc",
 	}
 	templatePersistentParameter22 := &models.TemplatePersistentParameter{
 		TemplateID: 2,
@@ -445,6 +475,7 @@ func TestTemplate_ExtractFromDesign(t *testing.T) {
 			String: "TestParameter22",
 			Valid:  true,
 		},
+		Description: "testParameter22desc",
 	}
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_persistent_parameters", nil), templatePersistentParameter11)
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_persistent_parameters", nil), templatePersistentParameter12)
@@ -463,11 +494,13 @@ func TestTemplate_LoadToDesign(t *testing.T) {
 		ID:              1,
 		Name:            "test1",
 		TemplateContent: "TestTemplate1",
+		Description:     "test1desc",
 	}
 	template2 := &models.Template{
 		ID:              2,
 		Name:            "test2",
 		TemplateContent: "TestTemplate2",
+		Description:     "test2desc",
 	}
 	templatePersistentParameter11 := &models.TemplatePersistentParameter{
 		ID:         1,
@@ -477,6 +510,7 @@ func TestTemplate_LoadToDesign(t *testing.T) {
 			String: "TestParameter11",
 			Valid:  true,
 		},
+		Description: "testParameter11desc",
 	}
 	templatePersistentParameter12 := &models.TemplatePersistentParameter{
 		ID:         2,
@@ -486,6 +520,7 @@ func TestTemplate_LoadToDesign(t *testing.T) {
 			String: "TestParameter12",
 			Valid:  true,
 		},
+		Description: "testParameter12desc",
 	}
 	templatePersistentParameter21 := &models.TemplatePersistentParameter{
 		ID:         3,
@@ -495,6 +530,7 @@ func TestTemplate_LoadToDesign(t *testing.T) {
 			String: "TestParameter21",
 			Valid:  true,
 		},
+		Description: "testParameter21desc",
 	}
 	templatePersistentParameter22 := &models.TemplatePersistentParameter{
 		ID:         4,
@@ -504,6 +540,7 @@ func TestTemplate_LoadToDesign(t *testing.T) {
 			String: "TestParameter22",
 			Valid:  true,
 		},
+		Description: "testParameter22desc",
 	}
 
 	design := &models.Design{
@@ -536,11 +573,13 @@ func TestTemplate_DeleteFromDesign(t *testing.T) {
 		ID:              1,
 		Name:            "test1",
 		TemplateContent: "TestTemplate1",
+		Description:     "test1desc",
 	}
 	template2 := &models.Template{
 		ID:              2,
 		Name:            "test2",
 		TemplateContent: "TestTemplate2",
+		Description:     "test2desc",
 	}
 	templatePersistentParameter11 := &models.TemplatePersistentParameter{
 		ID:         1,
@@ -550,6 +589,7 @@ func TestTemplate_DeleteFromDesign(t *testing.T) {
 			String: "TestParameter11",
 			Valid:  true,
 		},
+		Description: "testParameter11desc",
 	}
 	templatePersistentParameter12 := &models.TemplatePersistentParameter{
 		ID:         2,
@@ -559,6 +599,7 @@ func TestTemplate_DeleteFromDesign(t *testing.T) {
 			String: "TestParameter12",
 			Valid:  true,
 		},
+		Description: "testParameter12desc",
 	}
 	templatePersistentParameter21 := &models.TemplatePersistentParameter{
 		ID:         3,
@@ -568,6 +609,7 @@ func TestTemplate_DeleteFromDesign(t *testing.T) {
 			String: "TestParameter21",
 			Valid:  true,
 		},
+		Description: "testParameter21desc",
 	}
 	templatePersistentParameter22 := &models.TemplatePersistentParameter{
 		ID:         4,
@@ -577,6 +619,7 @@ func TestTemplate_DeleteFromDesign(t *testing.T) {
 			String: "TestParameter22",
 			Valid:  true,
 		},
+		Description: "testParameter22desc",
 	}
 
 	design := &models.Design{
@@ -1185,6 +1228,7 @@ sequence
 sequence[{{$i}}]={{$v}}
 {{- end}}
 `,
+		Description: "test1desc",
 	}
 
 	templatePersistentParameter11 := &models.TemplatePersistentParameter{
@@ -1198,6 +1242,7 @@ sequence[{{$i}}]={{$v}}
 			Int64: 1,
 			Valid: true,
 		},
+		Description: "testParameter11desc",
 	}
 	templatePersistentParameter12 := &models.TemplatePersistentParameter{
 		TemplateID: id,
@@ -1206,6 +1251,7 @@ sequence[{{$i}}]={{$v}}
 			String: "TestParameter12",
 			Valid:  true,
 		},
+		Description: "testParameter12desc",
 	}
 
 	templatePersistentParameter13 := &models.TemplatePersistentParameter{
@@ -1215,6 +1261,7 @@ sequence[{{$i}}]={{$v}}
 			Int64: 100,
 			Valid: true,
 		},
+		Description: "testParameter1Xdesc",
 	}
 
 	id2 := 2
@@ -1222,6 +1269,7 @@ sequence[{{$i}}]={{$v}}
 		ID:              id2,
 		Name:            "test12",
 		TemplateContent: `{{.testParameter1X}}`,
+		Description:     "test12desc",
 	}
 	templatePersistentParameter21 := &models.TemplatePersistentParameter{
 		TemplateID: id2,
@@ -1230,6 +1278,7 @@ sequence[{{$i}}]={{$v}}
 			Int64: 200,
 			Valid: true,
 		},
+		Description: "testParameter1Xdesc",
 	}
 
 	id3 := 3
@@ -1237,6 +1286,7 @@ sequence[{{$i}}]={{$v}}
 		ID:              id3,
 		Name:            "test13",
 		TemplateContent: `{{.testParameter1X}}`,
+		Description:     "test13desc",
 	}
 	templatePersistentParameter31 := &models.TemplatePersistentParameter{
 		TemplateID: id3,
@@ -1245,6 +1295,7 @@ sequence[{{$i}}]={{$v}}
 			Int64: 300,
 			Valid: true,
 		},
+		Description: "testParameter1Xdesc",
 	}
 
 	id4 := 4
@@ -1252,6 +1303,7 @@ sequence[{{$i}}]={{$v}}
 		ID:              id4,
 		Name:            "test14",
 		TemplateContent: `volatile1 = {{.volatile1}}, volatile2 = {{.volatile2}}`,
+		Description:     "test14desc",
 	}
 
 	id5 := 5
@@ -1266,6 +1318,7 @@ sequence[{{$i}}]={{$v}}
 {{ include .ModelStore "test13" nil }}
 {{ include .ModelStore "test14" $volatile }}
 `,
+		Description: "test15desc",
 	}
 
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template1)

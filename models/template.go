@@ -9,6 +9,7 @@ type Template struct {
 	ID                           int                            `json:"id" form:"id" gorm:"primary_key;AUTO_INCREMENT"`
 	Name                         string                         `json:"name" form:"name" gorm:"not null;unique"`
 	TemplateContent              string                         `json:"template_content" form:"template_content"`
+	Description                  string                         `json:"description" form:"description"`
 	TemplatePersistentParameters []*TemplatePersistentParameter `json:"template_persistent_parameters"`
 }
 

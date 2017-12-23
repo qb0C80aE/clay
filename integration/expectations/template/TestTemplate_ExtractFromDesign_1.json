@@ -3,18 +3,19 @@
     "template_persistent_parameters": [
       {
         "id": 1,
-        "name": "testParameter11",
         "template_id": 1,
-        "value_bool": {
-          "Bool": false,
+        "name": "testParameter11",
+        "description": "testParameter11desc",
+        "value_int": {
+          "Int64": 0,
           "Valid": false
         },
         "value_float": {
           "Float64": 0,
           "Valid": false
         },
-        "value_int": {
-          "Int64": 0,
+        "value_bool": {
+          "Bool": false,
           "Valid": false
         },
         "value_string": {
@@ -24,18 +25,19 @@
       },
       {
         "id": 2,
-        "name": "testParameter12",
         "template_id": 1,
-        "value_bool": {
-          "Bool": false,
+        "name": "testParameter12",
+        "description": "testParameter12desc",
+        "value_int": {
+          "Int64": 0,
           "Valid": false
         },
         "value_float": {
           "Float64": 0,
           "Valid": false
         },
-        "value_int": {
-          "Int64": 0,
+        "value_bool": {
+          "Bool": false,
           "Valid": false
         },
         "value_string": {
@@ -45,18 +47,19 @@
       },
       {
         "id": 3,
-        "name": "testParameter21",
         "template_id": 2,
-        "value_bool": {
-          "Bool": false,
+        "name": "testParameter21",
+        "description": "testParameter21desc",
+        "value_int": {
+          "Int64": 0,
           "Valid": false
         },
         "value_float": {
           "Float64": 0,
           "Valid": false
         },
-        "value_int": {
-          "Int64": 0,
+        "value_bool": {
+          "Bool": false,
           "Valid": false
         },
         "value_string": {
@@ -66,18 +69,19 @@
       },
       {
         "id": 4,
-        "name": "testParameter22",
         "template_id": 2,
-        "value_bool": {
-          "Bool": false,
+        "name": "testParameter22",
+        "description": "testParameter22desc",
+        "value_int": {
+          "Int64": 0,
           "Valid": false
         },
         "value_float": {
           "Float64": 0,
           "Valid": false
         },
-        "value_int": {
-          "Int64": 0,
+        "value_bool": {
+          "Bool": false,
           "Valid": false
         },
         "value_string": {
@@ -91,12 +95,14 @@
         "id": 1,
         "name": "test1",
         "template_content": "TestTemplate1",
+        "description": "test1desc",
         "template_persistent_parameters": null
       },
       {
         "id": 2,
         "name": "test2",
         "template_content": "TestTemplate2",
+        "description": "test2desc",
         "template_persistent_parameters": null
       }
     ]

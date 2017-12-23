@@ -1,17 +1,18 @@
 {
+  "description": "testParameter1descUpdated",
   "id": 1,
-  "template_id": 1,
   "name": "templatePersistentParameter1Updated",
-  "value_int": {
-    "Int64": 999,
+  "template_id": 1,
+  "value_bool": {
+    "Bool": true,
     "Valid": true
   },
   "value_float": {
     "Float64": 123.456,
     "Valid": true
   },
-  "value_bool": {
-    "Bool": true,
+  "value_int": {
+    "Int64": 999,
     "Valid": true
   },
   "value_string": {

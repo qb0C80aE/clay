@@ -1,11 +1,13 @@
 [
   {
+    "description": "test1desc",
     "id": 1,
     "name": "test1",
     "template_content": "TestTemplate1",
     "template_persistent_parameters": []
   },
   {
+    "description": "test2desc",
     "id": 2,
     "name": "test2",
     "template_content": "TestTemplate2",
@@ -14,6 +16,7 @@
         "id": 1,
         "template_id": 2,
         "name": "testParameter1",
+        "description": "testParameter1desc",
         "value_int": {
           "Int64": 0,
           "Valid": false
@@ -34,6 +37,7 @@
     ]
   },
   {
+    "description": "test100desc",
     "id": 100,
     "name": "test100",
     "template_content": "TestTemplate100",
@@ -42,6 +46,7 @@
         "id": 2,
         "template_id": 100,
         "name": "testParameter100",
+        "description": "testParameter100desc",
         "value_int": {
           "Int64": 0,
           "Valid": false
@@ -63,6 +68,7 @@
         "id": 10,
         "template_id": 100,
         "name": "testParameter110",
+        "description": "testParameter110desc",
         "value_int": {
           "Int64": 0,
           "Valid": false
