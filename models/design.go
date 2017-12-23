@@ -4,7 +4,9 @@ import "github.com/qb0C80aE/clay/extensions"
 
 // Design is the model class what represents the whole object model store
 type Design struct {
-	Content map[string]interface{} `json:"content"`
+	ClayVersion   string                 `json:"clay_version,omitempty"`
+	GeneratedDate string                 `json:"generated_date,omitempty"`
+	Content       map[string]interface{} `json:"content"`
 }
 
 // NewDesignModel creates a Design model instance

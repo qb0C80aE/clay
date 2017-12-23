@@ -29,5 +29,6 @@ script:
       go build -v -tags=${tag} $(glide novendor)
     done
   - go build -v
+  - sed -i "s/[0-9]\{14\}/unknown/g" buildtime/build_information.go
   - go test -tags=integration -v -race $(glide novendor)
 

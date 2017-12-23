@@ -4,9 +4,12 @@ package integration
 
 import (
 	"database/sql"
+	"github.com/bouk/monkey"
+	_ "github.com/qb0C80aE/clay/buildtime"
 	"github.com/qb0C80aE/clay/models"
 	"net/http"
 	"testing"
+	"time"
 )
 
 func TestGetDesign_Empty(t *testing.T) {
@@ -168,4 +171,9 @@ func TestDeleteDesign(t *testing.T) {
 
 	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "designs", "present", nil), nil)
 	CheckResponseJSON(t, code, http.StatusOK, responseText, LoadExpectation(t, "design/TestDeleteDesign_2.json"), &models.Design{})
+}
+
+func init() {
+	wayback := time.Date(1974, time.May, 19, 1, 2, 3, 4, time.UTC)
+	monkey.Patch(time.Now, func() time.Time { return wayback })
 }

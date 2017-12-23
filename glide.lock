@@ -1,5 +1,5 @@
-hash: f2da26d652cb419d7a8f997f33b3774ef1f47354fbe3975b830029ae2da007c3
-updated: 2017-10-20T16:30:39.617286229+09:00
+hash: 211d0a8dcffe7dd92e96ca171fdaa61ca7c3970e7779c67ac47e915816a4b43a
+updated: 2017-12-23T11:36:40.201956+09:00
 imports:
 - name: github.com/gin-gonic/gin
   version: e2212d40c62a98b388a5eb48ecbdcf88534688ba
@@ -42,4 +42,6 @@ imports:
   version: c193cecd124b5cc722d7ee5538e945bdb3348435
 - name: gopkg.in/yaml.v2
   version: cd8b52f8269e0feb286dfeef29f8fe4d5b397e0b
-testImports: []
+testImports:
+- name: github.com/bouk/monkey
+  version: b96e337f6e5b36906584cd0cf9803bbab09284f7

@@ -6,6 +6,7 @@ import (
 	"github.com/qb0C80aE/clay/extensions"
 	"github.com/qb0C80aE/clay/models"
 	"net/url"
+	"time"
 )
 
 type designLogic struct {
@@ -26,8 +27,12 @@ func (logic *designLogic) GetSingle(db *gorm.DB, _ gin.Params, _ url.Values, _ s
 	// Reset previous conditions
 	db = db.New()
 
+	programInformation := extensions.RegisteredProgramInformation()
+
 	design := &models.Design{
-		Content: map[string]interface{}{},
+		ClayVersion:   programInformation.BuildTime(),
+		GeneratedDate: time.Now().String(),
+		Content:       map[string]interface{}{},
 	}
 
 	designAccessors := extensions.RegisteredDesignAccessors()
