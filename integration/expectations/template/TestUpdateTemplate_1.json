@@ -2,5 +2,6 @@
   "id": 101,
   "name": "test1Updated",
   "template_content": "TestTemplate1Updated",
+  "description": "test1desc",
   "template_persistent_parameters": null
 }

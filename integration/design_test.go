@@ -25,12 +25,14 @@ func TestGetDesign(t *testing.T) {
 		ID:              1,
 		Name:            "test1",
 		TemplateContent: "TestTemplate1",
+		Description:     "tedst1desc",
 	}
 
 	template2 := &models.Template{
 		ID:              2,
 		Name:            "test2",
 		TemplateContent: "TestTemplate2",
+		Description:     "tedst2desc",
 		TemplatePersistentParameters: []*models.TemplatePersistentParameter{
 			{
 				Name: "testParameter1",
@@ -38,6 +40,7 @@ func TestGetDesign(t *testing.T) {
 					String: "TestParameter1",
 					Valid:  true,
 				},
+				Description: "testParameter1desc",
 			},
 		},
 	}
@@ -49,6 +52,7 @@ func TestGetDesign(t *testing.T) {
 			String: "TestParameter2",
 			Valid:  true,
 		},
+		Description: "testParameter2desc",
 	}
 
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template1)
@@ -74,6 +78,7 @@ func TestUpdateDesign(t *testing.T) {
 						String: "TestParameter11",
 						Valid:  true,
 					},
+					Description: "testParameter11desc",
 				},
 				{
 					ID:         2,
@@ -83,6 +88,7 @@ func TestUpdateDesign(t *testing.T) {
 						String: "TestParameter12",
 						Valid:  true,
 					},
+					Description: "testParameter12desc",
 				},
 			},
 			"templates": []*models.Template{
@@ -90,11 +96,13 @@ func TestUpdateDesign(t *testing.T) {
 					ID:              1,
 					Name:            "test1",
 					TemplateContent: "TestTemplate1",
+					Description:     "test1desc",
 				},
 				{
 					ID:              2,
 					Name:            "test2",
 					TemplateContent: "TestTemplate2",
+					Description:     "test2desc",
 				},
 			},
 		},
@@ -122,6 +130,7 @@ func TestDeleteDesign(t *testing.T) {
 						String: "TestParameter11",
 						Valid:  true,
 					},
+					Description: "testParameter11desc",
 				},
 				{
 					ID:         2,
@@ -131,6 +140,7 @@ func TestDeleteDesign(t *testing.T) {
 						String: "TestParameter12",
 						Valid:  true,
 					},
+					Description: "testParameter12desc",
 				},
 			},
 			"templates": []*models.Template{
@@ -138,11 +148,13 @@ func TestDeleteDesign(t *testing.T) {
 					ID:              1,
 					Name:            "test1",
 					TemplateContent: "TestTemplate1",
+					Description:     "test1desc",
 				},
 				{
 					ID:              2,
 					Name:            "test2",
 					TemplateContent: "TestTemplate2",
+					Description:     "test2desc",
 				},
 			},
 		},

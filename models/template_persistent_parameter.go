@@ -11,6 +11,7 @@ type TemplatePersistentParameter struct {
 	ID          int             `json:"id" gorm:"primary_key;AUTO_INCREMENT"`
 	TemplateID  int             `json:"template_id" gorm:"unique_index:template_id_name" sql:"type:integer references templates(id)"`
 	Name        string          `json:"name" gorm:"unique_index:template_id_name"`
+	Description string          `json:"description" form:"description"`
 	ValueInt    sql.NullInt64   `json:"value_int"`
 	ValueFloat  sql.NullFloat64 `json:"value_float"`
 	ValueBool   sql.NullBool    `json:"value_bool"`

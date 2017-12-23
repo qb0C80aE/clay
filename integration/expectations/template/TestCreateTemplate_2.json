@@ -2,11 +2,13 @@
   "id": 2,
   "name": "test2",
   "template_content": "TestTemplate2",
+  "description": "test2desc",
   "template_persistent_parameters": [
     {
       "id": 1,
       "template_id": 2,
       "name": "testParameter1",
+      "description": "testParameter1desc",
       "value_int": {
         "Int64": 0,
         "Valid": false

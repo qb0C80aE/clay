@@ -3,18 +3,19 @@
     "template_persistent_parameters": [
       {
         "id": 1,
-        "name": "testParameter1",
         "template_id": 2,
-        "value_bool": {
-          "Bool": false,
+        "name": "testParameter1",
+        "description": "testParameter1desc",
+        "value_int": {
+          "Int64": 0,
           "Valid": false
         },
         "value_float": {
           "Float64": 0,
           "Valid": false
         },
-        "value_int": {
-          "Int64": 0,
+        "value_bool": {
+          "Bool": false,
           "Valid": false
         },
         "value_string": {
@@ -24,18 +25,19 @@
       },
       {
         "id": 2,
-        "name": "testParameter2",
         "template_id": 2,
-        "value_bool": {
-          "Bool": false,
+        "name": "testParameter2",
+        "description": "testParameter2desc",
+        "value_int": {
+          "Int64": 0,
           "Valid": false
         },
         "value_float": {
           "Float64": 0,
           "Valid": false
         },
-        "value_int": {
-          "Int64": 0,
+        "value_bool": {
+          "Bool": false,
           "Valid": false
         },
         "value_string": {
@@ -49,12 +51,14 @@
         "id": 1,
         "name": "test1",
         "template_content": "TestTemplate1",
+        "description": "tedst1desc",
         "template_persistent_parameters": null
       },
       {
         "id": 2,
         "name": "test2",
         "template_content": "TestTemplate2",
+        "description": "tedst2desc",
         "template_persistent_parameters": null
       }
     ]

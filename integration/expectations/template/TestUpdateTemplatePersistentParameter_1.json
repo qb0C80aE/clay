@@ -2,6 +2,7 @@
   "id": 1,
   "template_id": 1,
   "name": "templatePersistentParameter1Updated",
+  "description": "testParameter1descUpdated",
   "value_int": {
     "Int64": 999,
     "Valid": true

@@ -2,6 +2,7 @@
   "content": {
     "template_persistent_parameters": [
       {
+        "description": "testParameter11desc",
         "id": 1,
         "name": "testParameter11",
         "template_id": 1,
@@ -23,6 +24,7 @@
         }
       },
       {
+        "description": "testParameter12desc",
         "id": 2,
         "name": "testParameter12",
         "template_id": 1,
@@ -46,12 +48,14 @@
     ],
     "templates": [
       {
+        "description": "test1desc",
         "id": 1,
         "name": "test1",
         "template_content": "TestTemplate1",
         "template_persistent_parameters": null
       },
       {
+        "description": "test2desc",
         "id": 2,
         "name": "test2",
         "template_content": "TestTemplate2",

@@ -2,11 +2,13 @@
   "id": 100,
   "name": "test100",
   "template_content": "TestTemplate100",
+  "description": "test100desc",
   "template_persistent_parameters": [
     {
       "id": 2,
       "template_id": 100,
       "name": "testParameter100",
+      "description": "testParameter100desc",
       "value_int": {
         "Int64": 0,
         "Valid": false
@@ -28,6 +30,7 @@
       "id": 10,
       "template_id": 100,
       "name": "testParameter110",
+      "description": "testParameter110desc",
       "value_int": {
         "Int64": 0,
         "Valid": false
