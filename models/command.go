@@ -16,6 +16,8 @@ type Command struct {
 	StdErr           string    `json:"std_err" form:"std_err"`
 	ExitCode         int       `json:"exit_code" form:"exit_code"`
 	Killed           bool      `json:"killed" form:"killed"`
+	StartedAt        string    `json:"started_at" form:"started_at"`
+	FinishedAt       string    `json:"finished_at" form:"finished_at"`
 	Cmd              *exec.Cmd `json:"cmd,omitempty"`
 }
 

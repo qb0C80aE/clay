@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
+	"time"
 )
 
 type commandExecutionLogic struct {
@@ -41,11 +42,16 @@ func (logic *commandExecutionLogic) Create(db *gorm.DB, parameters gin.Params, _
 		return nil, errors.New("record not found")
 	}
 
-	if command.Status != commandStatusCreated {
-		return nil, errors.New("the command has already started or finished")
+	if command.Status == commandStatusRunning {
+		return nil, errors.New("the command is already running")
 	}
 
 	command.Status = commandStatusRunning
+	command.Killed = false
+	command.StdOut = ""
+	command.StdErr = ""
+	command.StartedAt = time.Now().String()
+	command.FinishedAt = ""
 	go executeCommand(command)
 
 	return command, nil
@@ -64,7 +70,7 @@ func (logic *commandExecutionLogic) Delete(db *gorm.DB, parameters gin.Params, _
 	}
 
 	if (command.Status != commandStatusRunning) || (command.Cmd == nil) {
-		return errors.New("the command has not started yet or already finished")
+		return errors.New("the command is not running")
 	}
 
 	if err := command.Cmd.Process.Kill(); err != nil {
@@ -72,6 +78,7 @@ func (logic *commandExecutionLogic) Delete(db *gorm.DB, parameters gin.Params, _
 	}
 
 	command.Status = commandStatusFinished
+	command.FinishedAt = time.Now().String()
 	command.Killed = true
 
 	return nil
@@ -150,6 +157,8 @@ func executeCommand(command *models.Command) {
 
 	command.ExitCode = exitCode
 	command.Status = commandStatusFinished
+	command.FinishedAt = time.Now().String()
+
 }
 
 var uniqueCommandExecutionLogic = newCommandExecutionLogic()
