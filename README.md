@@ -5,6 +5,9 @@
 Clay is an abstract system model store to automate various kind of operations.
 It provides some APIs to access the system model store.
 
+![Concept](https://github.com/qb0C80aE/clay/raw/develop/images/concept.png)
+![Usecase](https://github.com/qb0C80aE/clay/raw/develop/images/usecase.png)
+
 ## Related modules
 
 * [Loam](https://github.com/qb0C80aE/loam)
