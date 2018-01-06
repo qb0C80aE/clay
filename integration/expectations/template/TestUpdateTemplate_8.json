@@ -1,14 +1,14 @@
 {
-  "id": 103,
-  "name": "test3",
-  "template_content": "TestTemplate3",
-  "description": "test3desc",
+  "id": 104,
+  "name": "test4",
+  "template_content": "TestTemplate4",
+  "description": "test4desc",
   "template_persistent_parameters": [
     {
-      "id": 1000,
-      "template_id": 103,
-      "name": "testParameter31",
-      "description": "testParameter31desc",
+      "id": 2001,
+      "template_id": 104,
+      "name": "testParameter42",
+      "description": "testParameter42desc",
       "value_int": {
         "Int64": 0,
         "Valid": false
@@ -22,15 +22,15 @@
         "Valid": false
       },
       "value_string": {
-        "String": "TestParameter31",
+        "String": "TestParameter42",
         "Valid": true
       }
     },
     {
-      "id": 1001,
-      "template_id": 103,
-      "name": "testParameter32Updated",
-      "description": "testParameter32descUpdated",
+      "id": 2003,
+      "template_id": 104,
+      "name": "testParameter44",
+      "description": "testParameter44desc",
       "value_int": {
         "Int64": 0,
         "Valid": false
@@ -44,15 +44,15 @@
         "Valid": false
       },
       "value_string": {
-        "String": "TestParameter32Updated",
+        "String": "TestParameter44",
         "Valid": true
       }
     },
     {
-      "id": 1002,
-      "template_id": 103,
-      "name": "testParameter34",
-      "description": "",
+      "id": 2004,
+      "template_id": 104,
+      "name": "testParameter45",
+      "description": "testParameter45desc",
       "value_int": {
         "Int64": 0,
         "Valid": false
@@ -66,7 +66,7 @@
         "Valid": false
       },
       "value_string": {
-        "String": "TestParameter34",
+        "String": "TestParameter45",
         "Valid": true
       }
     }

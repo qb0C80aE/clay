@@ -26,6 +26,6 @@ func UniqueTemplateLogic() extensions.Logic {
 }
 
 func init() {
+	extensions.RegisterLogic(models.SharedTemplateModel(), UniqueTemplateLogic())
 	extensions.RegisterDesignAccessor(uniqueTemplateLogic)
-	extensions.RegisterTemplateParameterGenerator(models.SharedTemplateModel(), uniqueTemplateLogic)
 }

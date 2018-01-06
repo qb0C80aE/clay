@@ -26,6 +26,6 @@ func UniqueTemplatePersistentParameterLogic() extensions.Logic {
 }
 
 func init() {
+	extensions.RegisterLogic(models.SharedTemplatePersistentParameterModel(), UniqueTemplatePersistentParameterLogic())
 	extensions.RegisterDesignAccessor(uniqueTemplatePersistentParameterLogic)
-	extensions.RegisterTemplateParameterGenerator(models.SharedTemplatePersistentParameterModel(), uniqueTemplatePersistentParameterLogic)
 }

@@ -133,5 +133,5 @@ func UniqueCommandLogic() extensions.Logic {
 }
 
 func init() {
-	extensions.RegisterTemplateParameterGenerator(models.SharedCommandModel(), uniqueCommandLogic)
+	extensions.RegisterLogic(models.SharedCommandModel(), UniqueCommandLogic())
 }
