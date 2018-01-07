@@ -87,6 +87,8 @@ func UniqueTemplateGenerationLogic() extensions.Logic {
 }
 
 func init() {
+	extensions.RegisterLogic(models.SharedTemplateGenerationModel(), UniqueTemplateGenerationLogic())
+
 	funcMap := tplpkg.FuncMap{
 		"add": func(a, b int) int { return a + b },
 		"sub": func(a, b int) int { return a - b },
@@ -276,7 +278,7 @@ func init() {
 			if err != nil {
 				return nil, err
 			}
-			templateParameterGenerator, err := extensions.RegisteredTemplateParameterGenerator(model)
+			logic, err := extensions.RegisteredLogic(model)
 			if err != nil {
 				return nil, err
 			}
@@ -290,7 +292,7 @@ func init() {
 			fields := helper.ParseFields(parameter.DefaultQuery(urlQuery, "fields", "*"))
 			queryFields := helper.QueryFields(model, fields)
 
-			result, err := templateParameterGenerator.GetSingle(db, parameters, requestForParameter.URL.Query(), queryFields)
+			result, err := logic.GetSingle(db, parameters, requestForParameter.URL.Query(), queryFields)
 			if err != nil {
 				return nil, err
 			}
@@ -335,7 +337,7 @@ func init() {
 			if err != nil {
 				return nil, err
 			}
-			templateParameterGenerator, err := extensions.RegisteredTemplateParameterGenerator(model)
+			logic, err := extensions.RegisteredLogic(model)
 			if err != nil {
 				return nil, err
 			}
@@ -349,7 +351,7 @@ func init() {
 			db = parameter.FilterFields(db)
 			fields := helper.ParseFields(parameter.DefaultQuery(urlQuery, "fields", "*"))
 			queryFields := helper.QueryFields(model, fields)
-			result, err := templateParameterGenerator.GetMulti(db, parameters, requestForParameter.URL.Query(), queryFields)
+			result, err := logic.GetMulti(db, parameters, requestForParameter.URL.Query(), queryFields)
 			if err != nil {
 				return nil, err
 			}

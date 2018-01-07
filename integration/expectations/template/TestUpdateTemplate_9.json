@@ -1,0 +1,165 @@
+[
+  {
+    "description": "test1desc",
+    "id": 101,
+    "name": "test1Updated",
+    "template_content": "TestTemplate1Updated",
+    "template_persistent_parameters": []
+  },
+  {
+    "description": "test2desc",
+    "id": 102,
+    "name": "test2",
+    "template_content": "TestTemplate2",
+    "template_persistent_parameters": [
+      {
+        "id": 1,
+        "template_id": 102,
+        "name": "testParameter21",
+        "description": "testParameter21desc",
+        "value_int": {
+          "Int64": 0,
+          "Valid": false
+        },
+        "value_float": {
+          "Float64": 0,
+          "Valid": false
+        },
+        "value_bool": {
+          "Bool": false,
+          "Valid": false
+        },
+        "value_string": {
+          "String": "TestParameter21",
+          "Valid": true
+        }
+      }
+    ]
+  },
+  {
+    "description": "test3desc",
+    "id": 103,
+    "name": "test3",
+    "template_content": "TestTemplate3",
+    "template_persistent_parameters": [
+      {
+        "id": 1001,
+        "template_id": 103,
+        "name": "testParameter32Updated",
+        "description": "testParameter32descUpdated",
+        "value_int": {
+          "Int64": 0,
+          "Valid": false
+        },
+        "value_float": {
+          "Float64": 0,
+          "Valid": false
+        },
+        "value_bool": {
+          "Bool": false,
+          "Valid": false
+        },
+        "value_string": {
+          "String": "TestParameter32Updated",
+          "Valid": true
+        }
+      },
+      {
+        "id": 1002,
+        "template_id": 103,
+        "name": "testParameter34",
+        "description": "",
+        "value_int": {
+          "Int64": 0,
+          "Valid": false
+        },
+        "value_float": {
+          "Float64": 0,
+          "Valid": false
+        },
+        "value_bool": {
+          "Bool": false,
+          "Valid": false
+        },
+        "value_string": {
+          "String": "TestParameter34",
+          "Valid": true
+        }
+      }
+    ]
+  },
+  {
+    "description": "test4desc",
+    "id": 104,
+    "name": "test4",
+    "template_content": "TestTemplate4",
+    "template_persistent_parameters": [
+      {
+        "id": 2001,
+        "template_id": 104,
+        "name": "testParameter42",
+        "description": "testParameter42desc",
+        "value_int": {
+          "Int64": 0,
+          "Valid": false
+        },
+        "value_float": {
+          "Float64": 0,
+          "Valid": false
+        },
+        "value_bool": {
+          "Bool": false,
+          "Valid": false
+        },
+        "value_string": {
+          "String": "TestParameter42",
+          "Valid": true
+        }
+      },
+      {
+        "id": 2003,
+        "template_id": 104,
+        "name": "testParameter44",
+        "description": "testParameter44desc",
+        "value_int": {
+          "Int64": 0,
+          "Valid": false
+        },
+        "value_float": {
+          "Float64": 0,
+          "Valid": false
+        },
+        "value_bool": {
+          "Bool": false,
+          "Valid": false
+        },
+        "value_string": {
+          "String": "TestParameter44",
+          "Valid": true
+        }
+      },
+      {
+        "id": 2004,
+        "template_id": 104,
+        "name": "testParameter45",
+        "description": "testParameter45desc",
+        "value_int": {
+          "Int64": 0,
+          "Valid": false
+        },
+        "value_float": {
+          "Float64": 0,
+          "Valid": false
+        },
+        "value_bool": {
+          "Bool": false,
+          "Valid": false
+        },
+        "value_string": {
+          "String": "TestParameter45",
+          "Valid": true
+        }
+      }
+    ]
+  }
+]

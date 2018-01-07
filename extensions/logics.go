@@ -1,13 +1,14 @@
 package extensions
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"net/url"
+	"reflect"
 )
 
-var logics = []Logic{}
-var logicMapByResourceName = map[string]Logic{}
+var logicMap = map[reflect.Type]Logic{}
 
 // Logic is the interface what handles business processes between logics and models
 // * ResourceName returns its target resource name
@@ -32,19 +33,17 @@ type Logic interface {
 }
 
 // RegisterLogic registers a logic used in the router
-func RegisterLogic(logic Logic) {
-	logics = append(logics, logic)
-	logicMapByResourceName[logic.ResourceName()] = logic
+func RegisterLogic(model interface{}, logic Logic) {
+	modelType := ModelType(model)
+	logicMap[modelType] = logic
 }
 
-// RegisteredLogics returns the registered logics
-func RegisteredLogics() []Logic {
-	result := []Logic{}
-	result = append(result, logics...)
-	return result
-}
-
-// RegisteredLogicByResourceName returns the registered logic related to the given resource name
-func RegisteredLogicByResourceName(resourceName string) Logic {
-	return logicMapByResourceName[resourceName]
+// RegisteredLogic returns the registered logic related to the given resource name
+func RegisteredLogic(model interface{}) (Logic, error) {
+	modelType := ModelType(model)
+	result, exist := logicMap[modelType]
+	if !exist {
+		return nil, fmt.Errorf("the logic related to given name %s does not exist", modelType.Name())
+	}
+	return result, nil
 }

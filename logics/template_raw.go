@@ -39,4 +39,5 @@ func UniqueTemplateRawLogic() extensions.Logic {
 }
 
 func init() {
+	extensions.RegisterLogic(models.SharedTemplateRawModel(), UniqueTemplateRawLogic())
 }

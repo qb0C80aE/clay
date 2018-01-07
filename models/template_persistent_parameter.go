@@ -16,6 +16,7 @@ type TemplatePersistentParameter struct {
 	ValueFloat  sql.NullFloat64 `json:"value_float"`
 	ValueBool   sql.NullBool    `json:"value_bool"`
 	ValueString sql.NullString  `json:"value_string"`
+	ToBeDeleted bool            `json:"to_be_deleted,omitempty" sql:"-"`
 }
 
 // NewTemplatePersistentParameterModel creates a template persistent parameter model instance

@@ -150,9 +150,47 @@ func TestUpdateTemplate(t *testing.T) {
 		},
 	}
 
+	id4 := 104
+	template4 := &models.Template{
+		ID:              id4,
+		Name:            "test4",
+		TemplateContent: "TestTemplate4",
+		Description:     "test4desc",
+		TemplatePersistentParameters: []*models.TemplatePersistentParameter{
+			{
+				ID:   2000,
+				Name: "testParameter41",
+				ValueString: sql.NullString{
+					String: "TestParameter41",
+					Valid:  true,
+				},
+				Description: "testParameter41desc",
+			},
+			{
+				ID:   2001,
+				Name: "testParameter42",
+				ValueString: sql.NullString{
+					String: "TestParameter42",
+					Valid:  true,
+				},
+				Description: "testParameter42desc",
+			},
+			{
+				ID:   2002,
+				Name: "testParameter43",
+				ValueString: sql.NullString{
+					String: "TestParameter43",
+					Valid:  true,
+				},
+				Description: "testParameter43desc",
+			},
+		},
+	}
+
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template1)
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template2)
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template3)
+	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template4)
 
 	template1.Name = "test1Updated"
 	template1.TemplateContent = "TestTemplate1Updated"
@@ -181,7 +219,7 @@ func TestUpdateTemplate(t *testing.T) {
 	template3.TemplatePersistentParameters = append(
 		template3.TemplatePersistentParameters,
 		&models.TemplatePersistentParameter{
-			ID:   1003,
+			ID:   1002,
 			Name: "testParameter34",
 			ValueString: sql.NullString{
 				String: "TestParameter34",
@@ -195,6 +233,41 @@ func TestUpdateTemplate(t *testing.T) {
 
 	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "templates", strconv.Itoa(id3), parameters), nil)
 	CheckResponseJSON(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestUpdateTemplate_6.json"), &models.Template{})
+
+	template3.TemplatePersistentParameters[0].ToBeDeleted = true
+	template4.TemplatePersistentParameters[0].ToBeDeleted = true
+	template4.TemplatePersistentParameters[2].ToBeDeleted = true
+	template4.TemplatePersistentParameters = append(template4.TemplatePersistentParameters,
+		[]*models.TemplatePersistentParameter{
+			{
+				ID:   2003,
+				Name: "testParameter44",
+				ValueString: sql.NullString{
+					String: "TestParameter44",
+					Valid:  true,
+				},
+				Description: "testParameter44desc",
+			},
+			{
+				Name: "testParameter45",
+				ValueString: sql.NullString{
+					String: "TestParameter45",
+					Valid:  true,
+				},
+				Description: "testParameter45desc",
+			},
+		}...,
+	)
+
+	responseText, code = Execute(t, http.MethodPut, GenerateSingleResourceURL(server, "templates", strconv.Itoa(id3), nil), template3)
+	CheckResponseJSON(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestUpdateTemplate_7.json"), &models.Template{})
+
+	responseText, code = Execute(t, http.MethodPut, GenerateSingleResourceURL(server, "templates", strconv.Itoa(id4), nil), template4)
+	CheckResponseJSON(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestUpdateTemplate_8.json"), &models.Template{})
+
+	responseText, code = Execute(t, http.MethodGet, GenerateMultiResourceURL(server, "templates", parameters), nil)
+	CheckResponseJSON(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestUpdateTemplate_9.json"), []*models.Template{})
+
 }
 
 func TestDeleteTemplate(t *testing.T) {

@@ -86,4 +86,5 @@ func UniqueDesignLogic() extensions.Logic {
 }
 
 func init() {
+	extensions.RegisterLogic(models.SharedDesignModel(), UniqueDesignLogic())
 }
