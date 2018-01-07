@@ -38,6 +38,88 @@ func NewBaseController(model interface{}, logic extensions.Logic) *BaseControlle
 	return controller
 }
 
+func (controller *BaseController) deleteMarkedItemsInSlices(db *gorm.DB, data interface{}) error {
+	valueOfData := reflect.ValueOf(data)
+	for valueOfData.Kind() == reflect.Ptr {
+		valueOfData = valueOfData.Elem()
+	}
+
+	typeOfData := valueOfData.Type()
+
+	for i := 0; i < typeOfData.NumField(); i++ {
+		structField := typeOfData.Field(i)
+		fieldValue := valueOfData.FieldByName(structField.Name)
+
+		for fieldValue.Kind() == reflect.Ptr {
+			fieldValue = fieldValue.Elem()
+		}
+
+		if fieldValue.Kind() == reflect.Slice {
+			processed := reflect.New(fieldValue.Type()).Elem()
+			for j := 0; j < fieldValue.Len(); j++ {
+				itemValue := fieldValue.Index(j)
+				for itemValue.Kind() == reflect.Ptr {
+					itemValue = itemValue.Elem()
+				}
+
+				toBeDeleted := false
+				toBeDeletedFieldValue := itemValue.FieldByName("ToBeDeleted")
+				if toBeDeletedFieldValue.IsValid() {
+					toBeDeleted = toBeDeletedFieldValue.Bool()
+				}
+
+				if toBeDeleted {
+					if err := controller.deleteMarkedItemsInSlices(db, fieldValue.Index(j).Interface()); err != nil {
+						return err
+					}
+
+					logic, err := extensions.RegisteredLogic(itemValue.Interface())
+					if err != nil {
+						return err
+					}
+
+					modelKey, err := extensions.RegisteredModelKey(itemValue.Interface())
+					if err != nil {
+						return err
+					}
+
+					keyFieldValue := itemValue.FieldByName(modelKey.KeyField)
+					keyParameterValue := ""
+
+					switch keyFieldValue.Kind() {
+					case reflect.String:
+						keyParameterValue = keyFieldValue.Interface().(string)
+					case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+						keyParameterValue = strconv.Itoa(int(keyFieldValue.Int()))
+					case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+						keyParameterValue = strconv.Itoa(int(keyFieldValue.Int()))
+					default:
+						return fmt.Errorf("the field %s does not exist, or is neither int nor string", modelKey.KeyField)
+					}
+
+					parameters := gin.Params{
+						{
+							Key:   modelKey.KeyParameter,
+							Value: keyParameterValue,
+						},
+					}
+					if err := logic.Delete(db, parameters, nil); err != nil {
+						return err
+					}
+				} else {
+					processed = reflect.Append(processed, itemValue.Addr())
+				}
+			}
+			fieldValue.Set(processed)
+		} else if fieldValue.Kind() == reflect.Struct {
+			if err := controller.deleteMarkedItemsInSlices(db, valueOfData.FieldByName(structField.Name).Interface()); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
 func (controller *BaseController) bind(c *gin.Context, container interface{}) error {
 	if err := c.Bind(container); err != nil {
 		return err
@@ -273,6 +355,10 @@ func (controller *BaseController) update(db *gorm.DB, parameters gin.Params, url
 			err = fmt.Errorf("%v", recoverResult)
 		}
 	}()
+
+	if err := controller.deleteMarkedItemsInSlices(db, data); err != nil {
+		return nil, err
+	}
 
 	result, err = controller.logic.Update(db, parameters, urlValues, data)
 	return result, err
