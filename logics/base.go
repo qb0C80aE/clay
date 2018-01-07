@@ -25,88 +25,6 @@ func NewBaseLogic(model interface{}) *BaseLogic {
 	return logic
 }
 
-func deleteMarkedItemsInSlices(db *gorm.DB, data interface{}) error {
-	valueOfData := reflect.ValueOf(data)
-	for valueOfData.Kind() == reflect.Ptr {
-		valueOfData = valueOfData.Elem()
-	}
-
-	typeOfData := valueOfData.Type()
-
-	for i := 0; i < typeOfData.NumField(); i++ {
-		structField := typeOfData.Field(i)
-		fieldValue := valueOfData.FieldByName(structField.Name)
-
-		for fieldValue.Kind() == reflect.Ptr {
-			fieldValue = fieldValue.Elem()
-		}
-
-		if fieldValue.Kind() == reflect.Slice {
-			processed := reflect.New(fieldValue.Type()).Elem()
-			for j := 0; j < fieldValue.Len(); j++ {
-				itemValue := fieldValue.Index(j)
-				for itemValue.Kind() == reflect.Ptr {
-					itemValue = itemValue.Elem()
-				}
-
-				toBeDeleted := false
-				toBeDeletedFieldValue := itemValue.FieldByName("ToBeDeleted")
-				if toBeDeletedFieldValue.IsValid() {
-					toBeDeleted = toBeDeletedFieldValue.Bool()
-				}
-
-				if toBeDeleted {
-					if err := deleteMarkedItemsInSlices(db, fieldValue.Index(j).Interface()); err != nil {
-						return err
-					}
-
-					logic, err := extensions.RegisteredLogic(itemValue.Interface())
-					if err != nil {
-						return err
-					}
-
-					modelKey, err := extensions.RegisteredModelKey(itemValue.Interface())
-					if err != nil {
-						return err
-					}
-
-					keyFieldValue := itemValue.FieldByName(modelKey.KeyField)
-					keyParameterValue := ""
-
-					switch keyFieldValue.Kind() {
-					case reflect.String:
-						keyParameterValue = keyFieldValue.Interface().(string)
-					case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-						keyParameterValue = strconv.Itoa(int(keyFieldValue.Int()))
-					case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-						keyParameterValue = strconv.Itoa(int(keyFieldValue.Int()))
-					default:
-						return fmt.Errorf("the field %s does not exist, or is neither int nor string", modelKey.KeyField)
-					}
-
-					parameters := gin.Params{
-						{
-							Key:   modelKey.KeyParameter,
-							Value: keyParameterValue,
-						},
-					}
-					if err := logic.Delete(db, parameters, nil); err != nil {
-						return err
-					}
-				} else {
-					processed = reflect.Append(processed, itemValue.Addr())
-				}
-			}
-			fieldValue.Set(processed)
-		} else if fieldValue.Kind() == reflect.Struct {
-			if err := deleteMarkedItemsInSlices(db, valueOfData.FieldByName(structField.Name).Interface()); err != nil {
-				return err
-			}
-		}
-	}
-	return nil
-}
-
 // ResourceName returns its target resource name
 func (logic *BaseLogic) ResourceName() string {
 	return extensions.RegisteredResourceName(logic.model)
@@ -182,10 +100,6 @@ func (logic *BaseLogic) Update(db *gorm.DB, parameters gin.Params, _ url.Values,
 		value.Elem().FieldByName(modelKey.KeyField).SetInt(int64(id))
 	default:
 		return nil, fmt.Errorf("the field %s does not exist, or is neither int nor string", modelKey.KeyField)
-	}
-
-	if err := deleteMarkedItemsInSlices(db, data); err != nil {
-		return nil, err
 	}
 
 	if err := db.Save(value.Interface()).Error; err != nil {
