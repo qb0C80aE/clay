@@ -58,6 +58,11 @@ func (controller *BaseController) deleteMarkedItemsInSlices(db *gorm.DB, data in
 			processed := reflect.New(fieldValue.Type()).Elem()
 			for j := 0; j < fieldValue.Len(); j++ {
 				itemValue := fieldValue.Index(j)
+
+				if err := controller.deleteMarkedItemsInSlices(db, itemValue.Interface()); err != nil {
+					return err
+				}
+
 				for itemValue.Kind() == reflect.Ptr {
 					itemValue = itemValue.Elem()
 				}
@@ -69,10 +74,6 @@ func (controller *BaseController) deleteMarkedItemsInSlices(db *gorm.DB, data in
 				}
 
 				if toBeDeleted {
-					if err := controller.deleteMarkedItemsInSlices(db, fieldValue.Index(j).Interface()); err != nil {
-						return err
-					}
-
 					logic, err := extensions.RegisteredLogic(itemValue.Interface())
 					if err != nil {
 						return err
