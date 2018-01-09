@@ -95,15 +95,20 @@ func (parameter *Parameter) SetPreloads(db *gorm.DB) *gorm.DB {
 			db = db.Preload(strings.Join(a, "."), func(db *gorm.DB) *gorm.DB {
 				for k, v := range m {
 					columnName := snaker.CamelToSnake(k)
-					if strings.Contains(v, "%") {
+					switch {
+					case regexpLike.MatchString(v):
 						db = db.Where(fmt.Sprintf("%s LIKE ?", columnName), v)
-					} else {
-						switch v {
-						case "null":
-							db = db.Where(fmt.Sprintf("%s is null", columnName))
-						case "not_null":
+					case regexNotEquals.MatchString(v):
+						parameter := v[1:]
+						if parameter == "null" {
 							db = db.Where(fmt.Sprintf("%s is not null", columnName))
-						default:
+						} else {
+							db = db.Where(fmt.Sprintf("%s NOT IN (?)", columnName), strings.Split(parameter, ","))
+						}
+					default:
+						if v == "null" {
+							db = db.Where(fmt.Sprintf("%s is null", columnName))
+						} else {
 							db = db.Where(fmt.Sprintf("%s IN (?)", columnName), strings.Split(v, ","))
 						}
 					}
