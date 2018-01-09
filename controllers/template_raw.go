@@ -15,7 +15,7 @@ type templateRawController struct {
 func newTemplateRawController() extensions.Controller {
 	controller := &templateRawController{
 		BaseController: NewBaseController(
-			models.SharedTemplateRawModel(),
+			models.SharedTemplateModel(),
 			logics.UniqueTemplateRawLogic(),
 		),
 	}
