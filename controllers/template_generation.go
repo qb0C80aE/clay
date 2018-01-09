@@ -15,7 +15,7 @@ type templateGenerationController struct {
 func newTemplateGenerationController() extensions.Controller {
 	controller := &templateGenerationController{
 		BaseController: NewBaseController(
-			models.SharedTemplateGenerationModel(),
+			models.SharedTemplateModel(),
 			logics.UniqueTemplateGenerationLogic(),
 		),
 	}

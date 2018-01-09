@@ -25,7 +25,7 @@ type templateGenerationLogic struct {
 func newTemplateGenerationLogic() *templateGenerationLogic {
 	logic := &templateGenerationLogic{
 		BaseLogic: NewBaseLogic(
-			models.SharedTemplateGenerationModel(),
+			models.SharedTemplateModel(),
 		),
 	}
 	return logic
@@ -87,8 +87,6 @@ func UniqueTemplateGenerationLogic() extensions.Logic {
 }
 
 func init() {
-	extensions.RegisterLogic(models.SharedTemplateGenerationModel(), UniqueTemplateGenerationLogic())
-
 	funcMap := tplpkg.FuncMap{
 		"add": func(a, b int) int { return a + b },
 		"sub": func(a, b int) int { return a - b },

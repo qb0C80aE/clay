@@ -15,7 +15,7 @@ type templateRawLogic struct {
 func newTemplateRawLogic() *templateRawLogic {
 	logic := &templateRawLogic{
 		BaseLogic: NewBaseLogic(
-			models.SharedTemplateRawModel(),
+			models.SharedTemplateModel(),
 		),
 	}
 	return logic
@@ -39,5 +39,4 @@ func UniqueTemplateRawLogic() extensions.Logic {
 }
 
 func init() {
-	extensions.RegisterLogic(models.SharedTemplateRawModel(), UniqueTemplateRawLogic())
 }
