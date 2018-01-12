@@ -3,25 +3,26 @@
   "name": "test4",
   "template_content": "TestTemplate4",
   "description": "test4desc",
-  "template_persistent_parameters": [
+  "template_arguments": [
     {
       "id": 2001,
       "template_id": 104,
       "name": "testParameter42",
       "description": "testParameter42desc",
-      "value_int": {
+      "type": 0,
+      "default_value_int": {
         "Int64": 0,
         "Valid": false
       },
-      "value_float": {
+      "default_value_float": {
         "Float64": 0,
         "Valid": false
       },
-      "value_bool": {
+      "default_value_bool": {
         "Bool": false,
         "Valid": false
       },
-      "value_string": {
+      "default_value_string": {
         "String": "TestParameter42",
         "Valid": true
       }
@@ -31,19 +32,20 @@
       "template_id": 104,
       "name": "testParameter44",
       "description": "testParameter44desc",
-      "value_int": {
+      "type": 0,
+      "default_value_int": {
         "Int64": 0,
         "Valid": false
       },
-      "value_float": {
+      "default_value_float": {
         "Float64": 0,
         "Valid": false
       },
-      "value_bool": {
+      "default_value_bool": {
         "Bool": false,
         "Valid": false
       },
-      "value_string": {
+      "default_value_string": {
         "String": "TestParameter44",
         "Valid": true
       }
@@ -53,19 +55,20 @@
       "template_id": 104,
       "name": "testParameter45",
       "description": "testParameter45desc",
-      "value_int": {
+      "type": 0,
+      "default_value_int": {
         "Int64": 0,
         "Valid": false
       },
-      "value_float": {
+      "default_value_float": {
         "Float64": 0,
         "Valid": false
       },
-      "value_bool": {
+      "default_value_bool": {
         "Bool": false,
         "Valid": false
       },
-      "value_string": {
+      "default_value_string": {
         "String": "TestParameter45",
         "Valid": true
       }

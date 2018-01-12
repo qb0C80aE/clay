@@ -2,29 +2,30 @@
   "description": "test2desc",
   "id": 102,
   "name": "test2",
-  "template_content": "TestTemplate2",
-  "template_persistent_parameters": [
+  "template_arguments": [
     {
       "id": 1,
       "template_id": 102,
       "name": "testParameter21",
       "description": "testParameter21desc",
-      "value_int": {
+      "type": 0,
+      "default_value_int": {
         "Int64": 0,
         "Valid": false
       },
-      "value_float": {
+      "default_value_float": {
         "Float64": 0,
         "Valid": false
       },
-      "value_bool": {
+      "default_value_bool": {
         "Bool": false,
         "Valid": false
       },
-      "value_string": {
+      "default_value_string": {
         "String": "TestParameter21",
         "Valid": true
       }
     }
-  ]
+  ],
+  "template_content": "TestTemplate2"
 }

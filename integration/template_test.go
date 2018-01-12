@@ -24,7 +24,7 @@ func TestCreateTemplate(t *testing.T) {
 	defer server.Close()
 
 	parameters := map[string]string{
-		"preloads": "TemplatePersistentParameters",
+		"preloads": "TemplateArguments",
 	}
 
 	template1 := &models.Template{
@@ -37,10 +37,10 @@ func TestCreateTemplate(t *testing.T) {
 		Name:            "test2",
 		TemplateContent: "TestTemplate2",
 		Description:     "test2desc",
-		TemplatePersistentParameters: []*models.TemplatePersistentParameter{
+		TemplateArguments: []*models.TemplateArgument{
 			{
 				Name: "testParameter1",
-				ValueString: sql.NullString{
+				DefaultValueString: sql.NullString{
 					String: "TestParameter1",
 					Valid:  true,
 				},
@@ -54,10 +54,10 @@ func TestCreateTemplate(t *testing.T) {
 		Name:            "test100",
 		TemplateContent: "TestTemplate100",
 		Description:     "test100desc",
-		TemplatePersistentParameters: []*models.TemplatePersistentParameter{
+		TemplateArguments: []*models.TemplateArgument{
 			{
 				Name: "testParameter100",
-				ValueString: sql.NullString{
+				DefaultValueString: sql.NullString{
 					String: "TestParameter100",
 					Valid:  true,
 				},
@@ -66,7 +66,7 @@ func TestCreateTemplate(t *testing.T) {
 			{
 				ID:   10,
 				Name: "testParameter110",
-				ValueString: sql.NullString{
+				DefaultValueString: sql.NullString{
 					String: "TestParameter110",
 					Valid:  true,
 				},
@@ -93,7 +93,7 @@ func TestUpdateTemplate(t *testing.T) {
 	defer server.Close()
 
 	parameters := map[string]string{
-		"preloads": "TemplatePersistentParameters",
+		"preloads": "TemplateArguments",
 	}
 
 	id1 := 101
@@ -110,10 +110,10 @@ func TestUpdateTemplate(t *testing.T) {
 		Name:            "test2",
 		TemplateContent: "TestTemplate2",
 		Description:     "test2desc",
-		TemplatePersistentParameters: []*models.TemplatePersistentParameter{
+		TemplateArguments: []*models.TemplateArgument{
 			{
 				Name: "testParameter21",
-				ValueString: sql.NullString{
+				DefaultValueString: sql.NullString{
 					String: "TestParameter21",
 					Valid:  true,
 				},
@@ -128,11 +128,11 @@ func TestUpdateTemplate(t *testing.T) {
 		Name:            "test3",
 		TemplateContent: "TestTemplate3",
 		Description:     "test3desc",
-		TemplatePersistentParameters: []*models.TemplatePersistentParameter{
+		TemplateArguments: []*models.TemplateArgument{
 			{
 				ID:   1000,
 				Name: "testParameter31",
-				ValueString: sql.NullString{
+				DefaultValueString: sql.NullString{
 					String: "TestParameter31",
 					Valid:  true,
 				},
@@ -141,7 +141,7 @@ func TestUpdateTemplate(t *testing.T) {
 			{
 				ID:   1001,
 				Name: "testParameter32",
-				ValueString: sql.NullString{
+				DefaultValueString: sql.NullString{
 					String: "TestParameter32",
 					Valid:  true,
 				},
@@ -156,11 +156,11 @@ func TestUpdateTemplate(t *testing.T) {
 		Name:            "test4",
 		TemplateContent: "TestTemplate4",
 		Description:     "test4desc",
-		TemplatePersistentParameters: []*models.TemplatePersistentParameter{
+		TemplateArguments: []*models.TemplateArgument{
 			{
 				ID:   2000,
 				Name: "testParameter41",
-				ValueString: sql.NullString{
+				DefaultValueString: sql.NullString{
 					String: "TestParameter41",
 					Valid:  true,
 				},
@@ -169,7 +169,7 @@ func TestUpdateTemplate(t *testing.T) {
 			{
 				ID:   2001,
 				Name: "testParameter42",
-				ValueString: sql.NullString{
+				DefaultValueString: sql.NullString{
 					String: "TestParameter42",
 					Valid:  true,
 				},
@@ -178,7 +178,7 @@ func TestUpdateTemplate(t *testing.T) {
 			{
 				ID:   2002,
 				Name: "testParameter43",
-				ValueString: sql.NullString{
+				DefaultValueString: sql.NullString{
 					String: "TestParameter43",
 					Valid:  true,
 				},
@@ -201,7 +201,7 @@ func TestUpdateTemplate(t *testing.T) {
 	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "templates", strconv.Itoa(id1), parameters), nil)
 	CheckResponseJSON(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestUpdateTemplate_2.json"), &models.Template{})
 
-	template2.TemplatePersistentParameters = nil
+	template2.TemplateArguments = nil
 
 	responseText, code = Execute(t, http.MethodPut, GenerateSingleResourceURL(server, "templates", strconv.Itoa(id2), nil), template2)
 	CheckResponseJSON(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestUpdateTemplate_3.json"), &models.Template{})
@@ -209,19 +209,19 @@ func TestUpdateTemplate(t *testing.T) {
 	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "templates", strconv.Itoa(id2), parameters), nil)
 	CheckResponseJSON(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestUpdateTemplate_4.json"), &models.Template{})
 
-	template3.TemplatePersistentParameters[1].Name = "testParameter32Updated"
-	template3.TemplatePersistentParameters[1].ValueString = sql.NullString{
+	template3.TemplateArguments[1].Name = "testParameter32Updated"
+	template3.TemplateArguments[1].DefaultValueString = sql.NullString{
 		String: "TestParameter32Updated",
 		Valid:  true,
 	}
-	template3.TemplatePersistentParameters[1].Description = "testParameter32descUpdated"
+	template3.TemplateArguments[1].Description = "testParameter32descUpdated"
 
-	template3.TemplatePersistentParameters = append(
-		template3.TemplatePersistentParameters,
-		&models.TemplatePersistentParameter{
+	template3.TemplateArguments = append(
+		template3.TemplateArguments,
+		&models.TemplateArgument{
 			ID:   1002,
 			Name: "testParameter34",
-			ValueString: sql.NullString{
+			DefaultValueString: sql.NullString{
 				String: "TestParameter34",
 				Valid:  true,
 			},
@@ -234,15 +234,15 @@ func TestUpdateTemplate(t *testing.T) {
 	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "templates", strconv.Itoa(id3), parameters), nil)
 	CheckResponseJSON(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestUpdateTemplate_6.json"), &models.Template{})
 
-	template3.TemplatePersistentParameters[0].ToBeDeleted = true
-	template4.TemplatePersistentParameters[0].ToBeDeleted = true
-	template4.TemplatePersistentParameters[2].ToBeDeleted = true
-	template4.TemplatePersistentParameters = append(template4.TemplatePersistentParameters,
-		[]*models.TemplatePersistentParameter{
+	template3.TemplateArguments[0].ToBeDeleted = true
+	template4.TemplateArguments[0].ToBeDeleted = true
+	template4.TemplateArguments[2].ToBeDeleted = true
+	template4.TemplateArguments = append(template4.TemplateArguments,
+		[]*models.TemplateArgument{
 			{
 				ID:   2003,
 				Name: "testParameter44",
-				ValueString: sql.NullString{
+				DefaultValueString: sql.NullString{
 					String: "TestParameter44",
 					Valid:  true,
 				},
@@ -250,7 +250,7 @@ func TestUpdateTemplate(t *testing.T) {
 			},
 			{
 				Name: "testParameter45",
-				ValueString: sql.NullString{
+				DefaultValueString: sql.NullString{
 					String: "TestParameter45",
 					Valid:  true,
 				},
@@ -291,15 +291,15 @@ func TestDeleteTemplate(t *testing.T) {
 	CheckResponseJSON(t, code, http.StatusNotFound, responseText, LoadExpectation(t, "template/TestDeleteTemplate_1.json"), &ErrorResponseText{})
 }
 
-func TestGetTemplatePersistentParameters_Empty(t *testing.T) {
+func TestGetTemplateArguments_Empty(t *testing.T) {
 	server := SetupServer()
 	defer server.Close()
 
-	responseText, code := Execute(t, http.MethodGet, GenerateMultiResourceURL(server, "template_persistent_parameters", nil), nil)
-	CheckResponseJSON(t, code, http.StatusOK, responseText, EmptyArrayString, []*models.TemplatePersistentParameter{})
+	responseText, code := Execute(t, http.MethodGet, GenerateMultiResourceURL(server, "template_arguments", nil), nil)
+	CheckResponseJSON(t, code, http.StatusOK, responseText, EmptyArrayString, []*models.TemplateArgument{})
 }
 
-func TestCreateTemplatePersistentParameters(t *testing.T) {
+func TestCreateTemplateArguments(t *testing.T) {
 	server := SetupServer()
 	defer server.Close()
 
@@ -312,60 +312,60 @@ func TestCreateTemplatePersistentParameters(t *testing.T) {
 
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template)
 
-	templatePersistentParameter1 := &models.TemplatePersistentParameter{
+	templateArgument1 := &models.TemplateArgument{
 		TemplateID: 1,
 		Name:       "testParameter1",
-		ValueInt: sql.NullInt64{
+		DefaultValueInt: sql.NullInt64{
 			Int64: 100,
 			Valid: true,
 		},
-		ValueFloat: sql.NullFloat64{
+		DefaultValueFloat: sql.NullFloat64{
 			Float64: 123.456,
 			Valid:   true,
 		},
-		ValueBool: sql.NullBool{
+		DefaultValueBool: sql.NullBool{
 			Bool:  true,
 			Valid: true,
 		},
-		ValueString: sql.NullString{
+		DefaultValueString: sql.NullString{
 			String: "TestParameter1",
 			Valid:  true,
 		},
 		Description: "testParameter1desc",
 	}
-	templatePersistentParameter2 := &models.TemplatePersistentParameter{
+	templateArgument2 := &models.TemplateArgument{
 		TemplateID: 1,
 		Name:       "testParameter2",
-		ValueInt: sql.NullInt64{
+		DefaultValueInt: sql.NullInt64{
 			Int64: 200,
 			Valid: true,
 		},
-		ValueFloat: sql.NullFloat64{
+		DefaultValueFloat: sql.NullFloat64{
 			Float64: 456.789,
 			Valid:   true,
 		},
-		ValueBool: sql.NullBool{
+		DefaultValueBool: sql.NullBool{
 			Bool:  false,
 			Valid: true,
 		},
-		ValueString: sql.NullString{
+		DefaultValueString: sql.NullString{
 			String: "TestParameter2",
 			Valid:  true,
 		},
 		Description: "testParameter2desc",
 	}
 
-	responseText, code := Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_persistent_parameters", nil), templatePersistentParameter1)
-	CheckResponseJSON(t, code, http.StatusCreated, responseText, LoadExpectation(t, "template/TestCreateTemplatePersistentParameter_1.json"), &models.TemplatePersistentParameter{})
+	responseText, code := Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_arguments", nil), templateArgument1)
+	CheckResponseJSON(t, code, http.StatusCreated, responseText, LoadExpectation(t, "template/TestCreateTemplateArgument_1.json"), &models.TemplateArgument{})
 
-	responseText, code = Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_persistent_parameters", nil), templatePersistentParameter2)
-	CheckResponseJSON(t, code, http.StatusCreated, responseText, LoadExpectation(t, "template/TestCreateTemplatePersistentParameter_2.json"), &models.TemplatePersistentParameter{})
+	responseText, code = Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_arguments", nil), templateArgument2)
+	CheckResponseJSON(t, code, http.StatusCreated, responseText, LoadExpectation(t, "template/TestCreateTemplateArgument_2.json"), &models.TemplateArgument{})
 
-	responseText, code = Execute(t, http.MethodGet, GenerateMultiResourceURL(server, "template_persistent_parameters", nil), nil)
-	CheckResponseJSON(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestCreateTemplatePersistentParameter_3.json"), []*models.TemplatePersistentParameter{})
+	responseText, code = Execute(t, http.MethodGet, GenerateMultiResourceURL(server, "template_arguments", nil), nil)
+	CheckResponseJSON(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestCreateTemplateArgument_3.json"), []*models.TemplateArgument{})
 }
 
-func TestUpdateTemplatePersistentParameters(t *testing.T) {
+func TestUpdateTemplateArguments(t *testing.T) {
 	server := SetupServer()
 	defer server.Close()
 
@@ -379,49 +379,49 @@ func TestUpdateTemplatePersistentParameters(t *testing.T) {
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template)
 
 	id := 1
-	templatePersistentParameter1 := &models.TemplatePersistentParameter{
+	templateArgument1 := &models.TemplateArgument{
 		TemplateID: id,
 		Name:       "testParameter1",
-		ValueInt: sql.NullInt64{
+		DefaultValueInt: sql.NullInt64{
 			Int64: 100,
 			Valid: true,
 		},
-		ValueFloat: sql.NullFloat64{
+		DefaultValueFloat: sql.NullFloat64{
 			Float64: 123.456,
 			Valid:   true,
 		},
-		ValueBool: sql.NullBool{
+		DefaultValueBool: sql.NullBool{
 			Bool:  true,
 			Valid: true,
 		},
-		ValueString: sql.NullString{
+		DefaultValueString: sql.NullString{
 			String: "TestParameter1",
 			Valid:  true,
 		},
 		Description: "testParameter1desc",
 	}
 
-	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_persistent_parameters", nil), templatePersistentParameter1)
+	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_arguments", nil), templateArgument1)
 
-	templatePersistentParameter1.Name = "templatePersistentParameter1Updated"
-	templatePersistentParameter1.ValueInt = sql.NullInt64{
+	templateArgument1.Name = "templateArgument1Updated"
+	templateArgument1.DefaultValueInt = sql.NullInt64{
 		Int64: 999,
 		Valid: true,
 	}
-	templatePersistentParameter1.ValueString = sql.NullString{
+	templateArgument1.DefaultValueString = sql.NullString{
 		String: "TestParameter1Updated",
 		Valid:  true,
 	}
-	templatePersistentParameter1.Description = "testParameter1descUpdated"
+	templateArgument1.Description = "testParameter1descUpdated"
 
-	responseText, code := Execute(t, http.MethodPut, GenerateSingleResourceURL(server, "template_persistent_parameters", strconv.Itoa(id), nil), templatePersistentParameter1)
-	CheckResponseJSON(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestUpdateTemplatePersistentParameter_1.json"), &models.TemplatePersistentParameter{})
+	responseText, code := Execute(t, http.MethodPut, GenerateSingleResourceURL(server, "template_arguments", strconv.Itoa(id), nil), templateArgument1)
+	CheckResponseJSON(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestUpdateTemplateArgument_1.json"), &models.TemplateArgument{})
 
-	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "template_persistent_parameters", strconv.Itoa(id), nil), nil)
-	CheckResponseJSON(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestUpdateTemplatePersistentParameter_2.json"), &models.TemplatePersistentParameter{})
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "template_arguments", strconv.Itoa(id), nil), nil)
+	CheckResponseJSON(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestUpdateTemplateArgument_2.json"), &models.TemplateArgument{})
 }
 
-func TestDeleteTemplatePersistentParameters(t *testing.T) {
+func TestDeleteTemplateArguments(t *testing.T) {
 	server := SetupServer()
 	defer server.Close()
 
@@ -435,33 +435,33 @@ func TestDeleteTemplatePersistentParameters(t *testing.T) {
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template)
 
 	id := 1
-	templatePersistentParameter1 := &models.TemplatePersistentParameter{
+	templateArgument1 := &models.TemplateArgument{
 		TemplateID: id,
 		Name:       "testParameter1",
-		ValueString: sql.NullString{
+		DefaultValueString: sql.NullString{
 			String: "TestParameter1",
 			Valid:  true,
 		},
 		Description: "testParameter1desc",
 	}
 
-	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_persistent_parameters", nil), templatePersistentParameter1)
+	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_arguments", nil), templateArgument1)
 
-	templatePersistentParameter1.Name = "templatePersistentParameter1Updated"
-	templatePersistentParameter1.ValueString = sql.NullString{
+	templateArgument1.Name = "templateArgument1Updated"
+	templateArgument1.DefaultValueString = sql.NullString{
 		String: "TestParameter1Updated",
 		Valid:  true,
 	}
-	templatePersistentParameter1.Description = "TestParameter1descUpdated"
+	templateArgument1.Description = "TestParameter1descUpdated"
 
-	responseText, code := Execute(t, http.MethodDelete, GenerateSingleResourceURL(server, "template_persistent_parameters", strconv.Itoa(id), nil), nil)
+	responseText, code := Execute(t, http.MethodDelete, GenerateSingleResourceURL(server, "template_arguments", strconv.Itoa(id), nil), nil)
 	CheckResponseText(t, code, http.StatusNoContent, responseText, []byte{})
 
-	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "template_persistent_parameters", strconv.Itoa(id), nil), nil)
-	CheckResponseJSON(t, code, http.StatusNotFound, responseText, LoadExpectation(t, "template/TestDeleteTemplatePersistentParameter_1.json"), &ErrorResponseText{})
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "template_arguments", strconv.Itoa(id), nil), nil)
+	CheckResponseJSON(t, code, http.StatusNotFound, responseText, LoadExpectation(t, "template/TestDeleteTemplateArgument_1.json"), &ErrorResponseText{})
 }
 
-func TestDeleteTemplatePersistentParameters_Cascade(t *testing.T) {
+func TestDeleteTemplateArguments_Cascade(t *testing.T) {
 	server := SetupServer()
 	defer server.Close()
 
@@ -476,22 +476,22 @@ func TestDeleteTemplatePersistentParameters_Cascade(t *testing.T) {
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template)
 
 	id := 1
-	templatePersistentParameter1 := &models.TemplatePersistentParameter{
+	templateArgument1 := &models.TemplateArgument{
 		TemplateID: id,
 		Name:       "testParameter1",
-		ValueString: sql.NullString{
+		DefaultValueString: sql.NullString{
 			String: "TestParameter1",
 			Valid:  true,
 		},
 		Description: "testParameter1desc",
 	}
 
-	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_persistent_parameters", nil), templatePersistentParameter1)
+	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_arguments", nil), templateArgument1)
 
 	Execute(t, http.MethodDelete, GenerateSingleResourceURL(server, "templates", strconv.Itoa(templateID), nil), nil)
 
-	responseText, code := Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "template_persistent_parameters", strconv.Itoa(id), nil), nil)
-	CheckResponseJSON(t, code, http.StatusNotFound, responseText, LoadExpectation(t, "template/TestDeleteTemplatePersistentParameter_Cascade_1.json"), &ErrorResponseText{})
+	responseText, code := Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "template_arguments", strconv.Itoa(id), nil), nil)
+	CheckResponseJSON(t, code, http.StatusNotFound, responseText, LoadExpectation(t, "template/TestDeleteTemplateArgument_Cascade_1.json"), &ErrorResponseText{})
 }
 
 func TestTemplate_ExtractFromDesign(t *testing.T) {
@@ -514,46 +514,46 @@ func TestTemplate_ExtractFromDesign(t *testing.T) {
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template1)
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template2)
 
-	templatePersistentParameter11 := &models.TemplatePersistentParameter{
+	templateArgument11 := &models.TemplateArgument{
 		TemplateID: 1,
 		Name:       "testParameter11",
-		ValueString: sql.NullString{
+		DefaultValueString: sql.NullString{
 			String: "TestParameter11",
 			Valid:  true,
 		},
 		Description: "testParameter11desc",
 	}
-	templatePersistentParameter12 := &models.TemplatePersistentParameter{
+	templateArgument12 := &models.TemplateArgument{
 		TemplateID: 1,
 		Name:       "testParameter12",
-		ValueString: sql.NullString{
+		DefaultValueString: sql.NullString{
 			String: "TestParameter12",
 			Valid:  true,
 		},
 		Description: "testParameter12desc",
 	}
-	templatePersistentParameter21 := &models.TemplatePersistentParameter{
+	templateArgument21 := &models.TemplateArgument{
 		TemplateID: 2,
 		Name:       "testParameter21",
-		ValueString: sql.NullString{
+		DefaultValueString: sql.NullString{
 			String: "TestParameter21",
 			Valid:  true,
 		},
 		Description: "testParameter21desc",
 	}
-	templatePersistentParameter22 := &models.TemplatePersistentParameter{
+	templateArgument22 := &models.TemplateArgument{
 		TemplateID: 2,
 		Name:       "testParameter22",
-		ValueString: sql.NullString{
+		DefaultValueString: sql.NullString{
 			String: "TestParameter22",
 			Valid:  true,
 		},
 		Description: "testParameter22desc",
 	}
-	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_persistent_parameters", nil), templatePersistentParameter11)
-	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_persistent_parameters", nil), templatePersistentParameter12)
-	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_persistent_parameters", nil), templatePersistentParameter21)
-	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_persistent_parameters", nil), templatePersistentParameter22)
+	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_arguments", nil), templateArgument11)
+	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_arguments", nil), templateArgument12)
+	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_arguments", nil), templateArgument21)
+	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_arguments", nil), templateArgument22)
 }
 
 func TestTemplate_Generate(t *testing.T) {
@@ -565,28 +565,166 @@ func TestTemplate_Generate(t *testing.T) {
 		ID:   id,
 		Name: "test",
 		TemplateContent: "" +
-			`{{.testParameter1.ValueString.String}} is TestParameter1, {{.testParameter2.ValueString.String}} is TestParameter2
-urlParam1 is {{.urlParam1}}
-urlParam2 is {{.urlParam2}}
-urlParam3 is {{.urlParam3}}
-{{index .urlParam1 0}}
-{{index .urlParam2 0}}
-{{index .urlParam2 1}}
-{{index .urlParam3 0}}
-{{index .urlParam3 1}}
-{{index .urlParam3 2}}`,
-		TemplatePersistentParameters: []*models.TemplatePersistentParameter{
+			`testParameterInt = {{ .testParameterInt }}
+testParameterInt8 = {{ .testParameterInt8 }}
+testParameterInt16 = {{ .testParameterInt16 }}
+testParameterInt32 = {{ .testParameterInt32 }}
+testParameterInt64 = {{ .testParameterInt64 }}
+testParameterUint = {{ .testParameterUint }}
+testParameterUint8 = {{ .testParameterUint8 }}
+testParameterUint16 = {{ .testParameterUint16 }}
+testParameterUint32 = {{ .testParameterUint32 }}
+testParameterUint64 = {{ .testParameterUint64 }}
+testParameterFloat32 = {{ .testParameterFloat32 }}
+testParameterFloat64 = {{ .testParameterFloat64 }}
+testParameterBool = {{ .testParameterBool }}
+testParameterString = {{ .testParameterString }}
+testParameterIntOverride = {{ .testParameterIntOverride }}
+testParameterFloatOverride = {{ .testParameterFloatOverride }}
+testParameterBoolOverride = {{ .testParameterBoolOverride }}
+testParameterStringOverride = {{ .testParameterStringOverride }}`,
+		TemplateArguments: []*models.TemplateArgument{
 			{
-				Name: "testParameter1",
-				ValueString: sql.NullString{
-					String: "TestParameter1",
+				Name: "testParameterInt",
+				Type: models.TemplateArgumentTypeInt,
+				DefaultValueInt: sql.NullInt64{
+					Int64: 123,
+					Valid: true,
+				},
+			},
+			{
+				Name: "testParameterInt8",
+				Type: models.TemplateArgumentTypeInt,
+				DefaultValueInt: sql.NullInt64{
+					Int64: 124,
+					Valid: true,
+				},
+			},
+			{
+				Name: "testParameterInt16",
+				Type: models.TemplateArgumentTypeInt,
+				DefaultValueInt: sql.NullInt64{
+					Int64: 125,
+					Valid: true,
+				},
+			},
+			{
+				Name: "testParameterInt32",
+				Type: models.TemplateArgumentTypeInt,
+				DefaultValueInt: sql.NullInt64{
+					Int64: 126,
+					Valid: true,
+				},
+			},
+			{
+				Name: "testParameterInt64",
+				Type: models.TemplateArgumentTypeInt,
+				DefaultValueInt: sql.NullInt64{
+					Int64: 127,
+					Valid: true,
+				},
+			},
+			{
+				Name: "testParameterUint",
+				Type: models.TemplateArgumentTypeInt,
+				DefaultValueInt: sql.NullInt64{
+					Int64: 1123,
+					Valid: true,
+				},
+			},
+			{
+				Name: "testParameterUint8",
+				Type: models.TemplateArgumentTypeInt,
+				DefaultValueInt: sql.NullInt64{
+					Int64: 1124,
+					Valid: true,
+				},
+			},
+			{
+				Name: "testParameterUint16",
+				Type: models.TemplateArgumentTypeInt,
+				DefaultValueInt: sql.NullInt64{
+					Int64: 1125,
+					Valid: true,
+				},
+			},
+			{
+				Name: "testParameterUint32",
+				Type: models.TemplateArgumentTypeInt,
+				DefaultValueInt: sql.NullInt64{
+					Int64: 1126,
+					Valid: true,
+				},
+			},
+			{
+				Name: "testParameterUint64",
+				Type: models.TemplateArgumentTypeInt,
+				DefaultValueInt: sql.NullInt64{
+					Int64: 1127,
+					Valid: true,
+				},
+			},
+			{
+				Name: "testParameterFloat32",
+				Type: models.TemplateArgumentTypeFloat,
+				DefaultValueFloat: sql.NullFloat64{
+					Float64: 123.1,
+					Valid:   true,
+				},
+			},
+			{
+				Name: "testParameterFloat64",
+				Type: models.TemplateArgumentTypeFloat,
+				DefaultValueFloat: sql.NullFloat64{
+					Float64: 123.2,
+					Valid:   true,
+				},
+			},
+			{
+				Name: "testParameterBool",
+				Type: models.TemplateArgumentTypeBool,
+				DefaultValueBool: sql.NullBool{
+					Bool:  true,
+					Valid: true,
+				},
+			},
+			{
+				Name: "testParameterString",
+				Type: models.TemplateArgumentTypeString,
+				DefaultValueString: sql.NullString{
+					String: "ABCDE",
 					Valid:  true,
 				},
 			},
 			{
-				Name: "testParameter2",
-				ValueString: sql.NullString{
-					String: "TestParameter2",
+				Name: "testParameterIntOverride",
+				Type: models.TemplateArgumentTypeInt,
+				DefaultValueInt: sql.NullInt64{
+					Int64: 0,
+					Valid: true,
+				},
+			},
+			{
+				Name: "testParameterFloatOverride",
+				Type: models.TemplateArgumentTypeFloat,
+				DefaultValueFloat: sql.NullFloat64{
+					Float64: 0,
+					Valid:   true,
+				},
+			},
+			{
+				Name: "testParameterBoolOverride",
+				Type: models.TemplateArgumentTypeBool,
+				DefaultValueBool: sql.NullBool{
+					Bool:  false,
+					Valid: true,
+				},
+			},
+			{
+				Name: "testParameterStringOverride",
+				Type: models.TemplateArgumentTypeString,
+				DefaultValueString: sql.NullString{
+					String: "nothing",
 					Valid:  true,
 				},
 			},
@@ -596,9 +734,10 @@ urlParam3 is {{.urlParam3}}
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template)
 
 	parameters := map[string]string{
-		"urlParam1": "100",
-		"urlParam2": "200&urlParam2=201",
-		"urlParam3": "300&urlParam3=301&&urlParam3=302",
+		"testParameterIntOverride":    "100",
+		"testParameterFloatOverride":  "200.123",
+		"testParameterBoolOverride":   "true",
+		"testParameterStringOverride": "QWERTY",
 	}
 	responseText, code := Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%d", id), "generation", parameters), nil)
 	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestGenerateTemplate_1.txt"))
@@ -875,7 +1014,7 @@ concatenate
 {{concatenate $slice2 $slice3}}
 
 fieldslice
-{{- $tpp := multi .ModelStore "template_persistent_parameters" ""}}
+{{- $tpp := multi .ModelStore "template_arguments" ""}}
 {{- $idfields := fieldslice $tpp "ID"}}
 {{- $namefields := fieldslice $tpp "Name"}}
 {{- $idfields := sort $idfields "asc"}}
@@ -1083,36 +1222,36 @@ keys of map1: {{$keys}}
 
 --- model store ---
 multi
-{{- $m := multi .ModelStore "templates" "preloads=TemplatePersistentParameters"}}
+{{- $m := multi .ModelStore "templates" "preloads=TemplateArguments"}}
 {{- $t := index $m 0}}
 {{$t.Name}}
-{{- $p1 := index $t.TemplatePersistentParameters 0}}
-{{$p1.Name}}={{$p1.ValueString.String}}
-{{- $p2 := index $t.TemplatePersistentParameters 1}}
-{{$p2.Name}}={{$p2.ValueString.String}}
+{{- $p1 := index $t.TemplateArguments 0}}
+{{$p1.Name}}={{$p1.DefaultValueString.String}}
+{{- $p2 := index $t.TemplateArguments 1}}
+{{$p2.Name}}={{$p2.DefaultValueString.String}}
 
 single
-{{- $path := printf "/templates/%d" .testParameter11.ValueInt.Int64}}
-{{- $s := single .ModelStore $path "preloads=TemplatePersistentParameters"}}
+{{- $path := printf "/templates/%d" .testParameter11}}
+{{- $s := single .ModelStore $path "preloads=TemplateArguments"}}
 {{$s.Name}}
-{{- $p1 := index $s.TemplatePersistentParameters 0}}
-{{$p1.Name}}={{$p1.ValueString.String}}
-{{- $p2 := index $s.TemplatePersistentParameters 1}}
-{{$p2.Name}}={{$p2.ValueString.String}}
+{{- $p1 := index $s.TemplateArguments 0}}
+{{$p1.Name}}={{$p1.DefaultValueString.String}}
+{{- $p2 := index $s.TemplateArguments 1}}
+{{$p2.Name}}={{$p2.DefaultValueString.String}}
 
 total
-{{- $t := total .ModelStore "/template_persistent_parameters"}}
+{{- $t := total .ModelStore "/template_arguments"}}
 {{$t}}
 
 --- hash ---
 hash
-{{- $h := hash $s.TemplatePersistentParameters "Name"}}
+{{- $h := hash $s.TemplateArguments "Name"}}
 hash[testParameter11]={{get $h "testParameter11"}}
 hash[testParameter12]={{get $h "testParameter12"}}
 
 --- slicemap ---
 slicemap
-{{- $p := multi .ModelStore "template_persistent_parameters" ""}}
+{{- $p := multi .ModelStore "template_arguments" ""}}
 {{- $z := slicemap $p "Name"}}
 {{- $z1 := get $z "testParameter11"}}
 {{- $z2 := get $z "testParameter12"}}
@@ -1137,33 +1276,36 @@ sequence[{{$i}}]={{$v}}
 		Description: "test1desc",
 	}
 
-	templatePersistentParameter11 := &models.TemplatePersistentParameter{
+	templateArgument11 := &models.TemplateArgument{
 		TemplateID: id,
 		Name:       "testParameter11",
-		ValueString: sql.NullString{
+		Type:       models.TemplateArgumentTypeInt,
+		DefaultValueString: sql.NullString{
 			String: "TestParameter11",
 			Valid:  true,
 		},
-		ValueInt: sql.NullInt64{
+		DefaultValueInt: sql.NullInt64{
 			Int64: 1,
 			Valid: true,
 		},
 		Description: "testParameter11desc",
 	}
-	templatePersistentParameter12 := &models.TemplatePersistentParameter{
+	templateArgument12 := &models.TemplateArgument{
 		TemplateID: id,
 		Name:       "testParameter12",
-		ValueString: sql.NullString{
+		Type:       models.TemplateArgumentTypeString,
+		DefaultValueString: sql.NullString{
 			String: "TestParameter12",
 			Valid:  true,
 		},
 		Description: "testParameter12desc",
 	}
 
-	templatePersistentParameter13 := &models.TemplatePersistentParameter{
+	templateArgument13 := &models.TemplateArgument{
 		TemplateID: id,
 		Name:       "testParameter1X",
-		ValueInt: sql.NullInt64{
+		Type:       models.TemplateArgumentTypeInt,
+		DefaultValueInt: sql.NullInt64{
 			Int64: 100,
 			Valid: true,
 		},
@@ -1177,10 +1319,11 @@ sequence[{{$i}}]={{$v}}
 		TemplateContent: `{{.testParameter1X}}`,
 		Description:     "test12desc",
 	}
-	templatePersistentParameter21 := &models.TemplatePersistentParameter{
+	templateArgument21 := &models.TemplateArgument{
 		TemplateID: id2,
 		Name:       "testParameter1X",
-		ValueInt: sql.NullInt64{
+		Type:       models.TemplateArgumentTypeInt,
+		DefaultValueInt: sql.NullInt64{
 			Int64: 200,
 			Valid: true,
 		},
@@ -1194,10 +1337,11 @@ sequence[{{$i}}]={{$v}}
 		TemplateContent: `{{.testParameter1X}}`,
 		Description:     "test13desc",
 	}
-	templatePersistentParameter31 := &models.TemplatePersistentParameter{
+	templateArgument31 := &models.TemplateArgument{
 		TemplateID: id3,
 		Name:       "testParameter1X",
-		ValueInt: sql.NullInt64{
+		Type:       models.TemplateArgumentTypeInt,
+		DefaultValueInt: sql.NullInt64{
 			Int64: 300,
 			Valid: true,
 		},
@@ -1206,40 +1350,29 @@ sequence[{{$i}}]={{$v}}
 
 	id4 := 4
 	template4 := &models.Template{
-		ID:              id4,
-		Name:            "test14",
-		TemplateContent: `volatile1 = {{.volatile1}}, volatile2 = {{.volatile2}}`,
-		Description:     "test14desc",
-	}
-
-	id5 := 5
-	template5 := &models.Template{
-		ID:   id5,
-		Name: "test15",
+		ID:   id4,
+		Name: "test14",
 		TemplateContent: `include test
-{{- $volatile := map }}
-{{- $volatile := put $volatile "volatile1" "abc" }}
-{{- $volatile := put $volatile "volatile2" 123 }}
+{{- $parameter := map }}
+{{- $parameter := put $parameter "testParameter1X" "999" }}
 {{ include .ModelStore "test12" nil }}
-{{ include .ModelStore "test13" nil }}
-{{ include .ModelStore "test14" $volatile }}
+{{ include .ModelStore "test13" $parameter }}
 `,
 		Description: "test15desc",
 	}
 
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template1)
-	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_persistent_parameters", nil), templatePersistentParameter11)
-	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_persistent_parameters", nil), templatePersistentParameter12)
-	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_persistent_parameters", nil), templatePersistentParameter13)
+	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_arguments", nil), templateArgument11)
+	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_arguments", nil), templateArgument12)
+	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_arguments", nil), templateArgument13)
 
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template2)
-	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_persistent_parameters", nil), templatePersistentParameter21)
+	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_arguments", nil), templateArgument21)
 
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template3)
-	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_persistent_parameters", nil), templatePersistentParameter31)
+	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_arguments", nil), templateArgument31)
 
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template4)
-	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template5)
 
 	responseText, code := Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%d", id), "generation", nil), nil)
 	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_FuncMaps_1.txt"))
@@ -1250,6 +1383,6 @@ sequence[{{$i}}]={{$v}}
 	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%d", id3), "generation", nil), nil)
 	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_FuncMaps_3.txt"))
 
-	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%d", id5), "generation", nil), nil)
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%d", id4), "generation", nil), nil)
 	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_FuncMaps_4.txt"))
 }

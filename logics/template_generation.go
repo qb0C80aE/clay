@@ -13,6 +13,7 @@ import (
 	"github.com/qb0C80aE/clay/utils/mapstruct"
 	"net/http"
 	"net/url"
+	"reflect"
 	"strconv"
 	"strings"
 	tplpkg "text/template"
@@ -32,23 +33,86 @@ func newTemplateGenerationLogic() *templateGenerationLogic {
 }
 
 // GenerateTemplate generates text data based on registered templates
-func GenerateTemplate(db *gorm.DB, id string, templateVolatileParameterMap map[interface{}]interface{}) (interface{}, error) {
-	templateParameter := map[interface{}]interface{}{}
+func GenerateTemplate(db *gorm.DB, id string, templateArgumentParameterMap map[interface{}]interface{}) (interface{}, error) {
+	templateArgumentMap := map[interface{}]*models.TemplateArgument{}
+	templateParameterMap := map[interface{}]interface{}{}
 
 	template := &models.Template{}
 	template.ID, _ = strconv.Atoi(id)
 
-	if err := db.Preload("TemplatePersistentParameters").Select("*").First(template, template.ID).Error; err != nil {
+	if err := db.Preload("TemplateArguments").Select("*").First(template, template.ID).Error; err != nil {
 		return nil, err
 	}
 
-	for key, value := range templateVolatileParameterMap {
-		templateParameter[key] = value
+	for _, templateArgument := range template.TemplateArguments {
+		templateArgumentMap[templateArgument.Name] = templateArgument
+		switch templateArgument.Type {
+		case models.TemplateArgumentTypeInt:
+			templateParameterMap[templateArgument.Name] = templateArgument.DefaultValueInt.Int64
+		case models.TemplateArgumentTypeFloat:
+			templateParameterMap[templateArgument.Name] = templateArgument.DefaultValueFloat.Float64
+		case models.TemplateArgumentTypeBool:
+			templateParameterMap[templateArgument.Name] = templateArgument.DefaultValueBool.Bool
+		case models.TemplateArgumentTypeString:
+			templateParameterMap[templateArgument.Name] = templateArgument.DefaultValueString.String
+		}
 	}
-	for _, templatePersistentParameter := range template.TemplatePersistentParameters {
-		templateParameter[templatePersistentParameter.Name] = templatePersistentParameter
+
+	for key, value := range templateArgumentParameterMap {
+		templateArgument, exists := templateArgumentMap[key]
+		if !exists {
+			return nil, fmt.Errorf("the argument related to a parameter %s does not exist", key)
+		}
+
+		valueType := reflect.TypeOf(value)
+		switch templateArgument.Type {
+		case models.TemplateArgumentTypeInt:
+			switch valueType.Kind() {
+			case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+				templateParameterMap[key] = int64(value.(int))
+			case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+				templateParameterMap[key] = int64(value.(uint))
+			case reflect.String:
+				var err error
+				templateParameterMap[key], err = strconv.ParseInt(value.(string), 10, 64)
+				if err != nil {
+					return nil, fmt.Errorf("parameter type mistmatch, %s should be int, or integer-formatted string, but value is %v", key, value)
+				}
+			default:
+				return nil, fmt.Errorf("parameter type mistmatch, %s should be int, or integer-formatted string, but value is %v", key, value)
+			}
+		case models.TemplateArgumentTypeFloat:
+			switch valueType.Kind() {
+			case reflect.Float32, reflect.Float64:
+				templateParameterMap[key] = float64(value.(float64))
+			case reflect.String:
+				var err error
+				templateParameterMap[key], err = strconv.ParseFloat(value.(string), 64)
+				if err != nil {
+					return nil, fmt.Errorf("parameter type mistmatch, %s should be float, or float-formatted string, but value is %v", key, value)
+				}
+			default:
+				return nil, fmt.Errorf("parameter type mistmatch, %s should be float, or float-formatted string, but value is %v", key, value)
+			}
+		case models.TemplateArgumentTypeBool:
+			switch valueType.Kind() {
+			case reflect.Bool:
+				templateParameterMap[key] = value.(bool)
+			case reflect.String:
+				var err error
+				templateParameterMap[key], err = strconv.ParseBool(value.(string))
+				if err != nil {
+					return nil, fmt.Errorf("parameter type mistmatch, %s should be bool, or bool-formatted string, but value is %v", key, value)
+				}
+			default:
+				return nil, fmt.Errorf("parameter type mistmatch, %s should be bool, or bool-formatted string, but value is %v", key, value)
+			}
+		case models.TemplateArgumentTypeString:
+			templateParameterMap[key] = fmt.Sprintf("%v", value)
+		}
 	}
-	templateParameter["ModelStore"] = db
+
+	templateParameterMap["ModelStore"] = db
 
 	tpl := tplpkg.New("template")
 	templateFuncMaps := extensions.RegisteredTemplateFuncMaps()
@@ -61,7 +125,7 @@ func GenerateTemplate(db *gorm.DB, id string, templateVolatileParameterMap map[i
 	}
 
 	var doc bytes.Buffer
-	if err := tpl.Execute(&doc, templateParameter); err != nil {
+	if err := tpl.Execute(&doc, templateParameterMap); err != nil {
 		return nil, err
 	}
 
@@ -72,11 +136,11 @@ func GenerateTemplate(db *gorm.DB, id string, templateVolatileParameterMap map[i
 
 // GetSingle generates text data based on registered templates
 func (logic *templateGenerationLogic) GetSingle(db *gorm.DB, parameters gin.Params, urlValues url.Values, queryFields string) (interface{}, error) {
-	templateVolatileParameterMap := make(map[interface{}]interface{}, len(urlValues))
-	for key, value := range urlValues {
-		templateVolatileParameterMap[key] = value
+	templateArgumentParameterMap := make(map[interface{}]interface{}, len(urlValues))
+	for key := range urlValues {
+		templateArgumentParameterMap[key] = urlValues.Get(key)
 	}
-	return GenerateTemplate(db, parameters.ByName("id"), templateVolatileParameterMap)
+	return GenerateTemplate(db, parameters.ByName("id"), templateArgumentParameterMap)
 }
 
 var uniqueTemplateGenerationLogic = newTemplateGenerationLogic()
@@ -369,13 +433,13 @@ func init() {
 			db.Model(model).Count(&total)
 			return total, nil
 		},
-		"include": func(dbObject interface{}, templateName string, templateVolatileParameterMap map[interface{}]interface{}) (interface{}, error) {
+		"include": func(dbObject interface{}, templateName string, templateArgumentParameterMap map[interface{}]interface{}) (interface{}, error) {
 			db := dbObject.(*gorm.DB)
 			template := models.NewTemplateModel()
 			if err := db.Select("*").First(template, "name = ?", templateName).Error; err != nil {
 				return nil, fmt.Errorf("template %s does not exist", templateName)
 			}
-			result, err := GenerateTemplate(db, strconv.Itoa(template.ID), templateVolatileParameterMap)
+			result, err := GenerateTemplate(db, strconv.Itoa(template.ID), templateArgumentParameterMap)
 			if err != nil {
 				return nil, err
 			}
