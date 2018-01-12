@@ -3,5 +3,5 @@
   "name": "test2",
   "template_content": "TestTemplate2",
   "description": "test2desc",
-  "template_persistent_parameters": null
+  "template_arguments": null
 }

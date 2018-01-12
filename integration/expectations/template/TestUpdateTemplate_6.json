@@ -2,26 +2,26 @@
   "description": "test3desc",
   "id": 103,
   "name": "test3",
-  "template_content": "TestTemplate3",
-  "template_persistent_parameters": [
+  "template_arguments": [
     {
       "id": 1000,
       "template_id": 103,
       "name": "testParameter31",
       "description": "testParameter31desc",
-      "value_int": {
+      "type": 0,
+      "default_value_int": {
         "Int64": 0,
         "Valid": false
       },
-      "value_float": {
+      "default_value_float": {
         "Float64": 0,
         "Valid": false
       },
-      "value_bool": {
+      "default_value_bool": {
         "Bool": false,
         "Valid": false
       },
-      "value_string": {
+      "default_value_string": {
         "String": "TestParameter31",
         "Valid": true
       }
@@ -31,19 +31,20 @@
       "template_id": 103,
       "name": "testParameter32Updated",
       "description": "testParameter32descUpdated",
-      "value_int": {
+      "type": 0,
+      "default_value_int": {
         "Int64": 0,
         "Valid": false
       },
-      "value_float": {
+      "default_value_float": {
         "Float64": 0,
         "Valid": false
       },
-      "value_bool": {
+      "default_value_bool": {
         "Bool": false,
         "Valid": false
       },
-      "value_string": {
+      "default_value_string": {
         "String": "TestParameter32Updated",
         "Valid": true
       }
@@ -53,22 +54,24 @@
       "template_id": 103,
       "name": "testParameter34",
       "description": "",
-      "value_int": {
+      "type": 0,
+      "default_value_int": {
         "Int64": 0,
         "Valid": false
       },
-      "value_float": {
+      "default_value_float": {
         "Float64": 0,
         "Valid": false
       },
-      "value_bool": {
+      "default_value_bool": {
         "Bool": false,
         "Valid": false
       },
-      "value_string": {
+      "default_value_string": {
         "String": "TestParameter34",
         "Valid": true
       }
     }
-  ]
+  ],
+  "template_content": "TestTemplate3"
 }

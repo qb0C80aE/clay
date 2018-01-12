@@ -1,10 +1,18 @@
-TestParameter1 is TestParameter1, TestParameter2 is TestParameter2
-urlParam1 is [100]
-urlParam2 is [200 201]
-urlParam3 is [300 301 302]
-100
-200
-201
-300
-301
-302
+testParameterInt = 123
+testParameterInt8 = 124
+testParameterInt16 = 125
+testParameterInt32 = 126
+testParameterInt64 = 127
+testParameterUint = 1123
+testParameterUint8 = 1124
+testParameterUint16 = 1125
+testParameterUint32 = 1126
+testParameterUint64 = 1127
+testParameterFloat32 = 123.1
+testParameterFloat64 = 123.2
+testParameterBool = true
+testParameterString = ABCDE
+testParameterIntOverride = 100
+testParameterFloatOverride = 200.123
+testParameterBoolOverride = true
+testParameterStringOverride = QWERTY

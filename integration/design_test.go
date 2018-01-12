@@ -36,10 +36,10 @@ func TestGetDesign(t *testing.T) {
 		Name:            "test2",
 		TemplateContent: "TestTemplate2",
 		Description:     "tedst2desc",
-		TemplatePersistentParameters: []*models.TemplatePersistentParameter{
+		TemplateArguments: []*models.TemplateArgument{
 			{
 				Name: "testParameter1",
-				ValueString: sql.NullString{
+				DefaultValueString: sql.NullString{
 					String: "TestParameter1",
 					Valid:  true,
 				},
@@ -48,10 +48,10 @@ func TestGetDesign(t *testing.T) {
 		},
 	}
 
-	templatePersistentParameter22 := &models.TemplatePersistentParameter{
+	templateArgument22 := &models.TemplateArgument{
 		TemplateID: 2,
 		Name:       "testParameter2",
-		ValueString: sql.NullString{
+		DefaultValueString: sql.NullString{
 			String: "TestParameter2",
 			Valid:  true,
 		},
@@ -60,7 +60,7 @@ func TestGetDesign(t *testing.T) {
 
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template1)
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template2)
-	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_persistent_parameters", nil), templatePersistentParameter22)
+	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_persistent_parameters", nil), templateArgument22)
 
 	responseText, code := Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "designs", "present", nil), nil)
 	CheckResponseJSON(t, code, http.StatusOK, responseText, LoadExpectation(t, "design/TestGetDesign_1.json"), &models.Design{})
@@ -72,12 +72,12 @@ func TestUpdateDesign(t *testing.T) {
 
 	design := &models.Design{
 		Content: map[string]interface{}{
-			"template_persistent_parameters": []*models.TemplatePersistentParameter{
+			"template_persistent_parameters": []*models.TemplateArgument{
 				{
 					ID:         1,
 					TemplateID: 1,
 					Name:       "testParameter11",
-					ValueString: sql.NullString{
+					DefaultValueString: sql.NullString{
 						String: "TestParameter11",
 						Valid:  true,
 					},
@@ -87,7 +87,7 @@ func TestUpdateDesign(t *testing.T) {
 					ID:         2,
 					TemplateID: 1,
 					Name:       "testParameter12",
-					ValueString: sql.NullString{
+					DefaultValueString: sql.NullString{
 						String: "TestParameter12",
 						Valid:  true,
 					},
@@ -124,12 +124,12 @@ func TestDeleteDesign(t *testing.T) {
 
 	design := &models.Design{
 		Content: map[string]interface{}{
-			"template_persistent_parameters": []*models.TemplatePersistentParameter{
+			"template_persistent_parameters": []*models.TemplateArgument{
 				{
 					ID:         1,
 					TemplateID: 1,
 					Name:       "testParameter11",
-					ValueString: sql.NullString{
+					DefaultValueString: sql.NullString{
 						String: "TestParameter11",
 						Valid:  true,
 					},
@@ -139,7 +139,7 @@ func TestDeleteDesign(t *testing.T) {
 					ID:         2,
 					TemplateID: 1,
 					Name:       "testParameter12",
-					ValueString: sql.NullString{
+					DefaultValueString: sql.NullString{
 						String: "TestParameter12",
 						Valid:  true,
 					},

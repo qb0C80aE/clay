@@ -307,16 +307,16 @@ total
 
 --- hash ---
 hash
-hash[testParameter11]={1 1 testParameter11 testParameter11desc {1 true} {0 false} {false false} {TestParameter11 true} false}
-hash[testParameter12]={2 1 testParameter12 testParameter12desc {0 false} {0 false} {false false} {TestParameter12 true} false}
+hash[testParameter11]={1 1 testParameter11 testParameter11desc 1 {1 true} {0 false} {false false} {TestParameter11 true} false}
+hash[testParameter12]={2 1 testParameter12 testParameter12desc 4 {0 false} {0 false} {false false} {TestParameter12 true} false}
 
 --- slicemap ---
 slicemap
-slicemap[testParameter1][0]={1 1 testParameter11 testParameter11desc {1 true} {0 false} {false false} {TestParameter11 true} false}
-slicemap[testParameter2][0]={2 1 testParameter12 testParameter12desc {0 false} {0 false} {false false} {TestParameter12 true} false}
-slicemap[testParameter1X][0]={3 1 testParameter1X testParameter1Xdesc {100 true} {0 false} {false false} { false} false}
-slicemap[testParameter1X][1]={4 2 testParameter1X testParameter1Xdesc {200 true} {0 false} {false false} { false} false}
-slicemap[testParameter1X][2]={5 3 testParameter1X testParameter1Xdesc {300 true} {0 false} {false false} { false} false}
+slicemap[testParameter1][0]={1 1 testParameter11 testParameter11desc 1 {1 true} {0 false} {false false} {TestParameter11 true} false}
+slicemap[testParameter2][0]={2 1 testParameter12 testParameter12desc 4 {0 false} {0 false} {false false} {TestParameter12 true} false}
+slicemap[testParameter1X][0]={3 1 testParameter1X testParameter1Xdesc 1 {100 true} {0 false} {false false} { false} false}
+slicemap[testParameter1X][1]={4 2 testParameter1X testParameter1Xdesc 1 {200 true} {0 false} {false false} { false} false}
+slicemap[testParameter1X][2]={5 3 testParameter1X testParameter1Xdesc 1 {300 true} {0 false} {false false} { false} false}
 
 --- sequence ---
 sequence

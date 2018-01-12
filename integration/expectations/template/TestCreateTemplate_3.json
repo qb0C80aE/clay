@@ -3,25 +3,26 @@
   "name": "test100",
   "template_content": "TestTemplate100",
   "description": "test100desc",
-  "template_persistent_parameters": [
+  "template_arguments": [
     {
       "id": 2,
       "template_id": 100,
       "name": "testParameter100",
       "description": "testParameter100desc",
-      "value_int": {
+      "type": 0,
+      "default_value_int": {
         "Int64": 0,
         "Valid": false
       },
-      "value_float": {
+      "default_value_float": {
         "Float64": 0,
         "Valid": false
       },
-      "value_bool": {
+      "default_value_bool": {
         "Bool": false,
         "Valid": false
       },
-      "value_string": {
+      "default_value_string": {
         "String": "TestParameter100",
         "Valid": true
       }
@@ -31,19 +32,20 @@
       "template_id": 100,
       "name": "testParameter110",
       "description": "testParameter110desc",
-      "value_int": {
+      "type": 0,
+      "default_value_int": {
         "Int64": 0,
         "Valid": false
       },
-      "value_float": {
+      "default_value_float": {
         "Float64": 0,
         "Valid": false
       },
-      "value_bool": {
+      "default_value_bool": {
         "Bool": false,
         "Valid": false
       },
-      "value_string": {
+      "default_value_string": {
         "String": "TestParameter110",
         "Valid": true
       }

@@ -1,0 +1,23 @@
+{
+  "id": 2,
+  "template_id": 1,
+  "name": "testParameter2",
+  "description": "testParameter2desc",
+  "type": 0,
+  "default_value_int": {
+    "Int64": 200,
+    "Valid": true
+  },
+  "default_value_float": {
+    "Float64": 456.789,
+    "Valid": true
+  },
+  "default_value_bool": {
+    "Bool": false,
+    "Valid": true
+  },
+  "default_value_string": {
+    "String": "TestParameter2",
+    "Valid": true
+  }
+}

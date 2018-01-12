@@ -1,0 +1,23 @@
+{
+  "id": 1,
+  "template_id": 1,
+  "name": "templateArgument1Updated",
+  "description": "testParameter1descUpdated",
+  "type": 0,
+  "default_value_int": {
+    "Int64": 999,
+    "Valid": true
+  },
+  "default_value_float": {
+    "Float64": 123.456,
+    "Valid": true
+  },
+  "default_value_bool": {
+    "Bool": true,
+    "Valid": true
+  },
+  "default_value_string": {
+    "String": "TestParameter1Updated",
+    "Valid": true
+  }
+}

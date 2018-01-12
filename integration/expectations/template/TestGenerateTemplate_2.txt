@@ -1,10 +1,18 @@
-{{.testParameter1.ValueString.String}} is TestParameter1, {{.testParameter2.ValueString.String}} is TestParameter2
-urlParam1 is {{.urlParam1}}
-urlParam2 is {{.urlParam2}}
-urlParam3 is {{.urlParam3}}
-{{index .urlParam1 0}}
-{{index .urlParam2 0}}
-{{index .urlParam2 1}}
-{{index .urlParam3 0}}
-{{index .urlParam3 1}}
-{{index .urlParam3 2}}
+testParameterInt = {{ .testParameterInt }}
+testParameterInt8 = {{ .testParameterInt8 }}
+testParameterInt16 = {{ .testParameterInt16 }}
+testParameterInt32 = {{ .testParameterInt32 }}
+testParameterInt64 = {{ .testParameterInt64 }}
+testParameterUint = {{ .testParameterUint }}
+testParameterUint8 = {{ .testParameterUint8 }}
+testParameterUint16 = {{ .testParameterUint16 }}
+testParameterUint32 = {{ .testParameterUint32 }}
+testParameterUint64 = {{ .testParameterUint64 }}
+testParameterFloat32 = {{ .testParameterFloat32 }}
+testParameterFloat64 = {{ .testParameterFloat64 }}
+testParameterBool = {{ .testParameterBool }}
+testParameterString = {{ .testParameterString }}
+testParameterIntOverride = {{ .testParameterIntOverride }}
+testParameterFloatOverride = {{ .testParameterFloatOverride }}
+testParameterBoolOverride = {{ .testParameterBoolOverride }}
+testParameterStringOverride = {{ .testParameterStringOverride }}

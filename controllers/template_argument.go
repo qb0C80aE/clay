@@ -7,21 +7,21 @@ import (
 	"github.com/qb0C80aE/clay/models"
 )
 
-type templatePersistentParameterController struct {
+type templateArgumentController struct {
 	*BaseController
 }
 
-func newTemplatePersistentParameterController() extensions.Controller {
-	controller := &templatePersistentParameterController{
+func newTemplateArgumentController() extensions.Controller {
+	controller := &templateArgumentController{
 		BaseController: NewBaseController(
-			models.SharedTemplatePersistentParameterModel(),
-			logics.UniqueTemplatePersistentParameterLogic(),
+			models.SharedTemplateArgumentModel(),
+			logics.UniqueTemplateArgumentLogic(),
 		),
 	}
 	return controller
 }
 
-func (controller *templatePersistentParameterController) RouteMap() map[int]map[int]gin.HandlerFunc {
+func (controller *templateArgumentController) RouteMap() map[int]map[int]gin.HandlerFunc {
 	routeMap := map[int]map[int]gin.HandlerFunc{
 		extensions.MethodGet: {
 			extensions.URLSingle: controller.GetSingle,
@@ -40,8 +40,8 @@ func (controller *templatePersistentParameterController) RouteMap() map[int]map[
 	return routeMap
 }
 
-var uniqueTemplatePersistentParameterController = newTemplatePersistentParameterController()
+var uniqueTemplateArgumentController = newTemplateArgumentController()
 
 func init() {
-	extensions.RegisterController(uniqueTemplatePersistentParameterController)
+	extensions.RegisterController(uniqueTemplateArgumentController)
 }

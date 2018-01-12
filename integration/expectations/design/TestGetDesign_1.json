@@ -1,49 +1,27 @@
 {
   "clay_version": "unknown",
-  "generated_date": "1974-05-19 01:02:03.000000004 +0000 UTC",
   "content": {
-    "template_persistent_parameters": [
+    "template_arguments": [
       {
         "id": 1,
         "template_id": 2,
         "name": "testParameter1",
         "description": "testParameter1desc",
-        "value_int": {
+        "type": 0,
+        "default_value_int": {
           "Int64": 0,
           "Valid": false
         },
-        "value_float": {
+        "default_value_float": {
           "Float64": 0,
           "Valid": false
         },
-        "value_bool": {
+        "default_value_bool": {
           "Bool": false,
           "Valid": false
         },
-        "value_string": {
+        "default_value_string": {
           "String": "TestParameter1",
-          "Valid": true
-        }
-      },
-      {
-        "id": 2,
-        "template_id": 2,
-        "name": "testParameter2",
-        "description": "testParameter2desc",
-        "value_int": {
-          "Int64": 0,
-          "Valid": false
-        },
-        "value_float": {
-          "Float64": 0,
-          "Valid": false
-        },
-        "value_bool": {
-          "Bool": false,
-          "Valid": false
-        },
-        "value_string": {
-          "String": "TestParameter2",
           "Valid": true
         }
       }
@@ -54,15 +32,16 @@
         "name": "test1",
         "template_content": "TestTemplate1",
         "description": "tedst1desc",
-        "template_persistent_parameters": null
+        "template_arguments": null
       },
       {
         "id": 2,
         "name": "test2",
         "template_content": "TestTemplate2",
         "description": "tedst2desc",
-        "template_persistent_parameters": null
+        "template_arguments": null
       }
     ]
-  }
+  },
+  "generated_date": "1974-05-19 01:02:03.000000004 +0000 UTC"
 }

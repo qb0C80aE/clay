@@ -1,68 +1,23 @@
 {
   "clay_version": "unknown",
-  "generated_date": "1974-05-19 01:02:03.000000004 +0000 UTC",
   "content": {
-    "template_persistent_parameters": [
-      {
-        "id": 1,
-        "template_id": 1,
-        "name": "testParameter11",
-        "description": "testParameter11desc",
-        "value_int": {
-          "Int64": 0,
-          "Valid": false
-        },
-        "value_float": {
-          "Float64": 0,
-          "Valid": false
-        },
-        "value_bool": {
-          "Bool": false,
-          "Valid": false
-        },
-        "value_string": {
-          "String": "TestParameter11",
-          "Valid": true
-        }
-      },
-      {
-        "id": 2,
-        "template_id": 1,
-        "name": "testParameter12",
-        "description": "testParameter12desc",
-        "value_int": {
-          "Int64": 0,
-          "Valid": false
-        },
-        "value_float": {
-          "Float64": 0,
-          "Valid": false
-        },
-        "value_bool": {
-          "Bool": false,
-          "Valid": false
-        },
-        "value_string": {
-          "String": "TestParameter12",
-          "Valid": true
-        }
-      }
-    ],
+    "template_arguments": [],
     "templates": [
       {
         "id": 1,
         "name": "test1",
         "template_content": "TestTemplate1",
         "description": "test1desc",
-        "template_persistent_parameters": null
+        "template_arguments": null
       },
       {
         "id": 2,
         "name": "test2",
         "template_content": "TestTemplate2",
         "description": "test2desc",
-        "template_persistent_parameters": null
+        "template_arguments": null
       }
     ]
-  }
+  },
+  "generated_date": "1974-05-19 01:02:03.000000004 +0000 UTC"
 }

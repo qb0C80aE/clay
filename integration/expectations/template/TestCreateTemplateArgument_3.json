@@ -1,0 +1,48 @@
+[
+  {
+    "default_value_bool": {
+      "Bool": true,
+      "Valid": true
+    },
+    "default_value_float": {
+      "Float64": 123.456,
+      "Valid": true
+    },
+    "default_value_int": {
+      "Int64": 100,
+      "Valid": true
+    },
+    "default_value_string": {
+      "String": "TestParameter1",
+      "Valid": true
+    },
+    "description": "testParameter1desc",
+    "id": 1,
+    "name": "testParameter1",
+    "template_id": 1,
+    "type": 0
+  },
+  {
+    "default_value_bool": {
+      "Bool": false,
+      "Valid": true
+    },
+    "default_value_float": {
+      "Float64": 456.789,
+      "Valid": true
+    },
+    "default_value_int": {
+      "Int64": 200,
+      "Valid": true
+    },
+    "default_value_string": {
+      "String": "TestParameter2",
+      "Valid": true
+    },
+    "description": "testParameter2desc",
+    "id": 2,
+    "name": "testParameter2",
+    "template_id": 1,
+    "type": 0
+  }
+]
