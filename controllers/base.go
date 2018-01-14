@@ -13,10 +13,13 @@ import (
 	"github.com/qb0C80aE/clay/extensions"
 	"github.com/qb0C80aE/clay/version"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"reflect"
+	"runtime/debug"
 	"strconv"
+	"time"
 )
 
 // BaseController is the base class that all controller classes inherit
@@ -36,6 +39,13 @@ func NewBaseController(model interface{}, logic extensions.Logic) *BaseControlle
 	controller.outputter = controller
 	controller.queryCustomizer = controller
 	return controller
+}
+
+func (controller *BaseController) logStackTrace() {
+	log.Printf("[%s] panic occured in logic, and recovered.\n%s",
+		time.Now(),
+		string(debug.Stack()),
+	)
 }
 
 func (controller *BaseController) deleteMarkedItemsInSlices(db *gorm.DB, data interface{}) error {
@@ -320,6 +330,7 @@ func (controller *BaseController) Queries(c *gin.Context) url.Values {
 func (controller *BaseController) getSingle(db *gorm.DB, parameters gin.Params, urlValues url.Values, queryFields string) (result interface{}, err error) {
 	defer func() {
 		if recoverResult := recover(); recoverResult != nil {
+			controller.logStackTrace()
 			err = fmt.Errorf("%v", recoverResult)
 		}
 	}()
@@ -331,6 +342,7 @@ func (controller *BaseController) getSingle(db *gorm.DB, parameters gin.Params, 
 func (controller *BaseController) getMulti(db *gorm.DB, parameters gin.Params, urlValues url.Values, queryFields string) (result interface{}, err error) {
 	defer func() {
 		if recoverResult := recover(); recoverResult != nil {
+			controller.logStackTrace()
 			err = fmt.Errorf("%v", recoverResult)
 		}
 	}()
@@ -342,6 +354,7 @@ func (controller *BaseController) getMulti(db *gorm.DB, parameters gin.Params, u
 func (controller *BaseController) create(db *gorm.DB, parameters gin.Params, urlValues url.Values, data interface{}) (result interface{}, err error) {
 	defer func() {
 		if recoverResult := recover(); recoverResult != nil {
+			controller.logStackTrace()
 			err = fmt.Errorf("%v", recoverResult)
 		}
 	}()
@@ -353,6 +366,7 @@ func (controller *BaseController) create(db *gorm.DB, parameters gin.Params, url
 func (controller *BaseController) update(db *gorm.DB, parameters gin.Params, urlValues url.Values, data interface{}) (result interface{}, err error) {
 	defer func() {
 		if recoverResult := recover(); recoverResult != nil {
+			controller.logStackTrace()
 			err = fmt.Errorf("%v", recoverResult)
 		}
 	}()
@@ -368,6 +382,7 @@ func (controller *BaseController) update(db *gorm.DB, parameters gin.Params, url
 func (controller *BaseController) delete(db *gorm.DB, parameters gin.Params, urlValues url.Values) (err error) {
 	defer func() {
 		if recoverResult := recover(); recoverResult != nil {
+			controller.logStackTrace()
 			err = fmt.Errorf("%v", recoverResult)
 		}
 	}()
@@ -379,6 +394,7 @@ func (controller *BaseController) delete(db *gorm.DB, parameters gin.Params, url
 func (controller *BaseController) patch(db *gorm.DB, parameters gin.Params, urlValues url.Values) (result interface{}, err error) {
 	defer func() {
 		if recoverResult := recover(); recoverResult != nil {
+			controller.logStackTrace()
 			err = fmt.Errorf("%v", recoverResult)
 		}
 	}()
@@ -390,6 +406,7 @@ func (controller *BaseController) patch(db *gorm.DB, parameters gin.Params, urlV
 func (controller *BaseController) options(db *gorm.DB, parameters gin.Params, urlValues url.Values) (err error) {
 	defer func() {
 		if recoverResult := recover(); recoverResult != nil {
+			controller.logStackTrace()
 			err = fmt.Errorf("%v", recoverResult)
 		}
 	}()
@@ -401,6 +418,7 @@ func (controller *BaseController) options(db *gorm.DB, parameters gin.Params, ur
 func (controller *BaseController) total(db *gorm.DB, model interface{}) (total int, err error) {
 	defer func() {
 		if recoverResult := recover(); recoverResult != nil {
+			controller.logStackTrace()
 			err = fmt.Errorf("%v", recoverResult)
 		}
 	}()
