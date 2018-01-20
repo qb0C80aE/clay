@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/qb0C80aE/clay/logging"
 	"reflect"
 	"sort"
 )
@@ -12,10 +13,12 @@ import (
 func MapToStruct(m []interface{}, val interface{}) error {
 	tmp, err := json.Marshal(m)
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		return err
 	}
 	err = json.Unmarshal(tmp, val)
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		return err
 	}
 	return nil
@@ -27,6 +30,7 @@ func SliceToInterfaceSlice(slice interface{}) ([]interface{}, error) {
 	v := reflect.ValueOf(slice)
 
 	if v.Kind() != reflect.Slice && v.Kind() != reflect.Array {
+		logging.Logger().Debug("given argument is neither a slice nor an array")
 		return nil, errors.New("given argument is neither a slice nor an array")
 	}
 
@@ -40,6 +44,7 @@ func SliceToInterfaceSlice(slice interface{}) ([]interface{}, error) {
 			itemForField = itemForField.Elem()
 		}
 		if !itemForField.IsValid() {
+			logging.Logger().Debugf("the actual item indexed %d in given slice is not valid", i)
 			return nil, fmt.Errorf("the actual item indexed %d in given slice is not valid", i)
 		}
 		// This method does not require the field name of struct
@@ -48,6 +53,7 @@ func SliceToInterfaceSlice(slice interface{}) ([]interface{}, error) {
 		//}
 
 		if !item.CanInterface() {
+			logging.Logger().Debugf("the original item indexed %d in given slice cannot interface", i)
 			return nil, fmt.Errorf("the original item indexed %d in given slice cannot interface", i)
 		}
 		result[i] = item.Interface()
@@ -61,6 +67,7 @@ func StructSliceToInterfaceMap(structSlice interface{}, keyFieldName string) (ma
 	structSliceValue := reflect.ValueOf(structSlice)
 
 	if structSliceValue.Kind() != reflect.Slice && structSliceValue.Kind() != reflect.Array {
+		logging.Logger().Debug("given argument is neither a slice nor an array")
 		return nil, errors.New("given argument is neither a slice nor an array")
 	}
 
@@ -74,18 +81,22 @@ func StructSliceToInterfaceMap(structSlice interface{}, keyFieldName string) (ma
 			sliceElementValueForField = sliceElementValueForField.Elem()
 		}
 		if !sliceElementValueForField.IsValid() {
+			logging.Logger().Debugf("the actual item indexed %d in given slice is not valid", i)
 			return nil, fmt.Errorf("the actual item indexed %d in given slice is not valid", i)
 		}
 		// This method requires the field name of struct
 		if sliceElementValueForField.Kind() != reflect.Struct {
+			logging.Logger().Debug("given slice isn't a slice of struct")
 			return nil, errors.New("given slice isn't a slice of struct")
 		}
 		structElementFieldValue := sliceElementValueForField.FieldByName(keyFieldName)
 		if !structElementFieldValue.IsValid() {
+			logging.Logger().Debugf("the actual struct in given slice doesn't have a field named '%s'", keyFieldName)
 			return nil, fmt.Errorf("the actual struct in given slice doesn't have a field named '%s'", keyFieldName)
 		}
 
 		if !sliceElementValue.CanInterface() {
+			logging.Logger().Debugf("the original item indexed %d in given slice cannot interface", i)
 			return nil, fmt.Errorf("the original item indexed %d in given slice cannot interface", i)
 		}
 		result[structElementFieldValue.Interface()] = sliceElementValue.Interface()
@@ -99,6 +110,7 @@ func StructSliceToInterfaceSliceMap(structSlice interface{}, keyFieldName string
 	structSliceValue := reflect.ValueOf(structSlice)
 
 	if structSliceValue.Kind() != reflect.Slice && structSliceValue.Kind() != reflect.Array {
+		logging.Logger().Debug("given argument is neither a slice nor an array")
 		return nil, errors.New("given argument is neither a slice nor an array")
 	}
 
@@ -112,18 +124,22 @@ func StructSliceToInterfaceSliceMap(structSlice interface{}, keyFieldName string
 			sliceElementValueForField = sliceElementValueForField.Elem()
 		}
 		if !sliceElementValueForField.IsValid() {
+			logging.Logger().Debugf("the actual item indexed %d in given slice is not valid", i)
 			return nil, fmt.Errorf("the actual item indexed %d in given slice is not valid", i)
 		}
 		// This method requires the field name of struct
 		if sliceElementValueForField.Kind() != reflect.Struct {
+			logging.Logger().Debug("given slice isn't a slice of struct")
 			return nil, errors.New("given slice isn't a slice of struct")
 		}
 		structElementFieldValue := sliceElementValueForField.FieldByName(keyFieldName)
 		if !structElementFieldValue.IsValid() {
+			logging.Logger().Debugf("the actual struct in given slice doesn't have a field named '%s'", keyFieldName)
 			return nil, fmt.Errorf("the actual struct in given slice doesn't have a field named '%s'", keyFieldName)
 		}
 
 		if !sliceElementValue.CanInterface() {
+			logging.Logger().Debugf("the original item indexed %d in given slice cannot interface", i)
 			return nil, fmt.Errorf("the original item indexed %d in given slice cannot interface", i)
 		}
 
@@ -143,6 +159,7 @@ func StructSliceToFieldValueInterfaceSlice(structSlice interface{}, fieldName st
 	structSliceValue := reflect.ValueOf(structSlice)
 
 	if structSliceValue.Kind() != reflect.Slice && structSliceValue.Kind() != reflect.Array {
+		logging.Logger().Debug("given argument is neither a slice nor an array")
 		return nil, errors.New("given argument is neither a slice nor an array")
 	}
 
@@ -156,17 +173,21 @@ func StructSliceToFieldValueInterfaceSlice(structSlice interface{}, fieldName st
 			sliceElementValueForField = sliceElementValueForField.Elem()
 		}
 		if !sliceElementValueForField.IsValid() {
+			logging.Logger().Debugf("the actual item indexed %d in given slice is not valid", i)
 			return nil, fmt.Errorf("the actual item indexed %d in given slice is not valid", i)
 		}
 		// This method requires the field name of struct
 		if sliceElementValueForField.Kind() != reflect.Struct {
+			logging.Logger().Debug("given slice isn't a slice of struct")
 			return nil, errors.New("given slice isn't a slice of struct")
 		}
 		structElementFieldValue := sliceElementValueForField.FieldByName(fieldName)
 		if !structElementFieldValue.IsValid() {
+			logging.Logger().Debugf("the actual struct in given slice doesn't have a field named '%s'", fieldName)
 			return nil, fmt.Errorf("the actual struct in given slice doesn't have a field named '%s'", fieldName)
 		}
 		if !structElementFieldValue.CanInterface() {
+			logging.Logger().Debugf("the original field of item indexed %d in given slice cannot interface", i)
 			return nil, fmt.Errorf("the original field of item indexed %d in given slice cannot interface", i)
 		}
 		result[i] = structElementFieldValue.Interface()
@@ -180,6 +201,7 @@ func MapToKeySlice(mapInterface interface{}) ([]interface{}, error) {
 	mapInterfaceValue := reflect.ValueOf(mapInterface)
 
 	if mapInterfaceValue.Kind() != reflect.Map {
+		logging.Logger().Debug("given argument is not a map")
 		return nil, errors.New("given argument is not a map")
 	}
 
@@ -194,9 +216,11 @@ func MapToKeySlice(mapInterface interface{}) ([]interface{}, error) {
 			key = key.Elem()
 		}
 		if !key.IsValid() {
+			logging.Logger().Debug("the key in given map is not valid")
 			return nil, fmt.Errorf("the key in given map is not valid")
 		}
 		if !key.CanInterface() {
+			logging.Logger().Debug("the key in given map cannot interface")
 			return nil, fmt.Errorf("the key in given map cannot interface")
 		}
 		result[i] = keys[i].Interface()
@@ -213,6 +237,7 @@ func SortSlice(slice interface{}, order string) ([]interface{}, error) {
 	sliceValue := reflect.ValueOf(slice)
 
 	if sliceValue.Kind() != reflect.Slice && sliceValue.Kind() != reflect.Array {
+		logging.Logger().Debug("given argument is neither a slice nor an array")
 		return nil, errors.New("given argument is neither a slice nor an array")
 	}
 
@@ -229,9 +254,11 @@ func SortSlice(slice interface{}, order string) ([]interface{}, error) {
 			sliceElementValue = sliceElementValue.Elem()
 		}
 		if !sliceElementValue.IsValid() {
+			logging.Logger().Debugf("the original item indexed %d in given slice is invalid", i)
 			return nil, fmt.Errorf("the original item indexed %d in given slice is invalid", i)
 		}
 		if !sliceElementValue.CanInterface() {
+			logging.Logger().Debugf("the original item indexed %d in given slice cannot interface", i)
 			return nil, fmt.Errorf("the original item indexed %d in given slice cannot interface", i)
 		}
 
@@ -239,6 +266,7 @@ func SortSlice(slice interface{}, order string) ([]interface{}, error) {
 			kindExpected = sliceElementValue.Kind()
 		} else {
 			if kindExpected != sliceElementValue.Kind() {
+				logging.Logger().Debugf("the kind was expected as %s, but another kind %s has been found in the slice index %d", kindExpected, sliceElementValue.Kind(), i)
 				return nil, fmt.Errorf("the kind was expected as %s, but another kind %s has been found in the slice index %d", kindExpected, sliceElementValue.Kind(), i)
 			}
 		}
@@ -251,6 +279,7 @@ func SortSlice(slice interface{}, order string) ([]interface{}, error) {
 			i, j = j, i
 		} else {
 			if order != "asc" {
+				logging.Logger().Debug("the order must be asc or desc")
 				panic("the order must be asc or desc")
 			}
 		}
@@ -310,6 +339,7 @@ func SortSlice(slice interface{}, order string) ([]interface{}, error) {
 			right := rightInterface.(string)
 			return left < right
 		default:
+			logging.Logger().Debug("the value in the given slice must be comparable type like digit or string")
 			panic("the value in the given slice must be comparable type like digit or string")
 		}
 	})

@@ -8,6 +8,7 @@ import (
 	_ "github.com/qb0C80aE/clay/buildtime" // Include program information
 	"github.com/qb0C80aE/clay/db"
 	"github.com/qb0C80aE/clay/extensions"
+	"github.com/qb0C80aE/clay/logging"
 	"github.com/qb0C80aE/clay/server"
 )
 
@@ -31,7 +32,10 @@ func (clayRuntime *clayRuntime) Run() {
 	database := db.Connect()
 	s := server.Setup(database)
 
-	s.Run(fmt.Sprintf("%s:%s", host, port))
+	if err := s.Run(fmt.Sprintf("%s:%s", host, port)); err != nil {
+		logging.Logger().Criticalf("failed to start: %s", err)
+		os.Exit(1)
+	}
 }
 
 func init() {

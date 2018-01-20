@@ -8,6 +8,7 @@ import (
 	dbpkg "github.com/qb0C80aE/clay/db"
 	"github.com/qb0C80aE/clay/extensions"
 	"github.com/qb0C80aE/clay/helper"
+	"github.com/qb0C80aE/clay/logging"
 	"github.com/qb0C80aE/clay/models"
 	"github.com/qb0C80aE/clay/utils/conversion"
 	"github.com/qb0C80aE/clay/utils/mapstruct"
@@ -41,6 +42,7 @@ func GenerateTemplate(db *gorm.DB, id string, templateArgumentParameterMap map[i
 	template.ID, _ = strconv.Atoi(id)
 
 	if err := db.Preload("TemplateArguments").Select("*").First(template, template.ID).Error; err != nil {
+		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
 
@@ -61,6 +63,7 @@ func GenerateTemplate(db *gorm.DB, id string, templateArgumentParameterMap map[i
 	for key, value := range templateArgumentParameterMap {
 		templateArgument, exists := templateArgumentMap[key]
 		if !exists {
+			logging.Logger().Debugf("the argument related to a parameter %s does not exist", key)
 			return nil, fmt.Errorf("the argument related to a parameter %s does not exist", key)
 		}
 
@@ -76,6 +79,7 @@ func GenerateTemplate(db *gorm.DB, id string, templateArgumentParameterMap map[i
 				var err error
 				templateParameterMap[key], err = strconv.ParseInt(value.(string), 10, 64)
 				if err != nil {
+					logging.Logger().Debug(err.Error())
 					return nil, fmt.Errorf("parameter type mistmatch, %s should be int, or integer-formatted string, but value is %v", key, value)
 				}
 			default:
@@ -89,6 +93,7 @@ func GenerateTemplate(db *gorm.DB, id string, templateArgumentParameterMap map[i
 				var err error
 				templateParameterMap[key], err = strconv.ParseFloat(value.(string), 64)
 				if err != nil {
+					logging.Logger().Debug(err.Error())
 					return nil, fmt.Errorf("parameter type mistmatch, %s should be float, or float-formatted string, but value is %v", key, value)
 				}
 			default:
@@ -102,6 +107,7 @@ func GenerateTemplate(db *gorm.DB, id string, templateArgumentParameterMap map[i
 				var err error
 				templateParameterMap[key], err = strconv.ParseBool(value.(string))
 				if err != nil {
+					logging.Logger().Debug(err.Error())
 					return nil, fmt.Errorf("parameter type mistmatch, %s should be bool, or bool-formatted string, but value is %v", key, value)
 				}
 			default:
@@ -121,11 +127,13 @@ func GenerateTemplate(db *gorm.DB, id string, templateArgumentParameterMap map[i
 	}
 	tpl, err := tpl.Parse(template.TemplateContent)
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
 
 	var doc bytes.Buffer
 	if err := tpl.Execute(&doc, templateParameterMap); err != nil {
+		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
 
@@ -206,6 +214,7 @@ func init() {
 		"subslice": func(sliceInterface interface{}, begin int, end int) (interface{}, error) {
 			slice, err := mapstruct.SliceToInterfaceSlice(sliceInterface)
 			if err != nil {
+				logging.Logger().Debug(err.Error())
 				return nil, err
 			}
 			if begin < 0 {
@@ -222,6 +231,7 @@ func init() {
 		"append": func(sliceInterface interface{}, item ...interface{}) (interface{}, error) {
 			slice, err := mapstruct.SliceToInterfaceSlice(sliceInterface)
 			if err != nil {
+				logging.Logger().Debug(err.Error())
 				return nil, err
 			}
 			return append(slice, item...), nil
@@ -229,10 +239,12 @@ func init() {
 		"concatenate": func(sliceInterface1 interface{}, sliceInterface2 interface{}) (interface{}, error) {
 			slice1, err := mapstruct.SliceToInterfaceSlice(sliceInterface1)
 			if err != nil {
+				logging.Logger().Debug(err.Error())
 				return nil, err
 			}
 			slice2, err := mapstruct.SliceToInterfaceSlice(sliceInterface2)
 			if err != nil {
+				logging.Logger().Debug(err.Error())
 				return nil, err
 			}
 			return append(slice1, slice2...), nil
@@ -245,6 +257,7 @@ func init() {
 		},
 		"map": func(pairs ...interface{}) (map[interface{}]interface{}, error) {
 			if len(pairs)%2 == 1 {
+				logging.Logger().Debug("numebr of arguments must be even")
 				return nil, fmt.Errorf("numebr of arguments must be even")
 			}
 			m := make(map[interface{}]interface{}, len(pairs)/2)
@@ -283,6 +296,7 @@ func init() {
 		"slicemap": func(slice interface{}, keyField string) (map[interface{}]interface{}, error) {
 			sliceMap, err := mapstruct.StructSliceToInterfaceSliceMap(slice, keyField)
 			if err != nil {
+				logging.Logger().Debug(err.Error())
 				return nil, err
 			}
 			result := make(map[interface{}]interface{}, len(sliceMap))
@@ -329,24 +343,29 @@ func init() {
 				nil,
 			)
 			if err != nil {
+				logging.Logger().Debug(err.Error())
 				return nil, err
 			}
 			model, err := extensions.CreateModel(resourceName)
 			if err != nil {
+				logging.Logger().Debug(err.Error())
 				return nil, err
 			}
 			urlQuery := requestForParameter.URL.Query()
 			parameter, err := dbpkg.NewParameter(urlQuery)
 			if err != nil {
+				logging.Logger().Debug(err.Error())
 				return nil, err
 			}
 			logic, err := extensions.RegisteredLogic(model)
 			if err != nil {
+				logging.Logger().Debug(err.Error())
 				return nil, err
 			}
 			db := dbObject.(*gorm.DB)
 			db, err = parameter.Paginate(db)
 			if err != nil {
+				logging.Logger().Debug(err.Error())
 				return nil, err
 			}
 			db = parameter.SetPreloads(db)
@@ -356,6 +375,7 @@ func init() {
 
 			result, err := logic.GetSingle(db, parameters, requestForParameter.URL.Query(), queryFields)
 			if err != nil {
+				logging.Logger().Debug(err.Error())
 				return nil, err
 			}
 			return result, nil
@@ -392,20 +412,24 @@ func init() {
 			)
 			model, err := extensions.CreateModel(resourceName)
 			if err != nil {
+				logging.Logger().Debug(err.Error())
 				return nil, err
 			}
 			urlQuery := requestForParameter.URL.Query()
 			parameter, err := dbpkg.NewParameter(urlQuery)
 			if err != nil {
+				logging.Logger().Debug(err.Error())
 				return nil, err
 			}
 			logic, err := extensions.RegisteredLogic(model)
 			if err != nil {
+				logging.Logger().Debug(err.Error())
 				return nil, err
 			}
 			db := dbObject.(*gorm.DB)
 			db, err = parameter.Paginate(db)
 			if err != nil {
+				logging.Logger().Debug(err.Error())
 				return nil, err
 			}
 			db = parameter.SetPreloads(db)
@@ -415,6 +439,7 @@ func init() {
 			queryFields := helper.QueryFields(model, fields)
 			result, err := logic.GetMulti(db, parameters, requestForParameter.URL.Query(), queryFields)
 			if err != nil {
+				logging.Logger().Debug(err.Error())
 				return nil, err
 			}
 			return result, nil
@@ -426,6 +451,7 @@ func init() {
 
 			model, err := extensions.CreateModel(resourceName)
 			if err != nil {
+				logging.Logger().Debug(err.Error())
 				return nil, err
 			}
 			db := dbObject.(*gorm.DB)
@@ -437,10 +463,12 @@ func init() {
 			db := dbObject.(*gorm.DB)
 			template := models.NewTemplateModel()
 			if err := db.Select("*").First(template, "name = ?", templateName).Error; err != nil {
+				logging.Logger().Debug(err.Error())
 				return nil, fmt.Errorf("template %s does not exist", templateName)
 			}
 			result, err := GenerateTemplate(db, strconv.Itoa(template.ID), templateArgumentParameterMap)
 			if err != nil {
+				logging.Logger().Debug(err.Error())
 				return nil, err
 			}
 			return result, nil

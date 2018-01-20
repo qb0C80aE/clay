@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extensions"
+	"github.com/qb0C80aE/clay/logging"
 	"github.com/qb0C80aE/clay/models"
 	"net/url"
 )
@@ -25,6 +26,7 @@ func (logic *templateRawLogic) GetSingle(db *gorm.DB, parameters gin.Params, _ u
 	template := &models.Template{}
 
 	if err := db.Select(queryFields).First(template, parameters.ByName("id")).Error; err != nil {
+		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
 

@@ -1,7 +1,6 @@
 package db
 
 import (
-	"log"
 	"os"
 	"strings"
 
@@ -10,6 +9,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite" // Need to avoid "Got error when connect database, the error is 'sql: unknown driver "sqlite3" (forgotten import?)'"
 	"github.com/qb0C80aE/clay/extensions"
+	"github.com/qb0C80aE/clay/logging"
 	"github.com/serenize/snaker"
 )
 
@@ -27,13 +27,15 @@ func Connect() *gorm.DB {
 			dbPath = "clay.db"
 		}
 	default:
-		log.Fatalf("Invalid DB_MODE '%s'", dbMode)
+		logging.Logger().Criticalf("invalid DB_MODE '%s'", dbMode)
+		os.Exit(1)
 	}
 
 	db, err := gorm.Open("sqlite3", dbPath)
 
 	if err != nil {
-		log.Fatalf("Got error when connect database, the error is '%v'", err)
+		logging.Logger().Criticalf("got an error when connect to the database, the error is '%v'", err)
+		os.Exit(1)
 	}
 
 	if gin.IsDebugging() {
@@ -44,7 +46,8 @@ func Connect() *gorm.DB {
 
 	registeredModelsToBeMigrated := extensions.RegisteredModelsToBeMigrated()
 	if err := db.AutoMigrate(registeredModelsToBeMigrated...).Error; err != nil {
-		log.Fatalf("AutoMigration failed: '%s'", err.Error())
+		logging.Logger().Criticalf("AutoMigration failed: '%s'", err.Error())
+		os.Exit(1)
 	}
 
 	for _, model := range extensions.RegisteredModels() {
@@ -63,7 +66,8 @@ func Connect() *gorm.DB {
 		err := initialDataLoader.SetupInitialData(tx)
 		if err != nil {
 			tx.Rollback()
-			log.Fatalf("Failed to load the initial data: %s", err)
+			logging.Logger().Criticalf("failed to run the initial data loader: %s", err)
+			os.Exit(1)
 		}
 	}
 	tx.Commit()

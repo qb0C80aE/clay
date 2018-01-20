@@ -3,6 +3,7 @@ package conversion
 import (
 	"errors"
 	"fmt"
+	"github.com/qb0C80aE/clay/logging"
 	"strconv"
 )
 
@@ -36,10 +37,12 @@ func ToIntInterface(value interface{}) (interface{}, error) {
 	case string:
 		val, err := strconv.ParseInt(value.(string), 10, 32)
 		if err != nil {
+			logging.Logger().Debug(err.Error())
 			return nil, err
 		}
 		return int(val), nil
 	default:
+		logging.Logger().Debug("value is not int, float, or number-strting")
 		return nil, errors.New("value is not int, float, or number-strting")
 	}
 }
@@ -74,10 +77,12 @@ func ToInt8Interface(value interface{}) (interface{}, error) {
 	case string:
 		val, err := strconv.ParseInt(value.(string), 10, 32)
 		if err != nil {
+			logging.Logger().Debug(err.Error())
 			return nil, err
 		}
 		return int8(val), nil
 	default:
+		logging.Logger().Debug("value is not int, float, or number-strting")
 		return nil, errors.New("value is not int, float, or number-strting")
 	}
 }
@@ -112,10 +117,12 @@ func ToInt16Interface(value interface{}) (interface{}, error) {
 	case string:
 		val, err := strconv.ParseInt(value.(string), 10, 32)
 		if err != nil {
+			logging.Logger().Debug(err.Error())
 			return nil, err
 		}
 		return int16(val), nil
 	default:
+		logging.Logger().Debug("value is not int, float, or number-strting")
 		return nil, errors.New("value is not int, float, or number-strting")
 	}
 }
@@ -150,10 +157,12 @@ func ToInt32Interface(value interface{}) (interface{}, error) {
 	case string:
 		val, err := strconv.ParseInt(value.(string), 10, 32)
 		if err != nil {
+			logging.Logger().Debug(err.Error())
 			return nil, err
 		}
 		return int32(val), nil
 	default:
+		logging.Logger().Debug("value is not int, float, or number-strting")
 		return nil, errors.New("value is not int, float, or number-strting")
 	}
 }
@@ -188,10 +197,12 @@ func ToInt64Interface(value interface{}) (interface{}, error) {
 	case string:
 		val, err := strconv.ParseInt(value.(string), 10, 64)
 		if err != nil {
+			logging.Logger().Debug(err.Error())
 			return nil, err
 		}
 		return int64(val), nil
 	default:
+		logging.Logger().Debug("value is not int, float, or number-strting")
 		return nil, errors.New("value is not int, float, or number-strting")
 	}
 }
@@ -226,10 +237,12 @@ func ToUintInterface(value interface{}) (interface{}, error) {
 	case string:
 		val, err := strconv.ParseUint(value.(string), 10, 32)
 		if err != nil {
+			logging.Logger().Debug(err.Error())
 			return nil, err
 		}
 		return uint(val), nil
 	default:
+		logging.Logger().Debug("value is not int, float, or number-strting")
 		return nil, errors.New("value is not int, float, or number-strting")
 	}
 }
@@ -264,10 +277,12 @@ func ToUint8Interface(value interface{}) (interface{}, error) {
 	case string:
 		val, err := strconv.ParseUint(value.(string), 10, 32)
 		if err != nil {
+			logging.Logger().Debug(err.Error())
 			return nil, err
 		}
 		return uint8(val), nil
 	default:
+		logging.Logger().Debug("value is not int, float, or number-strting")
 		return nil, errors.New("value is not int, float, or number-strting")
 	}
 }
@@ -302,10 +317,12 @@ func ToUint16Interface(value interface{}) (interface{}, error) {
 	case string:
 		val, err := strconv.ParseUint(value.(string), 10, 32)
 		if err != nil {
+			logging.Logger().Debug(err.Error())
 			return nil, err
 		}
 		return uint16(val), nil
 	default:
+		logging.Logger().Debug("value is not int, float, or number-strting")
 		return nil, errors.New("value is not int, float, or number-strting")
 	}
 }
@@ -340,10 +357,12 @@ func ToUint32Interface(value interface{}) (interface{}, error) {
 	case string:
 		val, err := strconv.ParseUint(value.(string), 10, 32)
 		if err != nil {
+			logging.Logger().Debug(err.Error())
 			return nil, err
 		}
 		return uint32(val), nil
 	default:
+		logging.Logger().Debug("value is not int, float, or number-strting")
 		return nil, errors.New("value is not int, float, or number-strting")
 	}
 }
@@ -378,10 +397,12 @@ func ToUint64Interface(value interface{}) (interface{}, error) {
 	case string:
 		val, err := strconv.ParseUint(value.(string), 10, 64)
 		if err != nil {
+			logging.Logger().Debug(err.Error())
 			return nil, err
 		}
 		return uint64(val), nil
 	default:
+		logging.Logger().Debug("value is not int, float, or number-strting")
 		return nil, errors.New("value is not int, float, or number-strting")
 	}
 }
@@ -416,10 +437,12 @@ func ToFloat32Interface(value interface{}) (interface{}, error) {
 	case string:
 		val, err := strconv.ParseFloat(value.(string), 32)
 		if err != nil {
+			logging.Logger().Debug(err.Error())
 			return nil, err
 		}
 		return float32(val), nil
 	default:
+		logging.Logger().Debug("value is not int, float, or number-strting")
 		return nil, errors.New("value is not int, float, or number-strting")
 	}
 }
@@ -454,10 +477,12 @@ func ToFloat64Interface(value interface{}) (interface{}, error) {
 	case string:
 		val, err := strconv.ParseFloat(value.(string), 64)
 		if err != nil {
+			logging.Logger().Debug(err.Error())
 			return nil, err
 		}
 		return float64(val), nil
 	default:
+		logging.Logger().Debug("value is not int, float, or number-strting")
 		return nil, errors.New("value is not int, float, or number-strting")
 	}
 }
@@ -502,10 +527,12 @@ func ToBooleanInterface(value interface{}) (interface{}, error) {
 	case string:
 		val, err := strconv.ParseBool(value.(string))
 		if err != nil {
+			logging.Logger().Debug(err.Error())
 			return nil, err
 		}
 		return val, nil
 	default:
+		logging.Logger().Debug("value is not boolean-string")
 		return nil, errors.New("value is not boolean-string")
 	}
 }

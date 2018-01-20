@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"github.com/qb0C80aE/clay/logging"
 	"net/url"
 	"reflect"
 )
@@ -43,6 +44,7 @@ func RegisteredLogic(model interface{}) (Logic, error) {
 	modelType := ModelType(model)
 	result, exist := logicMap[modelType]
 	if !exist {
+		logging.Logger().Debugf("the logic related to given name %s does not exist", modelType.Name())
 		return nil, fmt.Errorf("the logic related to given name %s does not exist", modelType.Name())
 	}
 	return result, nil

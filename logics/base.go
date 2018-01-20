@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extensions"
+	"github.com/qb0C80aE/clay/logging"
 	"github.com/qb0C80aE/clay/models"
 	"github.com/qb0C80aE/clay/utils/mapstruct"
 	"net/url"
@@ -34,15 +35,18 @@ func (logic *BaseLogic) ResourceName() string {
 func (logic *BaseLogic) GetSingle(db *gorm.DB, parameters gin.Params, _ url.Values, queryFields string) (interface{}, error) {
 	result, err := extensions.CreateModel(logic.ResourceName())
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
 
 	modelKey, err := extensions.RegisteredModelKey(result)
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
 
 	if err := db.Select(queryFields).First(result, fmt.Sprintf("%s = ?", modelKey.KeyParameter), parameters.ByName(modelKey.KeyParameter)).Error; err != nil {
+		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
 
@@ -53,6 +57,7 @@ func (logic *BaseLogic) GetSingle(db *gorm.DB, parameters gin.Params, _ url.Valu
 func (logic *BaseLogic) GetMulti(db *gorm.DB, parameters gin.Params, _ url.Values, queryFields string) (interface{}, error) {
 	model, err := extensions.CreateModel(logic.ResourceName())
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
 
@@ -65,6 +70,7 @@ func (logic *BaseLogic) GetMulti(db *gorm.DB, parameters gin.Params, _ url.Value
 	slicePointer.Elem().Set(slice)
 
 	if err := db.Select(queryFields).Find(slicePointer.Interface()).Error; err != nil {
+		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
 
@@ -74,6 +80,7 @@ func (logic *BaseLogic) GetMulti(db *gorm.DB, parameters gin.Params, _ url.Value
 // Create corresponds HTTP POST message and handles a request for multi resource to create a new information
 func (logic *BaseLogic) Create(db *gorm.DB, parameters gin.Params, _ url.Values, data interface{}) (interface{}, error) {
 	if err := db.Create(data).Error; err != nil {
+		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
 
@@ -86,6 +93,7 @@ func (logic *BaseLogic) Update(db *gorm.DB, parameters gin.Params, _ url.Values,
 
 	modelKey, err := extensions.RegisteredModelKey(data)
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
 
@@ -95,14 +103,17 @@ func (logic *BaseLogic) Update(db *gorm.DB, parameters gin.Params, _ url.Values,
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		id, err := strconv.Atoi(parameters.ByName(modelKey.KeyParameter))
 		if err != nil {
+			logging.Logger().Debug(err.Error())
 			return nil, err
 		}
 		value.Elem().FieldByName(modelKey.KeyField).SetInt(int64(id))
 	default:
+		logging.Logger().Debug(err.Error())
 		return nil, fmt.Errorf("the field %s does not exist, or is neither int nor string", modelKey.KeyField)
 	}
 
 	if err := db.Save(value.Interface()).Error; err != nil {
+		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
 
@@ -113,15 +124,18 @@ func (logic *BaseLogic) Update(db *gorm.DB, parameters gin.Params, _ url.Values,
 func (logic *BaseLogic) Delete(db *gorm.DB, parameters gin.Params, _ url.Values) error {
 	model, err := extensions.CreateModel(logic.ResourceName())
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		return err
 	}
 
 	modelKey, err := extensions.RegisteredModelKey(model)
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		return err
 	}
 
 	if err := db.First(model, fmt.Sprintf("%s = ?", modelKey.KeyParameter), parameters.ByName(modelKey.KeyParameter)).Error; err != nil {
+		logging.Logger().Debug(err.Error())
 		return err
 	}
 
@@ -142,6 +156,7 @@ func (logic *BaseLogic) Options(_ *gorm.DB, _ gin.Params, _ url.Values) error {
 func (logic *BaseLogic) Total(db *gorm.DB, model interface{}) (int, error) {
 	var total int
 	if err := db.Model(model).Count(&total).Error; err != nil {
+		logging.Logger().Debug(err.Error())
 		return 0, err
 	}
 
@@ -152,6 +167,7 @@ func (logic *BaseLogic) Total(db *gorm.DB, model interface{}) (int, error) {
 func (logic *BaseLogic) ExtractFromDesign(db *gorm.DB) (string, interface{}, error) {
 	model, err := extensions.CreateModel(logic.ResourceName())
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		return "", nil, err
 	}
 
@@ -164,8 +180,10 @@ func (logic *BaseLogic) ExtractFromDesign(db *gorm.DB) (string, interface{}, err
 	slicePointer.Elem().Set(slice)
 
 	if err := db.Select("*").Find(slicePointer.Interface()).Error; err != nil {
+		logging.Logger().Debug(err.Error())
 		return "", nil, err
 	}
+
 	return logic.ResourceName(), slicePointer.Elem().Interface(), nil
 }
 
@@ -173,16 +191,22 @@ func (logic *BaseLogic) ExtractFromDesign(db *gorm.DB) (string, interface{}, err
 func (logic *BaseLogic) DeleteFromDesign(db *gorm.DB) error {
 	model, err := extensions.CreateModel(logic.ResourceName())
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		return err
 	}
 
-	return db.Delete(model).Error
+	if err := db.Delete(model).Error; err != nil {
+		logging.Logger().Debug(err.Error())
+	}
+
+	return nil
 }
 
 // LoadToDesign loads the model related to this logic into db
 func (logic *BaseLogic) LoadToDesign(db *gorm.DB, data interface{}) error {
 	model, err := extensions.CreateModel(logic.ResourceName())
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		return err
 	}
 
@@ -197,6 +221,7 @@ func (logic *BaseLogic) LoadToDesign(db *gorm.DB, data interface{}) error {
 	design := data.(*models.Design)
 	if value, exists := design.Content[logic.ResourceName()]; exists {
 		if err := mapstruct.MapToStruct(value.([]interface{}), slicePointer.Interface()); err != nil {
+			logging.Logger().Debug(err.Error())
 			return err
 		}
 
@@ -214,6 +239,7 @@ func (logic *BaseLogic) LoadToDesign(db *gorm.DB, data interface{}) error {
 			}
 			model := modelValue.Interface()
 			if err := db.Create(model).Error; err != nil {
+				logging.Logger().Debug(err.Error())
 				return err
 			}
 		}

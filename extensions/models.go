@@ -3,6 +3,7 @@ package extensions
 import (
 	"fmt"
 	"github.com/jinzhu/gorm"
+	"github.com/qb0C80aE/clay/logging"
 	"reflect"
 	"strings"
 )
@@ -89,6 +90,7 @@ func RegisteredModelKey(model interface{}) (ModelKey, error) {
 	reflectType := ModelType(model)
 	result, exists := modelKeyMap[reflectType]
 	if !exists {
+		logging.Logger().Debugf("the model key of '%s' has not been registered yet", reflectType.String())
 		return ModelKey{}, fmt.Errorf("the model key of '%s' has not been registered yet", reflectType.String())
 	}
 	return result, nil
@@ -121,6 +123,7 @@ func RegisteredResourceName(model interface{}) string {
 func CreateModel(name string) (interface{}, error) {
 	reflectType, exists := typeMap[name]
 	if !exists {
+		logging.Logger().Debugf("the type named '%s' has not been registered yet", name)
 		return nil, fmt.Errorf("the type named '%s' has not been registered yet", name)
 	}
 	return reflect.New(reflectType).Elem().Addr().Interface(), nil

@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/qb0C80aE/clay/extensions"
+	"github.com/qb0C80aE/clay/logging"
 	"net/http"
+	"os"
 	"sort"
 )
 
@@ -32,7 +34,8 @@ func APIEndpoints(c *gin.Context) {
 				case extensions.URLMulti:
 					resources = append(resources, fmt.Sprintf("%s %s/%s", title, baseURL, controller.ResourceMultiURL()))
 				default:
-					panic("invalid url type")
+					logging.Logger().Criticalf("invalid url type: %d", pathType)
+					os.Exit(1)
 				}
 			}
 		}

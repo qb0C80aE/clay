@@ -4,6 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/qb0C80aE/clay/controllers"
 	"github.com/qb0C80aE/clay/extensions"
+	"github.com/qb0C80aE/clay/logging"
+	"os"
 )
 
 // Initialize initializes the router
@@ -40,7 +42,8 @@ func Initialize(r *gin.Engine) {
 					case extensions.URLMulti:
 						routingFunction(controller.ResourceMultiURL(), handlerFunc)
 					default:
-						panic("invalid url type")
+						logging.Logger().Criticalf("invalid url type: %d", pathType)
+						os.Exit(1)
 					}
 				}
 			}
