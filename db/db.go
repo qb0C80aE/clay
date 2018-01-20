@@ -18,9 +18,9 @@ func Connect() *gorm.DB {
 	dbMode := os.Getenv("DB_MODE")
 	var dbPath string
 	switch dbMode {
-	case "", "memory":
+	case "memory":
 		dbPath = ":memory:"
-	case "file":
+	case "", "file":
 		if dbFilePath := os.Getenv("DB_FILE_PATH"); dbFilePath != "" {
 			dbPath = dbFilePath
 		} else {
