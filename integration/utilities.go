@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"reflect"
 	"testing"
 	"time"
@@ -67,6 +68,7 @@ func GenerateSingleResourceURL(ts *httptest.Server, resource string, id string, 
 
 // SetupServer setups server for integration tests
 func SetupServer() *httptest.Server {
+	os.Setenv("DB_MODE", "memory")
 	database := db.Connect()
 	s := server.Setup(database)
 	return httptest.NewServer(s)
