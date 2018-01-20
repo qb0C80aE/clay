@@ -1,5 +1,5 @@
-hash: 211d0a8dcffe7dd92e96ca171fdaa61ca7c3970e7779c67ac47e915816a4b43a
-updated: 2017-12-23T11:36:40.201956+09:00
+hash: f8b6e6d9d4cd4904598b6ca0c2c62522f6f1618921bfcef93006c84ad43004e1
+updated: 2018-01-20T12:15:25.171269298+09:00
 imports:
 - name: github.com/gin-gonic/gin
   version: e2212d40c62a98b388a5eb48ecbdcf88534688ba
@@ -30,6 +30,8 @@ imports:
   version: 7b2c5ac9fc04fc5efafb60700713d4fa609b777b
 - name: github.com/spf13/pflag
   version: 1f33b80956cde38911d1f23d764deb8d77a649ce
+- name: github.com/umisama/golog
+  version: 4ebae395687aca5427e6ac844c38cf0ca033e8c3
 - name: golang.org/x/net
   version: f315505cf3349909cdf013ea56690da34e96a451
   subpackages:

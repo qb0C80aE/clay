@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extensions"
+	"github.com/qb0C80aE/clay/logging"
 	"github.com/qb0C80aE/clay/models"
 	"io"
 	"net/url"
@@ -74,6 +75,7 @@ func (logic *commandExecutionLogic) Delete(db *gorm.DB, parameters gin.Params, _
 	}
 
 	if err := command.Cmd.Process.Kill(); err != nil {
+		logging.Logger().Debug(err.Error())
 		return errors.New("failed to kill command")
 	}
 
@@ -89,12 +91,14 @@ func runCommand(command *models.Command) (int, error) {
 
 	stdOutPipe, err := command.Cmd.StdoutPipe()
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		return exitCode, err
 	}
 	defer stdOutPipe.Close()
 
 	stdErrPipe, err := command.Cmd.StderrPipe()
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		return exitCode, err
 	}
 	defer stdErrPipe.Close()
@@ -104,6 +108,7 @@ func runCommand(command *models.Command) (int, error) {
 	stdErrReader := io.TeeReader(stdErrPipe, &bufferStdErr)
 
 	if err = command.Cmd.Start(); err != nil {
+		logging.Logger().Debug(err.Error())
 		return exitCode, err
 	}
 
@@ -113,6 +118,7 @@ func runCommand(command *models.Command) (int, error) {
 	err = command.Cmd.Wait()
 
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		if exitError, ok := err.(*exec.ExitError); ok {
 			if waitStatus, ok := exitError.Sys().(syscall.WaitStatus); ok {
 				exitCode = waitStatus.ExitStatus()
@@ -151,6 +157,7 @@ func executeCommand(command *models.Command) {
 	exitCode, err := runCommand(command)
 
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		command.StdErr = err.Error()
 		exitCode = -1
 	}

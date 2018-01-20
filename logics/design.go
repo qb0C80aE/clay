@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extensions"
+	"github.com/qb0C80aE/clay/logging"
 	"github.com/qb0C80aE/clay/models"
 	"net/url"
 	"time"
@@ -39,6 +40,7 @@ func (logic *designLogic) GetSingle(db *gorm.DB, _ gin.Params, _ url.Values, _ s
 	for _, accessor := range designAccessors {
 		key, value, err := accessor.ExtractFromDesign(db)
 		if err != nil {
+			logging.Logger().Debug(err.Error())
 			return nil, err
 		}
 		design.Content[key] = value
@@ -54,11 +56,13 @@ func (logic *designLogic) Update(db *gorm.DB, _ gin.Params, _ url.Values, data i
 	designAccessors := extensions.RegisteredDesignAccessors()
 	for _, accessor := range designAccessors {
 		if err := accessor.DeleteFromDesign(db); err != nil {
+			logging.Logger().Debug(err.Error())
 			return nil, err
 		}
 	}
 	for _, accessor := range designAccessors {
 		if err := accessor.LoadToDesign(db, design); err != nil {
+			logging.Logger().Debug(err.Error())
 			return nil, err
 		}
 	}
@@ -71,6 +75,7 @@ func (logic *designLogic) Delete(db *gorm.DB, _ gin.Params, _ url.Values) error 
 	designAccessors := extensions.RegisteredDesignAccessors()
 	for _, accessor := range designAccessors {
 		if err := accessor.DeleteFromDesign(db); err != nil {
+			logging.Logger().Debug(err.Error())
 			return err
 		}
 	}

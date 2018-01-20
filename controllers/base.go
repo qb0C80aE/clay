@@ -11,15 +11,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extensions"
+	"github.com/qb0C80aE/clay/logging"
 	"github.com/qb0C80aE/clay/version"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"reflect"
 	"runtime/debug"
 	"strconv"
-	"time"
 )
 
 // BaseController is the base class that all controller classes inherit
@@ -42,10 +41,7 @@ func NewBaseController(model interface{}, logic extensions.Logic) *BaseControlle
 }
 
 func (controller *BaseController) logStackTrace() {
-	log.Printf("[%s] panic occured in logic, and recovered.\n%s",
-		time.Now(),
-		string(debug.Stack()),
-	)
+	logging.Logger().Critical("panic occured in logic, and recovered.", string(debug.Stack()))
 }
 
 func (controller *BaseController) deleteMarkedItemsInSlices(db *gorm.DB, data interface{}) error {
@@ -70,6 +66,7 @@ func (controller *BaseController) deleteMarkedItemsInSlices(db *gorm.DB, data in
 				itemValue := fieldValue.Index(j)
 
 				if err := controller.deleteMarkedItemsInSlices(db, itemValue.Interface()); err != nil {
+					logging.Logger().Debug(err.Error())
 					return err
 				}
 
@@ -86,11 +83,13 @@ func (controller *BaseController) deleteMarkedItemsInSlices(db *gorm.DB, data in
 				if toBeDeleted {
 					logic, err := extensions.RegisteredLogic(itemValue.Interface())
 					if err != nil {
+						logging.Logger().Debug(err.Error())
 						return err
 					}
 
 					modelKey, err := extensions.RegisteredModelKey(itemValue.Interface())
 					if err != nil {
+						logging.Logger().Debug(err.Error())
 						return err
 					}
 
@@ -105,6 +104,7 @@ func (controller *BaseController) deleteMarkedItemsInSlices(db *gorm.DB, data in
 					case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 						keyParameterValue = strconv.Itoa(int(keyFieldValue.Int()))
 					default:
+						logging.Logger().Debugf("the field %s does not exist, or is neither int nor string", modelKey.KeyField)
 						return fmt.Errorf("the field %s does not exist, or is neither int nor string", modelKey.KeyField)
 					}
 
@@ -115,6 +115,7 @@ func (controller *BaseController) deleteMarkedItemsInSlices(db *gorm.DB, data in
 						},
 					}
 					if err := logic.Delete(db, parameters, nil); err != nil {
+						logging.Logger().Debug(err.Error())
 						return err
 					}
 				} else {
@@ -124,6 +125,7 @@ func (controller *BaseController) deleteMarkedItemsInSlices(db *gorm.DB, data in
 			fieldValue.Set(processed)
 		} else if fieldValue.Kind() == reflect.Struct {
 			if err := controller.deleteMarkedItemsInSlices(db, valueOfData.FieldByName(structField.Name).Interface()); err != nil {
+				logging.Logger().Debug(err.Error())
 				return err
 			}
 		}
@@ -133,6 +135,7 @@ func (controller *BaseController) deleteMarkedItemsInSlices(db *gorm.DB, data in
 
 func (controller *BaseController) bind(c *gin.Context, container interface{}) error {
 	if err := c.Bind(container); err != nil {
+		logging.Logger().Debug(err.Error())
 		return err
 	}
 	if c.Request.ParseMultipartForm(1024*1024) == nil {
@@ -141,16 +144,19 @@ func (controller *BaseController) bind(c *gin.Context, container interface{}) er
 			buffer := &bytes.Buffer{}
 			file, _, err := c.Request.FormFile(name)
 			if err != nil {
+				logging.Logger().Debug(err.Error())
 				return err
 			}
 
 			data, err := ioutil.ReadAll(file)
 			if err != nil {
+				logging.Logger().Debug(err.Error())
 				return err
 			}
 
 			_, err = buffer.Write(data)
 			if err != nil {
+				logging.Logger().Debug(err.Error())
 				return err
 			}
 
@@ -159,9 +165,11 @@ func (controller *BaseController) bind(c *gin.Context, container interface{}) er
 				vs = vs.Elem()
 			}
 			if !vs.IsValid() {
+				logging.Logger().Debug("invalid container")
 				return errors.New("invalid container")
 			}
 			if !vs.CanInterface() {
+				logging.Logger().Debug("invalid container")
 				return errors.New("invalid container")
 			}
 			value := vs.Interface()
@@ -179,6 +187,7 @@ func (controller *BaseController) bind(c *gin.Context, container interface{}) er
 						vs.FieldByName(field.Name).SetBytes(buffer.Bytes())
 						break
 					} else {
+						logging.Logger().Debug("invalid field definition, the field must be string or slice of bytes")
 						return errors.New("invalid field definition, the field must be string or slice of bytes")
 					}
 				}
@@ -216,6 +225,7 @@ func (controller *BaseController) OutputGetSingle(c *gin.Context, code int, resu
 	} else {
 		fieldMap, err := helper.FieldToMap(result, fields)
 		if err != nil {
+			logging.Logger().Debug(err.Error())
 			controller.outputter.OutputError(c, http.StatusBadRequest, err)
 			return
 		}
@@ -237,6 +247,7 @@ func (controller *BaseController) OutputGetMulti(c *gin.Context, code int, resul
 		v := reflect.ValueOf(result)
 
 		if v.Kind() != reflect.Slice && v.Kind() != reflect.Array {
+			logging.Logger().Debug("given argument is neither a slice nor an array")
 			controller.outputter.OutputError(c, http.StatusBadRequest, errors.New("given argument is neither a slice nor an array"))
 			return
 		}
@@ -251,6 +262,7 @@ func (controller *BaseController) OutputGetMulti(c *gin.Context, code int, resul
 				item := v.Index(i)
 
 				if !item.CanInterface() {
+					logging.Logger().Debugf("the original item indexed %d in given slice cannot interface", i)
 					controller.outputter.OutputError(c, http.StatusBadRequest, fmt.Errorf("the original item indexed %d in given slice cannot interface", i))
 					return
 				}
@@ -258,11 +270,13 @@ func (controller *BaseController) OutputGetMulti(c *gin.Context, code int, resul
 				fieldMap, err := helper.FieldToMap(item.Interface(), fields)
 
 				if err != nil {
+					logging.Logger().Debug(err.Error())
 					controller.outputter.OutputError(c, http.StatusBadRequest, err)
 					return
 				}
 
 				if err := enc.Encode(fieldMap); err != nil {
+					logging.Logger().Debug(err.Error())
 					controller.outputter.OutputError(c, http.StatusBadRequest, err)
 					return
 				}
@@ -274,6 +288,7 @@ func (controller *BaseController) OutputGetMulti(c *gin.Context, code int, resul
 				item := v.Index(i)
 
 				if !item.CanInterface() {
+					logging.Logger().Debugf("the original item indexed %d in given slice cannot interface", i)
 					controller.outputter.OutputError(c, http.StatusBadRequest, fmt.Errorf("the original item indexed %d in given slice cannot interface", i))
 					return
 				}
@@ -281,6 +296,7 @@ func (controller *BaseController) OutputGetMulti(c *gin.Context, code int, resul
 				fieldMap, err := helper.FieldToMap(item.Interface(), fields)
 
 				if err != nil {
+					logging.Logger().Debug(err.Error())
 					controller.outputter.OutputError(c, http.StatusBadRequest, err)
 					return
 				}
@@ -432,6 +448,7 @@ func (controller *BaseController) total(db *gorm.DB, model interface{}) (total i
 func (controller *BaseController) GetSingle(c *gin.Context) {
 	ver, err := version.New(c)
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
@@ -439,6 +456,7 @@ func (controller *BaseController) GetSingle(c *gin.Context) {
 	db := dbpkg.Instance(c)
 	parameter, err := dbpkg.NewParameter(controller.queryCustomizer.Queries(c))
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
@@ -449,6 +467,7 @@ func (controller *BaseController) GetSingle(c *gin.Context) {
 
 	result, err := controller.getSingle(db, c.Params, c.Request.URL.Query(), queryFields)
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		controller.outputter.OutputError(c, http.StatusNotFound, err)
 		return
 	}
@@ -465,6 +484,7 @@ func (controller *BaseController) GetSingle(c *gin.Context) {
 func (controller *BaseController) GetMulti(c *gin.Context) {
 	ver, err := version.New(c)
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
@@ -472,12 +492,14 @@ func (controller *BaseController) GetMulti(c *gin.Context) {
 	db := dbpkg.Instance(c)
 	parameter, err := dbpkg.NewParameter(controller.queryCustomizer.Queries(c))
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
 	db, err = parameter.Paginate(db)
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
@@ -490,12 +512,14 @@ func (controller *BaseController) GetMulti(c *gin.Context) {
 
 	result, err := controller.getMulti(db, c.Params, c.Request.URL.Query(), queryFields)
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
 	total, err := controller.total(db, controller.model)
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
@@ -512,6 +536,7 @@ func (controller *BaseController) GetMulti(c *gin.Context) {
 func (controller *BaseController) Create(c *gin.Context) {
 	ver, err := version.New(c)
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
@@ -521,16 +546,19 @@ func (controller *BaseController) Create(c *gin.Context) {
 		vs = vs.Elem()
 	}
 	if !vs.IsValid() {
-		controller.outputter.OutputError(c, http.StatusBadRequest, errors.New("Invalid model"))
+		logging.Logger().Debug("invalid model")
+		controller.outputter.OutputError(c, http.StatusBadRequest, errors.New("invalid model"))
 		return
 	}
 	if !vs.CanInterface() {
-		controller.outputter.OutputError(c, http.StatusBadRequest, errors.New("Invalid model"))
+		logging.Logger().Debug("invalid model")
+		controller.outputter.OutputError(c, http.StatusBadRequest, errors.New("invalid model"))
 		return
 	}
 	container := reflect.New(reflect.TypeOf(vs.Interface())).Interface()
 
 	if err := controller.bind(c, container); err != nil {
+		logging.Logger().Debug(err.Error())
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
@@ -541,6 +569,7 @@ func (controller *BaseController) Create(c *gin.Context) {
 	result, err := controller.create(tx, c.Params, c.Request.URL.Query(), container)
 	if err != nil {
 		tx.Rollback()
+		logging.Logger().Debug(err.Error())
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
@@ -559,6 +588,7 @@ func (controller *BaseController) Create(c *gin.Context) {
 func (controller *BaseController) Update(c *gin.Context) {
 	ver, err := version.New(c)
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
@@ -568,16 +598,19 @@ func (controller *BaseController) Update(c *gin.Context) {
 		vs = vs.Elem()
 	}
 	if !vs.IsValid() {
-		controller.outputter.OutputError(c, http.StatusBadRequest, errors.New("Invalid model"))
+		logging.Logger().Debug("invalid model")
+		controller.outputter.OutputError(c, http.StatusBadRequest, errors.New("invalid model"))
 		return
 	}
 	if !vs.CanInterface() {
-		controller.outputter.OutputError(c, http.StatusBadRequest, errors.New("Invalid model"))
+		logging.Logger().Debug("invalid model")
+		controller.outputter.OutputError(c, http.StatusBadRequest, errors.New("invalid model"))
 		return
 	}
 	container := reflect.New(reflect.TypeOf(vs.Interface())).Interface()
 
 	if err := controller.bind(c, container); err != nil {
+		logging.Logger().Debug(err.Error())
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
@@ -588,6 +621,7 @@ func (controller *BaseController) Update(c *gin.Context) {
 	result, err := controller.update(tx, c.Params, c.Request.URL.Query(), container)
 	if err != nil {
 		tx.Rollback()
+		logging.Logger().Debug(err.Error())
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
@@ -606,6 +640,7 @@ func (controller *BaseController) Update(c *gin.Context) {
 func (controller *BaseController) Delete(c *gin.Context) {
 	ver, err := version.New(c)
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
@@ -616,6 +651,7 @@ func (controller *BaseController) Delete(c *gin.Context) {
 	err = controller.delete(tx, c.Params, c.Request.URL.Query())
 	if err != nil {
 		tx.Rollback()
+		logging.Logger().Debug(err.Error())
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
@@ -634,6 +670,7 @@ func (controller *BaseController) Delete(c *gin.Context) {
 func (controller *BaseController) Patch(c *gin.Context) {
 	ver, err := version.New(c)
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
@@ -644,6 +681,7 @@ func (controller *BaseController) Patch(c *gin.Context) {
 	result, err := controller.patch(tx, c.Params, c.Request.URL.Query())
 	if err != nil {
 		tx.Rollback()
+		logging.Logger().Debug(err.Error())
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
@@ -662,6 +700,7 @@ func (controller *BaseController) Patch(c *gin.Context) {
 func (controller *BaseController) Options(c *gin.Context) {
 	ver, err := version.New(c)
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
@@ -672,6 +711,7 @@ func (controller *BaseController) Options(c *gin.Context) {
 	err = controller.options(tx, c.Params, c.Request.URL.Query())
 	if err != nil {
 		tx.Rollback()
+		logging.Logger().Debug(err.Error())
 		controller.outputter.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
