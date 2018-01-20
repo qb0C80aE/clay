@@ -41,6 +41,10 @@ func GenerateTemplate(db *gorm.DB, id string, templateArgumentParameterMap map[i
 	template := &models.Template{}
 	template.ID, _ = strconv.Atoi(id)
 
+	// GenerateTemplate reset db conditions like preloads, so you should use this method in GetSingle or GetMulti only,
+	// and note that all conditions go away after this method.
+	db = db.New()
+
 	if err := db.Preload("TemplateArguments").Select("*").First(template, template.ID).Error; err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
