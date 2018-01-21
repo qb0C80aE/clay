@@ -4,19 +4,19 @@ import "github.com/qb0C80aE/clay/extensions"
 
 func init() {
 	var programInformation = &clayProgramInformation{
-		buildTime: "20180110155656",
+		buildTime: "20180121151801",
 		claySubModuleInformationList: []*claySubModuleInformation{
 			{
 				name:     "clay",
-				revision: "6dcaf03f94f46822d97a9899bb6d20408879d225",
+				revision: "d3d2ce380ce4d23014e4045069d49285f2c948f4",
 			},
 			{
 				name:     "github.com/qb0C80aE/loam",
-				revision: "b03da4d83378bdb0204b06b2b676f3517edd9b3c",
+				revision: "c366ccbccef307f6cd1d59313e8ba29a036911a6",
 			},
 			{
 				name:     "github.com/qb0C80aE/pottery",
-				revision: "36dff00f9847c342882b4d7d38eae9ee99b4cac9",
+				revision: "95f480d4467cb6240b7b760b3000728a587a9608",
 			},
 		},
 	}
