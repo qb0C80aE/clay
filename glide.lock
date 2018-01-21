@@ -1,5 +1,5 @@
 hash: fbaac0a0162a5ba958e151d43661672cd11ccb558a1038a23868dce62048d194
-updated: 2018-01-21T13:33:35.725114333+09:00
+updated: 2018-01-21T15:00:23.574369663+09:00
 imports:
 - name: github.com/elazarl/go-bindata-assetfs
   version: 30f82fa23fd844bd5bb1e5f216db87fd77b5eb43
@@ -43,7 +43,7 @@ imports:
   - models
   - utils/net
 - name: github.com/qb0C80aE/pottery
-  version: 9cb7a503d34ebc76742e47d9e3b8d566c52a5723
+  version: 95f480d4467cb6240b7b760b3000728a587a9608
   subpackages:
   - controllers
   - logics
