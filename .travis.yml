@@ -2,33 +2,34 @@ language: go
 go: 1.8
 
 notifications:
-  email: false
-
-env:
-  global:
-   - TAGS=()
+ email: false
 
 before_install:
-  - TAGS+=(debug)
-  - TAGS+=(integration)
-  - TAGS+=(prebuild)
-  - go version
+ - go version
+ - sudo apt-get -qq update
 
 install:
-  - go get github.com/Masterminds/glide
-  - go get -u github.com/golang/lint/golint
+ - sudo apt-get -qq install -y gcc-multilib
+ - sudo apt-get -qq install -y binutils-mingw-w64 mingw-w64
+ - wget https://storage.googleapis.com/golang/go1.4.3.linux-amd64.tar.gz
+ - tar -C $HOME -xzf go1.4.3.linux-amd64.tar.gz
+ - mv $HOME/go $HOME/go1.4
+ - (cd `which go | sed -e 's/\/bin\/go//g'`/src; GOOS=linux GOARCH=386 ./make.bash; GOOS=windows GOARCH=amd64 ./make.bash; GOOS=windows GOARCH=386 ./make.bash)
+ - go get github.com/Masterminds/glide
+ - go get github.com/jteeuwen/go-bindata/...
 
 script:
-  - glide install
-  - (result="`find . -type d -name vendor -prune -o -type f -name '*.go' -exec golint {} \;`"; if [ ! -z "${result}" ]; then echo "${result}"; exit 1; fi)
-  - go vet -tags="`echo ${TAGS[@]}`" $(glide novendor)
-  - go generate -tags=prebuild ./...
-  - |
-    for tag in ${TAGS[@]}; do
-      echo "go build -v -tags=${tag} $(glide novendor)"
-      go build -v -tags=${tag} $(glide novendor)
-    done
-  - go build -v
-  - sed -i "s/[0-9]\{14\}/unknown/g" buildtime/build_information.go
-  - go test -tags=integration -v -race $(glide novendor)
+ - glide install
+ - go generate -tags=prebuild ./...
+ - GOOS=linux GOARCH=amd64 go build --ldflags '-extldflags "-static"' -o linux_amd64/clay/clay
+ - CGO_ENABLED=1 GOOS=linux GOARCH=386 go build --ldflags '-extldflags "-static"' -o linux_386/clay/clay
+ - CC=x86_64-w64-mingw32-gcc LD=x86_64-w64-mingw32-ld CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build --ldflags '-extldflags "-static"' -o windows_amd64/clay/clay.exe
+ - CC=i686-w64-mingw32-gcc LD=i686-w64-mingw32-ld CGO_ENABLED=1 GOOS=windows GOARCH=386 go build --ldflags '-extldflags "-static"' -o windows_386/clay/clay.exe
 
+after_success:
+ - (cd linux_amd64; tar zcvf ../clay.bastet.linux-amd64.tgz clay)
+ - (cd linux_386; tar zcvf ../clay.bastet.linux-386.tgz clay)
+ - (cd windows_amd64; zip -r ../clay.bastet.windows-amd64.zip clay)
+ - (cd windows_386; zip -r ../clay.bastet.windows-386.zip clay)
+ - ls -la
+ - ./upload.sh
