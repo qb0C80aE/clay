@@ -12,6 +12,6 @@ import:
 - package: github.com/qb0C80aE/loam
   version: develop
 - package: github.com/qb0C80aE/pottery
-  version: develop
+  version: bastet
 testImport:
 - package: github.com/bouk/monkey
