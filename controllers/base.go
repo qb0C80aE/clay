@@ -65,6 +65,14 @@ func (controller *BaseController) deleteMarkedItemsInSlices(db *gorm.DB, data in
 			for j := 0; j < fieldValue.Len(); j++ {
 				itemValue := fieldValue.Index(j)
 
+				itemValueToCheckIfStruct := itemValue
+				for itemValueToCheckIfStruct.Kind() == reflect.Ptr {
+					itemValueToCheckIfStruct = itemValueToCheckIfStruct.Elem()
+				}
+				if itemValueToCheckIfStruct.Kind() != reflect.Struct {
+					return nil
+				}
+
 				if err := controller.deleteMarkedItemsInSlices(db, itemValue.Interface()); err != nil {
 					logging.Logger().Debug(err.Error())
 					return err
