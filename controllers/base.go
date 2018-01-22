@@ -41,7 +41,7 @@ func NewBaseController(model interface{}, logic extensions.Logic) *BaseControlle
 }
 
 func (controller *BaseController) logStackTrace() {
-	logging.Logger().Critical("panic occured in logic, and recovered.", string(debug.Stack()))
+	logging.Logger().Criticalf("panic occured in logic, and recovered.\n%s", string(debug.Stack()))
 }
 
 func (controller *BaseController) deleteMarkedItemsInSlices(db *gorm.DB, data interface{}) error {
