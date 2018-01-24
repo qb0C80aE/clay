@@ -1239,6 +1239,14 @@ single
 {{- $p2 := index $s.TemplateArguments 1}}
 {{$p2.Name}}={{$p2.DefaultValueString.String}}
 
+first
+{{- $f := first .ModelStore "templates" "q[name]=test1&preloads=TemplateArguments"}}
+{{$f.Name}}
+{{- $p1 := index $t.TemplateArguments 0}}
+{{$p1.Name}}={{$p1.DefaultValueString.String}}
+{{- $p2 := index $t.TemplateArguments 1}}
+{{$p2.Name}}={{$p2.DefaultValueString.String}}
+
 total
 {{- $t := total .ModelStore "/template_arguments"}}
 {{$t}}
