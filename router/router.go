@@ -31,7 +31,6 @@ func Initialize(r *gin.Engine) {
 
 		controllers := extensions.RegisteredControllers()
 		for _, controller := range controllers {
-			extensions.AssociateControllerWithResourceName(controller.ResourceName(), controller)
 			routeMap := controller.RouteMap()
 			for method, routingFunction := range methodFunctionMap {
 				routes := routeMap[method]
@@ -39,8 +38,10 @@ func Initialize(r *gin.Engine) {
 					switch pathType {
 					case extensions.URLSingle:
 						routingFunction(controller.ResourceSingleURL(), handlerFunc)
+						extensions.AssociateControllerWithPath(controller.ResourceSingleURL(), controller)
 					case extensions.URLMulti:
 						routingFunction(controller.ResourceMultiURL(), handlerFunc)
+						extensions.AssociateControllerWithPath(controller.ResourceMultiURL(), controller)
 					default:
 						logging.Logger().Criticalf("invalid url type: %d", pathType)
 						os.Exit(1)

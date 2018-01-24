@@ -13,7 +13,7 @@ import (
 	"sync"
 )
 
-var commandMap map[int]*models.Command = map[int]*models.Command{}
+var commandMap = map[int]*models.Command{}
 var commandMapMutex = new(sync.Mutex)
 
 const (
