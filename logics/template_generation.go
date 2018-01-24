@@ -2,6 +2,7 @@ package logics
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -454,6 +455,82 @@ func init() {
 				return nil, err
 			}
 			return result, nil
+		},
+		"first": func(dbObject interface{}, pathInterface interface{}, queryInterface interface{}) (interface{}, error) {
+			path := pathInterface.(string)
+			controller, err := extensions.AssociatedControllerWithPath(path)
+			if err != nil {
+				return nil, err
+			}
+
+			pathElements := strings.Split(strings.Trim(path, "/"), "/")
+			resourceName := pathElements[0]
+			multiURL := controller.ResourceMultiURL()
+			routeElements := strings.Split(strings.Trim(multiURL, "/"), "/")
+
+			parameters := gin.Params{}
+			for index, routeElement := range routeElements {
+				if routeElement[:1] == ":" {
+					parameter := gin.Param{
+						Key:   routeElement[1:],
+						Value: pathElements[index],
+					}
+					parameters = append(parameters, parameter)
+				}
+			}
+
+			query := queryInterface.(string)
+			URL := "/"
+			if query != "" {
+				URL = "/?" + query
+			}
+			requestForParameter, err := http.NewRequest(
+				http.MethodGet,
+				URL,
+				nil,
+			)
+			model, err := extensions.CreateModel(resourceName)
+			if err != nil {
+				logging.Logger().Debug(err.Error())
+				return nil, err
+			}
+			urlQuery := requestForParameter.URL.Query()
+			parameter, err := dbpkg.NewParameter(urlQuery)
+			if err != nil {
+				logging.Logger().Debug(err.Error())
+				return nil, err
+			}
+			logic, err := extensions.RegisteredLogic(model)
+			if err != nil {
+				logging.Logger().Debug(err.Error())
+				return nil, err
+			}
+			db := dbObject.(*gorm.DB)
+			db, err = parameter.Paginate(db)
+			if err != nil {
+				logging.Logger().Debug(err.Error())
+				return nil, err
+			}
+			db = parameter.SetPreloads(db)
+			db = parameter.SortRecords(db)
+			db = parameter.FilterFields(db)
+			fields := helper.ParseFields(parameter.DefaultQuery(urlQuery, "fields", "*"))
+			queryFields := helper.QueryFields(model, fields)
+			result, err := logic.GetMulti(db, parameters, requestForParameter.URL.Query(), queryFields)
+			if err != nil {
+				logging.Logger().Debug(err.Error())
+				return nil, err
+			}
+
+			logging.Logger().Debug(result)
+
+			resultValue := reflect.ValueOf(result)
+			if resultValue.Len() == 0 {
+				logging.Logger().Debug("no record selected")
+				return nil, errors.New("no record selected")
+			}
+
+			return resultValue.Index(0).Interface(), nil
 		},
 		"total": func(dbObject interface{}, pathInterface interface{}) (interface{}, error) {
 			path := pathInterface.(string)
