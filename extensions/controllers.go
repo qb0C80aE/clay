@@ -1,13 +1,23 @@
 package extensions
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/qb0C80aE/clay/logging"
 	"net/http"
 	"net/url"
+	"os"
+	"regexp"
+	"strings"
 )
 
+type regExpControllerPair struct {
+	regExp     *regexp.Regexp
+	controller Controller
+}
+
 var controllers = []Controller{}
-var controllerMapByResourceName = map[string]Controller{}
+var pathControllerMap = map[string]*regExpControllerPair{}
 
 // MethodSomething integer constants are used as the key value of HTTP methods in maps
 const (
@@ -85,12 +95,48 @@ func RegisteredControllers() []Controller {
 	return result
 }
 
-// AssociateControllerWithResourceName associates a resource name and a controller
-func AssociateControllerWithResourceName(resourceName string, controller Controller) {
-	controllerMapByResourceName[resourceName] = controller
+// AssociateControllerWithPath associates a path and a controller
+func AssociateControllerWithPath(path string, controller Controller) {
+	pathElements := strings.Split(strings.Trim(path, "/"), "/")
+
+	newPathElements := []string{}
+	for _, pathElement := range pathElements {
+		if pathElement[:1] == ":" {
+			newPathElements = append(newPathElements, "[0-9a-z_]+")
+		} else {
+			newPathElements = append(newPathElements, pathElement)
+		}
+	}
+
+	newPath := strings.Join(newPathElements, "/")
+
+	if oldPair, exists := pathControllerMap[newPath]; exists {
+		if oldPair.controller != controller {
+			logging.Logger().Criticalf("path %s is already mapped to another controller", newPath)
+			os.Exit(1)
+		}
+	}
+
+	newRegExp, err := regexp.Compile(newPath)
+	if err != nil {
+		logging.Logger().Critical(err.Error())
+		os.Exit(1)
+	}
+
+	pathControllerMap[newPath] = &regExpControllerPair{
+		regExp:     newRegExp,
+		controller: controller,
+	}
 }
 
-// AssociatedControllerWithResourceName returns the registered controller related to the given resource name
-func AssociatedControllerWithResourceName(resourceName string) Controller {
-	return controllerMapByResourceName[resourceName]
+// AssociatedControllerWithPath returns the registered controller related to the given resource name
+func AssociatedControllerWithPath(path string) (Controller, error) {
+	path = strings.Trim(path, "/")
+	for _, pair := range pathControllerMap {
+		if pair.regExp.MatchString(path) {
+			return pair.controller, nil
+		}
+	}
+	logging.Logger().Critical("no controller is associated with %s", path)
+	return nil, fmt.Errorf("no controller is associated with %s", path)
 }

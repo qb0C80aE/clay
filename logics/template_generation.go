@@ -319,9 +319,13 @@ func init() {
 		},
 		"single": func(dbObject interface{}, pathInterface interface{}, queryInterface interface{}) (interface{}, error) {
 			path := pathInterface.(string)
+			controller, err := extensions.AssociatedControllerWithPath(path)
+			if err != nil {
+				return nil, err
+			}
+
 			pathElements := strings.Split(strings.Trim(path, "/"), "/")
 			resourceName := pathElements[0]
-			controller := extensions.AssociatedControllerWithResourceName(resourceName)
 			singleURL := controller.ResourceSingleURL()
 			routeElements := strings.Split(strings.Trim(singleURL, "/"), "/")
 
@@ -386,12 +390,15 @@ func init() {
 		},
 		"multi": func(dbObject interface{}, pathInterface interface{}, queryInterface interface{}) (interface{}, error) {
 			path := pathInterface.(string)
+			controller, err := extensions.AssociatedControllerWithPath(path)
+			if err != nil {
+				return nil, err
+			}
+
 			pathElements := strings.Split(strings.Trim(path, "/"), "/")
 			resourceName := pathElements[0]
-
-			controller := extensions.AssociatedControllerWithResourceName(resourceName)
-			singleURL := controller.ResourceMultiURL()
-			routeElements := strings.Split(strings.Trim(singleURL, "/"), "/")
+			multiURL := controller.ResourceMultiURL()
+			routeElements := strings.Split(strings.Trim(multiURL, "/"), "/")
 
 			parameters := gin.Params{}
 			for index, routeElement := range routeElements {
