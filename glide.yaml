@@ -9,5 +9,8 @@ import:
 - package: github.com/mattn/go-sqlite3
   version: ~1.2.0
 - package: github.com/umisama/golog
+- package: github.com/adams-sarah/test2doc
+  subpackages:
+  - test
 testImport:
 - package: github.com/bouk/monkey

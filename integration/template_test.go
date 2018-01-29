@@ -11,6 +11,15 @@ import (
 	"testing"
 )
 
+func TestGenerateApiDocumentForTemplate(t *testing.T) {
+	server := SetupApiDocumentServer()
+	defer server.Close()
+
+	Execute(t, http.MethodGet, GenerateMultiResourceURL(server.Server, "templates", nil), nil)
+
+	server.Finish()
+}
+
 func TestGetTemplates_Empty(t *testing.T) {
 	server := SetupServer()
 	defer server.Close()

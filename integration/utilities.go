@@ -15,6 +15,8 @@ import (
 	"reflect"
 	"testing"
 	"time"
+	"github.com/adams-sarah/test2doc/test"
+	"github.com/gin-gonic/gin"
 )
 
 const timeout = 15
@@ -72,6 +74,33 @@ func SetupServer() *httptest.Server {
 	database := db.Connect()
 	s := server.Setup(database)
 	return httptest.NewServer(s)
+}
+
+func SetupApiDocumentServer() *test.Server {
+	os.Setenv("DB_MODE", "memory")
+	database := db.Connect()
+	s := server.Setup(database)
+	test.RegisterURLVarExtractor(makeURLVarExtractor(s))
+	server, _ := test.NewServer(s)
+	return server
+}
+
+func makeURLVarExtractor(e *echo.Echo) func(req *http.Request) map[string]string {
+	return func(req *http.Request) map[string]string {
+		gin.Default().
+		ctx := e.AcquireContext()
+		defer e.ReleaseContext(ctx)
+		pnames := ctx.ParamNames()
+		if len(pnames) == 0 {
+			return nil
+		}
+
+		paramsMap := make(map[string]string, len(pnames))
+		for _, name := range pnames {
+			paramsMap[name] = ctx.Param(name)
+		}
+		return paramsMap
+	}
 }
 
 // Execute send a HTTP request to the test server and receive a response

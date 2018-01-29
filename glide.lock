@@ -1,6 +1,12 @@
-hash: f8b6e6d9d4cd4904598b6ca0c2c62522f6f1618921bfcef93006c84ad43004e1
-updated: 2018-01-20T12:15:25.171269298+09:00
+hash: 0a291bf05bbcb7ab5e134d987af1321bd6a5dbd2764ba44bb6a57a860a65c5d3
+updated: 2018-01-29T14:23:44.536960501+09:00
 imports:
+- name: github.com/adams-sarah/test2doc
+  version: c7ff98656171ed5df5bac7f48ac4bbe1fcd4d291
+  subpackages:
+  - doc
+  - doc/parse
+  - test
 - name: github.com/gin-gonic/gin
   version: e2212d40c62a98b388a5eb48ecbdcf88534688ba
   subpackages:
@@ -27,9 +33,9 @@ imports:
 - name: github.com/serenize/snaker
   version: 543781d2b79bd95c51ffe70e70a55c946ca211ff
 - name: github.com/spf13/cobra
-  version: 7b2c5ac9fc04fc5efafb60700713d4fa609b777b
+  version: f91529fc609202eededff4de2dc0ba2f662240a3
 - name: github.com/spf13/pflag
-  version: 1f33b80956cde38911d1f23d764deb8d77a649ce
+  version: 4c012f6dcd9546820e378d0bdda4d8fc772cdfea
 - name: github.com/umisama/golog
   version: 4ebae395687aca5427e6ac844c38cf0ca033e8c3
 - name: golang.org/x/net
