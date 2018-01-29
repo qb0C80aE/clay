@@ -522,8 +522,6 @@ func init() {
 				return nil, err
 			}
 
-			logging.Logger().Debug(result)
-
 			resultValue := reflect.ValueOf(result)
 			if resultValue.Len() == 0 {
 				logging.Logger().Debug("no record selected")
