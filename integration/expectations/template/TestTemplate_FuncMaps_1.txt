@@ -190,6 +190,13 @@ map[key:value]
 300.1000061035156
 300.2
 
+--- string ---
+join
+join string: 1,99.99,a,false
+
+split
+split slice: [1 99.99 a false]
+
 --- slice ---
 slice init
 slice1: []
