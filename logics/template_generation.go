@@ -212,6 +212,24 @@ func init() {
 		"boolean": func(value interface{}) (interface{}, error) {
 			return conversion.ToBooleanInterface(value)
 		},
+		"split": func(value interface{}, separator string) interface{} {
+			data := fmt.Sprintf("%v", value)
+			return strings.Split(data, separator)
+		},
+		"join": func(slice interface{}, separator string) (interface{}, error) {
+			interfaceSlice, err := mapstruct.SliceToInterfaceSlice(slice)
+			if err != nil {
+				logging.Logger().Debug(err.Error())
+				return nil, err
+			}
+			stringSlice := make([]string, len(interfaceSlice))
+
+			for index, item := range interfaceSlice {
+				stringSlice[index] = fmt.Sprintf("%v", item)
+			}
+
+			return strings.Join(stringSlice, separator), nil
+		},
 		"slice": func(items ...interface{}) interface{} {
 			slice := []interface{}{}
 			return append(slice, items...)
@@ -322,6 +340,7 @@ func init() {
 			path := pathInterface.(string)
 			controller, err := extensions.AssociatedControllerWithPath(path)
 			if err != nil {
+				logging.Logger().Debug(err.Error())
 				return nil, err
 			}
 
@@ -393,6 +412,7 @@ func init() {
 			path := pathInterface.(string)
 			controller, err := extensions.AssociatedControllerWithPath(path)
 			if err != nil {
+				logging.Logger().Debug(err.Error())
 				return nil, err
 			}
 

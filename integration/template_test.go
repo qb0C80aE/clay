@@ -980,6 +980,16 @@ i = i mod 5
 {{ float64 $vfloat32 }}
 {{ float64 $vfloat64 }}
 
+--- string ---
+join
+{{- $data := slice 1 99.99 "a" false }}
+{{- $sj := join $data ","}}
+join string: {{$sj}}
+
+split
+{{- $ss := split $sj ","}}
+split slice: {{$ss}}
+
 --- slice ---
 slice init
 {{- $slice1 := slice}}
