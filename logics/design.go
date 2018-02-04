@@ -24,7 +24,7 @@ func newDesignLogic() *designLogic {
 }
 
 // GetSingle returns all models to store into versioning repositories
-func (logic *designLogic) GetSingle(db *gorm.DB, _ gin.Params, _ url.Values, _ string) (interface{}, error) {
+func (logic *designLogic) GetSingle(db *gorm.DB, _ gin.Params, urlValues url.Values, _ string) (interface{}, error) {
 	// Reset previous conditions
 	db = db.New()
 
@@ -32,8 +32,12 @@ func (logic *designLogic) GetSingle(db *gorm.DB, _ gin.Params, _ url.Values, _ s
 
 	design := &models.Design{
 		ClayVersion:   programInformation.BuildTime(),
-		GeneratedDate: time.Now().String(),
+		GeneratedDate: "",
 		Content:       map[string]interface{}{},
+	}
+
+	if _, exists := urlValues["timestamp"]; exists {
+		design.GeneratedDate = time.Now().String()
 	}
 
 	designAccessors := extensions.RegisteredDesignAccessors()

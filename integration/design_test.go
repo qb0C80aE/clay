@@ -64,6 +64,12 @@ func TestGetDesign(t *testing.T) {
 
 	responseText, code := Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "designs", "present", nil), nil)
 	CheckResponseJSON(t, code, http.StatusOK, responseText, LoadExpectation(t, "design/TestGetDesign_1.json"), &models.Design{})
+
+	parameters := map[string]string{
+		"timestamp": "",
+	}
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "designs", "present", parameters), nil)
+	CheckResponseJSON(t, code, http.StatusOK, responseText, LoadExpectation(t, "design/TestGetDesign_2.json"), &models.Design{})
 }
 
 func TestUpdateDesign(t *testing.T) {
