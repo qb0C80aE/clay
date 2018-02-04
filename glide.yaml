@@ -9,5 +9,9 @@ import:
 - package: github.com/mattn/go-sqlite3
   version: ~1.2.0
 - package: github.com/umisama/golog
+- package: github.com/qb0C80aE/loam
+  version: develop
+- package: github.com/qb0C80aE/pottery
+  version: heroku
 testImport:
 - package: github.com/bouk/monkey

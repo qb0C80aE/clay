@@ -1,6 +1,12 @@
-hash: f8b6e6d9d4cd4904598b6ca0c2c62522f6f1618921bfcef93006c84ad43004e1
-updated: 2018-01-20T12:15:25.171269298+09:00
+hash: 91ff2e590de724709576458ac5250bb6c3e25618c9def91594791015621ca7e6
+updated: 2018-02-04T15:45:10.262790896+09:00
 imports:
+- name: github.com/elazarl/go-bindata-assetfs
+  version: 30f82fa23fd844bd5bb1e5f216db87fd77b5eb43
+- name: github.com/gin-gonic/contrib
+  version: dccbb4a462e965297e21372a9ad3ea05e0df3e5f
+  subpackages:
+  - static
 - name: github.com/gin-gonic/gin
   version: e2212d40c62a98b388a5eb48ecbdcf88534688ba
   subpackages:
@@ -10,6 +16,8 @@ imports:
   version: 2402d76f3d41f928c7902a765dfc872356dd3aad
   subpackages:
   - proto
+- name: github.com/higanworks/envmap
+  version: 4eb38fd4f96bdca0deb8691ae3d25ac97912d650
 - name: github.com/inconshreveable/mousetrap
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
 - name: github.com/jinzhu/gorm
@@ -24,6 +32,20 @@ imports:
   version: fc9e8d8ef48496124e79ae0df75490096eccf6fe
 - name: github.com/mattn/go-sqlite3
   version: ca5e3819723d8eeaf170ad510e7da1d6d2e94a08
+- name: github.com/qb0C80aE/loam
+  version: c6458eef282948d3cd93e52e5e0b90b4028eb451
+  subpackages:
+  - controllers
+  - logics
+  - models
+  - utils/net
+- name: github.com/qb0C80aE/pottery
+  version: 2851ace069eb8e19c3136edc093a430545de9c8b
+  subpackages:
+  - controllers
+  - logics
+  - models
+  - ui
 - name: github.com/serenize/snaker
   version: 543781d2b79bd95c51ffe70e70a55c946ca211ff
 - name: github.com/spf13/cobra
