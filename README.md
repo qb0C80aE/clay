@@ -46,7 +46,7 @@ $ # Suppose that $HOME is /home/user, and $GOPATH is /home/user/go.
 $ # Note: Please install glide first.
 $ go get github.com/Masterminds/glide
 $ # Note: If there are any tools what modules that you want to install into clay depend on, please install first like below.
-$ # go get github.com/jteeuwen/go-bindata/...
+$ # go get github.com/mattn/go-bindata/...
 $ mkdir -p $GOPATH/src/github.com/qb0C80aE/
 $ cd $GOPATH/src/github.com/qb0C80aE/
 $ git clone https://github.com/qb0C80aE/clay.git
@@ -119,7 +119,7 @@ $ # Prepare go directories.
 $ mkdir -p $GOPATH/{src, bin}
 $ # Install glide, and additional tools like go-bindata if you need.
 $ go get github.com/Masterminds/glide
-$ ## go get github.com/jteeuwen/go-bindata/...
+$ ## go get github.com/mattn/go-bindata/...
 $ # Build clay
 $ mkdir -p $GOPATH/src/github.com/qb0C80aE
 $ cd $GOPATH/src/github.com/qb0C80aE
