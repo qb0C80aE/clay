@@ -16,7 +16,7 @@ install:
  - mv $HOME/go $HOME/go1.4
  - (cd `which go | sed -e 's/\/bin\/go//g'`/src; GOOS=linux GOARCH=386 ./make.bash; GOOS=windows GOARCH=amd64 ./make.bash; GOOS=windows GOARCH=386 ./make.bash)
  - go get github.com/Masterminds/glide
- - go get github.com/jteeuwen/go-bindata/...
+ - go get github.com/mattn/go-bindata/...
 
 script:
  - glide install
