@@ -1,0 +1,115 @@
+# Group Commands
+Welcome to the commands API. This API provides access to the commands service.
+
+## commands [/commands]
+
+### Create command [POST]
+
+Create a new command
+
++ Request command (application/json; charset=utf-8)
+    + Headers
+
+            Accept: application/vnd.qb0C80aE+json
+    + Attributes
+
+        + description: DESCRIPTION (string)
+        + working_directory: WORKINGDIRECTORY (string)
+        + command_line: COMMANDLINE (string)
+        + status: STATUS (string)
+        + std_out: STDOUT (string)
+        + std_err: STDERR (string)
+        + exit_code: 1 (number)
+        + killed: false (boolean)
+        + started_at: STARTEDAT (string)
+        + finished_at: FINISHEDAT (string)
+        + cmd ()
+
++ Response 201 (application/json; charset=utf-8)
+    + Attributes (command, fixed)
+
+### Get commands [GET]
+
+Returns a command list.
+
++ Request (application/json; charset=utf-8)
+    + Headers
+
+            Accept: application/vnd.qb0C80aE+json
+
++ Response 200 (application/json; charset=utf-8)
+    + Attributes (array, fixed)
+        + (command)
+
+## command details [/commands/{id}]
+
++ Parameters
+    + id: `1` (enum[string]) - The ID of the desired command.
+        + Members
+            + `1`
+            + `2`
+            + `3`
+
+### Get command [GET]
+
+Returns a command.
+
++ Request (application/json; charset=utf-8)
+    + Headers
+
+            Accept: application/vnd.qb0C80aE+json
+
++ Response 200 (application/json; charset=utf-8)
+    + Attributes (command, fixed)
+
+### Update command [PUT]
+
+Update a command.
+
++ Request command (application/json; charset=utf-8)
+    + Headers
+
+            Accept: application/vnd.qb0C80aE+json
+    + Attributes
+
+        + description: DESCRIPTION (string)
+        + working_directory: WORKINGDIRECTORY (string)
+        + command_line: COMMANDLINE (string)
+        + status: STATUS (string)
+        + std_out: STDOUT (string)
+        + std_err: STDERR (string)
+        + exit_code: 1 (number)
+        + killed: false (boolean)
+        + started_at: STARTEDAT (string)
+        + finished_at: FINISHEDAT (string)
+        + cmd ()
+
++ Response 200 (application/json; charset=utf-8)
+    + Attributes (command, fixed)
+
+### Delete command [DELETE]
+
+Delete a command.
+
++ Request (application/json; charset=utf-8)
+    + Headers
+
+            Accept: application/vnd.qb0C80aE+json
+
++ Response 204
+
+# Data Structures
+## command (object)
+
++ id: *1* (number)
++ description: *DESCRIPTION* (string)
++ working_directory: *WORKINGDIRECTORY* (string)
++ command_line: *COMMANDLINE* (string)
++ status: *STATUS* (string)
++ std_out: *STDOUT* (string)
++ std_err: *STDERR* (string)
++ exit_code: *1* (number)
++ killed: *false* (boolean)
++ started_at: *STARTEDAT* (string)
++ finished_at: *FINISHEDAT* (string)
++ cmd ()

@@ -1,0 +1,109 @@
+# Group TemplateArguments
+Welcome to the template arguments API. This API provides access to the template arguments service.
+
+## template arguments [/template_arguments]
+
+### Create template argument [POST]
+
+Create a new template argument
+
++ Request template argument (application/json; charset=utf-8)
+    + Headers
+
+            Accept: application/vnd.qb0C80aE+json
+    + Attributes
+
+        + template_id: 1 (number)
+        + name: NAME (string)
+        + description: DESCRIPTION (string)
+        + type: 1 (number)
+        + default_value_int: 1 (number, nullable)
+        + default_value_float: 1.1 (number, nullable)
+        + default_value_bool: false (boolean, nullable)
+        + default_value_string: DEFAULTVALUESTRING (string, nullable)
+        + to_be_deleted: false (boolean)
+
++ Response 201 (application/json; charset=utf-8)
+    + Attributes (template_argument, fixed)
+
+### Get template arguments [GET]
+
+Returns a template argument list.
+
++ Request (application/json; charset=utf-8)
+    + Headers
+
+            Accept: application/vnd.qb0C80aE+json
+
++ Response 200 (application/json; charset=utf-8)
+    + Attributes (array, fixed)
+        + (template_argument)
+
+## template argument details [/template_arguments/{id}]
+
++ Parameters
+    + id: `1` (enum[string]) - The ID of the desired template argument.
+        + Members
+            + `1`
+            + `2`
+            + `3`
+
+### Get template argument [GET]
+
+Returns a template argument.
+
++ Request (application/json; charset=utf-8)
+    + Headers
+
+            Accept: application/vnd.qb0C80aE+json
+
++ Response 200 (application/json; charset=utf-8)
+    + Attributes (template_argument, fixed)
+
+### Update template argument [PUT]
+
+Update a template argument.
+
++ Request template_argument (application/json; charset=utf-8)
+    + Headers
+
+            Accept: application/vnd.qb0C80aE+json
+    + Attributes
+
+        + template_id: 1 (number)
+        + name: NAME (string)
+        + description: DESCRIPTION (string)
+        + type: 1 (number)
+        + default_value_int: 1 (number, nullable)
+        + default_value_float: 1.1 (number, nullable)
+        + default_value_bool: false (boolean, nullable)
+        + default_value_string: DEFAULTVALUESTRING (string, nullable)
+        + to_be_deleted: false (boolean)
+
++ Response 200 (application/json; charset=utf-8)
+    + Attributes (template_argument, fixed)
+
+### Delete template argument [DELETE]
+
+Delete a template argument.
+
++ Request (application/json; charset=utf-8)
+    + Headers
+
+            Accept: application/vnd.qb0C80aE+json
+
++ Response 204
+
+# Data Structures
+## template_argument (object)
+
++ id: *1* (number)
++ template_id: *1* (number)
++ name: *NAME* (string)
++ description: *DESCRIPTION* (string)
++ type: *1* (number)
++ default_value_int: *1* (number, nullable)
++ default_value_float: *1.1* (number, nullable)
++ default_value_bool: *false* (boolean, nullable)
++ default_value_string: *DEFAULTVALUESTRING* (string, nullable)
++ to_be_deleted: *false* (boolean)
