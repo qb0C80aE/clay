@@ -14,8 +14,7 @@ import (
 )
 
 // Connect connects to its database and returns the instance
-func Connect() *gorm.DB {
-	dbMode := os.Getenv("DB_MODE")
+func Connect(dbMode string) *gorm.DB {
 	var dbPath string
 	switch dbMode {
 	case "memory":

@@ -29,7 +29,8 @@ func (clayRuntime *clayRuntime) Run() {
 		}
 	}
 
-	database := db.Connect()
+	dbMode := os.Getenv("DB_MODE")
+	database := db.Connect(dbMode)
 	s := server.Setup(database)
 
 	if err := s.Run(fmt.Sprintf("%s:%s", host, port)); err != nil {
