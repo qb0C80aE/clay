@@ -23,7 +23,7 @@ type TemplateArgument struct {
 	ID                 int             `json:"id" gorm:"primary_key;auto_increment"`
 	TemplateID         int             `json:"template_id" gorm:"unique_index:template_id_name" sql:"type:integer references templates(id)"`
 	Name               string          `json:"name" gorm:"unique_index:template_id_name"`
-	Description        string          `json:"description" form:"description"`
+	Description        string          `json:"description" form:"description" sql:"type:text"`
 	Type               int             `json:"type"`
 	DefaultValueInt    sql.NullInt64   `json:"default_value_int"`
 	DefaultValueFloat  sql.NullFloat64 `json:"default_value_float"`

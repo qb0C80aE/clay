@@ -9,8 +9,8 @@ type Template struct {
 	*Base             `json:"base,omitempty"`
 	ID                int                 `json:"id" form:"id" gorm:"primary_key;auto_increment"`
 	Name              string              `json:"name" form:"name" gorm:"not null;unique"`
-	TemplateContent   string              `json:"template_content" form:"template_content"`
-	Description       string              `json:"description" form:"description"`
+	TemplateContent   string              `json:"template_content" form:"template_content" sql:"type:text"`
+	Description       string              `json:"description" form:"description" sql:"type:text"`
 	TemplateArguments []*TemplateArgument `json:"template_arguments"`
 }
 
