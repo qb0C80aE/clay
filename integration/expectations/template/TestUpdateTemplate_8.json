@@ -9,69 +9,24 @@
       "template_id": 104,
       "name": "testParameter42",
       "description": "testParameter42desc",
-      "type": 0,
-      "default_value_int": {
-        "Int64": 0,
-        "Valid": false
-      },
-      "default_value_float": {
-        "Float64": 0,
-        "Valid": false
-      },
-      "default_value_bool": {
-        "Bool": false,
-        "Valid": false
-      },
-      "default_value_string": {
-        "String": "TestParameter42",
-        "Valid": true
-      }
+      "type": 4,
+      "default_value": "TestParameter42"
     },
     {
       "id": 2003,
       "template_id": 104,
       "name": "testParameter44",
       "description": "testParameter44desc",
-      "type": 0,
-      "default_value_int": {
-        "Int64": 0,
-        "Valid": false
-      },
-      "default_value_float": {
-        "Float64": 0,
-        "Valid": false
-      },
-      "default_value_bool": {
-        "Bool": false,
-        "Valid": false
-      },
-      "default_value_string": {
-        "String": "TestParameter44",
-        "Valid": true
-      }
+      "type": 4,
+      "default_value": "TestParameter44"
     },
     {
       "id": 2004,
       "template_id": 104,
       "name": "testParameter45",
       "description": "testParameter45desc",
-      "type": 0,
-      "default_value_int": {
-        "Int64": 0,
-        "Valid": false
-      },
-      "default_value_float": {
-        "Float64": 0,
-        "Valid": false
-      },
-      "default_value_bool": {
-        "Bool": false,
-        "Valid": false
-      },
-      "default_value_string": {
-        "String": "TestParameter45",
-        "Valid": true
-      }
+      "type": 4,
+      "default_value": "TestParameter45"
     }
   ]
 }

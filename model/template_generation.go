@@ -48,16 +48,24 @@ func (receiver *TemplateGeneration) GenerateTemplate(db *gorm.DB, id string, tem
 	}
 
 	for _, templateArgument := range template.TemplateArguments {
+		var err error = nil
 		templateArgumentMap[templateArgument.Name] = templateArgument
 		switch templateArgument.Type {
 		case TemplateArgumentTypeInt:
-			templateParameterMap[templateArgument.Name] = templateArgument.DefaultValueInt.Int64
+			templateParameterMap[templateArgument.Name], err = conversion.ToInt64Interface(templateArgument.DefaultValue)
 		case TemplateArgumentTypeFloat:
-			templateParameterMap[templateArgument.Name] = templateArgument.DefaultValueFloat.Float64
+			templateParameterMap[templateArgument.Name], err = conversion.ToFloat64Interface(templateArgument.DefaultValue)
 		case TemplateArgumentTypeBool:
-			templateParameterMap[templateArgument.Name] = templateArgument.DefaultValueBool.Bool
+			templateParameterMap[templateArgument.Name], err = conversion.ToBooleanInterface(templateArgument.DefaultValue)
 		case TemplateArgumentTypeString:
-			templateParameterMap[templateArgument.Name] = templateArgument.DefaultValueString.String
+			templateParameterMap[templateArgument.Name] = templateArgument.DefaultValue
+		default:
+			err = fmt.Errorf("invalid type: %v", templateArgument.Type)
+		}
+
+		if err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
 		}
 	}
 

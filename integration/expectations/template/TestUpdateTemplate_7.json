@@ -9,46 +9,16 @@
       "template_id": 103,
       "name": "testParameter32Updated",
       "description": "testParameter32descUpdated",
-      "type": 0,
-      "default_value_int": {
-        "Int64": 0,
-        "Valid": false
-      },
-      "default_value_float": {
-        "Float64": 0,
-        "Valid": false
-      },
-      "default_value_bool": {
-        "Bool": false,
-        "Valid": false
-      },
-      "default_value_string": {
-        "String": "TestParameter32Updated",
-        "Valid": true
-      }
+      "type": 1,
+      "default_value": "99999"
     },
     {
       "id": 1002,
       "template_id": 103,
       "name": "testParameter34",
       "description": "",
-      "type": 0,
-      "default_value_int": {
-        "Int64": 0,
-        "Valid": false
-      },
-      "default_value_float": {
-        "Float64": 0,
-        "Valid": false
-      },
-      "default_value_bool": {
-        "Bool": false,
-        "Valid": false
-      },
-      "default_value_string": {
-        "String": "TestParameter34",
-        "Valid": true
-      }
+      "type": 4,
+      "default_value": "TestParameter34"
     }
   ]
 }

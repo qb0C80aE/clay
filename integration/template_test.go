@@ -3,7 +3,6 @@
 package integration
 
 import (
-	"database/sql"
 	"fmt"
 	"github.com/qb0C80aE/clay/model"
 	"net/http"
@@ -39,12 +38,10 @@ func TestCreateTemplate(t *testing.T) {
 		Description:     "test2desc",
 		TemplateArguments: []*model.TemplateArgument{
 			{
-				Name: "testParameter1",
-				DefaultValueString: sql.NullString{
-					String: "TestParameter1",
-					Valid:  true,
-				},
-				Description: "testParameter1desc",
+				Name:         "testParameter1",
+				Type:         model.TemplateArgumentTypeString,
+				DefaultValue: "TestParameter1",
+				Description:  "testParameter1desc",
 			},
 		},
 	}
@@ -56,21 +53,17 @@ func TestCreateTemplate(t *testing.T) {
 		Description:     "test100desc",
 		TemplateArguments: []*model.TemplateArgument{
 			{
-				Name: "testParameter100",
-				DefaultValueString: sql.NullString{
-					String: "TestParameter100",
-					Valid:  true,
-				},
-				Description: "testParameter100desc",
+				Name:         "testParameter100",
+				Type:         model.TemplateArgumentTypeString,
+				DefaultValue: "TestParameter100",
+				Description:  "testParameter100desc",
 			},
 			{
-				ID:   10,
-				Name: "testParameter110",
-				DefaultValueString: sql.NullString{
-					String: "TestParameter110",
-					Valid:  true,
-				},
-				Description: "testParameter110desc",
+				ID:           10,
+				Name:         "testParameter110",
+				Type:         model.TemplateArgumentTypeString,
+				DefaultValue: "TestParameter110",
+				Description:  "testParameter110desc",
 			},
 		},
 	}
@@ -112,12 +105,10 @@ func TestUpdateTemplate(t *testing.T) {
 		Description:     "test2desc",
 		TemplateArguments: []*model.TemplateArgument{
 			{
-				Name: "testParameter21",
-				DefaultValueString: sql.NullString{
-					String: "TestParameter21",
-					Valid:  true,
-				},
-				Description: "testParameter21desc",
+				Name:         "testParameter21",
+				Type:         model.TemplateArgumentTypeString,
+				DefaultValue: "TestParameter21",
+				Description:  "testParameter21desc",
 			},
 		},
 	}
@@ -130,22 +121,18 @@ func TestUpdateTemplate(t *testing.T) {
 		Description:     "test3desc",
 		TemplateArguments: []*model.TemplateArgument{
 			{
-				ID:   1000,
-				Name: "testParameter31",
-				DefaultValueString: sql.NullString{
-					String: "TestParameter31",
-					Valid:  true,
-				},
-				Description: "testParameter31desc",
+				ID:           1000,
+				Name:         "testParameter31",
+				Type:         model.TemplateArgumentTypeString,
+				DefaultValue: "TestParameter31",
+				Description:  "testParameter31desc",
 			},
 			{
-				ID:   1001,
-				Name: "testParameter32",
-				DefaultValueString: sql.NullString{
-					String: "TestParameter32",
-					Valid:  true,
-				},
-				Description: "testParameter31desc",
+				ID:           1001,
+				Name:         "testParameter32",
+				Type:         model.TemplateArgumentTypeString,
+				DefaultValue: "TestParameter32",
+				Description:  "testParameter31desc",
 			},
 		},
 	}
@@ -158,31 +145,25 @@ func TestUpdateTemplate(t *testing.T) {
 		Description:     "test4desc",
 		TemplateArguments: []*model.TemplateArgument{
 			{
-				ID:   2000,
-				Name: "testParameter41",
-				DefaultValueString: sql.NullString{
-					String: "TestParameter41",
-					Valid:  true,
-				},
-				Description: "testParameter41desc",
+				ID:           2000,
+				Name:         "testParameter41",
+				Type:         model.TemplateArgumentTypeString,
+				DefaultValue: "TestParameter41",
+				Description:  "testParameter41desc",
 			},
 			{
-				ID:   2001,
-				Name: "testParameter42",
-				DefaultValueString: sql.NullString{
-					String: "TestParameter42",
-					Valid:  true,
-				},
-				Description: "testParameter42desc",
+				ID:           2001,
+				Name:         "testParameter42",
+				Type:         model.TemplateArgumentTypeString,
+				DefaultValue: "TestParameter42",
+				Description:  "testParameter42desc",
 			},
 			{
-				ID:   2002,
-				Name: "testParameter43",
-				DefaultValueString: sql.NullString{
-					String: "TestParameter43",
-					Valid:  true,
-				},
-				Description: "testParameter43desc",
+				ID:           2002,
+				Name:         "testParameter43",
+				Type:         model.TemplateArgumentTypeString,
+				DefaultValue: "TestParameter43",
+				Description:  "testParameter43desc",
 			},
 		},
 	}
@@ -210,21 +191,17 @@ func TestUpdateTemplate(t *testing.T) {
 	CheckResponseJSON(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestUpdateTemplate_4.json"), &model.Template{})
 
 	template3.TemplateArguments[1].Name = "testParameter32Updated"
-	template3.TemplateArguments[1].DefaultValueString = sql.NullString{
-		String: "TestParameter32Updated",
-		Valid:  true,
-	}
+	template3.TemplateArguments[1].Type = model.TemplateArgumentTypeInt
+	template3.TemplateArguments[1].DefaultValue = "99999"
 	template3.TemplateArguments[1].Description = "testParameter32descUpdated"
 
 	template3.TemplateArguments = append(
 		template3.TemplateArguments,
 		&model.TemplateArgument{
-			ID:   1002,
-			Name: "testParameter34",
-			DefaultValueString: sql.NullString{
-				String: "TestParameter34",
-				Valid:  true,
-			},
+			ID:           1002,
+			Name:         "testParameter34",
+			Type:         model.TemplateArgumentTypeString,
+			DefaultValue: "TestParameter34",
 		},
 	)
 
@@ -240,21 +217,17 @@ func TestUpdateTemplate(t *testing.T) {
 	template4.TemplateArguments = append(template4.TemplateArguments,
 		[]*model.TemplateArgument{
 			{
-				ID:   2003,
-				Name: "testParameter44",
-				DefaultValueString: sql.NullString{
-					String: "TestParameter44",
-					Valid:  true,
-				},
-				Description: "testParameter44desc",
+				ID:           2003,
+				Name:         "testParameter44",
+				Type:         model.TemplateArgumentTypeString,
+				DefaultValue: "TestParameter44",
+				Description:  "testParameter44desc",
 			},
 			{
-				Name: "testParameter45",
-				DefaultValueString: sql.NullString{
-					String: "TestParameter45",
-					Valid:  true,
-				},
-				Description: "testParameter45desc",
+				Type:         model.TemplateArgumentTypeString,
+				Name:         "testParameter45",
+				DefaultValue: "TestParameter45",
+				Description:  "testParameter45desc",
 			},
 		}...,
 	)
@@ -313,46 +286,18 @@ func TestCreateTemplateArguments(t *testing.T) {
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template)
 
 	templateArgument1 := &model.TemplateArgument{
-		TemplateID: 1,
-		Name:       "testParameter1",
-		DefaultValueInt: sql.NullInt64{
-			Int64: 100,
-			Valid: true,
-		},
-		DefaultValueFloat: sql.NullFloat64{
-			Float64: 123.456,
-			Valid:   true,
-		},
-		DefaultValueBool: sql.NullBool{
-			Bool:  true,
-			Valid: true,
-		},
-		DefaultValueString: sql.NullString{
-			String: "TestParameter1",
-			Valid:  true,
-		},
-		Description: "testParameter1desc",
+		TemplateID:   1,
+		Name:         "testParameter1",
+		Type:         model.TemplateArgumentTypeInt,
+		DefaultValue: "123",
+		Description:  "testParameter1desc",
 	}
 	templateArgument2 := &model.TemplateArgument{
-		TemplateID: 1,
-		Name:       "testParameter2",
-		DefaultValueInt: sql.NullInt64{
-			Int64: 200,
-			Valid: true,
-		},
-		DefaultValueFloat: sql.NullFloat64{
-			Float64: 456.789,
-			Valid:   true,
-		},
-		DefaultValueBool: sql.NullBool{
-			Bool:  false,
-			Valid: true,
-		},
-		DefaultValueString: sql.NullString{
-			String: "TestParameter2",
-			Valid:  true,
-		},
-		Description: "testParameter2desc",
+		TemplateID:   1,
+		Name:         "testParameter2",
+		Type:         model.TemplateArgumentTypeFloat,
+		DefaultValue: "456.789",
+		Description:  "testParameter2desc",
 	}
 
 	responseText, code := Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_arguments", nil), templateArgument1)
@@ -380,38 +325,18 @@ func TestUpdateTemplateArguments(t *testing.T) {
 
 	id := 1
 	templateArgument1 := &model.TemplateArgument{
-		TemplateID: id,
-		Name:       "testParameter1",
-		DefaultValueInt: sql.NullInt64{
-			Int64: 100,
-			Valid: true,
-		},
-		DefaultValueFloat: sql.NullFloat64{
-			Float64: 123.456,
-			Valid:   true,
-		},
-		DefaultValueBool: sql.NullBool{
-			Bool:  true,
-			Valid: true,
-		},
-		DefaultValueString: sql.NullString{
-			String: "TestParameter1",
-			Valid:  true,
-		},
-		Description: "testParameter1desc",
+		TemplateID:   id,
+		Name:         "testParameter1",
+		Type:         model.TemplateArgumentTypeBool,
+		DefaultValue: "true",
+		Description:  "testParameter1desc",
 	}
 
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_arguments", nil), templateArgument1)
 
 	templateArgument1.Name = "templateArgument1Updated"
-	templateArgument1.DefaultValueInt = sql.NullInt64{
-		Int64: 999,
-		Valid: true,
-	}
-	templateArgument1.DefaultValueString = sql.NullString{
-		String: "TestParameter1Updated",
-		Valid:  true,
-	}
+	templateArgument1.Type = model.TemplateArgumentTypeInt
+	templateArgument1.DefaultValue = "999"
 	templateArgument1.Description = "testParameter1descUpdated"
 
 	responseText, code := Execute(t, http.MethodPut, GenerateSingleResourceURL(server, "template_arguments", strconv.Itoa(id), nil), templateArgument1)
@@ -436,22 +361,17 @@ func TestDeleteTemplateArguments(t *testing.T) {
 
 	id := 1
 	templateArgument1 := &model.TemplateArgument{
-		TemplateID: id,
-		Name:       "testParameter1",
-		DefaultValueString: sql.NullString{
-			String: "TestParameter1",
-			Valid:  true,
-		},
-		Description: "testParameter1desc",
+		TemplateID:   id,
+		Name:         "testParameter1",
+		Type:         model.TemplateArgumentTypeString,
+		DefaultValue: "TestParameter1",
+		Description:  "testParameter1desc",
 	}
 
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_arguments", nil), templateArgument1)
 
 	templateArgument1.Name = "templateArgument1Updated"
-	templateArgument1.DefaultValueString = sql.NullString{
-		String: "TestParameter1Updated",
-		Valid:  true,
-	}
+	templateArgument1.DefaultValue = "TestParameter1Updated"
 	templateArgument1.Description = "TestParameter1descUpdated"
 
 	responseText, code := Execute(t, http.MethodDelete, GenerateSingleResourceURL(server, "template_arguments", strconv.Itoa(id), nil), nil)
@@ -477,13 +397,11 @@ func TestDeleteTemplateArguments_Cascade(t *testing.T) {
 
 	id := 1
 	templateArgument1 := &model.TemplateArgument{
-		TemplateID: id,
-		Name:       "testParameter1",
-		DefaultValueString: sql.NullString{
-			String: "TestParameter1",
-			Valid:  true,
-		},
-		Description: "testParameter1desc",
+		TemplateID:   id,
+		Name:         "testParameter1",
+		Type:         model.TemplateArgumentTypeString,
+		DefaultValue: "TestParameter1",
+		Description:  "testParameter1desc",
 	}
 
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_arguments", nil), templateArgument1)
@@ -515,40 +433,32 @@ func TestTemplate_ExtractFromDesign(t *testing.T) {
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template2)
 
 	templateArgument11 := &model.TemplateArgument{
-		TemplateID: 1,
-		Name:       "testParameter11",
-		DefaultValueString: sql.NullString{
-			String: "TestParameter11",
-			Valid:  true,
-		},
-		Description: "testParameter11desc",
+		TemplateID:   1,
+		Name:         "testParameter11",
+		Type:         model.TemplateArgumentTypeString,
+		DefaultValue: "TestParameter11",
+		Description:  "testParameter11desc",
 	}
 	templateArgument12 := &model.TemplateArgument{
-		TemplateID: 1,
-		Name:       "testParameter12",
-		DefaultValueString: sql.NullString{
-			String: "TestParameter12",
-			Valid:  true,
-		},
-		Description: "testParameter12desc",
+		TemplateID:   1,
+		Name:         "testParameter12",
+		Type:         model.TemplateArgumentTypeString,
+		DefaultValue: "TestParameter12",
+		Description:  "testParameter12desc",
 	}
 	templateArgument21 := &model.TemplateArgument{
-		TemplateID: 2,
-		Name:       "testParameter21",
-		DefaultValueString: sql.NullString{
-			String: "TestParameter21",
-			Valid:  true,
-		},
-		Description: "testParameter21desc",
+		TemplateID:   2,
+		Name:         "testParameter21",
+		Type:         model.TemplateArgumentTypeString,
+		DefaultValue: "TestParameter21",
+		Description:  "testParameter21desc",
 	}
 	templateArgument22 := &model.TemplateArgument{
-		TemplateID: 2,
-		Name:       "testParameter22",
-		DefaultValueString: sql.NullString{
-			String: "TestParameter22",
-			Valid:  true,
-		},
-		Description: "testParameter22desc",
+		TemplateID:   2,
+		Name:         "testParameter22",
+		Type:         model.TemplateArgumentTypeString,
+		DefaultValue: "TestParameter22",
+		Description:  "testParameter22desc",
 	}
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_arguments", nil), templateArgument11)
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "template_arguments", nil), templateArgument12)
@@ -585,148 +495,94 @@ testParameterBoolOverride = {{ .testParameterBoolOverride }}
 testParameterStringOverride = {{ .testParameterStringOverride }}`,
 		TemplateArguments: []*model.TemplateArgument{
 			{
-				Name: "testParameterInt",
-				Type: model.TemplateArgumentTypeInt,
-				DefaultValueInt: sql.NullInt64{
-					Int64: 123,
-					Valid: true,
-				},
+				Name:         "testParameterInt",
+				Type:         model.TemplateArgumentTypeInt,
+				DefaultValue: "123",
 			},
 			{
-				Name: "testParameterInt8",
-				Type: model.TemplateArgumentTypeInt,
-				DefaultValueInt: sql.NullInt64{
-					Int64: 124,
-					Valid: true,
-				},
+				Name:         "testParameterInt8",
+				Type:         model.TemplateArgumentTypeInt,
+				DefaultValue: "124",
 			},
 			{
-				Name: "testParameterInt16",
-				Type: model.TemplateArgumentTypeInt,
-				DefaultValueInt: sql.NullInt64{
-					Int64: 125,
-					Valid: true,
-				},
+				Name:         "testParameterInt16",
+				Type:         model.TemplateArgumentTypeInt,
+				DefaultValue: "125",
 			},
 			{
-				Name: "testParameterInt32",
-				Type: model.TemplateArgumentTypeInt,
-				DefaultValueInt: sql.NullInt64{
-					Int64: 126,
-					Valid: true,
-				},
+				Name:         "testParameterInt32",
+				Type:         model.TemplateArgumentTypeInt,
+				DefaultValue: "126",
 			},
 			{
-				Name: "testParameterInt64",
-				Type: model.TemplateArgumentTypeInt,
-				DefaultValueInt: sql.NullInt64{
-					Int64: 127,
-					Valid: true,
-				},
+				Name:         "testParameterInt64",
+				Type:         model.TemplateArgumentTypeInt,
+				DefaultValue: "127",
 			},
 			{
-				Name: "testParameterUint",
-				Type: model.TemplateArgumentTypeInt,
-				DefaultValueInt: sql.NullInt64{
-					Int64: 1123,
-					Valid: true,
-				},
+				Name:         "testParameterUint",
+				Type:         model.TemplateArgumentTypeInt,
+				DefaultValue: "1123",
 			},
 			{
-				Name: "testParameterUint8",
-				Type: model.TemplateArgumentTypeInt,
-				DefaultValueInt: sql.NullInt64{
-					Int64: 1124,
-					Valid: true,
-				},
+				Name:         "testParameterUint8",
+				Type:         model.TemplateArgumentTypeInt,
+				DefaultValue: "1124",
 			},
 			{
-				Name: "testParameterUint16",
-				Type: model.TemplateArgumentTypeInt,
-				DefaultValueInt: sql.NullInt64{
-					Int64: 1125,
-					Valid: true,
-				},
+				Name:         "testParameterUint16",
+				Type:         model.TemplateArgumentTypeInt,
+				DefaultValue: "1125",
 			},
 			{
-				Name: "testParameterUint32",
-				Type: model.TemplateArgumentTypeInt,
-				DefaultValueInt: sql.NullInt64{
-					Int64: 1126,
-					Valid: true,
-				},
+				Name:         "testParameterUint32",
+				Type:         model.TemplateArgumentTypeInt,
+				DefaultValue: "1126",
 			},
 			{
-				Name: "testParameterUint64",
-				Type: model.TemplateArgumentTypeInt,
-				DefaultValueInt: sql.NullInt64{
-					Int64: 1127,
-					Valid: true,
-				},
+				Name:         "testParameterUint64",
+				Type:         model.TemplateArgumentTypeInt,
+				DefaultValue: "1127",
 			},
 			{
-				Name: "testParameterFloat32",
-				Type: model.TemplateArgumentTypeFloat,
-				DefaultValueFloat: sql.NullFloat64{
-					Float64: 123.1,
-					Valid:   true,
-				},
+				Name:         "testParameterFloat32",
+				Type:         model.TemplateArgumentTypeFloat,
+				DefaultValue: "123.1",
 			},
 			{
-				Name: "testParameterFloat64",
-				Type: model.TemplateArgumentTypeFloat,
-				DefaultValueFloat: sql.NullFloat64{
-					Float64: 123.2,
-					Valid:   true,
-				},
+				Name:         "testParameterFloat64",
+				Type:         model.TemplateArgumentTypeFloat,
+				DefaultValue: "123.2",
 			},
 			{
-				Name: "testParameterBool",
-				Type: model.TemplateArgumentTypeBool,
-				DefaultValueBool: sql.NullBool{
-					Bool:  true,
-					Valid: true,
-				},
+				Name:         "testParameterBool",
+				Type:         model.TemplateArgumentTypeBool,
+				DefaultValue: "true",
 			},
 			{
-				Name: "testParameterString",
-				Type: model.TemplateArgumentTypeString,
-				DefaultValueString: sql.NullString{
-					String: "ABCDE",
-					Valid:  true,
-				},
+				Name:         "testParameterString",
+				Type:         model.TemplateArgumentTypeString,
+				DefaultValue: "ABCDE",
 			},
 			{
-				Name: "testParameterIntOverride",
-				Type: model.TemplateArgumentTypeInt,
-				DefaultValueInt: sql.NullInt64{
-					Int64: 0,
-					Valid: true,
-				},
+				Name:         "testParameterIntOverride",
+				Type:         model.TemplateArgumentTypeInt,
+				DefaultValue: "0",
 			},
 			{
-				Name: "testParameterFloatOverride",
-				Type: model.TemplateArgumentTypeFloat,
-				DefaultValueFloat: sql.NullFloat64{
-					Float64: 0,
-					Valid:   true,
-				},
+				Name:         "testParameterFloatOverride",
+				Type:         model.TemplateArgumentTypeFloat,
+				DefaultValue: "0",
 			},
 			{
-				Name: "testParameterBoolOverride",
-				Type: model.TemplateArgumentTypeBool,
-				DefaultValueBool: sql.NullBool{
-					Bool:  false,
-					Valid: true,
-				},
+				Name:         "testParameterBoolOverride",
+				Type:         model.TemplateArgumentTypeBool,
+				DefaultValue: "false",
 			},
 			{
-				Name: "testParameterStringOverride",
-				Type: model.TemplateArgumentTypeString,
-				DefaultValueString: sql.NullString{
-					String: "nothing",
-					Valid:  true,
-				},
+				Name:         "testParameterStringOverride",
+				Type:         model.TemplateArgumentTypeString,
+				DefaultValue: "nothing",
 			},
 		},
 	}
@@ -1236,26 +1092,26 @@ multi
 {{- $t := index $m 0}}
 {{$t.Name}}
 {{- $p1 := index $t.TemplateArguments 0}}
-{{$p1.Name}}={{$p1.DefaultValueString.String}}
+{{$p1.Name}}={{$p1.DefaultValue}}
 {{- $p2 := index $t.TemplateArguments 1}}
-{{$p2.Name}}={{$p2.DefaultValueString.String}}
+{{$p2.Name}}={{$p2.DefaultValue}}
 
 single
 {{- $path := printf "/templates/%d" .testParameter11}}
 {{- $s := single .ModelStore $path "preloads=TemplateArguments"}}
 {{$s.Name}}
 {{- $p1 := index $s.TemplateArguments 0}}
-{{$p1.Name}}={{$p1.DefaultValueString.String}}
+{{$p1.Name}}={{$p1.DefaultValue}}
 {{- $p2 := index $s.TemplateArguments 1}}
-{{$p2.Name}}={{$p2.DefaultValueString.String}}
+{{$p2.Name}}={{$p2.DefaultValue}}
 
 first
 {{- $f := first .ModelStore "templates" "q[name]=test1&preloads=TemplateArguments"}}
 {{$f.Name}}
 {{- $p1 := index $t.TemplateArguments 0}}
-{{$p1.Name}}={{$p1.DefaultValueString.String}}
+{{$p1.Name}}={{$p1.DefaultValue}}
 {{- $p2 := index $t.TemplateArguments 1}}
-{{$p2.Name}}={{$p2.DefaultValueString.String}}
+{{$p2.Name}}={{$p2.DefaultValue}}
 
 total
 {{- $t := total .ModelStore "/template_arguments"}}
@@ -1295,39 +1151,26 @@ sequence[{{$i}}]={{$v}}
 	}
 
 	templateArgument11 := &model.TemplateArgument{
-		TemplateID: id,
-		Name:       "testParameter11",
-		Type:       model.TemplateArgumentTypeInt,
-		DefaultValueString: sql.NullString{
-			String: "TestParameter11",
-			Valid:  true,
-		},
-		DefaultValueInt: sql.NullInt64{
-			Int64: 1,
-			Valid: true,
-		},
-		Description: "testParameter11desc",
+		TemplateID:   id,
+		Name:         "testParameter11",
+		Type:         model.TemplateArgumentTypeInt,
+		DefaultValue: "1",
+		Description:  "testParameter11desc",
 	}
 	templateArgument12 := &model.TemplateArgument{
-		TemplateID: id,
-		Name:       "testParameter12",
-		Type:       model.TemplateArgumentTypeString,
-		DefaultValueString: sql.NullString{
-			String: "TestParameter12",
-			Valid:  true,
-		},
-		Description: "testParameter12desc",
+		TemplateID:   id,
+		Name:         "testParameter12",
+		Type:         model.TemplateArgumentTypeString,
+		DefaultValue: "TestParameter12",
+		Description:  "testParameter12desc",
 	}
 
 	templateArgument13 := &model.TemplateArgument{
-		TemplateID: id,
-		Name:       "testParameter1X",
-		Type:       model.TemplateArgumentTypeInt,
-		DefaultValueInt: sql.NullInt64{
-			Int64: 100,
-			Valid: true,
-		},
-		Description: "testParameter1Xdesc",
+		TemplateID:   id,
+		Name:         "testParameter1X",
+		Type:         model.TemplateArgumentTypeInt,
+		DefaultValue: "100",
+		Description:  "testParameter1Xdesc",
 	}
 
 	id2 := 2
@@ -1338,14 +1181,11 @@ sequence[{{$i}}]={{$v}}
 		Description:     "test12desc",
 	}
 	templateArgument21 := &model.TemplateArgument{
-		TemplateID: id2,
-		Name:       "testParameter1X",
-		Type:       model.TemplateArgumentTypeInt,
-		DefaultValueInt: sql.NullInt64{
-			Int64: 200,
-			Valid: true,
-		},
-		Description: "testParameter1Xdesc",
+		TemplateID:   id2,
+		Name:         "testParameter1X",
+		Type:         model.TemplateArgumentTypeInt,
+		DefaultValue: "200",
+		Description:  "testParameter1Xdesc",
 	}
 
 	id3 := 3
@@ -1356,14 +1196,11 @@ sequence[{{$i}}]={{$v}}
 		Description:     "test13desc",
 	}
 	templateArgument31 := &model.TemplateArgument{
-		TemplateID: id3,
-		Name:       "testParameter1X",
-		Type:       model.TemplateArgumentTypeInt,
-		DefaultValueInt: sql.NullInt64{
-			Int64: 300,
-			Valid: true,
-		},
-		Description: "testParameter1Xdesc",
+		TemplateID:   id3,
+		Name:         "testParameter1X",
+		Type:         model.TemplateArgumentTypeInt,
+		DefaultValue: "300",
+		Description:  "testParameter1Xdesc",
 	}
 
 	id4 := 4

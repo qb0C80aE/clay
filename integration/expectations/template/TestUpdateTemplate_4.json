@@ -8,23 +8,8 @@
       "template_id": 102,
       "name": "testParameter21",
       "description": "testParameter21desc",
-      "type": 0,
-      "default_value_int": {
-        "Int64": 0,
-        "Valid": false
-      },
-      "default_value_float": {
-        "Float64": 0,
-        "Valid": false
-      },
-      "default_value_bool": {
-        "Bool": false,
-        "Valid": false
-      },
-      "default_value_string": {
-        "String": "TestParameter21",
-        "Valid": true
-      }
+      "type": 4,
+      "default_value": "TestParameter21"
     }
   ],
   "template_content": "TestTemplate2"

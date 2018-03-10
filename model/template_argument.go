@@ -1,9 +1,10 @@
 package model
 
 import (
-	"database/sql"
+	"fmt"
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extension"
+	"github.com/qb0C80aE/clay/util/conversion"
 )
 
 const (
@@ -19,17 +20,14 @@ const (
 
 // TemplateArgument is the model class what represents model-independent arguments used in templates
 type TemplateArgument struct {
-	*Base              `json:"base,omitempty"`
-	ID                 int             `json:"id" gorm:"primary_key;auto_increment"`
-	TemplateID         int             `json:"template_id" gorm:"unique_index:template_id_name" sql:"type:integer references templates(id)"`
-	Name               string          `json:"name" gorm:"unique_index:template_id_name"`
-	Description        string          `json:"description" form:"description" sql:"type:text"`
-	Type               int             `json:"type"`
-	DefaultValueInt    sql.NullInt64   `json:"default_value_int"`
-	DefaultValueFloat  sql.NullFloat64 `json:"default_value_float"`
-	DefaultValueBool   sql.NullBool    `json:"default_value_bool"`
-	DefaultValueString sql.NullString  `json:"default_value_string"`
-	ToBeDeleted        bool            `json:"to_be_deleted,omitempty" sql:"-"`
+	*Base        `json:"base,omitempty"`
+	ID           int    `json:"id" gorm:"primary_key;auto_increment"`
+	TemplateID   int    `json:"template_id" gorm:"unique_index:template_id_name" sql:"type:integer references templates(id)"`
+	Name         string `json:"name" gorm:"unique_index:template_id_name"`
+	Description  string `json:"description" form:"description" sql:"type:text"`
+	Type         int    `json:"type"`
+	DefaultValue string `json:"default_value"`
+	ToBeDeleted  bool   `json:"to_be_deleted,omitempty" sql:"-"`
 }
 
 // NewTemplateArgument creates a template argument model instance
@@ -45,6 +43,32 @@ func (receiver *TemplateArgument) DoAfterDBMigration(db *gorm.DB) error {
 			delete from template_arguments where template_id = old.id;
 		end;
 	`).Error
+}
+
+func (receiver *TemplateArgument) checkDefaultValueBeforeStore() error {
+	var err error
+
+	switch receiver.Type {
+	case TemplateArgumentTypeInt:
+		_, err = conversion.ToInt64Interface(receiver.DefaultValue)
+	case TemplateArgumentTypeFloat:
+		_, err = conversion.ToFloat64Interface(receiver.DefaultValue)
+	case TemplateArgumentTypeBool:
+		_, err = conversion.ToBooleanInterface(receiver.DefaultValue)
+	case TemplateArgumentTypeString:
+	default:
+		err = fmt.Errorf("invalid type: %v", receiver.Type)
+	}
+
+	return err
+}
+
+func (receiver *TemplateArgument) BeforeCreate() error {
+	return receiver.checkDefaultValueBeforeStore()
+}
+
+func (receiver *TemplateArgument) BeforeSave() error {
+	return receiver.checkDefaultValueBeforeStore()
 }
 
 func init() {

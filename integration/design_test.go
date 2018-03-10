@@ -3,7 +3,6 @@
 package integration
 
 import (
-	"database/sql"
 	"github.com/bouk/monkey"
 	_ "github.com/qb0C80aE/clay/buildtime"
 	"github.com/qb0C80aE/clay/model"
@@ -38,24 +37,20 @@ func TestGetDesign(t *testing.T) {
 		Description:     "tedst2desc",
 		TemplateArguments: []*model.TemplateArgument{
 			{
-				Name: "testParameter1",
-				DefaultValueString: sql.NullString{
-					String: "TestParameter1",
-					Valid:  true,
-				},
-				Description: "testParameter1desc",
+				Name:         "testParameter1",
+				Type:         model.TemplateArgumentTypeString,
+				DefaultValue: "TestParameter1",
+				Description:  "testParameter1desc",
 			},
 		},
 	}
 
 	templateArgument22 := &model.TemplateArgument{
-		TemplateID: 2,
-		Name:       "testParameter2",
-		DefaultValueString: sql.NullString{
-			String: "TestParameter2",
-			Valid:  true,
-		},
-		Description: "testParameter2desc",
+		TemplateID:   2,
+		Name:         "testParameter2",
+		Type:         model.TemplateArgumentTypeString,
+		DefaultValue: "TestParameter2",
+		Description:  "testParameter2desc",
 	}
 
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template1)
@@ -80,24 +75,20 @@ func TestUpdateDesign(t *testing.T) {
 		Content: map[string]interface{}{
 			"template_persistent_parameters": []*model.TemplateArgument{
 				{
-					ID:         1,
-					TemplateID: 1,
-					Name:       "testParameter11",
-					DefaultValueString: sql.NullString{
-						String: "TestParameter11",
-						Valid:  true,
-					},
-					Description: "testParameter11desc",
+					ID:           1,
+					TemplateID:   1,
+					Name:         "testParameter11",
+					Type:         model.TemplateArgumentTypeString,
+					DefaultValue: "TestParameter11",
+					Description:  "testParameter11desc",
 				},
 				{
-					ID:         2,
-					TemplateID: 1,
-					Name:       "testParameter12",
-					DefaultValueString: sql.NullString{
-						String: "TestParameter12",
-						Valid:  true,
-					},
-					Description: "testParameter12desc",
+					ID:           2,
+					TemplateID:   1,
+					Name:         "testParameter12",
+					Type:         model.TemplateArgumentTypeString,
+					DefaultValue: "TestParameter12",
+					Description:  "testParameter12desc",
 				},
 			},
 			"templates": []*model.Template{
@@ -132,24 +123,20 @@ func TestDeleteDesign(t *testing.T) {
 		Content: map[string]interface{}{
 			"template_persistent_parameters": []*model.TemplateArgument{
 				{
-					ID:         1,
-					TemplateID: 1,
-					Name:       "testParameter11",
-					DefaultValueString: sql.NullString{
-						String: "TestParameter11",
-						Valid:  true,
-					},
-					Description: "testParameter11desc",
+					ID:           1,
+					TemplateID:   1,
+					Name:         "testParameter11",
+					Type:         model.TemplateArgumentTypeString,
+					DefaultValue: "TestParameter11",
+					Description:  "testParameter11desc",
 				},
 				{
-					ID:         2,
-					TemplateID: 1,
-					Name:       "testParameter12",
-					DefaultValueString: sql.NullString{
-						String: "TestParameter12",
-						Valid:  true,
-					},
-					Description: "testParameter12desc",
+					ID:           2,
+					TemplateID:   1,
+					Name:         "testParameter12",
+					Type:         model.TemplateArgumentTypeString,
+					DefaultValue: "TestParameter12",
+					Description:  "testParameter12desc",
 				},
 			},
 			"templates": []*model.Template{

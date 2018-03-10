@@ -9,23 +9,8 @@
       "template_id": 2,
       "name": "testParameter1",
       "description": "testParameter1desc",
-      "type": 0,
-      "default_value_int": {
-        "Int64": 0,
-        "Valid": false
-      },
-      "default_value_float": {
-        "Float64": 0,
-        "Valid": false
-      },
-      "default_value_bool": {
-        "Bool": false,
-        "Valid": false
-      },
-      "default_value_string": {
-        "String": "TestParameter1",
-        "Valid": true
-      }
+      "type": 4,
+      "default_value": "TestParameter1"
     }
   ]
 }
