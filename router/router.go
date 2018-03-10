@@ -2,46 +2,46 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/qb0C80aE/clay/controllers"
-	"github.com/qb0C80aE/clay/extensions"
+	"github.com/qb0C80aE/clay/controller"
+	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
 	"os"
 )
 
 // Initialize initializes the router
 func Initialize(r *gin.Engine) {
-	routerInitializers := extensions.RegisteredRouterInitializers()
+	initializerList := extension.GetRegisteredInitializerList()
 
-	for _, initializer := range routerInitializers {
-		initializer.InitializeEarly(r)
+	for _, initializer := range initializerList {
+		initializer.DoBeforeRouterSetup(r)
 	}
 
-	r.GET("/", controllers.APIEndpoints)
+	r.GET("/", controller.GetAPIEndpoints)
 
 	api := r.Group("")
 	{
 		methodFunctionMap := map[int]func(string, ...gin.HandlerFunc) gin.IRoutes{
-			extensions.MethodGet:     api.GET,
-			extensions.MethodPost:    api.POST,
-			extensions.MethodPut:     api.PUT,
-			extensions.MethodDelete:  api.DELETE,
-			extensions.MethodPatch:   api.PATCH,
-			extensions.MethodOptions: api.OPTIONS,
+			extension.MethodGet:     api.GET,
+			extension.MethodPost:    api.POST,
+			extension.MethodPut:     api.PUT,
+			extension.MethodDelete:  api.DELETE,
+			extension.MethodPatch:   api.PATCH,
+			extension.MethodOptions: api.OPTIONS,
 		}
 
-		controllers := extensions.RegisteredControllers()
-		for _, controller := range controllers {
-			routeMap := controller.RouteMap()
+		controllerList := extension.GetRegisteredControllerList()
+		for _, controller := range controllerList {
+			routeMap := controller.GetRouteMap()
 			for method, routingFunction := range methodFunctionMap {
-				routes := routeMap[method]
-				for pathType, handlerFunc := range routes {
+				routeList := routeMap[method]
+				for pathType, handlerFunc := range routeList {
 					switch pathType {
-					case extensions.URLSingle:
-						routingFunction(controller.ResourceSingleURL(), handlerFunc)
-						extensions.AssociateControllerWithPath(controller.ResourceSingleURL(), controller)
-					case extensions.URLMulti:
-						routingFunction(controller.ResourceMultiURL(), handlerFunc)
-						extensions.AssociateControllerWithPath(controller.ResourceMultiURL(), controller)
+					case extension.URLSingle:
+						routingFunction(controller.GetResourceSingleURL(), handlerFunc)
+						extension.AssociateControllerWithPath(controller.GetResourceSingleURL(), controller)
+					case extension.URLMulti:
+						routingFunction(controller.GetResourceMultiURL(), handlerFunc)
+						extension.AssociateControllerWithPath(controller.GetResourceMultiURL(), controller)
 					default:
 						logging.Logger().Criticalf("invalid url type: %d", pathType)
 						os.Exit(1)
@@ -51,7 +51,7 @@ func Initialize(r *gin.Engine) {
 		}
 	}
 
-	for _, initializer := range routerInitializers {
-		initializer.InitializeLate(r)
+	for _, initializer := range initializerList {
+		initializer.DoAfterRouterSetup(r)
 	}
 }

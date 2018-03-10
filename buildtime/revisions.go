@@ -1,6 +1,6 @@
 package buildtime
 
-import "github.com/qb0C80aE/clay/extensions"
+import "github.com/qb0C80aE/clay/extension"
 
 type clayProgramInformation struct {
 	buildTime                    string
@@ -16,8 +16,8 @@ func (clayProgramInformation *clayProgramInformation) BuildTime() string {
 	return clayProgramInformation.buildTime
 }
 
-func (clayProgramInformation *clayProgramInformation) SubModuleInformationList() []extensions.SubModuleInformation {
-	result := make([]extensions.SubModuleInformation, len(clayProgramInformation.claySubModuleInformationList))
+func (clayProgramInformation *clayProgramInformation) SubModuleInformationList() []extension.SubModuleInformation {
+	result := make([]extension.SubModuleInformation, len(clayProgramInformation.claySubModuleInformationList))
 	for i, subModuleInformation := range clayProgramInformation.claySubModuleInformationList {
 		result[i] = subModuleInformation
 	}

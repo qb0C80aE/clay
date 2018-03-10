@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/qb0C80aE/clay/cmd"
+	"github.com/qb0C80aE/clay/client"
 )
 
 func main() {
-	cmd.Execute()
+	client.Execute()
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite" // Need to avoid "Got error when connect database, the error is 'sql: unknown driver "sqlite3" (forgotten import?)'"
-	"github.com/qb0C80aE/clay/extensions"
+	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
 	"github.com/serenize/snaker"
 )
@@ -44,26 +44,27 @@ func Connect() *gorm.DB {
 
 	db.Exec("pragma foreign_keys = on")
 
-	registeredModelsToBeMigrated := extensions.RegisteredModelsToBeMigrated()
+	registeredModelsToBeMigrated := extension.GetRegisteredModelToBeMigratedList()
 	if err := db.AutoMigrate(registeredModelsToBeMigrated...).Error; err != nil {
 		logging.Logger().Criticalf("AutoMigration failed: '%s'", err.Error())
 		os.Exit(1)
 	}
 
-	for _, model := range extensions.RegisteredModels() {
+	modelList := extension.GetRegisteredModelList()
+	for _, model := range modelList {
 		tableName := db.NewScope(model).TableName()
-		extensions.RegisterResourceName(model, tableName)
+		extension.AssociateResourceNameWithModel(tableName, model)
 	}
 
-	initialDataLoaders := extensions.RegisteredInitialDataLoaders()
+	initializerList := extension.GetRegisteredInitializerList()
 	// Caution: Even if you input the inconsistent data like foreign keys do not exist,
 	//          it will be registered, and never be checked this time.
 	//          Todo: It requires order resolution logic like "depends on" between models.
 	db.Exec("pragma foreign_keys = off;")
 
 	tx := db.Begin()
-	for _, initialDataLoader := range initialDataLoaders {
-		err := initialDataLoader.SetupInitialData(tx)
+	for _, initializer := range initializerList {
+		err := initializer.DoAfterDBMigration(tx)
 		if err != nil {
 			tx.Rollback()
 			logging.Logger().Criticalf("failed to run the initial data loader: %s", err)

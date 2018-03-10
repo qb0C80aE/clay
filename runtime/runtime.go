@@ -7,7 +7,7 @@ import (
 	"fmt"
 	_ "github.com/qb0C80aE/clay/buildtime" // Include program information
 	"github.com/qb0C80aE/clay/db"
-	"github.com/qb0C80aE/clay/extensions"
+	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
 	"github.com/qb0C80aE/clay/server"
 )
@@ -40,5 +40,5 @@ func (clayRuntime *clayRuntime) Run() {
 
 func init() {
 	runtime := &clayRuntime{}
-	extensions.RegisterRuntime(runtime)
+	extension.RegisterRuntime(runtime)
 }
