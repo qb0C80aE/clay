@@ -18,7 +18,6 @@ import (
 	"net/http"
 	"net/url"
 	"reflect"
-	"runtime/debug"
 	"strconv"
 )
 
@@ -44,10 +43,6 @@ func CreateController(actualController extension.Controller, model extension.Mod
 	baseControllerValue := reflect.ValueOf(baseController)
 	actualControllerValue.FieldByName("BaseController").Set(baseControllerValue)
 	return actualController
-}
-
-func (receiver *BaseController) logStackTrace() {
-	logging.Logger().Criticalf("panic occured in logic, and recovered.\n%s", string(debug.Stack()))
 }
 
 // Bind binds input data to model instance
@@ -268,103 +263,6 @@ func (receiver *BaseController) GetQueries(c *gin.Context) url.Values {
 	return c.Request.URL.Query()
 }
 
-func (receiver *BaseController) getSingle(db *gorm.DB, parameters gin.Params, urlValues url.Values, queryFields string) (result interface{}, err error) {
-	defer func() {
-		if recoverResult := recover(); recoverResult != nil {
-			receiver.logStackTrace()
-			err = fmt.Errorf("%v", recoverResult)
-		}
-	}()
-
-	result, err = receiver.model.GetSingle(db, parameters, urlValues, queryFields)
-	return result, err
-}
-
-func (receiver *BaseController) getMulti(db *gorm.DB, parameters gin.Params, urlValues url.Values, queryFields string) (result interface{}, err error) {
-	defer func() {
-		if recoverResult := recover(); recoverResult != nil {
-			receiver.logStackTrace()
-			err = fmt.Errorf("%v", recoverResult)
-		}
-	}()
-
-	result, err = receiver.model.GetMulti(db, parameters, urlValues, queryFields)
-	return result, err
-}
-
-func (receiver *BaseController) create(db *gorm.DB, parameters gin.Params, urlValues url.Values, input extension.Model) (result interface{}, err error) {
-	defer func() {
-		if recoverResult := recover(); recoverResult != nil {
-			receiver.logStackTrace()
-			err = fmt.Errorf("%v", recoverResult)
-		}
-	}()
-
-	result, err = receiver.model.Create(db, parameters, urlValues, input)
-	return result, err
-}
-
-func (receiver *BaseController) update(db *gorm.DB, parameters gin.Params, urlValues url.Values, input extension.Model) (result interface{}, err error) {
-	defer func() {
-		if recoverResult := recover(); recoverResult != nil {
-			receiver.logStackTrace()
-			err = fmt.Errorf("%v", recoverResult)
-		}
-	}()
-
-	result, err = receiver.model.Update(db, parameters, urlValues, input)
-	return result, err
-}
-
-func (receiver *BaseController) delete(db *gorm.DB, parameters gin.Params, urlValues url.Values) (err error) {
-	defer func() {
-		if recoverResult := recover(); recoverResult != nil {
-			receiver.logStackTrace()
-			err = fmt.Errorf("%v", recoverResult)
-		}
-	}()
-
-	err = receiver.model.Delete(db, parameters, urlValues)
-	return err
-}
-
-func (receiver *BaseController) patch(db *gorm.DB, parameters gin.Params, urlValues url.Values, input extension.Model) (result interface{}, err error) {
-	defer func() {
-		if recoverResult := recover(); recoverResult != nil {
-			receiver.logStackTrace()
-			err = fmt.Errorf("%v", recoverResult)
-		}
-	}()
-
-	result, err = receiver.model.Patch(db, parameters, urlValues, input)
-	return result, err
-}
-
-func (receiver *BaseController) getOptions(db *gorm.DB, parameters gin.Params, urlValues url.Values) (err error) {
-	defer func() {
-		if recoverResult := recover(); recoverResult != nil {
-			receiver.logStackTrace()
-			err = fmt.Errorf("%v", recoverResult)
-		}
-	}()
-
-	err = receiver.model.GetOptions(db, parameters, urlValues)
-	return err
-}
-
-func (receiver *BaseController) getTotal(db *gorm.DB) (total int, err error) {
-	defer func() {
-		if recoverResult := recover(); recoverResult != nil {
-			receiver.logStackTrace()
-			err = fmt.Errorf("%v", recoverResult)
-		}
-	}()
-
-	db = db.New()
-	total, err = receiver.model.GetTotal(db)
-	return total, err
-}
-
 // GetSingle corresponds HTTP GET message and handles a request for a single resource to get the information
 func (receiver *BaseController) GetSingle(c *gin.Context) {
 	ver, err := version.New(c)
@@ -386,7 +284,7 @@ func (receiver *BaseController) GetSingle(c *gin.Context) {
 	fields := helper.ParseFields(c.DefaultQuery("fields", "*"))
 	queryFields := helper.QueryFields(receiver.model, fields)
 
-	result, err := receiver.getSingle(db, c.Params, c.Request.URL.Query(), queryFields)
+	result, err := receiver.model.GetSingle(db, c.Params, c.Request.URL.Query(), queryFields)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		receiver.outputHandler.OutputError(c, http.StatusNotFound, err)
@@ -431,14 +329,17 @@ func (receiver *BaseController) GetMulti(c *gin.Context) {
 	fields := helper.ParseFields(c.DefaultQuery("fields", "*"))
 	queryFields := helper.QueryFields(receiver.model, fields)
 
-	result, err := receiver.getMulti(db, c.Params, c.Request.URL.Query(), queryFields)
+	result, err := receiver.model.GetMulti(db, c.Params, c.Request.URL.Query(), queryFields)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
-	total, err := receiver.getTotal(db)
+	// reset conditions
+	db = db.New()
+
+	total, err := receiver.model.GetTotal(db)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
@@ -475,7 +376,7 @@ func (receiver *BaseController) Create(c *gin.Context) {
 	db := dbpkg.Instance(c)
 
 	tx := db.Begin()
-	result, err := receiver.create(tx, c.Params, c.Request.URL.Query(), model)
+	result, err := receiver.model.Create(tx, c.Params, c.Request.URL.Query(), model)
 	if err != nil {
 		tx.Rollback()
 		logging.Logger().Debug(err.Error())
@@ -515,7 +416,7 @@ func (receiver *BaseController) Update(c *gin.Context) {
 	db := dbpkg.Instance(c)
 
 	tx := db.Begin()
-	result, err := receiver.update(tx, c.Params, c.Request.URL.Query(), model)
+	result, err := receiver.model.Update(tx, c.Params, c.Request.URL.Query(), model)
 	if err != nil {
 		tx.Rollback()
 		logging.Logger().Debug(err.Error())
@@ -545,7 +446,7 @@ func (receiver *BaseController) Delete(c *gin.Context) {
 	db := dbpkg.Instance(c)
 
 	tx := db.Begin()
-	err = receiver.delete(tx, c.Params, c.Request.URL.Query())
+	err = receiver.model.Delete(tx, c.Params, c.Request.URL.Query())
 	if err != nil {
 		tx.Rollback()
 		logging.Logger().Debug(err.Error())
@@ -577,7 +478,7 @@ func (receiver *BaseController) Patch(c *gin.Context) {
 	db := dbpkg.Instance(c)
 
 	tx := db.Begin()
-	result, err := receiver.patch(tx, c.Params, c.Request.URL.Query(), model)
+	result, err := receiver.model.Patch(tx, c.Params, c.Request.URL.Query(), model)
 	if err != nil {
 		tx.Rollback()
 		logging.Logger().Debug(err.Error())
@@ -607,7 +508,7 @@ func (receiver *BaseController) GetOptions(c *gin.Context) {
 	db := dbpkg.Instance(c)
 
 	tx := db.Begin()
-	err = receiver.getOptions(tx, c.Params, c.Request.URL.Query())
+	err = receiver.model.GetOptions(tx, c.Params, c.Request.URL.Query())
 	if err != nil {
 		tx.Rollback()
 		logging.Logger().Debug(err.Error())
