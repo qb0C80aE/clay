@@ -7,7 +7,7 @@ import (
 )
 
 type commandController struct {
-	*BaseController
+	BaseController
 }
 
 func newCommandController() *commandController {

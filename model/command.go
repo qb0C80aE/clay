@@ -24,7 +24,7 @@ const (
 
 // Command is the model class what represents command to execute something
 type Command struct {
-	*Base            `json:"base,omitempty"`
+	Base
 	ID               int       `json:"id" form:"id"`
 	Description      string    `json:"description" form:"description"`
 	WorkingDirectory string    `json:"working_directory" form:"working_directory"`

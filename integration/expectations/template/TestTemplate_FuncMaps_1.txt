@@ -319,16 +319,16 @@ total
 
 --- hash ---
 hash
-hash[testParameter11]={<nil> 1 1 testParameter11 testParameter11desc 1 1 false}
-hash[testParameter12]={<nil> 2 1 testParameter12 testParameter12desc 4 TestParameter12 false}
+hash[testParameter11]={{<nil> false} 1 1 testParameter11 testParameter11desc 1 1}
+hash[testParameter12]={{<nil> false} 2 1 testParameter12 testParameter12desc 4 TestParameter12}
 
 --- slicemap ---
 slicemap
-slicemap[testParameter1][0]={<nil> 1 1 testParameter11 testParameter11desc 1 1 false}
-slicemap[testParameter2][0]={<nil> 2 1 testParameter12 testParameter12desc 4 TestParameter12 false}
-slicemap[testParameter1X][0]={<nil> 3 1 testParameter1X testParameter1Xdesc 1 100 false}
-slicemap[testParameter1X][1]={<nil> 4 2 testParameter1X testParameter1Xdesc 1 200 false}
-slicemap[testParameter1X][2]={<nil> 5 3 testParameter1X testParameter1Xdesc 1 300 false}
+slicemap[testParameter1][0]={{<nil> false} 1 1 testParameter11 testParameter11desc 1 1}
+slicemap[testParameter2][0]={{<nil> false} 2 1 testParameter12 testParameter12desc 4 TestParameter12}
+slicemap[testParameter1X][0]={{<nil> false} 3 1 testParameter1X testParameter1Xdesc 1 100}
+slicemap[testParameter1X][1]={{<nil> false} 4 2 testParameter1X testParameter1Xdesc 1 200}
+slicemap[testParameter1X][2]={{<nil> false} 5 3 testParameter1X testParameter1Xdesc 1 300}
 
 --- sequence ---
 sequence

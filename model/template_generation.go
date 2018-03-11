@@ -22,7 +22,7 @@ import (
 
 // TemplateGeneration is the model class what represents template generation
 type TemplateGeneration struct {
-	*Base `json:"base,omitempty"`
+	Base
 }
 
 // NewTemplateGeneration creates a template generation model instance
@@ -35,7 +35,7 @@ func (receiver *TemplateGeneration) GenerateTemplate(db *gorm.DB, id string, tem
 	templateArgumentMap := map[interface{}]*TemplateArgument{}
 	templateParameterMap := map[interface{}]interface{}{}
 
-	template := NewTemplate().NewModelContainer().(*Template)
+	template := NewTemplate()
 	template.ID, _ = strconv.Atoi(id)
 
 	// GenerateTemplate reset db conditions like preloads, so you should use this method in GetSingle or GetMulti only,
@@ -48,7 +48,7 @@ func (receiver *TemplateGeneration) GenerateTemplate(db *gorm.DB, id string, tem
 	}
 
 	for _, templateArgument := range template.TemplateArguments {
-		var err error = nil
+		var err error
 		templateArgumentMap[templateArgument.Name] = templateArgument
 		switch templateArgument.Type {
 		case TemplateArgumentTypeInt:
@@ -371,8 +371,7 @@ func init() {
 				logging.Logger().Debug(err.Error())
 				return nil, err
 			}
-			modelContainer, err := extension.CreateModelContainerByResourceName(resourceName)
-			model := CreateModel(modelContainer)
+			model, err := extension.CreateModelByResourceName(resourceName)
 			if err != nil {
 				logging.Logger().Debug(err.Error())
 				return nil, err
@@ -394,7 +393,7 @@ func init() {
 			fields := helper.ParseFields(parameter.DefaultQuery(urlQuery, "fields", "*"))
 			queryFields := helper.QueryFields(model, fields)
 
-			result, err := model.ExecuteActualGetSingle(db, parameters, requestForParameter.URL.Query(), queryFields)
+			result, err := model.GetSingle(db, parameters, requestForParameter.URL.Query(), queryFields)
 			if err != nil {
 				logging.Logger().Debug(err.Error())
 				return nil, err
@@ -435,8 +434,7 @@ func init() {
 				URL,
 				nil,
 			)
-			modelContainer, err := extension.CreateModelContainerByResourceName(resourceName)
-			model := CreateModel(modelContainer)
+			model, err := extension.CreateModelByResourceName(resourceName)
 			if err != nil {
 				logging.Logger().Debug(err.Error())
 				return nil, err
@@ -458,7 +456,7 @@ func init() {
 			db = parameter.FilterFields(db)
 			fields := helper.ParseFields(parameter.DefaultQuery(urlQuery, "fields", "*"))
 			queryFields := helper.QueryFields(model, fields)
-			result, err := model.ExecuteActualGetMulti(db, parameters, requestForParameter.URL.Query(), queryFields)
+			result, err := model.GetMulti(db, parameters, requestForParameter.URL.Query(), queryFields)
 			if err != nil {
 				logging.Logger().Debug(err.Error())
 				return nil, err
@@ -498,8 +496,7 @@ func init() {
 				URL,
 				nil,
 			)
-			modelContainer, err := extension.CreateModelContainerByResourceName(resourceName)
-			model := CreateModel(modelContainer)
+			model, err := extension.CreateModelByResourceName(resourceName)
 			if err != nil {
 				logging.Logger().Debug(err.Error())
 				return nil, err
@@ -521,7 +518,7 @@ func init() {
 			db = parameter.FilterFields(db)
 			fields := helper.ParseFields(parameter.DefaultQuery(urlQuery, "fields", "*"))
 			queryFields := helper.QueryFields(model, fields)
-			result, err := model.ExecuteActualGetMulti(db, parameters, requestForParameter.URL.Query(), queryFields)
+			result, err := model.GetMulti(db, parameters, requestForParameter.URL.Query(), queryFields)
 			if err != nil {
 				logging.Logger().Debug(err.Error())
 				return nil, err
@@ -540,14 +537,13 @@ func init() {
 			pathElements := strings.Split(strings.Trim(path, "/"), "/")
 			resourceName := pathElements[0]
 
-			modelContainer, err := extension.CreateModelContainerByResourceName(resourceName)
-			model := CreateModel(modelContainer)
+			model, err := extension.CreateModelByResourceName(resourceName)
 			if err != nil {
 				logging.Logger().Debug(err.Error())
 				return nil, err
 			}
 			db := dbObject.(*gorm.DB)
-			total, err := model.ExecuteActualGetTotal(db)
+			total, err := model.GetTotal(db)
 			if err != nil {
 				logging.Logger().Debug(err.Error())
 				return nil, err

@@ -7,7 +7,7 @@ import (
 )
 
 type templateArgumentController struct {
-	*BaseController
+	BaseController
 }
 
 func newTemplateArgumentController() *templateArgumentController {

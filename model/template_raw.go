@@ -10,7 +10,7 @@ import (
 
 // TemplateRaw is the model class what represents raw template
 type TemplateRaw struct {
-	*Base `json:"base,omitempty"`
+	Base
 }
 
 // NewTemplateRaw creates a template raw model instance
@@ -20,7 +20,7 @@ func NewTemplateRaw() *TemplateRaw {
 
 // GetSingle corresponds HTTP GET message and handles a request for a single resource to get the information
 func (receiver *TemplateRaw) GetSingle(db *gorm.DB, parameters gin.Params, _ url.Values, queryFields string) (interface{}, error) {
-	template := NewTemplate().NewModelContainer().(*Template)
+	template := NewTemplate()
 
 	if err := db.Select(queryFields).First(template, parameters.ByName("id")).Error; err != nil {
 		logging.Logger().Debug(err.Error())

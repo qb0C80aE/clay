@@ -32,13 +32,8 @@ type BaseController struct {
 
 // CreateController creates a new instance of actual controller with BaseController
 func CreateController(actualController extension.Controller, model extension.Model) extension.Controller {
-	if reflect.ValueOf(model).Elem().FieldByName("Base").IsNil() {
-		logging.Logger().Criticalf("the model is a container which does not have *Base")
-		panic("the model is a container which does not have *Base")
-	}
-
 	actualControllerValue := reflect.ValueOf(actualController).Elem()
-	baseController := &BaseController{
+	baseController := BaseController{
 		actualController: actualController,
 		model:            model,
 		outputHandler:    actualController.(extension.OutputHandler),
@@ -98,8 +93,7 @@ func (receiver *BaseController) deleteMarkedItemsInSlices(db *gorm.DB, data inte
 				}
 
 				if toBeDeleted {
-					modelContainer := itemValue.Addr().Interface().(extension.Model)
-					model := model.CreateModel(modelContainer)
+					model := model.CreateModel(itemValue.Addr().Interface().(extension.Model))
 
 					modelKey, err := extension.GetRegisteredModelKey(model)
 					if err != nil {
@@ -128,7 +122,7 @@ func (receiver *BaseController) deleteMarkedItemsInSlices(db *gorm.DB, data inte
 							Value: keyParameterValue,
 						},
 					}
-					if err := model.ExecuteActualDelete(db, parameters, nil); err != nil {
+					if err := model.Delete(db, parameters, nil); err != nil {
 						logging.Logger().Debug(err.Error())
 						return err
 					}
@@ -147,8 +141,8 @@ func (receiver *BaseController) deleteMarkedItemsInSlices(db *gorm.DB, data inte
 	return nil
 }
 
-func (receiver *BaseController) bind(c *gin.Context, container interface{}) error {
-	if err := c.Bind(container); err != nil {
+func (receiver *BaseController) bind(c *gin.Context, model extension.Model) error {
+	if err := c.Bind(model); err != nil {
 		logging.Logger().Debug(err.Error())
 		return err
 	}
@@ -174,17 +168,17 @@ func (receiver *BaseController) bind(c *gin.Context, container interface{}) erro
 				return err
 			}
 
-			vs := reflect.ValueOf(container)
+			vs := reflect.ValueOf(model)
 			for vs.Kind() == reflect.Ptr {
 				vs = vs.Elem()
 			}
 			if !vs.IsValid() {
-				logging.Logger().Debug("invalid container")
-				return errors.New("invalid container")
+				logging.Logger().Debug("invalid model")
+				return errors.New("invalid model")
 			}
 			if !vs.CanInterface() {
-				logging.Logger().Debug("invalid container")
-				return errors.New("invalid container")
+				logging.Logger().Debug("invalid model")
+				return errors.New("invalid model")
 			}
 			value := vs.Interface()
 
@@ -239,7 +233,8 @@ func (receiver *BaseController) OutputError(c *gin.Context, code int, err error)
 
 // OutputGetSingle corresponds HTTP GET message and handles the output of a single result from logic classes
 func (receiver *BaseController) OutputGetSingle(c *gin.Context, code int, result interface{}, fields map[string]interface{}) {
-	if fields == nil {
+	_, allFieldExists := fields["*"]
+	if (fields == nil) || ((len(fields) == 1) && allFieldExists) {
 		c.JSON(code, result)
 	} else {
 		fieldMap, err := helper.FieldToMap(result, fields)
@@ -260,7 +255,8 @@ func (receiver *BaseController) OutputGetSingle(c *gin.Context, code int, result
 // OutputGetMulti corresponds HTTP GET message and handles the output of multiple result from logic classes
 func (receiver *BaseController) OutputGetMulti(c *gin.Context, code int, result interface{}, total int, fields map[string]interface{}) {
 	c.Header("Total", strconv.Itoa(total))
-	if fields == nil {
+	_, allFieldExists := fields["*"]
+	if (fields == nil) || ((len(fields) == 1) && allFieldExists) {
 		c.JSON(code, result)
 	} else {
 		v := reflect.ValueOf(result)
@@ -370,7 +366,7 @@ func (receiver *BaseController) getSingle(db *gorm.DB, parameters gin.Params, ur
 		}
 	}()
 
-	result, err = receiver.model.ExecuteActualGetSingle(db, parameters, urlValues, queryFields)
+	result, err = receiver.model.GetSingle(db, parameters, urlValues, queryFields)
 	return result, err
 }
 
@@ -382,7 +378,7 @@ func (receiver *BaseController) getMulti(db *gorm.DB, parameters gin.Params, url
 		}
 	}()
 
-	result, err = receiver.model.ExecuteActualGetMulti(db, parameters, urlValues, queryFields)
+	result, err = receiver.model.GetMulti(db, parameters, urlValues, queryFields)
 	return result, err
 }
 
@@ -394,7 +390,7 @@ func (receiver *BaseController) create(db *gorm.DB, parameters gin.Params, urlVa
 		}
 	}()
 
-	result, err = receiver.model.ExecuteActualCreate(db, parameters, urlValues, input)
+	result, err = receiver.model.Create(db, parameters, urlValues, input)
 	return result, err
 }
 
@@ -410,7 +406,7 @@ func (receiver *BaseController) update(db *gorm.DB, parameters gin.Params, urlVa
 		return nil, err
 	}
 
-	result, err = receiver.model.ExecuteActualUpdate(db, parameters, urlValues, input)
+	result, err = receiver.model.Update(db, parameters, urlValues, input)
 	return result, err
 }
 
@@ -422,7 +418,7 @@ func (receiver *BaseController) delete(db *gorm.DB, parameters gin.Params, urlVa
 		}
 	}()
 
-	err = receiver.model.ExecuteActualDelete(db, parameters, urlValues)
+	err = receiver.model.Delete(db, parameters, urlValues)
 	return err
 }
 
@@ -434,7 +430,7 @@ func (receiver *BaseController) patch(db *gorm.DB, parameters gin.Params, urlVal
 		}
 	}()
 
-	result, err = receiver.model.ExecuteActualPatch(db, parameters, urlValues, input)
+	result, err = receiver.model.Patch(db, parameters, urlValues, input)
 	return result, err
 }
 
@@ -446,7 +442,7 @@ func (receiver *BaseController) getOptions(db *gorm.DB, parameters gin.Params, u
 		}
 	}()
 
-	err = receiver.model.ExecuteActualGetOptions(db, parameters, urlValues)
+	err = receiver.model.GetOptions(db, parameters, urlValues)
 	return err
 }
 
@@ -459,7 +455,7 @@ func (receiver *BaseController) getTotal(db *gorm.DB) (total int, err error) {
 	}()
 
 	db = db.New()
-	total, err = receiver.model.ExecuteActualGetTotal(db)
+	total, err = receiver.model.GetTotal(db)
 	return total, err
 }
 
@@ -560,9 +556,9 @@ func (receiver *BaseController) Create(c *gin.Context) {
 		return
 	}
 
-	container := receiver.model.NewModelContainer()
+	model := receiver.model.New()
 
-	if err := receiver.bind(c, container); err != nil {
+	if err := receiver.bind(c, model); err != nil {
 		logging.Logger().Debug(err.Error())
 		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
 		return
@@ -571,7 +567,7 @@ func (receiver *BaseController) Create(c *gin.Context) {
 	db := dbpkg.Instance(c)
 
 	tx := db.Begin()
-	result, err := receiver.create(tx, c.Params, c.Request.URL.Query(), container)
+	result, err := receiver.create(tx, c.Params, c.Request.URL.Query(), model)
 	if err != nil {
 		tx.Rollback()
 		logging.Logger().Debug(err.Error())
@@ -598,9 +594,9 @@ func (receiver *BaseController) Update(c *gin.Context) {
 		return
 	}
 
-	container := receiver.model.NewModelContainer()
+	model := receiver.model.New()
 
-	if err := receiver.bind(c, container); err != nil {
+	if err := receiver.bind(c, model); err != nil {
 		logging.Logger().Debug(err.Error())
 		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
 		return
@@ -609,7 +605,7 @@ func (receiver *BaseController) Update(c *gin.Context) {
 	db := dbpkg.Instance(c)
 
 	tx := db.Begin()
-	result, err := receiver.update(tx, c.Params, c.Request.URL.Query(), container)
+	result, err := receiver.update(tx, c.Params, c.Request.URL.Query(), model)
 	if err != nil {
 		tx.Rollback()
 		logging.Logger().Debug(err.Error())
@@ -666,12 +662,12 @@ func (receiver *BaseController) Patch(c *gin.Context) {
 		return
 	}
 
-	container := receiver.model.NewModelContainer()
+	model := receiver.model.New()
 
 	db := dbpkg.Instance(c)
 
 	tx := db.Begin()
-	result, err := receiver.patch(tx, c.Params, c.Request.URL.Query(), container)
+	result, err := receiver.patch(tx, c.Params, c.Request.URL.Query(), model)
 	if err != nil {
 		tx.Rollback()
 		logging.Logger().Debug(err.Error())

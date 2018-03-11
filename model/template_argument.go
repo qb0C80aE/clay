@@ -20,14 +20,13 @@ const (
 
 // TemplateArgument is the model class what represents model-independent arguments used in templates
 type TemplateArgument struct {
-	*Base        `json:"base,omitempty"`
+	Base
 	ID           int    `json:"id" gorm:"primary_key;auto_increment"`
 	TemplateID   int    `json:"template_id" gorm:"unique_index:template_id_name" sql:"type:integer references templates(id)"`
 	Name         string `json:"name" gorm:"unique_index:template_id_name"`
 	Description  string `json:"description" form:"description" sql:"type:text"`
 	Type         int    `json:"type"`
 	DefaultValue string `json:"default_value"`
-	ToBeDeleted  bool   `json:"to_be_deleted,omitempty" sql:"-"`
 }
 
 // NewTemplateArgument creates a template argument model instance
@@ -63,10 +62,12 @@ func (receiver *TemplateArgument) checkDefaultValueBeforeStore() error {
 	return err
 }
 
+// BeforeCreate is executed before db.Create with the model
 func (receiver *TemplateArgument) BeforeCreate() error {
 	return receiver.checkDefaultValueBeforeStore()
 }
 
+// BeforeSave is executed before db.Save with the model
 func (receiver *TemplateArgument) BeforeSave() error {
 	return receiver.checkDefaultValueBeforeStore()
 }

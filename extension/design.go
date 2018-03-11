@@ -2,8 +2,6 @@ package extension
 
 import (
 	"github.com/jinzhu/gorm"
-	"github.com/qb0C80aE/clay/logging"
-	"reflect"
 )
 
 var designAccessorList = []DesignAccessor{}
@@ -21,11 +19,6 @@ type DesignAccessor interface {
 
 // RegisterDesignAccessor registers a design accessor used in the design logic
 func RegisterDesignAccessor(designAccessor DesignAccessor) {
-	if reflect.ValueOf(designAccessor).Elem().FieldByName("Base").IsNil() {
-		logging.Logger().Criticalf("the designAccessor is a container which does not have *Base")
-		panic("the designAccessor is a container which does not have *Base")
-	}
-
 	designAccessorList = append(designAccessorList, designAccessor)
 }
 

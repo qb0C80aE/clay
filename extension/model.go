@@ -27,15 +27,7 @@ var typeNameModelKeyMap = map[string]ModelKey{}
 // * GetOptions corresponds HTTP OPTIONS message and handles a request for multi resources to retrieve its supported options
 // * GetTotal returns the count of for multi resource
 type Model interface {
-	NewModelContainer() Model
-	ExecuteActualGetSingle(db *gorm.DB, parameters gin.Params, urlValues url.Values, queryString string) (interface{}, error)
-	ExecuteActualGetMulti(db *gorm.DB, parameters gin.Params, urlValues url.Values, queryString string) (interface{}, error)
-	ExecuteActualCreate(db *gorm.DB, parameters gin.Params, urlValues url.Values, input Model) (interface{}, error)
-	ExecuteActualUpdate(db *gorm.DB, parameters gin.Params, urlValues url.Values, input Model) (interface{}, error)
-	ExecuteActualDelete(db *gorm.DB, parameters gin.Params, urlValues url.Values) error
-	ExecuteActualPatch(db *gorm.DB, parameters gin.Params, urlValues url.Values, input Model) (interface{}, error)
-	ExecuteActualGetOptions(db *gorm.DB, parameters gin.Params, urlValues url.Values) error
-	ExecuteActualGetTotal(db *gorm.DB) (int, error)
+	New() Model
 	GetSingle(db *gorm.DB, parameters gin.Params, urlValues url.Values, queryString string) (interface{}, error)
 	GetMulti(db *gorm.DB, parameters gin.Params, urlValues url.Values, queryString string) (interface{}, error)
 	Create(db *gorm.DB, parameters gin.Params, urlValues url.Values, input Model) (interface{}, error)
@@ -63,11 +55,6 @@ func GetActualType(object interface{}) reflect.Type {
 
 // RegisterModel registers a model to migrate automatically, and to generate new instances in processing requests
 func RegisterModel(model Model, autoMigration bool) {
-	if reflect.ValueOf(model).Elem().FieldByName("Base").IsNil() {
-		logging.Logger().Criticalf("the model is a container which does not have *Base")
-		panic("the model is a container which does not have *Base")
-	}
-
 	modelList = append(modelList, model)
 	if autoMigration {
 		modelToBeMigratedList = append(modelToBeMigratedList, model)
@@ -137,11 +124,6 @@ func GetRegisteredModelToBeMigratedList() []interface{} {
 
 // AssociateResourceNameWithModel registers a name of given model
 func AssociateResourceNameWithModel(resourceName string, model Model) {
-	if reflect.ValueOf(model).Elem().FieldByName("Base").IsNil() {
-		logging.Logger().Criticalf("the model is a container which does not have *Base")
-		panic("the model is a container which does not have *Base")
-	}
-
 	modelType := GetActualType(model)
 	modelTypeName := modelType.String()
 	typeNameResourceNameMap[modelTypeName] = resourceName
@@ -154,13 +136,12 @@ func GetAssociateResourceNameWithModel(model Model) string {
 	return typeNameResourceNameMap[modelType.String()]
 }
 
-// CreateModelContainerByResourceName creates a model instance using given resource name and the registered model related to the resource name
-// Note that ModelContainer does not contain *Base
-func CreateModelContainerByResourceName(resourceName string) (Model, error) {
+// CreateModelByResourceName creates a model instance using given resource name and the registered model related to the resource name
+func CreateModelByResourceName(resourceName string) (Model, error) {
 	model, exists := resourceNameModelMap[resourceName]
 	if !exists {
 		logging.Logger().Debugf("the type which associated with the resource name '%s' has not been registered yet", resourceName)
 		return nil, fmt.Errorf("the type named associated with the resource name '%s' has not been registered yet", resourceName)
 	}
-	return model.NewModelContainer(), nil
+	return model.New(), nil
 }

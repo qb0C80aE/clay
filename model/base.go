@@ -16,113 +16,29 @@ import (
 // Base is the base class that all model classes inherit
 type Base struct {
 	actualModel extension.Model
+	ToBeDeleted bool `json:"to_be_deleted,omitempty" sql:"-"`
 }
 
 // CreateModel creates a concrete model with Base
 func CreateModel(actualModel extension.Model) extension.Model {
 	actualModelValue := reflect.ValueOf(actualModel).Elem()
-	base := &Base{
+	base := Base{
 		actualModel: actualModel,
 	}
 	actualModelValue.FieldByName("Base").Set(reflect.ValueOf(base))
 	return actualModel
 }
 
-// NewModelContainer creates a container, which means a model without Base
-func (receiver *Base) NewModelContainer() extension.Model {
-	if receiver == nil {
-		logging.Logger().Criticalf("the model is a container which does not have *Base")
-		panic("the model is a container which does not have *Base")
-	}
-
+// New creates a new model
+func (receiver *Base) New() extension.Model {
 	actualModelType := extension.GetActualType(receiver.actualModel)
 	newModel := reflect.New(actualModelType)
-	return newModel.Interface().(extension.Model)
-}
-
-// ExecuteActualGetSingle executes GetSingle with container check
-func (receiver *Base) ExecuteActualGetSingle(db *gorm.DB, parameters gin.Params, urlValues url.Values, queryFields string) (interface{}, error) {
-	if (receiver == nil) || (receiver.actualModel == nil) {
-		logging.Logger().Criticalf("the model is a container which does not have *Base")
-		return nil, errors.New("the model is a container which does not have *Base")
-	}
-
-	return receiver.actualModel.GetSingle(db, parameters, urlValues, queryFields)
-}
-
-// ExecuteActualGetMulti executes GetMulti with container check
-func (receiver *Base) ExecuteActualGetMulti(db *gorm.DB, parameters gin.Params, urlValues url.Values, queryFields string) (interface{}, error) {
-	if (receiver == nil) || (receiver.actualModel == nil) {
-		logging.Logger().Criticalf("the model is a container which does not have *Base")
-		return nil, errors.New("the model is a container which does not have *Base")
-	}
-
-	return receiver.actualModel.GetMulti(db, parameters, urlValues, queryFields)
-}
-
-// ExecuteActualCreate executes Create with container check
-func (receiver *Base) ExecuteActualCreate(db *gorm.DB, parameters gin.Params, urlValues url.Values, input extension.Model) (interface{}, error) {
-	if (receiver == nil) || (receiver.actualModel == nil) {
-		logging.Logger().Criticalf("the model is a container which does not have *Base")
-		return nil, errors.New("the model is a container which does not have *Base")
-	}
-
-	return receiver.actualModel.Create(db, parameters, urlValues, input)
-}
-
-// ExecuteActualUpdate executes Update with container check
-func (receiver *Base) ExecuteActualUpdate(db *gorm.DB, parameters gin.Params, urlValues url.Values, input extension.Model) (interface{}, error) {
-	if (receiver == nil) || (receiver.actualModel == nil) {
-		logging.Logger().Criticalf("the model is a container which does not have *Base")
-		return nil, errors.New("the model is a container which does not have *Base")
-	}
-
-	return receiver.actualModel.Update(db, parameters, urlValues, input)
-}
-
-// ExecuteActualDelete executes Delete with container check
-func (receiver *Base) ExecuteActualDelete(db *gorm.DB, parameters gin.Params, urlValues url.Values) error {
-	if (receiver == nil) || (receiver.actualModel == nil) {
-		logging.Logger().Criticalf("the model is a container which does not have *Base")
-		return errors.New("the model is a container which does not have *Base")
-	}
-
-	return receiver.actualModel.Delete(db, parameters, urlValues)
-}
-
-// ExecuteActualPatch executes Patch with container check
-func (receiver *Base) ExecuteActualPatch(db *gorm.DB, parameters gin.Params, urlValues url.Values, input extension.Model) (interface{}, error) {
-	if (receiver == nil) || (receiver.actualModel == nil) {
-		logging.Logger().Criticalf("the model is a container which does not have *Base")
-		return nil, errors.New("the model is a container which does not have *Base")
-	}
-
-	return receiver.actualModel.Patch(db, parameters, urlValues, input)
-}
-
-// ExecuteActualGetOptions executes GetOptions with container check
-func (receiver *Base) ExecuteActualGetOptions(db *gorm.DB, parameters gin.Params, urlValues url.Values) error {
-	if (receiver == nil) || (receiver.actualModel == nil) {
-		logging.Logger().Criticalf("the model is a container which does not have *Base")
-		return errors.New("the model is a container which does not have *Base")
-	}
-
-	return receiver.actualModel.GetOptions(db, parameters, urlValues)
-}
-
-// ExecuteActualGetTotal executes GetTotal with container check
-func (receiver *Base) ExecuteActualGetTotal(db *gorm.DB) (int, error) {
-	if (receiver == nil) || (receiver.actualModel == nil) {
-		logging.Logger().Criticalf("the model is a container which does not have *Base")
-		return 0, errors.New("the model is a container which does not have *Base")
-	}
-
-	return receiver.actualModel.GetTotal(db)
+	return CreateModel(newModel.Interface().(extension.Model))
 }
 
 // GetSingle corresponds HTTP GET message and handles a request for a single resource to get the information
 func (receiver *Base) GetSingle(db *gorm.DB, parameters gin.Params, _ url.Values, queryFields string) (interface{}, error) {
-	result := receiver.NewModelContainer()
+	result := receiver.New()
 
 	modelKey, err := extension.GetRegisteredModelKey(result)
 	if err != nil {
@@ -140,7 +56,7 @@ func (receiver *Base) GetSingle(db *gorm.DB, parameters gin.Params, _ url.Values
 
 // GetMulti corresponds HTTP GET message and handles a request for multi resource to get the list of information
 func (receiver *Base) GetMulti(db *gorm.DB, parameters gin.Params, _ url.Values, queryFields string) (interface{}, error) {
-	elementOfResult := receiver.NewModelContainer()
+	elementOfResult := receiver.New()
 
 	modelType := extension.GetActualType(elementOfResult)
 	modelPointerType := reflect.PtrTo(modelType)
@@ -209,7 +125,7 @@ func (receiver *Base) Delete(db *gorm.DB, parameters gin.Params, _ url.Values) e
 		return err
 	}
 
-	target := receiver.NewModelContainer()
+	target := receiver.New()
 	if err := db.First(target, fmt.Sprintf("%s = ?", modelKey.KeyParameter), parameters.ByName(modelKey.KeyParameter)).Error; err != nil {
 		logging.Logger().Debug(err.Error())
 		return err
@@ -246,7 +162,7 @@ func (receiver *Base) ExtractFromDesign(db *gorm.DB) (string, interface{}, error
 		return "", nil, errors.New("the model is a container which does not have *Base")
 	}
 
-	model := receiver.NewModelContainer()
+	model := receiver.New()
 
 	modelType := extension.GetActualType(model)
 	modelPointerType := reflect.PtrTo(modelType)
@@ -273,7 +189,7 @@ func (receiver *Base) DeleteFromDesign(db *gorm.DB) error {
 		return errors.New("the model is a container which does not have *Base")
 	}
 
-	model := receiver.NewModelContainer()
+	model := receiver.New()
 
 	if err := db.Delete(model).Error; err != nil {
 		logging.Logger().Debug(err.Error())
@@ -289,7 +205,7 @@ func (receiver *Base) LoadToDesign(db *gorm.DB, data interface{}) error {
 		return errors.New("the model is a container which does not have *Base")
 	}
 
-	model := receiver.NewModelContainer()
+	model := receiver.New()
 
 	modelType := extension.GetActualType(model)
 	modelPointerType := reflect.PtrTo(modelType)

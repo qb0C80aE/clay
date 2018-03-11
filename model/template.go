@@ -6,7 +6,7 @@ import (
 
 // Template is the model class what represents templates to generate texts from models
 type Template struct {
-	*Base             `json:"base,omitempty"`
+	Base
 	ID                int                 `json:"id" form:"id" gorm:"primary_key;auto_increment"`
 	Name              string              `json:"name" form:"name" gorm:"not null;unique"`
 	TemplateContent   string              `json:"template_content" form:"template_content" sql:"type:text"`

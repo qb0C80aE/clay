@@ -19,7 +19,7 @@ import (
 
 // CommandExecution is the model class what represents command execution
 type CommandExecution struct {
-	*Base `json:"base,omitempty"`
+	Base
 }
 
 // Create corresponds HTTP POST message and handles a request for multi resource to create a new information

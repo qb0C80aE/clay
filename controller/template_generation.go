@@ -8,7 +8,7 @@ import (
 )
 
 type templateGenerationController struct {
-	*BaseController
+	BaseController
 }
 
 func newTemplateGenerationController() *templateGenerationController {

@@ -11,7 +11,7 @@ import (
 
 // Design is the model class what represents the whole object model store
 type Design struct {
-	*Base         `json:"base,omitempty"`
+	Base
 	ClayVersion   string                 `json:"clay_version,omitempty"`
 	GeneratedDate string                 `json:"generated_date,omitempty"`
 	Content       map[string]interface{} `json:"content"`
@@ -29,7 +29,7 @@ func (receiver *Design) GetSingle(db *gorm.DB, _ gin.Params, urlValues url.Value
 
 	programInformation := extension.GetRegisteredProgramInformation()
 
-	design := receiver.NewModelContainer().(*Design)
+	design := NewDesign()
 	design.ClayVersion = programInformation.BuildTime()
 	design.GeneratedDate = ""
 	design.Content = map[string]interface{}{}

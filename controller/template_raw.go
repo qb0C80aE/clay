@@ -8,7 +8,7 @@ import (
 )
 
 type templateRawController struct {
-	*BaseController
+	BaseController
 }
 
 func newTemplateRawController() *templateRawController {

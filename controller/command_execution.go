@@ -8,7 +8,7 @@ import (
 )
 
 type commandExecutionController struct {
-	*BaseController
+	BaseController
 }
 
 func newCommandExecutionController() *commandExecutionController {

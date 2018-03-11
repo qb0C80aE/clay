@@ -9,7 +9,7 @@ import (
 )
 
 type designController struct {
-	*BaseController
+	BaseController
 }
 
 func newDesignController() *designController {

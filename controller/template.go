@@ -7,7 +7,7 @@ import (
 )
 
 type templateController struct {
-	*BaseController
+	BaseController
 }
 
 func newTemplateController() *templateController {
