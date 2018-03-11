@@ -35,6 +35,24 @@
   revision = "5a0f697c9ed9d68fef0116532c6e05cfeae00e55"
 
 [[projects]]
+  name = "github.com/graphql-go/graphql"
+  packages = [
+    ".",
+    "gqlerrors",
+    "language/ast",
+    "language/kinds",
+    "language/lexer",
+    "language/location",
+    "language/parser",
+    "language/printer",
+    "language/source",
+    "language/typeInfo",
+    "language/visitor"
+  ]
+  revision = "1e23489041ba90a66f317fe0deccb236a2fff3cb"
+  version = "v0.7.5"
+
+[[projects]]
   name = "github.com/inconshreveable/mousetrap"
   packages = ["."]
   revision = "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75"
@@ -115,6 +133,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "029370516c777cfe0b34b3b583f30241a16c96249987d3738627b93d7c2d6d49"
+  inputs-digest = "23a5ac2cc1de5f59e81c04b7c0d0948d78c5b5fcb1013399113891dcd928b65d"
   solver-name = "gps-cdcl"
   solver-version = 1

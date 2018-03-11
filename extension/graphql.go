@@ -1,4 +1,4 @@
-package extensions
+package extension
 
 import (
 	"fmt"
@@ -28,7 +28,7 @@ type GraphqlType interface {
 }
 
 func RegisterGraphqlType(model interface{}, graphqlType GraphqlType) {
-	modelType := ModelType(model)
+	modelType := GetActualType(model)
 	graphqlTypes = append(graphqlTypes, graphqlType)
 	graphqlTypeMap[modelType] = graphqlType
 }
@@ -42,7 +42,7 @@ func RegisteredGraphqlTypes() []GraphqlType {
 }
 
 func RegisteredGraphqlType(model interface{}) (GraphqlType, error) {
-	modelType := ModelType(model)
+	modelType := GetActualType(model)
 	result, exist := graphqlTypeMap[modelType]
 	if !exist {
 		logging.Logger().Debugf("the graphql type related to given name %s does not exist", modelType.Name())

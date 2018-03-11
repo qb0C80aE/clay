@@ -2,8 +2,8 @@ package graphql
 
 import (
 	graphqlGo "github.com/graphql-go/graphql"
-	"github.com/qb0C80aE/clay/extensions"
-	"github.com/qb0C80aE/clay/models"
+	"github.com/qb0C80aE/clay/extension"
+	"github.com/qb0C80aE/clay/model"
 )
 
 type designGraphqlType struct {
@@ -13,7 +13,7 @@ type designGraphqlType struct {
 func newDesignGraphqlType() *designGraphqlType {
 	graphqlType := &designGraphqlType{
 		BaseGraphqlType: NewBaseGraphqlType(
-			models.SharedDesignModel(),
+			model.NewDesign(),
 		),
 	}
 	return graphqlType
@@ -22,7 +22,7 @@ func newDesignGraphqlType() *designGraphqlType {
 var uniqueDesignGraphqlType = newDesignGraphqlType()
 
 // UniqueDesignGraphqlType returns the unique design graphql type instance
-func UniqueDesignGraphqlType() extensions.GraphqlType {
+func UniqueDesignGraphqlType() extension.GraphqlType {
 	return uniqueDesignGraphqlType
 }
 
@@ -44,5 +44,5 @@ func (graphqlType *designGraphqlType) BuildTypeFieldsLate() graphqlGo.Fields {
 }
 
 func init() {
-	extensions.RegisterGraphqlType(models.SharedDesignModel(), UniqueDesignGraphqlType())
+	extension.RegisterGraphqlType(model.NewDesign(), UniqueDesignGraphqlType())
 }

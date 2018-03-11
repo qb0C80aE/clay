@@ -3,8 +3,8 @@ package graphql
 import (
 	"fmt"
 	graphqlGo "github.com/graphql-go/graphql"
-	"github.com/qb0C80aE/clay/extensions"
 	"github.com/serenize/snaker"
+	"github.com/qb0C80aE/clay/extension"
 )
 
 var commonArgumentMap = graphqlGo.FieldConfigArgument{
@@ -26,7 +26,7 @@ var commonArgumentMap = graphqlGo.FieldConfigArgument{
 }
 
 type BaseGraphqlType struct {
-	model                     interface{}
+	model                     extension.Model
 	fields                    graphqlGo.Fields
 	inputObjectConfigFieldMap graphqlGo.InputObjectConfigFieldMap
 	fieldConfigArguments      graphqlGo.FieldConfigArgument
@@ -35,7 +35,7 @@ type BaseGraphqlType struct {
 }
 
 // NewBaseGraphqlType creates a new instance of BaseGraphqlType
-func NewBaseGraphqlType(model interface{}) *BaseGraphqlType {
+func NewBaseGraphqlType(model extension.Model) *BaseGraphqlType {
 	graphqlType := &BaseGraphqlType{
 		model: model,
 	}
@@ -58,7 +58,7 @@ func (graphqlType *BaseGraphqlType) BuildTypeObject(fieldsEarly graphqlGo.Fields
 	}
 	graphqlType.fieldConfigArguments = argumentMap
 
-	resourceName := extensions.RegisteredResourceName(graphqlType.model)
+	resourceName := extension.GetAssociateResourceNameWithModel(graphqlType.model)
 
 	graphqlType.typeObject = graphqlGo.NewObject(
 		graphqlGo.ObjectConfig{

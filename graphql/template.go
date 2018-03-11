@@ -5,9 +5,9 @@ import (
 	"github.com/gin-gonic/gin"
 	graphqlGo "github.com/graphql-go/graphql"
 	dbpkg "github.com/qb0C80aE/clay/db"
-	"github.com/qb0C80aE/clay/extensions"
+	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
-	"github.com/qb0C80aE/clay/models"
+	"github.com/qb0C80aE/clay/model"
 	"net/url"
 )
 
@@ -18,7 +18,7 @@ type templateGraphqlType struct {
 func newTemplateGraphqlType() *templateGraphqlType {
 	graphqlType := &templateGraphqlType{
 		BaseGraphqlType: NewBaseGraphqlType(
-			models.SharedTemplateModel(),
+			model.NewTemplate(),
 		),
 	}
 	return graphqlType
@@ -27,7 +27,7 @@ func newTemplateGraphqlType() *templateGraphqlType {
 var uniqueTemplateGraphqlType = newTemplateGraphqlType()
 
 // UniqueTemplateGraphqlType returns the unique template graphql type instance
-func UniqueTemplateGraphqlType() extensions.GraphqlType {
+func UniqueTemplateGraphqlType() extension.GraphqlType {
 	return uniqueTemplateGraphqlType
 }
 
@@ -135,7 +135,7 @@ func (graphqlType *templateGraphqlType) ResolveForQuery(p graphqlGo.ResolveParam
 	c := p.Context.(*gin.Context)
 	db := dbpkg.Instance(c)
 
-	template := &models.Template{}
+	template := model.NewTemplate()
 
 	db = db.New()
 	db = parameter.SortRecords(db)
@@ -150,13 +150,7 @@ func (graphqlType *templateGraphqlType) ResolveForQuery(p graphqlGo.ResolveParam
 	// db = parameter.FilterFields(db)
 	// queryFields := helper.QueryFields(graphqlType.GetModel(), "*")
 
-	logic, err := extensions.RegisteredLogic(template)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-
-	result, err := logic.GetMulti(db, nil, urlValues, "*")
+	result, err := template.GetMulti(db, nil, urlValues, "*")
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
@@ -166,5 +160,5 @@ func (graphqlType *templateGraphqlType) ResolveForQuery(p graphqlGo.ResolveParam
 }
 
 func init() {
-	extensions.RegisterGraphqlType(models.SharedTemplateModel(), UniqueTemplateGraphqlType())
+	extension.RegisterGraphqlType(model.NewTemplate(), UniqueTemplateGraphqlType())
 }

@@ -5,9 +5,9 @@ import (
 	"github.com/gin-gonic/gin"
 	graphqlGo "github.com/graphql-go/graphql"
 	dbpkg "github.com/qb0C80aE/clay/db"
-	"github.com/qb0C80aE/clay/extensions"
+	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
-	"github.com/qb0C80aE/clay/models"
+	"github.com/qb0C80aE/clay/model"
 	"net/url"
 )
 
@@ -18,7 +18,7 @@ type templateArgumentGraphqlType struct {
 func newTemplateArgumentGraphqlType() *templateArgumentGraphqlType {
 	graphqlType := &templateArgumentGraphqlType{
 		BaseGraphqlType: NewBaseGraphqlType(
-			models.SharedTemplateArgumentModel(),
+			model.NewTemplateArgument(),
 		),
 	}
 	return graphqlType
@@ -27,7 +27,7 @@ func newTemplateArgumentGraphqlType() *templateArgumentGraphqlType {
 var uniqueTemplateArgumentGraphqlType = newTemplateArgumentGraphqlType()
 
 // UniqueTemplateArgumentGraphqlType returns the unique template argument graphql type instance
-func UniqueTemplateArgumentGraphqlType() extensions.GraphqlType {
+func UniqueTemplateArgumentGraphqlType() extension.GraphqlType {
 	return uniqueTemplateArgumentGraphqlType
 }
 
@@ -150,6 +150,7 @@ func (graphqlType *templateArgumentGraphqlType) ResolveForQuery(p graphqlGo.Reso
 		}
 	}
 
+	fmt.Println(p.Source)
 	fmt.Println(urlValues)
 
 	parameter, err := dbpkg.NewParameter(urlValues)
@@ -161,7 +162,7 @@ func (graphqlType *templateArgumentGraphqlType) ResolveForQuery(p graphqlGo.Reso
 	c := p.Context.(*gin.Context)
 	db := dbpkg.Instance(c)
 
-	templateArgument := &models.TemplateArgument{}
+	templateArgument := model.NewTemplateArgument()
 
 	db = db.New()
 	db = parameter.SortRecords(db)
@@ -176,13 +177,7 @@ func (graphqlType *templateArgumentGraphqlType) ResolveForQuery(p graphqlGo.Reso
 	// db = parameter.FilterFields(db)
 	// queryFields := helper.QueryFields(graphqlType.GetModel(), "*")
 
-	logic, err := extensions.RegisteredLogic(templateArgument)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-
-	result, err := logic.GetMulti(db, nil, urlValues, "*")
+	result, err := templateArgument.GetMulti(db, nil, urlValues, "*")
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
@@ -192,5 +187,5 @@ func (graphqlType *templateArgumentGraphqlType) ResolveForQuery(p graphqlGo.Reso
 }
 
 func init() {
-	extensions.RegisterGraphqlType(models.SharedTemplateArgumentModel(), UniqueTemplateArgumentGraphqlType())
+	extension.RegisterGraphqlType(model.NewTemplateArgument(), UniqueTemplateArgumentGraphqlType())
 }
