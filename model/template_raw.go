@@ -15,7 +15,7 @@ type TemplateRaw struct {
 
 // NewTemplateRaw creates a template raw model instance
 func NewTemplateRaw() *TemplateRaw {
-	return CreateModel(&TemplateRaw{}).(*TemplateRaw)
+	return ConvertContainerToModel(&TemplateRaw{}).(*TemplateRaw)
 }
 
 // GetSingle corresponds HTTP GET message and handles a request for a single resource to get the information

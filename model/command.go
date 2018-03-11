@@ -129,7 +129,7 @@ func (receiver *Command) GetTotal(_ *gorm.DB) (int, error) {
 
 // NewCommand creates a command model instance
 func NewCommand() *Command {
-	return CreateModel(&Command{}).(*Command)
+	return ConvertContainerToModel(&Command{}).(*Command)
 }
 
 func init() {

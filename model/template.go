@@ -16,7 +16,7 @@ type Template struct {
 
 // NewTemplate creates a template model instance
 func NewTemplate() *Template {
-	return CreateModel(&Template{}).(*Template)
+	return ConvertContainerToModel(&Template{}).(*Template)
 }
 
 func init() {

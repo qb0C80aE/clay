@@ -19,7 +19,7 @@ type Design struct {
 
 // NewDesign creates a design model instance
 func NewDesign() *Design {
-	return CreateModel(&Design{}).(*Design)
+	return ConvertContainerToModel(&Design{}).(*Design)
 }
 
 // GetSingle returns all models to store into versioning repositories

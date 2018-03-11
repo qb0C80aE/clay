@@ -1,6 +1,7 @@
 package extension
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -18,6 +19,7 @@ var typeNameModelKeyMap = map[string]ModelKey{}
 
 // Model is the interface what contains the actual model data and handle it
 // * NewModelContainer creates a container, which means a model without Base
+// * IsContainer tells if the instance is container, that is the model instance without Base-ActualModel relationship
 // * GetSingle corresponds HTTP GET message and handles a request for a single resource to get the information
 // * GetMulti corresponds HTTP GET message and handles a request for multi resource to get the list of information
 // * Create corresponds HTTP POST message and handles a request for multi resource to create a new information
@@ -28,6 +30,7 @@ var typeNameModelKeyMap = map[string]ModelKey{}
 // * GetTotal returns the count of for multi resource
 type Model interface {
 	New() Model
+	IsContainer() bool
 	GetSingle(db *gorm.DB, parameters gin.Params, urlValues url.Values, queryString string) (interface{}, error)
 	GetMulti(db *gorm.DB, parameters gin.Params, urlValues url.Values, queryString string) (interface{}, error)
 	Create(db *gorm.DB, parameters gin.Params, urlValues url.Values, input Model) (interface{}, error)
@@ -53,8 +56,21 @@ func GetActualType(object interface{}) reflect.Type {
 	return objectType
 }
 
+// GetActualValue returns the value of given object stripping pointer and interface
+func GetActualValue(object interface{}) reflect.Value {
+	objectValue := reflect.ValueOf(object)
+	for (objectValue.Kind() == reflect.Ptr) || (objectValue.Kind() == reflect.Interface) {
+		objectValue = objectValue.Elem()
+	}
+	return objectValue
+}
+
 // RegisterModel registers a model to migrate automatically, and to generate new instances in processing requests
 func RegisterModel(model Model, autoMigration bool) {
+	if model.IsContainer() {
+		panic(errors.New("the given model is a container"))
+	}
+
 	modelList = append(modelList, model)
 	if autoMigration {
 		modelToBeMigratedList = append(modelToBeMigratedList, model)
@@ -124,6 +140,10 @@ func GetRegisteredModelToBeMigratedList() []interface{} {
 
 // AssociateResourceNameWithModel registers a name of given model
 func AssociateResourceNameWithModel(resourceName string, model Model) {
+	if model.IsContainer() {
+		panic(errors.New("the given model is a container"))
+	}
+
 	modelType := GetActualType(model)
 	modelTypeName := modelType.String()
 	typeNameResourceNameMap[modelTypeName] = resourceName

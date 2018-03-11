@@ -16,24 +16,61 @@ import (
 // Base is the base class that all model classes inherit
 type Base struct {
 	actualModel extension.Model
-	ToBeDeleted bool `json:"to_be_deleted,omitempty" sql:"-"`
 }
 
-// CreateModel creates a concrete model with Base
-func CreateModel(actualModel extension.Model) extension.Model {
-	actualModelValue := reflect.ValueOf(actualModel).Elem()
-	base := Base{
-		actualModel: actualModel,
+func convertContainerToModel(container interface{}) {
+	typeOfContainer := extension.GetActualType(container)
+	actualValueOfContainer := extension.GetActualValue(container)
+	valueOfContainer := reflect.ValueOf(container)
+
+	switch actualValueOfContainer.Kind() {
+	case reflect.Array, reflect.Slice:
+		for i := 0; i < valueOfContainer.Len(); i++ {
+			valueOfElement := valueOfContainer.Index(i)
+			convertContainerToModel(valueOfElement.Interface())
+		}
+	case reflect.Struct:
+		if _, ok := valueOfContainer.Interface().(extension.Model); !ok {
+			panic(fmt.Errorf("%v is not extension.Model", container))
+		}
+
+		if !actualValueOfContainer.FieldByName("Base").IsValid() {
+			panic(fmt.Errorf("%v is not extension.Model", container))
+		}
+
+		for i := 0; i < typeOfContainer.NumField(); i++ {
+			field := typeOfContainer.Field(i)
+			if field.Name == "Base" {
+				continue
+			}
+
+			valueOfField := valueOfContainer.Elem().FieldByName(field.Name)
+			convertContainerToModel(valueOfField.Interface())
+		}
+
+		base := Base{
+			actualModel: valueOfContainer.Interface().(extension.Model),
+		}
+		actualValueOfContainer.FieldByName("Base").Set(reflect.ValueOf(base))
 	}
-	actualModelValue.FieldByName("Base").Set(reflect.ValueOf(base))
-	return actualModel
+}
+
+// ConvertContainerToModel converts from container, which means, what does not have the relationship with Base, to model, what have the one recursively
+func ConvertContainerToModel(container interface{}) extension.Model {
+	convertContainerToModel(container)
+	return container.(extension.Model)
 }
 
 // New creates a new model
 func (receiver *Base) New() extension.Model {
 	actualModelType := extension.GetActualType(receiver.actualModel)
 	newModel := reflect.New(actualModelType)
-	return CreateModel(newModel.Interface().(extension.Model))
+	return ConvertContainerToModel(newModel.Interface()).(extension.Model)
+}
+
+// IsContainer tells if the instance is container, that is the model instance without Base-ActualModel relationship
+func (receiver *Base) IsContainer() bool {
+	return receiver.actualModel == nil
 }
 
 // GetSingle corresponds HTTP GET message and handles a request for a single resource to get the information
@@ -273,5 +310,109 @@ func (receiver *Base) DoAfterRouterSetup(r *gin.Engine) error {
 		return errors.New("the model is a container which does not have *Base")
 	}
 
+	return nil
+}
+
+// BeforeCreate is executed before db.Create with the model
+func (receiver *Base) BeforeCreate(tx *gorm.DB) error {
+	return receiver.deleteMarkedItemsInSlices(tx, receiver.actualModel)
+}
+
+// BeforeSave is executed before db.Save with the model
+func (receiver *Base) BeforeSave(tx *gorm.DB) error {
+	return receiver.deleteMarkedItemsInSlices(tx, receiver.actualModel)
+}
+
+func (receiver *Base) deleteMarkedItemsInSlices(db *gorm.DB, data interface{}) error {
+	valueOfData := reflect.ValueOf(data)
+	for valueOfData.Kind() == reflect.Ptr {
+		valueOfData = valueOfData.Elem()
+	}
+
+	typeOfData := valueOfData.Type()
+
+	for i := 0; i < typeOfData.NumField(); i++ {
+		structField := typeOfData.Field(i)
+		fieldValue := valueOfData.FieldByName(structField.Name)
+
+		for fieldValue.Kind() == reflect.Ptr {
+			fieldValue = fieldValue.Elem()
+		}
+
+		if fieldValue.Kind() == reflect.Slice {
+			processed := reflect.New(fieldValue.Type()).Elem()
+			for j := 0; j < fieldValue.Len(); j++ {
+				itemValue := fieldValue.Index(j)
+
+				itemValueToCheckIfStruct := itemValue
+				for itemValueToCheckIfStruct.Kind() == reflect.Ptr {
+					itemValueToCheckIfStruct = itemValueToCheckIfStruct.Elem()
+				}
+				if itemValueToCheckIfStruct.Kind() != reflect.Struct {
+					return nil
+				}
+
+				if err := receiver.deleteMarkedItemsInSlices(db, itemValue.Interface()); err != nil {
+					logging.Logger().Debug(err.Error())
+					return err
+				}
+
+				for itemValue.Kind() == reflect.Ptr {
+					itemValue = itemValue.Elem()
+				}
+
+				toBeDeleted := false
+				toBeDeletedFieldValue := itemValue.FieldByName("ToBeDeleted")
+				if toBeDeletedFieldValue.IsValid() {
+					toBeDeleted = toBeDeletedFieldValue.Bool()
+				}
+
+				if toBeDeleted {
+					model := ConvertContainerToModel(itemValue.Addr().Interface()).(extension.Model)
+
+					modelKey, err := extension.GetRegisteredModelKey(model)
+					if err != nil {
+						logging.Logger().Debug(err.Error())
+						return err
+					}
+
+					keyFieldValue := itemValue.FieldByName(modelKey.KeyField)
+					keyParameterValue := ""
+
+					switch keyFieldValue.Kind() {
+					case reflect.String:
+						keyParameterValue = keyFieldValue.Interface().(string)
+					case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+						keyParameterValue = strconv.Itoa(int(keyFieldValue.Int()))
+					case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+						keyParameterValue = strconv.Itoa(int(keyFieldValue.Int()))
+					default:
+						logging.Logger().Debugf("the field %s does not exist, or is neither int nor string", modelKey.KeyField)
+						return fmt.Errorf("the field %s does not exist, or is neither int nor string", modelKey.KeyField)
+					}
+
+					parameters := gin.Params{
+						{
+							Key:   modelKey.KeyParameter,
+							Value: keyParameterValue,
+						},
+					}
+
+					if err := model.Delete(db, parameters, nil); err != nil {
+						logging.Logger().Debug(err.Error())
+						return err
+					}
+				} else {
+					processed = reflect.Append(processed, itemValue.Addr())
+				}
+			}
+			fieldValue.Set(processed)
+		} else if fieldValue.Kind() == reflect.Struct {
+			if err := receiver.deleteMarkedItemsInSlices(db, valueOfData.FieldByName(structField.Name).Interface()); err != nil {
+				logging.Logger().Debug(err.Error())
+				return err
+			}
+		}
+	}
 	return nil
 }

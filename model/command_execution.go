@@ -162,7 +162,7 @@ func executeCommand(command *Command) {
 
 // NewCommandExecution creates a commandExecution model instance
 func NewCommandExecution() *CommandExecution {
-	return CreateModel(&CommandExecution{}).(*CommandExecution)
+	return ConvertContainerToModel(&CommandExecution{}).(*CommandExecution)
 }
 
 func init() {

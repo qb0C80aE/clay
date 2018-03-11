@@ -27,11 +27,12 @@ type TemplateArgument struct {
 	Description  string `json:"description" form:"description" sql:"type:text"`
 	Type         int    `json:"type"`
 	DefaultValue string `json:"default_value"`
+	ToBeDeleted  bool   `json:"to_be_deleted,omitempty" sql:"-"`
 }
 
 // NewTemplateArgument creates a template argument model instance
 func NewTemplateArgument() *TemplateArgument {
-	return CreateModel(&TemplateArgument{}).(*TemplateArgument)
+	return ConvertContainerToModel(&TemplateArgument{}).(*TemplateArgument)
 }
 
 // DoAfterDBMigration execute initialization process after DB migration
@@ -63,12 +64,18 @@ func (receiver *TemplateArgument) checkDefaultValueBeforeStore() error {
 }
 
 // BeforeCreate is executed before db.Create with the model
-func (receiver *TemplateArgument) BeforeCreate() error {
+func (receiver *TemplateArgument) BeforeCreate(tx *gorm.DB) error {
+	if err := receiver.Base.BeforeCreate(tx); err != nil {
+		return err
+	}
 	return receiver.checkDefaultValueBeforeStore()
 }
 
 // BeforeSave is executed before db.Save with the model
-func (receiver *TemplateArgument) BeforeSave() error {
+func (receiver *TemplateArgument) BeforeSave(tx *gorm.DB) error {
+	if err := receiver.Base.BeforeSave(tx); err != nil {
+		return err
+	}
 	return receiver.checkDefaultValueBeforeStore()
 }
 

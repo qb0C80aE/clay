@@ -27,7 +27,7 @@ type TemplateGeneration struct {
 
 // NewTemplateGeneration creates a template generation model instance
 func NewTemplateGeneration() *TemplateGeneration {
-	return CreateModel(&TemplateGeneration{}).(*TemplateGeneration)
+	return ConvertContainerToModel(&TemplateGeneration{}).(*TemplateGeneration)
 }
 
 // GenerateTemplate generates text data based on registered templates

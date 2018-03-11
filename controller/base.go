@@ -48,99 +48,6 @@ func (receiver *BaseController) logStackTrace() {
 	logging.Logger().Criticalf("panic occured in logic, and recovered.\n%s", string(debug.Stack()))
 }
 
-func (receiver *BaseController) deleteMarkedItemsInSlices(db *gorm.DB, data interface{}) error {
-	valueOfData := reflect.ValueOf(data)
-	for valueOfData.Kind() == reflect.Ptr {
-		valueOfData = valueOfData.Elem()
-	}
-
-	typeOfData := valueOfData.Type()
-
-	for i := 0; i < typeOfData.NumField(); i++ {
-		structField := typeOfData.Field(i)
-		fieldValue := valueOfData.FieldByName(structField.Name)
-
-		for fieldValue.Kind() == reflect.Ptr {
-			fieldValue = fieldValue.Elem()
-		}
-
-		if fieldValue.Kind() == reflect.Slice {
-			processed := reflect.New(fieldValue.Type()).Elem()
-			for j := 0; j < fieldValue.Len(); j++ {
-				itemValue := fieldValue.Index(j)
-
-				itemValueToCheckIfStruct := itemValue
-				for itemValueToCheckIfStruct.Kind() == reflect.Ptr {
-					itemValueToCheckIfStruct = itemValueToCheckIfStruct.Elem()
-				}
-				if itemValueToCheckIfStruct.Kind() != reflect.Struct {
-					return nil
-				}
-
-				if err := receiver.deleteMarkedItemsInSlices(db, itemValue.Interface()); err != nil {
-					logging.Logger().Debug(err.Error())
-					return err
-				}
-
-				for itemValue.Kind() == reflect.Ptr {
-					itemValue = itemValue.Elem()
-				}
-
-				toBeDeleted := false
-				toBeDeletedFieldValue := itemValue.FieldByName("ToBeDeleted")
-				if toBeDeletedFieldValue.IsValid() {
-					toBeDeleted = toBeDeletedFieldValue.Bool()
-				}
-
-				if toBeDeleted {
-					model := model.CreateModel(itemValue.Addr().Interface().(extension.Model))
-
-					modelKey, err := extension.GetRegisteredModelKey(model)
-					if err != nil {
-						logging.Logger().Debug(err.Error())
-						return err
-					}
-
-					keyFieldValue := itemValue.FieldByName(modelKey.KeyField)
-					keyParameterValue := ""
-
-					switch keyFieldValue.Kind() {
-					case reflect.String:
-						keyParameterValue = keyFieldValue.Interface().(string)
-					case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-						keyParameterValue = strconv.Itoa(int(keyFieldValue.Int()))
-					case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-						keyParameterValue = strconv.Itoa(int(keyFieldValue.Int()))
-					default:
-						logging.Logger().Debugf("the field %s does not exist, or is neither int nor string", modelKey.KeyField)
-						return fmt.Errorf("the field %s does not exist, or is neither int nor string", modelKey.KeyField)
-					}
-
-					parameters := gin.Params{
-						{
-							Key:   modelKey.KeyParameter,
-							Value: keyParameterValue,
-						},
-					}
-					if err := model.Delete(db, parameters, nil); err != nil {
-						logging.Logger().Debug(err.Error())
-						return err
-					}
-				} else {
-					processed = reflect.Append(processed, itemValue.Addr())
-				}
-			}
-			fieldValue.Set(processed)
-		} else if fieldValue.Kind() == reflect.Struct {
-			if err := receiver.deleteMarkedItemsInSlices(db, valueOfData.FieldByName(structField.Name).Interface()); err != nil {
-				logging.Logger().Debug(err.Error())
-				return err
-			}
-		}
-	}
-	return nil
-}
-
 func (receiver *BaseController) bind(c *gin.Context, model extension.Model) error {
 	if err := c.Bind(model); err != nil {
 		logging.Logger().Debug(err.Error())
@@ -402,10 +309,6 @@ func (receiver *BaseController) update(db *gorm.DB, parameters gin.Params, urlVa
 		}
 	}()
 
-	if err := receiver.deleteMarkedItemsInSlices(db, input); err != nil {
-		return nil, err
-	}
-
 	result, err = receiver.model.Update(db, parameters, urlValues, input)
 	return result, err
 }
@@ -556,13 +459,15 @@ func (receiver *BaseController) Create(c *gin.Context) {
 		return
 	}
 
-	model := receiver.model.New()
+	container := receiver.model.New()
 
-	if err := receiver.bind(c, model); err != nil {
+	if err := receiver.bind(c, container); err != nil {
 		logging.Logger().Debug(err.Error())
 		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
+
+	model := model.ConvertContainerToModel(container)
 
 	db := dbpkg.Instance(c)
 
@@ -594,13 +499,15 @@ func (receiver *BaseController) Update(c *gin.Context) {
 		return
 	}
 
-	model := receiver.model.New()
+	container := receiver.model.New()
 
-	if err := receiver.bind(c, model); err != nil {
+	if err := receiver.bind(c, container); err != nil {
 		logging.Logger().Debug(err.Error())
 		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
+
+	model := model.ConvertContainerToModel(container)
 
 	db := dbpkg.Instance(c)
 
