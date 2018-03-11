@@ -5,7 +5,7 @@ package main
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v2"
+	"github.com/BurntSushi/toml"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -19,7 +19,7 @@ import (
 
 var clayVersionTemplate = template.Must(template.New("template").Parse(`package buildtime
 
-import "github.com/qb0C80aE/clay/extensions"
+import "github.com/qb0C80aE/clay/extension"
 
 func init() {
 	var programInformation = &clayProgramInformation{
@@ -28,43 +28,46 @@ func init() {
 			{{- range $i, $subModule := .SubModules}}
 			{
 				name:     "{{$subModule.Name}}",
-				revision: "{{$subModule.Version}}",
+				revision: "{{$subModule.Revision}}",
+				version:  "{{$subModule.Version}}",
 			},
 			{{- end }}
 		},
 	}
-	extensions.RegisterProgramInformation(programInformation)
+	extension.RegisterProgramInformation(programInformation)
 }
 `))
 
-type glideLock struct {
-	Imports []*glideLockImport `yaml:"imports"`
+type depLock struct {
+	Projects []*depLockProject `toml:"projects"`
 }
 
-type glideLockImport struct {
-	Name    string `yaml:"name"`
-	Version string `yaml:"version"`
+type depLockProject struct {
+	Name     string `toml:"name"`
+	Revision string `toml:"revision"`
+	Version  string `toml:"version"`
 }
 
-func claySubModules(cwd string, glideLockImports []*glideLockImport) ([]*glideLockImport, error) {
-	result := []*glideLockImport{}
+func claySubModules(cwd string, depLockProjects []*depLockProject) ([]*depLockProject, error) {
+	result := []*depLockProject{}
 
 	out, err := exec.Command("git", "rev-parse", "@").Output()
 	if err != nil {
 		return nil, err
 	}
-	clayInfo := &glideLockImport{
-		Name:    "clay",
-		Version: strings.TrimSpace(string(out)),
+	clayInfo := &depLockProject{
+		Name:     "clay",
+		Revision: strings.TrimSpace(string(out)),
+		Version:  strings.TrimSpace(string(out)),
 	}
 	result = append(result, clayInfo)
 
-	for _, glideLockImport := range glideLockImports {
-		_, err := os.Stat(filepath.Join(cwd, "vendor", glideLockImport.Name, "clay_module.go"))
+	for _, depLockProject := range depLockProjects {
+		_, err := os.Stat(filepath.Join(cwd, "vendor", depLockProject.Name, "clay_module.go"))
 		if err != nil {
 			continue
 		}
-		result = append(result, glideLockImport)
+		result = append(result, depLockProject)
 	}
 	return result, nil
 }
@@ -76,15 +79,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	buf, err := ioutil.ReadFile(filepath.Join(cwd, "glide.lock"))
+	buf, err := ioutil.ReadFile(filepath.Join(cwd, "Gopkg.toml"))
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 
-	var glideLock glideLock
-	err = yaml.Unmarshal(buf, &glideLock)
-	clayModules, err := claySubModules(cwd, glideLock.Imports)
+	var depLock depLock
+	err = toml.Unmarshal(buf, &depLock)
+	clayModules, err := claySubModules(cwd, depLock.Projects)
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
@@ -104,7 +107,7 @@ func main() {
 
 	clayVersionTemplate.Execute(f, struct {
 		BuildTime  string
-		SubModules []*glideLockImport
+		SubModules []*depLockProject
 	}{
 		BuildTime:  now,
 		SubModules: clayModules,

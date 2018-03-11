@@ -10,6 +10,7 @@ type clayProgramInformation struct {
 type claySubModuleInformation struct {
 	name     string
 	revision string
+	version  string
 }
 
 func (clayProgramInformation *clayProgramInformation) BuildTime() string {
