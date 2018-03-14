@@ -1,16 +1,17 @@
 {
+  "template_arguments": [
+    {
+      "type": 4,
+      "default_value": "TestParameter1",
+      "id": 1,
+      "template_id": 2,
+      "template": null,
+      "name": "testParameter1",
+      "description": "testParameter1desc"
+    }
+  ],
   "id": 2,
   "name": "test2",
   "template_content": "TestTemplate2",
-  "description": "test2desc",
-  "template_arguments": [
-    {
-      "id": 1,
-      "template_id": 2,
-      "name": "testParameter1",
-      "description": "testParameter1desc",
-      "type": 4,
-      "default_value": "TestParameter1"
-    }
-  ]
+  "description": "test2desc"
 }

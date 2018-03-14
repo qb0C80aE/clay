@@ -1,24 +1,26 @@
 {
-  "id": 100,
   "name": "test100",
   "template_content": "TestTemplate100",
   "description": "test100desc",
   "template_arguments": [
     {
+      "default_value": "TestParameter100",
       "id": 2,
       "template_id": 100,
+      "template": null,
       "name": "testParameter100",
       "description": "testParameter100desc",
-      "type": 4,
-      "default_value": "TestParameter100"
+      "type": 4
     },
     {
+      "default_value": "TestParameter110",
       "id": 10,
       "template_id": 100,
+      "template": null,
       "name": "testParameter110",
       "description": "testParameter110desc",
-      "type": 4,
-      "default_value": "TestParameter110"
+      "type": 4
     }
-  ]
+  ],
+  "id": 100
 }

@@ -5,6 +5,7 @@
       {
         "id": 1,
         "template_id": 2,
+        "template": null,
         "name": "testParameter1",
         "description": "testParameter1desc",
         "type": 4,

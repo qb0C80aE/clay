@@ -1,7 +1,6 @@
 package model
 
 import (
-	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -10,74 +9,83 @@ import (
 	"github.com/qb0C80aE/clay/util/mapstruct"
 	"net/url"
 	"reflect"
+	"regexp"
 	"strconv"
 )
 
+var regrxpExportedSymbol, _ = regexp.Compile(`^[0-9A-Z].*$`)
+
 // Base is the base class that all model classes inherit
 type Base struct {
-	actualModel extension.Model
 }
 
-func convertContainerToModel(container interface{}) {
-	typeOfContainer := extension.GetActualType(container)
-	actualValueOfContainer := extension.GetActualValue(container)
-	valueOfContainer := reflect.ValueOf(container)
+// GetTypeName returns its struct type name
+func (receiver *Base) GetTypeName(model extension.Model) string {
+	return extension.GetActualType(model).Name()
+}
 
-	switch actualValueOfContainer.Kind() {
-	case reflect.Array, reflect.Slice:
-		for i := 0; i < valueOfContainer.Len(); i++ {
-			valueOfElement := valueOfContainer.Index(i)
-			convertContainerToModel(valueOfElement.Interface())
-		}
-	case reflect.Struct:
-		if _, ok := valueOfContainer.Interface().(extension.Model); !ok {
-			panic(fmt.Errorf("%v is not extension.Model", container))
-		}
+// GetResourceName returns its resource/table name in URL/DB
+func (receiver *Base) GetResourceName(model extension.Model) (string, error) {
+	return extension.GetAssociatedResourceNameWithModel(model)
+}
 
-		if !actualValueOfContainer.FieldByName("Base").IsValid() {
-			panic(fmt.Errorf("%v is not extension.Model", container))
-		}
+// GenerateTableName generates its resource/table name in URL/DB
+func (receiver *Base) GenerateTableName(model extension.Model, db *gorm.DB) string {
+	return db.NewScope(model).TableName()
+}
 
-		for i := 0; i < typeOfContainer.NumField(); i++ {
-			field := typeOfContainer.Field(i)
-			if field.Name == "Base" {
-				continue
+// GetModelKey returns its key fields
+func (receiver *Base) GetModelKey(model extension.Model) (extension.ModelKey, error) {
+	return extension.GetRegisteredModelKey(model)
+}
+
+// GetStructFields returns its struct fields used to create containers
+func (receiver *Base) GetStructFields(model extension.Model) []reflect.StructField {
+	actualType := extension.GetActualType(model)
+	actualValue := extension.GetActualValue(model)
+
+	structFieldList := []reflect.StructField{}
+	for i := 0; i < actualType.NumField(); i++ {
+		field := actualType.Field(i)
+
+		if !actualType.Field(i).Anonymous && regrxpExportedSymbol.MatchString(field.Name) {
+			actualFieldType := field.Type
+			for actualFieldType.Kind() == reflect.Ptr {
+				actualFieldType = actualFieldType.Elem()
 			}
 
-			valueOfField := valueOfContainer.Elem().FieldByName(field.Name)
-			convertContainerToModel(valueOfField.Interface())
+			switch actualFieldType.Kind() {
+			case reflect.Struct, reflect.Slice, reflect.Array:
+				actualElementType := extension.InspectActualElementType(actualValue.FieldByIndex(field.Index).Interface())
+				newStructField := field
+				newStructField.Type = extension.NewStructFieldTypeProxy(actualElementType.Name(), actualFieldType.Kind())
+				structFieldList = append(structFieldList, newStructField)
+			default:
+				structFieldList = append(structFieldList, field)
+			}
 		}
-
-		base := Base{
-			actualModel: valueOfContainer.Interface().(extension.Model),
-		}
-		actualValueOfContainer.FieldByName("Base").Set(reflect.ValueOf(base))
 	}
-}
 
-// ConvertContainerToModel converts from container, which means, what does not have the relationship with Base, to model, what have the one recursively
-func ConvertContainerToModel(container interface{}) extension.Model {
-	convertContainerToModel(container)
-	return container.(extension.Model)
-}
-
-// New creates a new model
-func (receiver *Base) New() extension.Model {
-	actualModelType := extension.GetActualType(receiver.actualModel)
-	newModel := reflect.New(actualModelType)
-	return ConvertContainerToModel(newModel.Interface()).(extension.Model)
-}
-
-// IsContainer tells if the instance is container, that is the model instance without Base-ActualModel relationship
-func (receiver *Base) IsContainer() bool {
-	return receiver.actualModel == nil
+	return structFieldList
 }
 
 // GetSingle corresponds HTTP GET message and handles a request for a single resource to get the information
-func (receiver *Base) GetSingle(db *gorm.DB, parameters gin.Params, _ url.Values, queryFields string) (interface{}, error) {
-	result := receiver.New()
+func (receiver *Base) GetSingle(model extension.Model, db *gorm.DB, parameters gin.Params, urlValues url.Values, queryFields string) (interface{}, error) {
+	preloadString := urlValues.Get("preloads")
 
-	modelKey, err := extension.GetRegisteredModelKey(result)
+	resourceName, err := model.GetResourceName(model)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+
+	result, err := extension.CreateOutputContainerByResourceName(resourceName, preloadString)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+
+	modelKey, err := extension.GetRegisteredModelKey(model)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
@@ -92,8 +100,20 @@ func (receiver *Base) GetSingle(db *gorm.DB, parameters gin.Params, _ url.Values
 }
 
 // GetMulti corresponds HTTP GET message and handles a request for multi resource to get the list of information
-func (receiver *Base) GetMulti(db *gorm.DB, parameters gin.Params, _ url.Values, queryFields string) (interface{}, error) {
-	elementOfResult := receiver.New()
+func (receiver *Base) GetMulti(model extension.Model, db *gorm.DB, parameters gin.Params, urlValues url.Values, queryFields string) (interface{}, error) {
+	preloadString := urlValues.Get("preloads")
+
+	resourceName, err := model.GetResourceName(model)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+
+	elementOfResult, err := extension.CreateOutputContainerByResourceName(resourceName, preloadString)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
 
 	modelType := extension.GetActualType(elementOfResult)
 	modelPointerType := reflect.PtrTo(modelType)
@@ -112,20 +132,20 @@ func (receiver *Base) GetMulti(db *gorm.DB, parameters gin.Params, _ url.Values,
 }
 
 // Create corresponds HTTP POST message and handles a request for multi resource to create a new information
-func (receiver *Base) Create(db *gorm.DB, _ gin.Params, _ url.Values, input extension.Model) (interface{}, error) {
-	if err := db.Create(input).Error; err != nil {
+func (receiver *Base) Create(_ extension.Model, db *gorm.DB, _ gin.Params, _ url.Values, inputContainer interface{}) (interface{}, error) {
+	if err := db.Create(inputContainer).Error; err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
 
-	return input, nil
+	return inputContainer, nil
 }
 
 // Update corresponds HTTP PUT message and handles a request for a single resource to update the specific information
-func (receiver *Base) Update(db *gorm.DB, parameters gin.Params, _ url.Values, input extension.Model) (interface{}, error) {
-	value := reflect.ValueOf(input)
+func (receiver *Base) Update(model extension.Model, db *gorm.DB, parameters gin.Params, _ url.Values, inputContainer interface{}) (interface{}, error) {
+	value := reflect.ValueOf(inputContainer)
 
-	modelKey, err := extension.GetRegisteredModelKey(input)
+	modelKey, err := extension.GetRegisteredModelKey(model)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
@@ -146,23 +166,41 @@ func (receiver *Base) Update(db *gorm.DB, parameters gin.Params, _ url.Values, i
 		return nil, fmt.Errorf("the field %s does not exist, or is neither int nor string", modelKey.KeyField)
 	}
 
+	// NOTE: due to reflect.StructOf() restriction, BeforeSave does not work on containers,
+	//       so delete children before save explicitly.
+	if err := receiver.deleteMarkedItemsInSlices(db, value.Interface()); err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+
 	if err := db.Save(value.Interface()).Error; err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
 
-	return input, nil
+	return inputContainer, nil
 }
 
 // Delete corresponds HTTP DELETE message and handles a request for a single resource to delete the specific information
-func (receiver *Base) Delete(db *gorm.DB, parameters gin.Params, _ url.Values) error {
-	modelKey, err := extension.GetRegisteredModelKey(receiver.actualModel)
+func (receiver *Base) Delete(model extension.Model, db *gorm.DB, parameters gin.Params, _ url.Values) error {
+	modelKey, err := model.GetModelKey(model)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return err
 	}
 
-	target := receiver.New()
+	resourceName, err := model.GetResourceName(model)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return err
+	}
+
+	target, err := extension.CreateContainerByResourceName(resourceName)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return err
+	}
+
 	if err := db.First(target, fmt.Sprintf("%s = ?", modelKey.KeyParameter), parameters.ByName(modelKey.KeyParameter)).Error; err != nil {
 		logging.Logger().Debug(err.Error())
 		return err
@@ -172,19 +210,25 @@ func (receiver *Base) Delete(db *gorm.DB, parameters gin.Params, _ url.Values) e
 }
 
 // Patch corresponds HTTP PATCH message and handles a request for a single resource to update partially the specific information
-func (receiver *Base) Patch(_ *gorm.DB, _ gin.Params, _ url.Values, _ extension.Model) (interface{}, error) {
+func (receiver *Base) Patch(_ extension.Model, _ *gorm.DB, _ gin.Params, _ url.Values, _ interface{}) (interface{}, error) {
 	return nil, nil
 }
 
 // GetOptions corresponds HTTP OPTIONS message and handles a request for multi resources to retrieve its supported options
-func (receiver *Base) GetOptions(_ *gorm.DB, _ gin.Params, _ url.Values) error {
+func (receiver *Base) GetOptions(_ extension.Model, _ *gorm.DB, _ gin.Params, _ url.Values) error {
 	return nil
 }
 
 // GetTotal returns the count of for multi resource
-func (receiver *Base) GetTotal(db *gorm.DB) (int, error) {
+func (receiver *Base) GetTotal(model extension.Model, db *gorm.DB) (int, error) {
+	resourceName, err := model.GetResourceName(model)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return 0, err
+	}
+
 	var total int
-	if err := db.Model(receiver.actualModel).Count(&total).Error; err != nil {
+	if err := db.Table(resourceName).Count(&total).Error; err != nil {
 		logging.Logger().Debug(err.Error())
 		return 0, err
 	}
@@ -193,17 +237,22 @@ func (receiver *Base) GetTotal(db *gorm.DB) (int, error) {
 }
 
 // ExtractFromDesign extracts the model related to this model from db
-func (receiver *Base) ExtractFromDesign(db *gorm.DB) (string, interface{}, error) {
-	if receiver == nil {
-		logging.Logger().Criticalf("the model is a container which does not have *Base")
-		return "", nil, errors.New("the model is a container which does not have *Base")
+func (receiver *Base) ExtractFromDesign(model extension.Model, db *gorm.DB) (string, interface{}, error) {
+	resourceName, err := model.GetResourceName(model)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return "", nil, err
 	}
 
-	model := receiver.New()
+	outputContainer, err := extension.CreateOutputContainerByResourceName(resourceName, "")
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return "", nil, err
+	}
 
-	modelType := extension.GetActualType(model)
-	modelPointerType := reflect.PtrTo(modelType)
-	sliceType := reflect.SliceOf(modelPointerType)
+	outputContainerType := extension.GetActualType(outputContainer)
+	outputContainerTypePointerType := reflect.PtrTo(outputContainerType)
+	sliceType := reflect.SliceOf(outputContainerTypePointerType)
 	slice := reflect.MakeSlice(sliceType, 0, 0)
 
 	slicePointer := reflect.New(sliceType)
@@ -214,45 +263,52 @@ func (receiver *Base) ExtractFromDesign(db *gorm.DB) (string, interface{}, error
 		return "", nil, err
 	}
 
-	resourceName := extension.GetAssociateResourceNameWithModel(model)
-
 	return resourceName, slicePointer.Elem().Interface(), nil
 }
 
 // DeleteFromDesign deletes the model related to this model in db
-func (receiver *Base) DeleteFromDesign(db *gorm.DB) error {
-	if receiver == nil {
-		logging.Logger().Criticalf("the model is a container which does not have *Base")
-		return errors.New("the model is a container which does not have *Base")
+func (receiver *Base) DeleteFromDesign(model extension.Model, db *gorm.DB) error {
+	resourceName, err := model.GetResourceName(model)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return err
 	}
 
-	model := receiver.New()
-
-	if err := db.Delete(model).Error; err != nil {
+	inputContainer, err := extension.CreateOutputContainerByResourceName(resourceName, "")
+	if err != nil {
 		logging.Logger().Debug(err.Error())
+		return err
+	}
+
+	if err := db.Delete(inputContainer).Error; err != nil {
+		logging.Logger().Debug(err.Error())
+		return err
 	}
 
 	return nil
 }
 
 // LoadToDesign loads the model related to this model into db
-func (receiver *Base) LoadToDesign(db *gorm.DB, data interface{}) error {
-	if receiver == nil {
-		logging.Logger().Criticalf("the model is a container which does not have *Base")
-		return errors.New("the model is a container which does not have *Base")
+func (receiver *Base) LoadToDesign(model extension.Model, db *gorm.DB, data interface{}) error {
+	resourceName, err := model.GetResourceName(model)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return err
 	}
 
-	model := receiver.New()
+	outputContainer, err := extension.CreateOutputContainerByResourceName(resourceName, "")
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return err
+	}
 
-	modelType := extension.GetActualType(model)
-	modelPointerType := reflect.PtrTo(modelType)
-	sliceType := reflect.SliceOf(modelPointerType)
+	outputContainerType := extension.GetActualType(outputContainer)
+	outputContainerTypePointerType := reflect.PtrTo(outputContainerType)
+	sliceType := reflect.SliceOf(outputContainerTypePointerType)
 	slice := reflect.MakeSlice(sliceType, 0, 0)
 
 	slicePointer := reflect.New(sliceType)
 	slicePointer.Elem().Set(slice)
-
-	resourceName := extension.GetAssociateResourceNameWithModel(model)
 
 	design := data.(*Design)
 	if value, exists := design.Content[resourceName]; exists {
@@ -264,63 +320,44 @@ func (receiver *Base) LoadToDesign(db *gorm.DB, data interface{}) error {
 		slice = slicePointer.Elem()
 		size := slice.Len()
 		for i := 0; i < size; i++ {
-			modelValue := slice.Index(i).Elem()
-			fieldCount := modelValue.NumField()
+			outputContainerValue := slice.Index(i).Elem()
+			fieldCount := outputContainerValue.NumField()
 			for j := 0; j < fieldCount; j++ {
-				modelFieldValue := modelValue.Field(j)
-				switch modelFieldValue.Kind() {
+				outputContainerFieldValue := outputContainerValue.Field(j)
+				switch outputContainerFieldValue.Kind() {
 				case reflect.Array, reflect.Slice, reflect.Ptr:
-					modelFieldValue.Set(reflect.Zero(modelFieldValue.Type()))
+					outputContainerFieldValue.Set(reflect.Zero(outputContainerFieldValue.Type()))
 				}
 			}
-			model := modelValue.Interface()
-			if err := db.Create(model).Error; err != nil {
+			outputContainer := outputContainerValue.Interface()
+			if err := db.Create(outputContainer).Error; err != nil {
 				logging.Logger().Debug(err.Error())
 				return err
 			}
 		}
 	}
+
+	return nil
+}
+
+// DoBeforeDBMigration execute initialization process before DB migration
+func (receiver *Base) DoBeforeDBMigration(_ *gorm.DB) error {
 	return nil
 }
 
 // DoAfterDBMigration execute initialization process after DB migration
-func (receiver *Base) DoAfterDBMigration(db *gorm.DB) error {
-	if receiver == nil {
-		logging.Logger().Criticalf("the model is a container which does not have *Base")
-		return errors.New("the model is a container which does not have *Base")
-	}
-
+func (receiver *Base) DoAfterDBMigration(_ *gorm.DB) error {
 	return nil
 }
 
 // DoBeforeRouterSetup execute initialization process before Router initialization
-func (receiver *Base) DoBeforeRouterSetup(r *gin.Engine) error {
-	if receiver == nil {
-		logging.Logger().Criticalf("the model is a container which does not have *Base")
-		return errors.New("the model is a container which does not have *Base")
-	}
-
+func (receiver *Base) DoBeforeRouterSetup(_ *gin.Engine) error {
 	return nil
 }
 
 // DoAfterRouterSetup execute initialization process after Router initialization
-func (receiver *Base) DoAfterRouterSetup(r *gin.Engine) error {
-	if receiver == nil {
-		logging.Logger().Criticalf("the model is a container which does not have *Base")
-		return errors.New("the model is a container which does not have *Base")
-	}
-
+func (receiver *Base) DoAfterRouterSetup(_ *gin.Engine) error {
 	return nil
-}
-
-// BeforeCreate is executed before db.Create with the model
-func (receiver *Base) BeforeCreate(tx *gorm.DB) error {
-	return receiver.deleteMarkedItemsInSlices(tx, receiver.actualModel)
-}
-
-// BeforeSave is executed before db.Save with the model
-func (receiver *Base) BeforeSave(tx *gorm.DB) error {
-	return receiver.deleteMarkedItemsInSlices(tx, receiver.actualModel)
 }
 
 func (receiver *Base) deleteMarkedItemsInSlices(db *gorm.DB, data interface{}) error {
@@ -368,7 +405,11 @@ func (receiver *Base) deleteMarkedItemsInSlices(db *gorm.DB, data interface{}) e
 				}
 
 				if toBeDeleted {
-					model := ConvertContainerToModel(itemValue.Addr().Interface()).(extension.Model)
+					model, err := extension.GetRegisteredModelByContainer(itemValue.Addr().Interface())
+					if err != nil {
+						logging.Logger().Debug(err.Error())
+						return err
+					}
 
 					modelKey, err := extension.GetRegisteredModelKey(model)
 					if err != nil {
@@ -398,7 +439,7 @@ func (receiver *Base) deleteMarkedItemsInSlices(db *gorm.DB, data interface{}) e
 						},
 					}
 
-					if err := model.Delete(db, parameters, nil); err != nil {
+					if err := model.Delete(model, db, parameters, nil); err != nil {
 						logging.Logger().Debug(err.Error())
 						return err
 					}

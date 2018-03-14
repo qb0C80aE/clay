@@ -26,13 +26,28 @@ func GetAPIEndpoints(c *gin.Context) {
 	for _, controller := range controllerList {
 		routeMap := controller.GetRouteMap()
 		for method, routes := range routeMap {
-			title := fmt.Sprintf("%s_url [%s]", controller.GetResourceName(), extension.LookUpMethodName(method))
+			resourceName, err := controller.GetResourceName()
+			if err != nil {
+				logging.Logger().Critical(err.Error())
+				os.Exit(1)
+			}
+			title := fmt.Sprintf("%s_url [%s]", resourceName, extension.LookUpMethodName(method))
 			for pathType := range routes {
 				switch pathType {
 				case extension.URLSingle:
-					resourceList = append(resourceList, fmt.Sprintf("%s %s/%s", title, baseURL, controller.GetResourceSingleURL()))
+					resourceSingleURL, err := controller.GetResourceSingleURL()
+					if err != nil {
+						logging.Logger().Critical(err.Error())
+						os.Exit(1)
+					}
+					resourceList = append(resourceList, fmt.Sprintf("%s %s/%s", title, baseURL, resourceSingleURL))
 				case extension.URLMulti:
-					resourceList = append(resourceList, fmt.Sprintf("%s %s/%s", title, baseURL, controller.GetResourceMultiURL()))
+					resourceMultiURL, err := controller.GetResourceMultiURL()
+					if err != nil {
+						logging.Logger().Critical(err.Error())
+						os.Exit(1)
+					}
+					resourceList = append(resourceList, fmt.Sprintf("%s %s/%s", title, baseURL, resourceMultiURL))
 				default:
 					logging.Logger().Criticalf("invalid url type: %d", pathType)
 					os.Exit(1)

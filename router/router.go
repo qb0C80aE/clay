@@ -4,54 +4,33 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/qb0C80aE/clay/controller"
 	"github.com/qb0C80aE/clay/extension"
-	"github.com/qb0C80aE/clay/logging"
-	"os"
 )
 
-// Initialize initializes the router
-func Initialize(r *gin.Engine) {
+// Setup initializes the router
+func Setup(engine *gin.Engine) error {
+	engine.GET("/", controller.GetAPIEndpoints)
+
+	apiPath := ""
+	apiGroup := engine.Group(apiPath)
+	extension.RegisterRouterGroup(apiPath, apiGroup)
+
 	initializerList := extension.GetRegisteredInitializerList()
-
 	for _, initializer := range initializerList {
-		initializer.DoBeforeRouterSetup(r)
-	}
-
-	r.GET("/", controller.GetAPIEndpoints)
-
-	api := r.Group("")
-	{
-		methodFunctionMap := map[int]func(string, ...gin.HandlerFunc) gin.IRoutes{
-			extension.MethodGet:     api.GET,
-			extension.MethodPost:    api.POST,
-			extension.MethodPut:     api.PUT,
-			extension.MethodDelete:  api.DELETE,
-			extension.MethodPatch:   api.PATCH,
-			extension.MethodOptions: api.OPTIONS,
-		}
-
-		controllerList := extension.GetRegisteredControllerList()
-		for _, controller := range controllerList {
-			routeMap := controller.GetRouteMap()
-			for method, routingFunction := range methodFunctionMap {
-				routeList := routeMap[method]
-				for pathType, handlerFunc := range routeList {
-					switch pathType {
-					case extension.URLSingle:
-						routingFunction(controller.GetResourceSingleURL(), handlerFunc)
-						extension.AssociateControllerWithPath(controller.GetResourceSingleURL(), controller)
-					case extension.URLMulti:
-						routingFunction(controller.GetResourceMultiURL(), handlerFunc)
-						extension.AssociateControllerWithPath(controller.GetResourceMultiURL(), controller)
-					default:
-						logging.Logger().Criticalf("invalid url type: %d", pathType)
-						os.Exit(1)
-					}
-				}
-			}
+		if err := initializer.DoBeforeRouterSetup(engine); err != nil {
+			return nil
 		}
 	}
 
-	for _, initializer := range initializerList {
-		initializer.DoAfterRouterSetup(r)
+	controllerList := extension.GetRegisteredControllerList()
+	if err := extension.SetupController(apiPath, controllerList); err != nil {
+		return err
 	}
+
+	for _, initializer := range initializerList {
+		if err := initializer.DoAfterRouterSetup(engine); err != nil {
+			return nil
+		}
+	}
+
+	return nil
 }

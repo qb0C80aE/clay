@@ -1,10 +1,12 @@
 {
   "clay_version": "unknown",
+  "generated_date": "1974-05-19 01:02:03.000000004 +0000 UTC",
   "content": {
     "template_arguments": [
       {
         "id": 1,
         "template_id": 2,
+        "template": null,
         "name": "testParameter1",
         "description": "testParameter1desc",
         "type": 4,
@@ -27,6 +29,5 @@
         "template_arguments": null
       }
     ]
-  },
-  "generated_date": "1974-05-19 01:02:03.000000004 +0000 UTC"
+  }
 }

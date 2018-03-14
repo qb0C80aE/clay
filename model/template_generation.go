@@ -27,7 +27,12 @@ type TemplateGeneration struct {
 
 // NewTemplateGeneration creates a template generation model instance
 func NewTemplateGeneration() *TemplateGeneration {
-	return ConvertContainerToModel(&TemplateGeneration{}).(*TemplateGeneration)
+	return &TemplateGeneration{}
+}
+
+// GetContainerForMigration returns its container for migration, if no need to be migrated, just return null
+func (receiver *TemplateGeneration) GetContainerForMigration() (interface{}, error) {
+	return nil, nil
 }
 
 // GenerateTemplate generates text data based on registered templates
@@ -152,7 +157,7 @@ func (receiver *TemplateGeneration) GenerateTemplate(db *gorm.DB, id string, tem
 }
 
 // GetSingle generates text data based on registered templates
-func (receiver *TemplateGeneration) GetSingle(db *gorm.DB, parameters gin.Params, urlValues url.Values, queryFields string) (interface{}, error) {
+func (receiver *TemplateGeneration) GetSingle(_ extension.Model, db *gorm.DB, parameters gin.Params, urlValues url.Values, queryFields string) (interface{}, error) {
 	templateArgumentParameterMap := make(map[interface{}]interface{}, len(urlValues))
 	for key := range urlValues {
 		templateArgumentParameterMap[key] = urlValues.Get(key)
@@ -343,7 +348,12 @@ func init() {
 
 			pathElements := strings.Split(strings.Trim(path, "/"), "/")
 			resourceName := pathElements[0]
-			singleURL := controller.GetResourceSingleURL()
+			singleURL, err := controller.GetResourceSingleURL()
+			if err != nil {
+				logging.Logger().Debug(err.Error())
+				return nil, err
+			}
+
 			routeElements := strings.Split(strings.Trim(singleURL, "/"), "/")
 
 			parameters := gin.Params{}
@@ -371,7 +381,7 @@ func init() {
 				logging.Logger().Debug(err.Error())
 				return nil, err
 			}
-			model, err := extension.CreateModelByResourceName(resourceName)
+			model, err := extension.GetAssociatedModelWithResourceName(resourceName)
 			if err != nil {
 				logging.Logger().Debug(err.Error())
 				return nil, err
@@ -393,7 +403,7 @@ func init() {
 			fields := helper.ParseFields(parameter.DefaultQuery(urlQuery, "fields", "*"))
 			queryFields := helper.QueryFields(model, fields)
 
-			result, err := model.GetSingle(db, parameters, requestForParameter.URL.Query(), queryFields)
+			result, err := model.GetSingle(model, db, parameters, requestForParameter.URL.Query(), queryFields)
 			if err != nil {
 				logging.Logger().Debug(err.Error())
 				return nil, err
@@ -410,7 +420,12 @@ func init() {
 
 			pathElements := strings.Split(strings.Trim(path, "/"), "/")
 			resourceName := pathElements[0]
-			multiURL := controller.GetResourceMultiURL()
+			multiURL, err := controller.GetResourceMultiURL()
+			if err != nil {
+				logging.Logger().Debug(err.Error())
+				return nil, err
+			}
+
 			routeElements := strings.Split(strings.Trim(multiURL, "/"), "/")
 
 			parameters := gin.Params{}
@@ -434,7 +449,7 @@ func init() {
 				URL,
 				nil,
 			)
-			model, err := extension.CreateModelByResourceName(resourceName)
+			model, err := extension.GetAssociatedModelWithResourceName(resourceName)
 			if err != nil {
 				logging.Logger().Debug(err.Error())
 				return nil, err
@@ -456,7 +471,7 @@ func init() {
 			db = parameter.FilterFields(db)
 			fields := helper.ParseFields(parameter.DefaultQuery(urlQuery, "fields", "*"))
 			queryFields := helper.QueryFields(model, fields)
-			result, err := model.GetMulti(db, parameters, requestForParameter.URL.Query(), queryFields)
+			result, err := model.GetMulti(model, db, parameters, requestForParameter.URL.Query(), queryFields)
 			if err != nil {
 				logging.Logger().Debug(err.Error())
 				return nil, err
@@ -472,7 +487,12 @@ func init() {
 
 			pathElements := strings.Split(strings.Trim(path, "/"), "/")
 			resourceName := pathElements[0]
-			multiURL := controller.GetResourceMultiURL()
+			multiURL, err := controller.GetResourceMultiURL()
+			if err != nil {
+				logging.Logger().Debug(err.Error())
+				return nil, err
+			}
+
 			routeElements := strings.Split(strings.Trim(multiURL, "/"), "/")
 
 			parameters := gin.Params{}
@@ -496,7 +516,7 @@ func init() {
 				URL,
 				nil,
 			)
-			model, err := extension.CreateModelByResourceName(resourceName)
+			model, err := extension.GetAssociatedModelWithResourceName(resourceName)
 			if err != nil {
 				logging.Logger().Debug(err.Error())
 				return nil, err
@@ -518,7 +538,7 @@ func init() {
 			db = parameter.FilterFields(db)
 			fields := helper.ParseFields(parameter.DefaultQuery(urlQuery, "fields", "*"))
 			queryFields := helper.QueryFields(model, fields)
-			result, err := model.GetMulti(db, parameters, requestForParameter.URL.Query(), queryFields)
+			result, err := model.GetMulti(model, db, parameters, requestForParameter.URL.Query(), queryFields)
 			if err != nil {
 				logging.Logger().Debug(err.Error())
 				return nil, err
@@ -537,13 +557,13 @@ func init() {
 			pathElements := strings.Split(strings.Trim(path, "/"), "/")
 			resourceName := pathElements[0]
 
-			model, err := extension.CreateModelByResourceName(resourceName)
+			model, err := extension.GetAssociatedModelWithResourceName(resourceName)
 			if err != nil {
 				logging.Logger().Debug(err.Error())
 				return nil, err
 			}
 			db := dbObject.(*gorm.DB)
-			total, err := model.GetTotal(db)
+			total, err := model.GetTotal(model, db)
 			if err != nil {
 				logging.Logger().Debug(err.Error())
 				return nil, err
@@ -569,5 +589,5 @@ func init() {
 }
 
 func init() {
-	extension.RegisterModel(NewTemplateGeneration(), false)
+	extension.RegisterModel(NewTemplateGeneration())
 }

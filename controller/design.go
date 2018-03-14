@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/qb0C80aE/clay/db"
 	"github.com/qb0C80aE/clay/extension"
+	"github.com/qb0C80aE/clay/logging"
 	"github.com/qb0C80aE/clay/model"
 )
 
@@ -16,8 +17,13 @@ func newDesignController() *designController {
 	return CreateController(&designController{}, model.NewDesign()).(*designController)
 }
 
-func (receiver *designController) GetResourceSingleURL() string {
-	return fmt.Sprintf("%s/present", receiver.GetResourceName())
+func (receiver *designController) GetResourceSingleURL() (string, error) {
+	resourceName, err := receiver.model.GetResourceName(receiver.model)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return "", err
+	}
+	return fmt.Sprintf("%s/present", resourceName), nil
 }
 
 func (receiver *designController) GetRouteMap() map[int]map[int]gin.HandlerFunc {

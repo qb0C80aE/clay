@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/qb0C80aE/clay/extension"
+	"github.com/qb0C80aE/clay/logging"
 	"github.com/qb0C80aE/clay/model"
 )
 
@@ -15,9 +16,13 @@ func newTemplateRawController() *templateRawController {
 	return CreateController(&templateRawController{}, model.NewTemplateRaw()).(*templateRawController)
 }
 
-func (receiver *templateRawController) GetResourceSingleURL() string {
-	templateResourceName := extension.GetAssociateResourceNameWithModel(model.NewTemplate())
-	return fmt.Sprintf("%s/:id/raw", templateResourceName)
+func (receiver *templateRawController) GetResourceSingleURL() (string, error) {
+	templateResourceName, err := extension.GetAssociatedResourceNameWithModel(model.NewTemplate())
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return "", err
+	}
+	return fmt.Sprintf("%s/:id/raw", templateResourceName), nil
 }
 
 func (receiver *templateRawController) GetRouteMap() map[int]map[int]gin.HandlerFunc {

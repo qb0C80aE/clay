@@ -8,11 +8,13 @@ import (
 var initializerList = []Initializer{}
 
 // Initializer is the interface what adds router processes specifically before and after router registration
+// * DoBeforeDBMigration execute initialization process before DB migration
 // * DoAfterDBMigration execute initialization process after DB migration
 // * DoBeforeRouterSetup execute initialization process before Router initialization
 // * DoAfterRouterSetup execute initialization process after Router initialization
 type Initializer interface {
-	DoAfterDBMigration(db *gorm.DB) error
+	DoBeforeDBMigration(db *gorm.DB) error
+	DoAfterDBMigration(tx *gorm.DB) error
 	DoBeforeRouterSetup(r *gin.Engine) error
 	DoAfterRouterSetup(r *gin.Engine) error
 }

@@ -11,15 +11,20 @@ type Template struct {
 	Name              string              `json:"name" form:"name" gorm:"not null;unique"`
 	TemplateContent   string              `json:"template_content" form:"template_content" sql:"type:text"`
 	Description       string              `json:"description" form:"description" sql:"type:text"`
-	TemplateArguments []*TemplateArgument `json:"template_arguments"`
+	TemplateArguments []*TemplateArgument `json:"template_arguments" gorm:"ForeignKey:template_id"`
 }
 
 // NewTemplate creates a template model instance
 func NewTemplate() *Template {
-	return ConvertContainerToModel(&Template{}).(*Template)
+	return &Template{}
+}
+
+// GetContainerForMigration returns its container for migration, if no need to be migrated, just return null
+func (receiver *Template) GetContainerForMigration() (interface{}, error) {
+	return extension.CreateContainerByTypeName(receiver.GetTypeName(receiver))
 }
 
 func init() {
-	extension.RegisterModel(NewTemplate(), true)
+	extension.RegisterModel(NewTemplate())
 	extension.RegisterDesignAccessor(NewTemplate())
 }

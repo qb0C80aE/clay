@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/qb0C80aE/clay/extension"
+	"github.com/qb0C80aE/clay/logging"
 	"github.com/qb0C80aE/clay/model"
 )
 
@@ -15,9 +16,13 @@ func newTemplateGenerationController() *templateGenerationController {
 	return CreateController(&templateGenerationController{}, model.NewTemplateGeneration()).(*templateGenerationController)
 }
 
-func (receiver *templateGenerationController) GetResourceSingleURL() string {
-	templateResourceName := extension.GetAssociateResourceNameWithModel(model.NewTemplate())
-	return fmt.Sprintf("%s/:id/generation", templateResourceName)
+func (receiver *templateGenerationController) GetResourceSingleURL() (string, error) {
+	templateResourceName, err := extension.GetAssociatedResourceNameWithModel(model.NewTemplate())
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return "", err
+	}
+	return fmt.Sprintf("%s/:id/generation", templateResourceName), nil
 }
 
 func (receiver *templateGenerationController) GetRouteMap() map[int]map[int]gin.HandlerFunc {
@@ -34,8 +39,6 @@ func (receiver *templateGenerationController) OutputGetSingle(c *gin.Context, co
 	c.String(code, text)
 }
 
-var uniqueTemplateGenerationController = newTemplateGenerationController()
-
 func init() {
-	extension.RegisterController(uniqueTemplateGenerationController)
+	extension.RegisterController(newTemplateGenerationController())
 }
