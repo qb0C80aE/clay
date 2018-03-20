@@ -9,6 +9,7 @@ import (
 	"github.com/qb0C80aE/clay/logging"
 	"github.com/qb0C80aE/clay/model"
 	"net/url"
+	"reflect"
 )
 
 type templateArgumentGraphqlType struct {
@@ -159,8 +160,13 @@ func (graphqlType *templateArgumentGraphqlType) ResolveForQuery(p graphqlGo.Reso
 		return nil, err
 	}
 
+
+
 	c := p.Context.(*gin.Context)
 	db := dbpkg.Instance(c)
+
+	parents, _ := c.Get("parents")
+	fmt.Printf("parents: %v", parents)
 
 	templateArgument := model.NewTemplateArgument()
 

@@ -156,6 +156,8 @@ func (graphqlType *templateGraphqlType) ResolveForQuery(p graphqlGo.ResolveParam
 		return nil, err
 	}
 
+	c.Set("parents", result)
+
 	return result, err
 }
 
