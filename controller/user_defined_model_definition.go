@@ -71,23 +71,41 @@ func (receiver *userDefinedModelDefinitionController) Create(c *gin.Context) {
 		return
 	}
 
-	newUserDefinedModel, ok := newModel.(*model.UserDefinedModel)
-	if !ok {
-		logging.Logger().Debug("model is not an UserDefinedModel")
-		receiver.outputHandler.OutputError(c, http.StatusBadRequest, errors.New("model is not an UserDefinedModel"))
-		return
-	}
-
-	if newUserDefinedModel.IsControllerEnabled() {
-		apiPath := ""
-		newController := newUserDefinedModelController(newModel)
-		extension.RegisterController(newController)
-		newControllerList := []extension.Controller{newController}
-		if err := extension.SetupController(apiPath, newControllerList); err != nil {
-			logging.Logger().Debug(err.Error())
-			receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
-			return
+	apiPath := ""
+	if newUserDefinedManyToManyAssociationModel, ok := newModel.(*model.UserDefinedManyToManyAssociationModel); ok {
+		if newUserDefinedManyToManyAssociationModel.IsControllerEnabled() {
+			newParentController := newUserDefinedManyToManyAssociationModelController(newModel)
+			newChildLeftController := newUserDefinedManyToManyAssociationChildModelController(newModel, true)
+			newChildRightController := newUserDefinedManyToManyAssociationChildModelController(newModel, false)
+			extension.RegisterController(newParentController)
+			extension.RegisterController(newChildLeftController)
+			extension.RegisterController(newChildRightController)
+			newControllerList := []extension.Controller{
+				newParentController,
+				newChildLeftController,
+				newChildRightController,
+			}
+			if err := extension.SetupController(apiPath, newControllerList); err != nil {
+				logging.Logger().Debug(err.Error())
+				receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
+				return
+			}
 		}
+	} else if newUserDefinedModel, ok := newModel.(*model.UserDefinedModel); ok {
+		if newUserDefinedModel.IsControllerEnabled() {
+			newController := newUserDefinedModelController(newModel)
+			extension.RegisterController(newController)
+			newControllerList := []extension.Controller{newController}
+			if err := extension.SetupController(apiPath, newControllerList); err != nil {
+				logging.Logger().Debug(err.Error())
+				receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
+				return
+			}
+		}
+	} else {
+		logging.Logger().Debug("model is not an UserDefinedModel or an UserDefinedManyToManyAssociationModel")
+		receiver.outputHandler.OutputError(c, http.StatusBadRequest, errors.New("model is not an UserDefinedManyToManyAssociationModel"))
+		return
 	}
 
 	if version.Range("1.0.0", "<=", ver) && version.Range(ver, "<", "2.0.0") {
