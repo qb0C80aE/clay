@@ -26,6 +26,7 @@ import (
 type BaseController struct {
 	actualController extension.Controller
 	model            extension.Model
+	binder           extension.Binder
 	outputHandler    extension.OutputHandler
 	queryCustomizer  extension.QueryCustomizer
 }
@@ -36,6 +37,7 @@ func CreateController(actualController extension.Controller, model extension.Mod
 	baseController := BaseController{
 		actualController: actualController,
 		model:            model,
+		binder:           actualController.(extension.Binder),
 		outputHandler:    actualController.(extension.OutputHandler),
 		queryCustomizer:  actualController.(extension.QueryCustomizer),
 	}
@@ -48,8 +50,9 @@ func (receiver *BaseController) logStackTrace() {
 	logging.Logger().Criticalf("panic occured in logic, and recovered.\n%s", string(debug.Stack()))
 }
 
-func (receiver *BaseController) bind(c *gin.Context, model extension.Model) error {
-	if err := c.Bind(model); err != nil {
+// Bind binds input data to model instance
+func (receiver *BaseController) Bind(c *gin.Context, container interface{}) error {
+	if err := c.Bind(container); err != nil {
 		logging.Logger().Debug(err.Error())
 		return err
 	}
@@ -75,7 +78,7 @@ func (receiver *BaseController) bind(c *gin.Context, model extension.Model) erro
 				return err
 			}
 
-			vs := reflect.ValueOf(model)
+			vs := reflect.ValueOf(container)
 			for vs.Kind() == reflect.Ptr {
 				vs = vs.Elem()
 			}
@@ -461,7 +464,7 @@ func (receiver *BaseController) Create(c *gin.Context) {
 
 	container := receiver.model.New()
 
-	if err := receiver.bind(c, container); err != nil {
+	if err := receiver.binder.Bind(c, container); err != nil {
 		logging.Logger().Debug(err.Error())
 		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
 		return
@@ -501,7 +504,7 @@ func (receiver *BaseController) Update(c *gin.Context) {
 
 	container := receiver.model.New()
 
-	if err := receiver.bind(c, container); err != nil {
+	if err := receiver.binder.Bind(c, container); err != nil {
 		logging.Logger().Debug(err.Error())
 		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
 		return

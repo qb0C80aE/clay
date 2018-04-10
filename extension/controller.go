@@ -54,6 +54,12 @@ type Controller interface {
 	GetRouteMap() map[int]map[int]gin.HandlerFunc
 }
 
+// Binder is the interface what handles binding of input data
+// * Bind binds input data to model instance
+type Binder interface {
+	Bind(c *gin.Context, container interface{}) error
+}
+
 // QueryCustomizer is the interface what handles query parameters used as Parameter struct in GetSingle and GetMulti
 // * GetQueries returns query parameters
 type QueryCustomizer interface {
