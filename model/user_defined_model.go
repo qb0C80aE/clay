@@ -7,7 +7,7 @@ import (
 	"reflect"
 )
 
-// UserDefinedModel is the model class what represents templates to generate texts from models
+// UserDefinedModel is the model class what handles user defined models
 // Todo: Note that current Go implementation, reflect.StructOf does not generate wrapper methods to embedded structure
 // Todo: therefore, methods like BeforeSave do not work.
 type UserDefinedModel struct {

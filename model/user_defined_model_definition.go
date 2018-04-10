@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extension"
+	"github.com/qb0C80aE/clay/logging"
 	"net/url"
 	"reflect"
 	"sort"
@@ -34,16 +35,21 @@ var typeNameTypeMap = map[string]reflect.Type{
 // UserDefinedModelDefinition is the model class what represents raw template
 type UserDefinedModelDefinition struct {
 	Base
-	TypeName            string                             `json:"type_name" binding:"required" clay:"key_parameter" `
-	ResourceName        string                             `json:"resource_name" binding:"required"`
-	ToBeMigrated        bool                               `json:"to_be_migrated" binding:"required"`
-	IsControllerEnabled bool                               `json:"is_controller_enabled" binding:"required"`
-	SQLBeforeMigration  string                             `json:"sql_before_migration"`
-	SQLAfterMigration   string                             `json:"sql_after_migration"`
-	SQLDesignExtraction string                             `json:"sql_design_extraction"`
-	SQLDesignDeletion   string                             `json:"sql_design_deletion"`
-	Fields              []*UserDefinedModelFieldDefinition `json:"fields"`
-	structFieldList     []reflect.StructField
+	TypeName                       string                             `json:"type_name" binding:"required" clay:"key_parameter" `
+	ResourceName                   string                             `json:"resource_name" binding:"required"`
+	ToBeMigrated                   bool                               `json:"to_be_migrated"`
+	IsControllerEnabled            bool                               `json:"is_controller_enabled"`
+	SQLBeforeMigration             string                             `json:"sql_before_migration"`
+	SQLAfterMigration              string                             `json:"sql_after_migration"`
+	SQLDesignExtraction            string                             `json:"sql_design_extraction"`
+	SQLDesignDeletion              string                             `json:"sql_design_deletion"`
+	IsManyToManyAssociation        bool                               `json:"is_many_to_many_association"`
+	ManyToManyLeftResourceName     string                             `json:"many_to_many_left_resource_name"`
+	ManyToManyLeftResourceKeyName  string                             `json:"many_to_many_left_resource_key_name"`
+	ManyToManyRightResourceName    string                             `json:"many_to_many_right_resource_name"`
+	ManyToManyRightResourceKeyName string                             `json:"many_to_many_right_resource_key_name"`
+	Fields                         []*UserDefinedModelFieldDefinition `json:"fields"`
+	structFieldList                []reflect.StructField
 }
 
 // NewUserDefinedModelDefinition creates a template raw model instance
@@ -98,8 +104,6 @@ func (receiver *UserDefinedModelDefinition) Create(model extension.Model, db *go
 		return nil, err
 	}
 
-	newUserDefinedModel := NewUserDefinedModel()
-
 	structFieldList := []reflect.StructField{}
 	for _, field := range userDefinedModelDefinition.Fields {
 		reflectType, exists := typeNameTypeMap[field.TypeName]
@@ -118,21 +122,71 @@ func (receiver *UserDefinedModelDefinition) Create(model extension.Model, db *go
 		}
 		structFieldList = append(structFieldList, structField)
 	}
-	newUserDefinedModel.typeName = userDefinedModelDefinition.TypeName
-	newUserDefinedModel.resourceName = userDefinedModelDefinition.ResourceName
-	newUserDefinedModel.toBeMigrated = userDefinedModelDefinition.ToBeMigrated
-	newUserDefinedModel.isControllerEnabled = userDefinedModelDefinition.IsControllerEnabled
-	newUserDefinedModel.sqlBeforeMigration = userDefinedModelDefinition.SQLBeforeMigration
-	newUserDefinedModel.sqlAfterMigration = userDefinedModelDefinition.SQLAfterMigration
-	newUserDefinedModel.sqlDesignExtraction = userDefinedModelDefinition.SQLDesignExtraction
-	newUserDefinedModel.sqlDesignDeletion = userDefinedModelDefinition.SQLDesignDeletion
-	newUserDefinedModel.structFieldList = structFieldList
 
-	extension.RegisterModel(newUserDefinedModel)
-	extension.RegisterDesignAccessor(newUserDefinedModel)
+	var newModel extension.Model
+	var newInitializer extension.Initializer
+	var newDesignAccessor extension.DesignAccessor
 
-	initializerList := []extension.Initializer{newUserDefinedModel}
-	modelList := []extension.Model{newUserDefinedModel}
+	if userDefinedModelDefinition.IsManyToManyAssociation {
+		if len(userDefinedModelDefinition.ManyToManyLeftResourceName) == 0 {
+			logging.Logger().Debug("ManyToManyLeftResourceName is empty")
+			return nil, errors.New("ManyToManyLeftResourceName is empty")
+		}
+		if len(userDefinedModelDefinition.ManyToManyLeftResourceName) == 0 {
+			logging.Logger().Debug("ManyToManyLeftResourceKeyName is empty")
+			return nil, errors.New("ManyToManyLeftResourceKeyName is empty")
+		}
+		if len(userDefinedModelDefinition.ManyToManyLeftResourceName) == 0 {
+			logging.Logger().Debug("ManyToManyRightResourceName is empty")
+			return nil, errors.New("ManyToManyRightResourceName is empty")
+		}
+		if len(userDefinedModelDefinition.ManyToManyLeftResourceName) == 0 {
+			logging.Logger().Debug("ManyToManyRightResourceKeyName is empty")
+			return nil, errors.New("ManyToManyRightResourceKeyName is empty")
+		}
+
+		newUserDefinedManyToManyAssociationModel := NewUserDefinedManyToManyAssociationModel()
+		newUserDefinedManyToManyAssociationModel.leftResourceName = userDefinedModelDefinition.ManyToManyLeftResourceName
+		newUserDefinedManyToManyAssociationModel.leftResourceKeyName = userDefinedModelDefinition.ManyToManyLeftResourceKeyName
+		newUserDefinedManyToManyAssociationModel.rightResourceName = userDefinedModelDefinition.ManyToManyRightResourceName
+		newUserDefinedManyToManyAssociationModel.rightResourceKeyName = userDefinedModelDefinition.ManyToManyRightResourceKeyName
+
+		newUserDefinedManyToManyAssociationModel.typeName = userDefinedModelDefinition.TypeName
+		newUserDefinedManyToManyAssociationModel.resourceName = userDefinedModelDefinition.ResourceName
+		newUserDefinedManyToManyAssociationModel.toBeMigrated = userDefinedModelDefinition.ToBeMigrated
+		newUserDefinedManyToManyAssociationModel.isControllerEnabled = userDefinedModelDefinition.IsControllerEnabled
+		newUserDefinedManyToManyAssociationModel.sqlBeforeMigration = userDefinedModelDefinition.SQLBeforeMigration
+		newUserDefinedManyToManyAssociationModel.sqlAfterMigration = userDefinedModelDefinition.SQLAfterMigration
+		newUserDefinedManyToManyAssociationModel.sqlDesignExtraction = userDefinedModelDefinition.SQLDesignExtraction
+		newUserDefinedManyToManyAssociationModel.sqlDesignDeletion = userDefinedModelDefinition.SQLDesignDeletion
+		newUserDefinedManyToManyAssociationModel.structFieldList = structFieldList
+
+		newModel = newUserDefinedManyToManyAssociationModel
+		newInitializer = newUserDefinedManyToManyAssociationModel
+		newDesignAccessor = newUserDefinedManyToManyAssociationModel
+	} else {
+		newUserDefinedModel := NewUserDefinedModel()
+
+		newUserDefinedModel.typeName = userDefinedModelDefinition.TypeName
+		newUserDefinedModel.resourceName = userDefinedModelDefinition.ResourceName
+		newUserDefinedModel.toBeMigrated = userDefinedModelDefinition.ToBeMigrated
+		newUserDefinedModel.isControllerEnabled = userDefinedModelDefinition.IsControllerEnabled
+		newUserDefinedModel.sqlBeforeMigration = userDefinedModelDefinition.SQLBeforeMigration
+		newUserDefinedModel.sqlAfterMigration = userDefinedModelDefinition.SQLAfterMigration
+		newUserDefinedModel.sqlDesignExtraction = userDefinedModelDefinition.SQLDesignExtraction
+		newUserDefinedModel.sqlDesignDeletion = userDefinedModelDefinition.SQLDesignDeletion
+		newUserDefinedModel.structFieldList = structFieldList
+
+		newModel = newUserDefinedModel
+		newInitializer = newUserDefinedModel
+		newDesignAccessor = newUserDefinedModel
+	}
+
+	extension.RegisterModel(newModel)
+	extension.RegisterDesignAccessor(newDesignAccessor)
+
+	initializerList := []extension.Initializer{newInitializer}
+	modelList := []extension.Model{newModel}
 
 	if _, err := extension.SetupModel(db, initializerList, modelList); err != nil {
 		return nil, err
