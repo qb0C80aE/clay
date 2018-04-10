@@ -351,7 +351,17 @@ func (receiver *BaseController) GetMulti(c *gin.Context) {
 		// 1.0.0 <= this version < 2.0.0 !!
 	}
 
-	receiver.outputHandler.OutputGetMulti(c, http.StatusOK, result, total, fields)
+	_, first := c.GetQuery("first")
+	if first {
+		resultValue := reflect.ValueOf(result)
+		if resultValue.Len() == 0 {
+			receiver.outputHandler.OutputError(c, http.StatusBadRequest, errors.New("no records retrieved"))
+		} else {
+			receiver.outputHandler.OutputGetSingle(c, http.StatusOK, reflect.ValueOf(result).Index(0).Interface(), fields)
+		}
+	} else {
+		receiver.outputHandler.OutputGetMulti(c, http.StatusOK, result, total, fields)
+	}
 }
 
 // Create corresponds HTTP POST message and handles a request for multi resource to create a new information
