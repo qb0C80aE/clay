@@ -12,7 +12,6 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
-	"github.com/qb0C80aE/clay/model"
 	"github.com/qb0C80aE/clay/version"
 	"io/ioutil"
 	"net/http"
@@ -45,70 +44,104 @@ func CreateController(actualController extension.Controller, model extension.Mod
 	return actualController
 }
 
-// Bind binds input data to model instance
-func (receiver *BaseController) Bind(c *gin.Context, container interface{}) error {
-	if err := c.Bind(container); err != nil {
-		logging.Logger().Debug(err.Error())
-		return err
-	}
-	if c.Request.ParseMultipartForm(1024*1024) == nil {
-		files := c.Request.MultipartForm.File
-		for name := range files {
-			buffer := &bytes.Buffer{}
-			file, _, err := c.Request.FormFile(name)
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return err
-			}
+// Bind binds input data to a container instance
+func (receiver *BaseController) Bind(c *gin.Context, resourceName string) (interface{}, error) {
+	preloadedBody := c.MustGet("PreloadedBody").([]byte)
 
-			data, err := ioutil.ReadAll(file)
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return err
-			}
+	switch c.ContentType() {
+	case "application/json":
+		inputMap := map[string]interface{}{}
+		if err := json.Unmarshal(preloadedBody, &inputMap); err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
 
-			_, err = buffer.Write(data)
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return err
-			}
+		container, err := extension.CreateInputContainerByResourceName(resourceName, inputMap)
+		if err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
 
-			vs := reflect.ValueOf(container)
-			for vs.Kind() == reflect.Ptr {
-				vs = vs.Elem()
-			}
-			if !vs.IsValid() {
-				logging.Logger().Debug("invalid model")
-				return errors.New("invalid model")
-			}
-			if !vs.CanInterface() {
-				logging.Logger().Debug("invalid model")
-				return errors.New("invalid model")
-			}
-			value := vs.Interface()
+		if err := c.Bind(container); err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
 
-			t := reflect.TypeOf(value)
-			for i := 0; i < t.NumField(); i++ {
-				field := t.Field(i)
-				jsonTag := field.Tag.Get("json")
-				formTag := field.Tag.Get("form")
-				if jsonTag == name || formTag == name {
-					if field.Type.Kind() == reflect.String {
-						vs.FieldByName(field.Name).SetString(buffer.String())
-						break
-					} else if field.Type.Kind() == reflect.Slice {
-						vs.FieldByName(field.Name).SetBytes(buffer.Bytes())
-						break
-					} else {
-						logging.Logger().Debug("invalid field definition, the field must be string or slice of bytes")
-						return errors.New("invalid field definition, the field must be string or slice of bytes")
+		return container, nil
+	case "multipart/form-data":
+		inputMap := map[string]interface{}{}
+		container, err := extension.CreateInputContainerByResourceName(resourceName, inputMap)
+		if err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
+
+		if err := c.Bind(container); err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
+
+		if c.Request.ParseMultipartForm(1024*1024) == nil {
+			files := c.Request.MultipartForm.File
+			for name := range files {
+				buffer := &bytes.Buffer{}
+				file, _, err := c.Request.FormFile(name)
+				if err != nil {
+					logging.Logger().Debug(err.Error())
+					return nil, err
+				}
+
+				data, err := ioutil.ReadAll(file)
+				if err != nil {
+					logging.Logger().Debug(err.Error())
+					return nil, err
+				}
+
+				_, err = buffer.Write(data)
+				if err != nil {
+					logging.Logger().Debug(err.Error())
+					return nil, err
+				}
+
+				vs := reflect.ValueOf(container)
+				for vs.Kind() == reflect.Ptr {
+					vs = vs.Elem()
+				}
+				if !vs.IsValid() {
+					logging.Logger().Debug("invalid model")
+					return nil, errors.New("invalid model")
+				}
+				if !vs.CanInterface() {
+					logging.Logger().Debug("invalid model")
+					return nil, errors.New("invalid model")
+				}
+				value := vs.Interface()
+
+				t := reflect.TypeOf(value)
+				for i := 0; i < t.NumField(); i++ {
+					field := t.Field(i)
+					jsonTag := field.Tag.Get("json")
+					formTag := field.Tag.Get("form")
+					if jsonTag == name || formTag == name {
+						if field.Type.Kind() == reflect.String {
+							vs.FieldByName(field.Name).SetString(buffer.String())
+							break
+						} else if field.Type.Kind() == reflect.Slice {
+							vs.FieldByName(field.Name).SetBytes(buffer.Bytes())
+							break
+						} else {
+							logging.Logger().Debug("invalid field definition, the field must be string or slice of bytes")
+							return nil, errors.New("invalid field definition, the field must be string or slice of bytes")
+						}
 					}
 				}
-			}
 
+			}
 		}
+		return container, nil
 	}
-	return nil
+
+	return nil, fmt.Errorf("Content-Type %s is not supported", c.ContentType())
 }
 
 // GetModel returns its model
@@ -116,19 +149,34 @@ func (receiver *BaseController) GetModel() extension.Model {
 	return receiver.model
 }
 
-// GetResourceName returns its resource name in REST
-func (receiver *BaseController) GetResourceName() string {
-	return extension.GetAssociateResourceNameWithModel(receiver.model)
+// GetResourceName returns its resource/table name in REST/DB
+func (receiver *BaseController) GetResourceName() (string, error) {
+	return extension.GetAssociatedResourceNameWithModel(receiver.model)
 }
 
 // GetResourceSingleURL builds a resource url what represents a single resource based on the argument
-func (receiver *BaseController) GetResourceSingleURL() string {
-	return fmt.Sprintf("%s/:id", receiver.GetResourceName())
+func (receiver *BaseController) GetResourceSingleURL() (string, error) {
+	resourceName, err := receiver.GetResourceName()
+	if err != nil {
+		return "", err
+	}
+
+	modelKey, err := extension.GetRegisteredModelKey(receiver.model)
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%s/:%s", resourceName, modelKey.KeyParameter), nil
 }
 
 // GetResourceMultiURL builds a resource url what represents multi resources based on the argument
-func (receiver *BaseController) GetResourceMultiURL() string {
-	return fmt.Sprintf("%s", receiver.GetResourceName())
+func (receiver *BaseController) GetResourceMultiURL() (string, error) {
+	resourceName, err := receiver.GetResourceName()
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%s", resourceName), nil
 }
 
 // OutputError handles an error output
@@ -140,7 +188,11 @@ func (receiver *BaseController) OutputError(c *gin.Context, code int, err error)
 func (receiver *BaseController) OutputGetSingle(c *gin.Context, code int, result interface{}, fields map[string]interface{}) {
 	_, allFieldExists := fields["*"]
 	if (fields == nil) || ((len(fields) == 1) && allFieldExists) {
-		c.JSON(code, result)
+		if _, ok := c.GetQuery("pretty"); ok {
+			c.IndentedJSON(code, result)
+		} else {
+			c.JSON(code, result)
+		}
 	} else {
 		fieldMap, err := helper.FieldToMap(result, fields)
 		if err != nil {
@@ -162,7 +214,11 @@ func (receiver *BaseController) OutputGetMulti(c *gin.Context, code int, result 
 	c.Header("Total", strconv.Itoa(total))
 	_, allFieldExists := fields["*"]
 	if (fields == nil) || ((len(fields) == 1) && allFieldExists) {
-		c.JSON(code, result)
+		if _, ok := c.GetQuery("pretty"); ok {
+			c.IndentedJSON(code, result)
+		} else {
+			c.JSON(code, result)
+		}
 	} else {
 		v := reflect.ValueOf(result)
 
@@ -284,7 +340,7 @@ func (receiver *BaseController) GetSingle(c *gin.Context) {
 	fields := helper.ParseFields(c.DefaultQuery("fields", "*"))
 	queryFields := helper.QueryFields(receiver.model, fields)
 
-	result, err := receiver.model.GetSingle(db, c.Params, c.Request.URL.Query(), queryFields)
+	result, err := receiver.model.GetSingle(receiver.model, db, c.Params, c.Request.URL.Query(), queryFields)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		receiver.outputHandler.OutputError(c, http.StatusNotFound, err)
@@ -329,7 +385,7 @@ func (receiver *BaseController) GetMulti(c *gin.Context) {
 	fields := helper.ParseFields(c.DefaultQuery("fields", "*"))
 	queryFields := helper.QueryFields(receiver.model, fields)
 
-	result, err := receiver.model.GetMulti(db, c.Params, c.Request.URL.Query(), queryFields)
+	result, err := receiver.model.GetMulti(receiver.model, db, c.Params, c.Request.URL.Query(), queryFields)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
@@ -339,7 +395,7 @@ func (receiver *BaseController) GetMulti(c *gin.Context) {
 	// reset conditions
 	db = db.New()
 
-	total, err := receiver.model.GetTotal(db)
+	total, err := receiver.model.GetTotal(receiver.model, db)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
@@ -373,20 +429,25 @@ func (receiver *BaseController) Create(c *gin.Context) {
 		return
 	}
 
-	container := receiver.model.New()
-
-	if err := receiver.binder.Bind(c, container); err != nil {
+	resourceName, err := receiver.model.GetResourceName(receiver.model)
+	if err != nil {
 		logging.Logger().Debug(err.Error())
 		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
-	model := model.ConvertContainerToModel(container)
+	container, err := receiver.binder.Bind(c, resourceName)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
+		return
+	}
 
 	db := dbpkg.Instance(c)
 
 	tx := db.Begin()
-	result, err := receiver.model.Create(tx, c.Params, c.Request.URL.Query(), model)
+
+	result, err := receiver.model.Create(receiver.model, tx, c.Params, c.Request.URL.Query(), container)
 	if err != nil {
 		tx.Rollback()
 		logging.Logger().Debug(err.Error())
@@ -413,20 +474,24 @@ func (receiver *BaseController) Update(c *gin.Context) {
 		return
 	}
 
-	container := receiver.model.New()
-
-	if err := receiver.binder.Bind(c, container); err != nil {
+	resourceName, err := receiver.model.GetResourceName(receiver.model)
+	if err != nil {
 		logging.Logger().Debug(err.Error())
 		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
-	model := model.ConvertContainerToModel(container)
+	container, err := receiver.binder.Bind(c, resourceName)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
+		return
+	}
 
 	db := dbpkg.Instance(c)
 
 	tx := db.Begin()
-	result, err := receiver.model.Update(tx, c.Params, c.Request.URL.Query(), model)
+	result, err := receiver.model.Update(receiver.model, tx, c.Params, c.Request.URL.Query(), container)
 	if err != nil {
 		tx.Rollback()
 		logging.Logger().Debug(err.Error())
@@ -456,7 +521,7 @@ func (receiver *BaseController) Delete(c *gin.Context) {
 	db := dbpkg.Instance(c)
 
 	tx := db.Begin()
-	err = receiver.model.Delete(tx, c.Params, c.Request.URL.Query())
+	err = receiver.model.Delete(receiver.model, tx, c.Params, c.Request.URL.Query())
 	if err != nil {
 		tx.Rollback()
 		logging.Logger().Debug(err.Error())
@@ -483,12 +548,24 @@ func (receiver *BaseController) Patch(c *gin.Context) {
 		return
 	}
 
-	model := receiver.model.New()
+	resourceName, err := receiver.model.GetResourceName(receiver.model)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
+		return
+	}
+
+	container, err := receiver.binder.Bind(c, resourceName)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
+		return
+	}
 
 	db := dbpkg.Instance(c)
 
 	tx := db.Begin()
-	result, err := receiver.model.Patch(tx, c.Params, c.Request.URL.Query(), model)
+	result, err := receiver.model.Patch(receiver.model, tx, c.Params, c.Request.URL.Query(), container)
 	if err != nil {
 		tx.Rollback()
 		logging.Logger().Debug(err.Error())
@@ -518,7 +595,7 @@ func (receiver *BaseController) GetOptions(c *gin.Context) {
 	db := dbpkg.Instance(c)
 
 	tx := db.Begin()
-	err = receiver.model.GetOptions(tx, c.Params, c.Request.URL.Query())
+	err = receiver.model.GetOptions(receiver.model, tx, c.Params, c.Request.URL.Query())
 	if err != nil {
 		tx.Rollback()
 		logging.Logger().Debug(err.Error())
@@ -534,6 +611,11 @@ func (receiver *BaseController) GetOptions(c *gin.Context) {
 	}
 
 	receiver.outputHandler.OutputGetOptions(c, http.StatusNoContent)
+}
+
+// DoBeforeDBMigration execute initialization process before DB migration
+func (receiver *BaseController) DoBeforeDBMigration(_ *gorm.DB) error {
+	return nil
 }
 
 // DoAfterDBMigration execute initialization process after DB migration

@@ -5,9 +5,15 @@ package integration
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
-	"github.com/qb0C80aE/clay/db"
-	"github.com/qb0C80aE/clay/server"
+	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
+	dbpkg "github.com/qb0C80aE/clay/db"
+	"github.com/qb0C80aE/clay/extension"
+	"github.com/qb0C80aE/clay/logging"
+	"github.com/qb0C80aE/clay/middleware"
+	"github.com/qb0C80aE/clay/router"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -17,6 +23,9 @@ import (
 )
 
 const timeout = 15
+
+var engine *gin.Engine
+var database *gorm.DB
 
 // EmptyArrayString represents an empty JSON array in string type
 var EmptyArrayString = []byte("[]")
@@ -65,11 +74,93 @@ func GenerateSingleResourceURL(ts *httptest.Server, resource string, id string, 
 	return url
 }
 
+func setDBtoContext() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Set("DB", database)
+		c.Next()
+	}
+}
+
+func doAutoMigrationOnly(db *gorm.DB, initializerList []extension.Initializer, modelList []extension.Model) *gorm.DB {
+	db.Exec("pragma foreign_keys = on")
+
+	containerToBeMigratedList := []interface{}{}
+	for _, model := range modelList {
+		container, err := model.GetContainerForMigration()
+		if err != nil {
+			logging.Logger().Critical(err.Error())
+			panic(err)
+		}
+
+		if container != nil {
+			containerType := extension.InspectActualElementType(container)
+			_, exists := containerType.FieldByName("StructMetaInformation")
+			if !exists {
+				logging.Logger().Critical("the container does not have StructMetaInformation field, it might not be a container")
+				panic(errors.New("the container does not have StructMetaInformation field, it might not be a container"))
+			}
+			containerToBeMigratedList = append(containerToBeMigratedList, container)
+		}
+	}
+
+	if err := db.AutoMigrate(containerToBeMigratedList...).Error; err != nil {
+		logging.Logger().Critical(err.Error())
+		panic(err)
+	}
+
+	db.Exec("pragma foreign_keys = off;")
+
+	tx := db.Begin()
+	for _, initializer := range initializerList {
+		err := initializer.DoAfterDBMigration(tx)
+		if err != nil {
+			tx.Rollback()
+			logging.Logger().Critical(err.Error())
+			panic(err)
+		}
+	}
+	tx.Commit()
+
+	db.Exec("pragma foreign_keys = on;")
+
+	return db
+}
+
 // SetupServer setups server for integration tests
 func SetupServer() *httptest.Server {
-	database := db.Connect("memory")
-	s := server.Setup(database)
-	return httptest.NewServer(s)
+	// Initialize DB every test goes
+	newDatabase, err := dbpkg.Connect("memory")
+	if err != nil {
+		panic(err)
+	}
+	database = newDatabase
+
+	// Setup engine once when the first test goes
+	initializerList := extension.GetRegisteredInitializerList()
+	modelList := extension.GetRegisteredModelList()
+	if engine == nil {
+		// run SetupModel once
+		database, err = extension.SetupModel(database, initializerList, modelList)
+		if err != nil {
+			panic(err)
+		}
+
+		// setup engine once, but make engine use new DB
+		engine = gin.Default()
+		engine.Use(setDBtoContext())
+		engine.Use(middleware.PreloadBody())
+		if err := router.Setup(engine); err != nil {
+			panic(err)
+		}
+	} else {
+		// never run SetupModel again, but do auto-migration only
+		doAutoMigrationOnly(database, initializerList, modelList)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	return httptest.NewServer(engine)
 }
 
 // Execute send a HTTP request to the test server and receive a response

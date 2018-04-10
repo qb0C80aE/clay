@@ -1,7 +1,7 @@
 {
-  "description": "test1desc",
   "id": 101,
   "name": "test1Updated",
-  "template_arguments": [],
-  "template_content": "TestTemplate1Updated"
+  "template_content": "TestTemplate1Updated",
+  "description": "test1desc",
+  "template_arguments": []
 }

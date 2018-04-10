@@ -39,12 +39,19 @@ type Command struct {
 	Cmd              *exec.Cmd `json:"cmd,omitempty"`
 }
 
-// GetSingle corresponds HTTP GET message and handles a request for a single resource to get the information
-func (receiver *Command) GetSingle(db *gorm.DB, parameters gin.Params, _ url.Values, queryFields string) (interface{}, error) {
-	id, _ := strconv.Atoi(parameters.ByName("id"))
+// NewCommand creates a command model instance
+func NewCommand() *Command {
+	return &Command{}
+}
 
-	commandIDCommandMapMutex.Lock()
-	defer commandIDCommandMapMutex.Unlock()
+// GetContainerForMigration returns its container for migration, if no need to be migrated, just return null
+func (receiver *Command) GetContainerForMigration() (interface{}, error) {
+	return nil, nil
+}
+
+// GetSingle corresponds HTTP GET message and handles a request for a single resource to get the information
+func (receiver *Command) GetSingle(_ extension.Model, db *gorm.DB, parameters gin.Params, _ url.Values, queryFields string) (interface{}, error) {
+	id, _ := strconv.Atoi(parameters.ByName("id"))
 
 	result, exists := commandIDCommandMap[id]
 
@@ -56,7 +63,7 @@ func (receiver *Command) GetSingle(db *gorm.DB, parameters gin.Params, _ url.Val
 }
 
 // GetMulti corresponds HTTP GET message and handles a request for multi resource to get the list of information
-func (receiver *Command) GetMulti(db *gorm.DB, _ gin.Params, _ url.Values, queryFields string) (interface{}, error) {
+func (receiver *Command) GetMulti(_ extension.Model, db *gorm.DB, _ gin.Params, _ url.Values, queryFields string) (interface{}, error) {
 	commandIDCommandMapMutex.Lock()
 	defer commandIDCommandMapMutex.Unlock()
 
@@ -77,8 +84,11 @@ func (receiver *Command) GetMulti(db *gorm.DB, _ gin.Params, _ url.Values, query
 }
 
 // Create corresponds HTTP POST message and handles a request for multi resource to create a new information
-func (receiver *Command) Create(db *gorm.DB, _ gin.Params, _ url.Values, input extension.Model) (interface{}, error) {
-	command := input.(*Command)
+func (receiver *Command) Create(_ extension.Model, db *gorm.DB, _ gin.Params, _ url.Values, inputContainer interface{}) (interface{}, error) {
+	command := NewCommand()
+	if err := extension.ConvertInputMapToContainer(inputContainer, command); err != nil {
+		return nil, err
+	}
 
 	if len(command.WorkingDirectory) == 0 {
 		var err error
@@ -100,7 +110,7 @@ func (receiver *Command) Create(db *gorm.DB, _ gin.Params, _ url.Values, input e
 }
 
 // Delete corresponds HTTP DELETE message and handles a request for a single resource to delete the specific information
-func (receiver *Command) Delete(db *gorm.DB, parameters gin.Params, _ url.Values) error {
+func (receiver *Command) Delete(_ extension.Model, db *gorm.DB, parameters gin.Params, _ url.Values) error {
 	id, _ := strconv.Atoi(parameters.ByName("id"))
 
 	commandIDCommandMapMutex.Lock()
@@ -123,15 +133,10 @@ func (receiver *Command) Delete(db *gorm.DB, parameters gin.Params, _ url.Values
 }
 
 // GetTotal returns the count of for multi resource
-func (receiver *Command) GetTotal(_ *gorm.DB) (int, error) {
+func (receiver *Command) GetTotal(_ extension.Model, _ *gorm.DB) (int, error) {
 	return len(commandIDCommandMap), nil
 }
 
-// NewCommand creates a command model instance
-func NewCommand() *Command {
-	return ConvertContainerToModel(&Command{}).(*Command)
-}
-
 func init() {
-	extension.RegisterModel(NewCommand(), false)
+	extension.RegisterModel(NewCommand())
 }

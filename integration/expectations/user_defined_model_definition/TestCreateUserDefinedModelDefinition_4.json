@@ -1,0 +1,80 @@
+[
+  {
+    "type_name": "Node",
+    "resource_name": "nodes",
+    "to_be_migrated": true,
+    "is_controller_enabled": true,
+    "sql_before_migration": "",
+    "sql_after_migration": "",
+    "sql_design_extraction": "",
+    "sql_design_deletion": "",
+    "fields": [
+      {
+        "name": "ID",
+        "tag": "json:\"id\" gorm:\"primary_key;auto_increment\"",
+        "type_name": "int",
+        "is_slice": false
+      },
+      {
+        "name": "Name",
+        "tag": "json:\"name\" gorm:\"unique\"",
+        "type_name": "string",
+        "is_slice": false
+      },
+      {
+        "name": "NodeChildren",
+        "tag": "json:\"node_children\" gorm:\"ForeignKey:NodeID\"",
+        "type_name": "Node",
+        "is_slice": true
+      }
+    ]
+  },
+  {
+    "type_name": "NodeAttribute",
+    "resource_name": "node_attributes",
+    "to_be_migrated": true,
+    "is_controller_enabled": true,
+    "sql_before_migration": "",
+    "sql_after_migration": "",
+    "sql_design_extraction": "",
+    "sql_design_deletion": "",
+    "fields": [
+      {
+        "name": "ID",
+        "tag": "json:\"id\" gorm:\"primary_key;auto_increment\"",
+        "type_name": "int",
+        "is_slice": false
+      },
+      {
+        "name": "Name",
+        "tag": "json:\"name\" gorm:\"unique\"",
+        "type_name": "string",
+        "is_slice": false
+      },
+      {
+        "name": "NodeID",
+        "tag": "json:\"node_id\" sql:\"type:integer references nodes(id)\"",
+        "type_name": "int",
+        "is_slice": false
+      },
+      {
+        "name": "Node",
+        "tag": "json:\"node\" gorm:\"ForeignKey:NodeID\"",
+        "type_name": "Node",
+        "is_slice": false
+      },
+      {
+        "name": "TemplateID",
+        "tag": "json:\"template_id\" sql:\"type:integer references templates(id)\" binding:\"required,min=1,max=100\"",
+        "type_name": "int",
+        "is_slice": false
+      },
+      {
+        "name": "Template",
+        "tag": "json:\"template\" gorm:\"ForeignKey:TemplateID\"",
+        "type_name": "Template",
+        "is_slice": false
+      }
+    ]
+  }
+]

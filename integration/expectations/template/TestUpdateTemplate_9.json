@@ -1,35 +1,38 @@
 [
   {
-    "description": "test1desc",
     "id": 101,
     "name": "test1Updated",
-    "template_arguments": [],
-    "template_content": "TestTemplate1Updated"
+    "template_content": "TestTemplate1Updated",
+    "description": "test1desc",
+    "template_arguments": []
   },
   {
-    "description": "test2desc",
     "id": 102,
     "name": "test2",
+    "template_content": "TestTemplate2",
+    "description": "test2desc",
     "template_arguments": [
       {
         "id": 1,
         "template_id": 102,
+        "template": null,
         "name": "testParameter21",
         "description": "testParameter21desc",
         "type": 4,
         "default_value": "TestParameter21"
       }
-    ],
-    "template_content": "TestTemplate2"
+    ]
   },
   {
-    "description": "test3desc",
     "id": 103,
     "name": "test3",
+    "template_content": "TestTemplate3",
+    "description": "test3desc",
     "template_arguments": [
       {
         "id": 1001,
         "template_id": 103,
+        "template": null,
         "name": "testParameter32Updated",
         "description": "testParameter32descUpdated",
         "type": 1,
@@ -38,22 +41,24 @@
       {
         "id": 1002,
         "template_id": 103,
+        "template": null,
         "name": "testParameter34",
         "description": "",
         "type": 4,
         "default_value": "TestParameter34"
       }
-    ],
-    "template_content": "TestTemplate3"
+    ]
   },
   {
-    "description": "test4desc",
     "id": 104,
     "name": "test4",
+    "template_content": "TestTemplate4",
+    "description": "test4desc",
     "template_arguments": [
       {
         "id": 2001,
         "template_id": 104,
+        "template": null,
         "name": "testParameter42",
         "description": "testParameter42desc",
         "type": 4,
@@ -62,6 +67,7 @@
       {
         "id": 2003,
         "template_id": 104,
+        "template": null,
         "name": "testParameter44",
         "description": "testParameter44desc",
         "type": 4,
@@ -70,12 +76,12 @@
       {
         "id": 2004,
         "template_id": 104,
+        "template": null,
         "name": "testParameter45",
         "description": "testParameter45desc",
         "type": 4,
         "default_value": "TestParameter45"
       }
-    ],
-    "template_content": "TestTemplate4"
+    ]
   }
 ]

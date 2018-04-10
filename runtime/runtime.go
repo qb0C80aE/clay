@@ -5,11 +5,12 @@ import (
 	"strconv"
 
 	"fmt"
+	"github.com/gin-gonic/gin"
 	_ "github.com/qb0C80aE/clay/buildtime" // Include program information
-	"github.com/qb0C80aE/clay/db"
+	dbpkg "github.com/qb0C80aE/clay/db"
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
-	"github.com/qb0C80aE/clay/server"
+	serverpkg "github.com/qb0C80aE/clay/server"
 )
 
 type clayRuntime struct {
@@ -30,10 +31,32 @@ func (clayRuntime *clayRuntime) Run() {
 	}
 
 	dbMode := os.Getenv("DB_MODE")
-	database := db.Connect(dbMode)
-	s := server.Setup(database)
+	db, err := dbpkg.Connect(dbMode)
+	if err != nil {
+		logging.Logger().Critical(err.Error())
+		os.Exit(1)
+	}
 
-	if err := s.Run(fmt.Sprintf("%s:%s", host, port)); err != nil {
+	// Caution: Even if you input the inconsistent data like foreign keys do not exist,
+	//          it will be registered, and never be checked this time.
+	//          Todo: It requires order resolution logic like "depends on" between models.
+	initializerList := extension.GetRegisteredInitializerList()
+	modelList := extension.GetRegisteredModelList()
+
+	db, err = extension.SetupModel(db, initializerList, modelList)
+	if err != nil {
+		logging.Logger().Critical(err.Error())
+		os.Exit(1)
+	}
+
+	engine := gin.Default()
+	server, err := serverpkg.Setup(engine, db)
+	if err != nil {
+		logging.Logger().Criticalf("failed to start: %s", err)
+		os.Exit(1)
+	}
+
+	if err := server.Run(fmt.Sprintf("%s:%s", host, port)); err != nil {
 		logging.Logger().Criticalf("failed to start: %s", err)
 		os.Exit(1)
 	}

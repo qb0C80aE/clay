@@ -18,6 +18,7 @@ type regExpControllerPair struct {
 
 var controllerList = []Controller{}
 var pathControllerMap = map[string]*regExpControllerPair{}
+var routerGroupMap = map[string]*gin.RouterGroup{}
 
 // MethodSomething integer constants are used as the key value of HTTP methods in maps
 const (
@@ -42,22 +43,22 @@ var methodStringMap = map[int]string{
 
 // Controller is the interface what is mapped into specific urls and handles the requests from HTTP clients
 // * GetModel returns its model
-// * GetResourceName returns its resource name in REST
+// * GetResourceName returns its resource/table name in REST/DB
 // * GetResourceSingleURL builds a resource url what represents a single resource based on the argument
 // * GetResourceMultiURL builds a resource url what represents multi resources based on the argument
 // * GetRouteMap returns the map its key is resource url and its value is request handler of the controller
 type Controller interface {
 	GetModel() Model
-	GetResourceName() string
-	GetResourceSingleURL() string
-	GetResourceMultiURL() string
+	GetResourceName() (string, error)
+	GetResourceSingleURL() (string, error)
+	GetResourceMultiURL() (string, error)
 	GetRouteMap() map[int]map[int]gin.HandlerFunc
 }
 
 // Binder is the interface what handles binding of input data
-// * Bind binds input data to model instance
+// * Bind binds input data to a container instance
 type Binder interface {
-	Bind(c *gin.Context, container interface{}) error
+	Bind(c *gin.Context, resourceName string) (interface{}, error)
 }
 
 // QueryCustomizer is the interface what handles query parameters used as Parameter struct in GetSingle and GetMulti
@@ -147,4 +148,74 @@ func GetAssociatedControllerWithPath(path string) (Controller, error) {
 	}
 	logging.Logger().Critical("no controller is associated with %s", path)
 	return nil, fmt.Errorf("no controller is associated with %s", path)
+}
+
+// RegisterRouterGroup registers a router group with a relative pth
+func RegisterRouterGroup(relativePath string, routerGroup *gin.RouterGroup) error {
+	if _, exists := routerGroupMap[relativePath]; exists {
+		return fmt.Errorf("relative path %s is already registered", relativePath)
+	}
+
+	routerGroupMap[relativePath] = routerGroup
+
+	return nil
+}
+
+// GetRegisteredRouterGroup returns a router group related to given path
+func GetRegisteredRouterGroup(relativePath string) (*gin.RouterGroup, error) {
+	routerGroup, exists := routerGroupMap[relativePath]
+	if !exists {
+		return nil, fmt.Errorf("relative path %s is not registered yet", relativePath)
+	}
+
+	return routerGroup, nil
+}
+
+// SetupController setups controllers
+func SetupController(relativePath string, controllerList []Controller) error {
+	routerGroup, err := GetRegisteredRouterGroup(relativePath)
+	if err != nil {
+		return err
+	}
+
+	methodFunctionMap := map[int]func(string, ...gin.HandlerFunc) gin.IRoutes{
+		MethodGet:     routerGroup.GET,
+		MethodPost:    routerGroup.POST,
+		MethodPut:     routerGroup.PUT,
+		MethodDelete:  routerGroup.DELETE,
+		MethodPatch:   routerGroup.PATCH,
+		MethodOptions: routerGroup.OPTIONS,
+	}
+
+	for _, controller := range controllerList {
+		routeMap := controller.GetRouteMap()
+		for method, routingFunction := range methodFunctionMap {
+			routeList := routeMap[method]
+			for pathType, handlerFunc := range routeList {
+				switch pathType {
+				case URLSingle:
+					resourceSingleURL, err := controller.GetResourceSingleURL()
+					if err != nil {
+						logging.Logger().Critical(err.Error())
+						return err
+					}
+					routingFunction(resourceSingleURL, handlerFunc)
+					AssociateControllerWithPath(resourceSingleURL, controller)
+				case URLMulti:
+					resourceMultiURL, err := controller.GetResourceMultiURL()
+					if err != nil {
+						logging.Logger().Critical(err.Error())
+						return err
+					}
+					routingFunction(resourceMultiURL, handlerFunc)
+					AssociateControllerWithPath(resourceMultiURL, controller)
+				default:
+					logging.Logger().Criticalf("invalid url type: %d", pathType)
+					return err
+				}
+			}
+		}
+	}
+
+	return nil
 }

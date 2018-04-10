@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/qb0C80aE/clay/extension"
+	"github.com/qb0C80aE/clay/logging"
 	"github.com/qb0C80aE/clay/model"
 )
 
@@ -15,9 +16,13 @@ func newCommandExecutionController() *commandExecutionController {
 	return CreateController(&commandExecutionController{}, model.NewCommandExecution()).(*commandExecutionController)
 }
 
-func (receiver *commandExecutionController) GetResourceSingleURL() string {
-	commandResourceName := extension.GetAssociateResourceNameWithModel(model.NewCommand())
-	return fmt.Sprintf("%s/:id/execution", commandResourceName)
+func (receiver *commandExecutionController) GetResourceSingleURL() (string, error) {
+	commandResourceName, err := extension.GetAssociatedResourceNameWithModel(model.NewCommand())
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return "", err
+	}
+	return fmt.Sprintf("%s/:id/execution", commandResourceName), nil
 }
 
 func (receiver *commandExecutionController) GetRouteMap() map[int]map[int]gin.HandlerFunc {

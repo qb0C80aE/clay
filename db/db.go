@@ -13,8 +13,32 @@ import (
 	"github.com/serenize/snaker"
 )
 
+func defaultTableNameHandler(db *gorm.DB, defaultTableName string) string {
+	if db.Value == nil {
+		return defaultTableName
+	}
+
+	model, err := extension.GetRegisteredModelByContainer(db.Value)
+	if err != nil {
+		if len(defaultTableName) > 0 {
+			return defaultTableName
+		}
+
+		logging.Logger().Critical(err.Error())
+		panic(err)
+	}
+
+	resourceName, err := model.GetResourceName(model)
+	if err != nil {
+		logging.Logger().Critical(err.Error())
+		panic(err)
+	}
+
+	return resourceName
+}
+
 // Connect connects to its database and returns the instance
-func Connect(dbMode string) *gorm.DB {
+func Connect(dbMode string) (*gorm.DB, error) {
 	var dbPath string
 	switch dbMode {
 	case "memory":
@@ -27,54 +51,23 @@ func Connect(dbMode string) *gorm.DB {
 		}
 	default:
 		logging.Logger().Criticalf("invalid DB_MODE '%s'", dbMode)
-		os.Exit(1)
+		return nil, fmt.Errorf("invalid DB_MODE '%s'", dbMode)
 	}
 
 	db, err := gorm.Open("sqlite3", dbPath)
 
 	if err != nil {
 		logging.Logger().Criticalf("got an error when connect to the database, the error is '%v'", err)
-		os.Exit(1)
+		return nil, fmt.Errorf("got an error when connect to the database, the error is '%v'", err)
 	}
 
 	if gin.IsDebugging() {
 		db.LogMode(true)
 	}
 
-	db.Exec("pragma foreign_keys = on")
+	gorm.DefaultTableNameHandler = defaultTableNameHandler
 
-	registeredModelsToBeMigrated := extension.GetRegisteredModelToBeMigratedList()
-	if err := db.AutoMigrate(registeredModelsToBeMigrated...).Error; err != nil {
-		logging.Logger().Criticalf("AutoMigration failed: '%s'", err.Error())
-		os.Exit(1)
-	}
-
-	modelList := extension.GetRegisteredModelList()
-	for _, model := range modelList {
-		tableName := db.NewScope(model).TableName()
-		extension.AssociateResourceNameWithModel(tableName, model)
-	}
-
-	initializerList := extension.GetRegisteredInitializerList()
-	// Caution: Even if you input the inconsistent data like foreign keys do not exist,
-	//          it will be registered, and never be checked this time.
-	//          Todo: It requires order resolution logic like "depends on" between models.
-	db.Exec("pragma foreign_keys = off;")
-
-	tx := db.Begin()
-	for _, initializer := range initializerList {
-		err := initializer.DoAfterDBMigration(tx)
-		if err != nil {
-			tx.Rollback()
-			logging.Logger().Criticalf("failed to run the initial data loader: %s", err)
-			os.Exit(1)
-		}
-	}
-	tx.Commit()
-
-	db.Exec("pragma foreign_keys = on;")
-
-	return db
+	return db, nil
 }
 
 // Instance returns the connected db instance

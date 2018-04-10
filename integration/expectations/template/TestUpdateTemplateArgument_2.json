@@ -1,8 +1,9 @@
 {
-  "default_value": "999",
-  "description": "testParameter1descUpdated",
   "id": 1,
-  "name": "templateArgument1Updated",
   "template_id": 1,
-  "type": 1
+  "template": null,
+  "name": "templateArgument1Updated",
+  "description": "testParameter1descUpdated",
+  "type": 1,
+  "default_value": "999"
 }

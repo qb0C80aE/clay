@@ -1,18 +1,20 @@
 [
   {
-    "default_value": "123",
-    "description": "testParameter1desc",
     "id": 1,
-    "name": "testParameter1",
     "template_id": 1,
-    "type": 1
+    "template": null,
+    "name": "testParameter1",
+    "description": "testParameter1desc",
+    "type": 1,
+    "default_value": "123"
   },
   {
-    "default_value": "456.789",
-    "description": "testParameter2desc",
     "id": 2,
-    "name": "testParameter2",
     "template_id": 1,
-    "type": 2
+    "template": null,
+    "name": "testParameter2",
+    "description": "testParameter2desc",
+    "type": 2,
+    "default_value": "456.789"
   }
 ]

@@ -1,35 +1,38 @@
 [
   {
-    "description": "test1desc",
     "id": 1,
     "name": "test1",
-    "template_arguments": [],
-    "template_content": "TestTemplate1"
+    "template_content": "TestTemplate1",
+    "description": "test1desc",
+    "template_arguments": []
   },
   {
-    "description": "test2desc",
     "id": 2,
     "name": "test2",
+    "template_content": "TestTemplate2",
+    "description": "test2desc",
     "template_arguments": [
       {
         "id": 1,
         "template_id": 2,
+        "template": null,
         "name": "testParameter1",
         "description": "testParameter1desc",
         "type": 4,
         "default_value": "TestParameter1"
       }
-    ],
-    "template_content": "TestTemplate2"
+    ]
   },
   {
-    "description": "test100desc",
     "id": 100,
     "name": "test100",
+    "template_content": "TestTemplate100",
+    "description": "test100desc",
     "template_arguments": [
       {
         "id": 2,
         "template_id": 100,
+        "template": null,
         "name": "testParameter100",
         "description": "testParameter100desc",
         "type": 4,
@@ -38,12 +41,12 @@
       {
         "id": 10,
         "template_id": 100,
+        "template": null,
         "name": "testParameter110",
         "description": "testParameter110desc",
         "type": 4,
         "default_value": "TestParameter110"
       }
-    ],
-    "template_content": "TestTemplate100"
+    ]
   }
 ]

@@ -19,11 +19,16 @@ type Design struct {
 
 // NewDesign creates a design model instance
 func NewDesign() *Design {
-	return ConvertContainerToModel(&Design{}).(*Design)
+	return &Design{}
+}
+
+// GetContainerForMigration returns its container for migration, if no need to be migrated, just return null
+func (receiver *Design) GetContainerForMigration() (interface{}, error) {
+	return nil, nil
 }
 
 // GetSingle returns all models to store into versioning repositories
-func (receiver *Design) GetSingle(db *gorm.DB, _ gin.Params, urlValues url.Values, _ string) (interface{}, error) {
+func (receiver *Design) GetSingle(_ extension.Model, db *gorm.DB, _ gin.Params, urlValues url.Values, _ string) (interface{}, error) {
 	// Reset previous conditions
 	db = db.New()
 
@@ -39,8 +44,9 @@ func (receiver *Design) GetSingle(db *gorm.DB, _ gin.Params, urlValues url.Value
 	}
 
 	designAccessors := extension.GetRegisteredDesignAccessorList()
+
 	for _, accessor := range designAccessors {
-		key, value, err := accessor.ExtractFromDesign(db)
+		key, value, err := accessor.ExtractFromDesign(accessor, db)
 		if err != nil {
 			logging.Logger().Debug(err.Error())
 			return nil, err
@@ -52,18 +58,22 @@ func (receiver *Design) GetSingle(db *gorm.DB, _ gin.Params, urlValues url.Value
 }
 
 // Update deletes and updates all models bases on the given data
-func (receiver *Design) Update(db *gorm.DB, _ gin.Params, _ url.Values, input extension.Model) (interface{}, error) {
-	design := input.(*Design)
+func (receiver *Design) Update(_ extension.Model, db *gorm.DB, _ gin.Params, _ url.Values, inputContainer interface{}) (interface{}, error) {
+	design := NewDesign()
+	if err := extension.ConvertInputMapToContainer(inputContainer, design); err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
 
 	designAccessors := extension.GetRegisteredDesignAccessorList()
 	for _, accessor := range designAccessors {
-		if err := accessor.DeleteFromDesign(db); err != nil {
+		if err := accessor.DeleteFromDesign(accessor, db); err != nil {
 			logging.Logger().Debug(err.Error())
 			return nil, err
 		}
 	}
 	for _, accessor := range designAccessors {
-		if err := accessor.LoadToDesign(db, design); err != nil {
+		if err := accessor.LoadToDesign(accessor, db, design); err != nil {
 			logging.Logger().Debug(err.Error())
 			return nil, err
 		}
@@ -73,10 +83,10 @@ func (receiver *Design) Update(db *gorm.DB, _ gin.Params, _ url.Values, input ex
 }
 
 // Delete deletes all models
-func (receiver *Design) Delete(db *gorm.DB, _ gin.Params, _ url.Values) error {
+func (receiver *Design) Delete(_ extension.Model, db *gorm.DB, _ gin.Params, _ url.Values) error {
 	designAccessors := extension.GetRegisteredDesignAccessorList()
 	for _, accessor := range designAccessors {
-		if err := accessor.DeleteFromDesign(db); err != nil {
+		if err := accessor.DeleteFromDesign(accessor, db); err != nil {
 			logging.Logger().Debug(err.Error())
 			return err
 		}
@@ -86,5 +96,5 @@ func (receiver *Design) Delete(db *gorm.DB, _ gin.Params, _ url.Values) error {
 }
 
 func init() {
-	extension.RegisterModel(NewDesign(), false)
+	extension.RegisterModel(NewDesign())
 }

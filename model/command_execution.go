@@ -22,8 +22,18 @@ type CommandExecution struct {
 	Base
 }
 
+// NewCommandExecution creates a commandExecution model instance
+func NewCommandExecution() *CommandExecution {
+	return &CommandExecution{}
+}
+
+// GetContainerForMigration returns its container for migration, if no need to be migrated, just return null
+func (receiver *CommandExecution) GetContainerForMigration() (interface{}, error) {
+	return nil, nil
+}
+
 // Create corresponds HTTP POST message and handles a request for multi resource to create a new information
-func (receiver *CommandExecution) Create(db *gorm.DB, parameters gin.Params, _ url.Values, _ extension.Model) (interface{}, error) {
+func (receiver *CommandExecution) Create(_ extension.Model, db *gorm.DB, parameters gin.Params, _ url.Values, _ interface{}) (interface{}, error) {
 	id, _ := strconv.Atoi(parameters.ByName("id"))
 
 	commandIDCommandMapMutex.Lock()
@@ -51,7 +61,7 @@ func (receiver *CommandExecution) Create(db *gorm.DB, parameters gin.Params, _ u
 }
 
 // Delete corresponds HTTP DELETE message and handles a request for a single resource to delete the specific information
-func (receiver *CommandExecution) Delete(db *gorm.DB, parameters gin.Params, _ url.Values) error {
+func (receiver *CommandExecution) Delete(_ extension.Model, db *gorm.DB, parameters gin.Params, _ url.Values) error {
 	id, _ := strconv.Atoi(parameters.ByName("id"))
 
 	commandIDCommandMapMutex.Lock()
@@ -160,11 +170,6 @@ func executeCommand(command *Command) {
 	command.FinishedAt = time.Now().String()
 }
 
-// NewCommandExecution creates a commandExecution model instance
-func NewCommandExecution() *CommandExecution {
-	return ConvertContainerToModel(&CommandExecution{}).(*CommandExecution)
-}
-
 func init() {
-	extension.RegisterModel(NewCommandExecution(), false)
+	extension.RegisterModel(NewCommandExecution())
 }

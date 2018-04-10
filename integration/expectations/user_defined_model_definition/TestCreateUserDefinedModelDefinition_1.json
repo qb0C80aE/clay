@@ -1,0 +1,30 @@
+{
+  "type_name": "Node",
+  "resource_name": "nodes",
+  "to_be_migrated": true,
+  "is_controller_enabled": true,
+  "sql_before_migration": "",
+  "sql_after_migration": "",
+  "sql_design_extraction": "",
+  "sql_design_deletion": "",
+  "fields": [
+    {
+      "name": "ID",
+      "tag": "json:\"id\" gorm:\"primary_key;auto_increment\"",
+      "type_name": "int",
+      "is_slice": false
+    },
+    {
+      "name": "Name",
+      "tag": "json:\"name\" gorm:\"unique\"",
+      "type_name": "string",
+      "is_slice": false
+    },
+    {
+      "name": "NodeChildren",
+      "tag": "json:\"node_children\" gorm:\"ForeignKey:NodeID\"",
+      "type_name": "Node",
+      "is_slice": true
+    }
+  ]
+}

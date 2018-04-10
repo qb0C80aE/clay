@@ -1,6 +1,7 @@
 {
   "id": 2,
   "template_id": 1,
+  "template": null,
   "name": "testParameter2",
   "description": "testParameter2desc",
   "type": 2,
