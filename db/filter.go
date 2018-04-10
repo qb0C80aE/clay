@@ -10,7 +10,7 @@ import (
 	"regexp"
 )
 
-var regexNotEquals = regexp.MustCompile(`^!.+$`)
+var regexNotEquals = regexp.MustCompile(`^!.*$`)
 var regexpLike = regexp.MustCompile(`^%.+|.+%$`)
 
 func filterToMap(query url.Values) (map[string]string, map[string]map[string]string) {
@@ -42,7 +42,7 @@ func filterToMap(query url.Values) (map[string]string, map[string]map[string]str
 // FilterFields filters fields
 func (parameter *Parameter) FilterFields(db *gorm.DB) *gorm.DB {
 	for k, v := range parameter.Filters {
-		if (v != "") && !(strings.Contains(k, ".")) {
+		if !(strings.Contains(k, ".")) {
 			columnName := snaker.CamelToSnake(k)
 			switch {
 			case regexpLike.MatchString(v):
