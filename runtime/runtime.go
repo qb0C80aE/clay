@@ -7,7 +7,7 @@ import (
 	"fmt"
 	_ "github.com/qb0C80aE/clay/buildtime" // Include program information
 	"github.com/qb0C80aE/clay/db"
-	"github.com/qb0C80aE/clay/extensions"
+	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
 	"github.com/qb0C80aE/clay/server"
 )
@@ -29,7 +29,8 @@ func (clayRuntime *clayRuntime) Run() {
 		}
 	}
 
-	database := db.Connect()
+	dbMode := os.Getenv("DB_MODE")
+	database := db.Connect(dbMode)
 	s := server.Setup(database)
 
 	if err := s.Run(fmt.Sprintf("%s:%s", host, port)); err != nil {
@@ -40,5 +41,5 @@ func (clayRuntime *clayRuntime) Run() {
 
 func init() {
 	runtime := &clayRuntime{}
-	extensions.RegisterRuntime(runtime)
+	extension.RegisterRuntime(runtime)
 }

@@ -2,50 +2,20 @@
   "content": {
     "template_persistent_parameters": [
       {
-        "default_value_bool": {
-          "Bool": false,
-          "Valid": false
-        },
-        "default_value_float": {
-          "Float64": 0,
-          "Valid": false
-        },
-        "default_value_int": {
-          "Int64": 0,
-          "Valid": false
-        },
-        "default_value_string": {
-          "String": "TestParameter11",
-          "Valid": true
-        },
+        "default_value": "TestParameter11",
         "description": "testParameter11desc",
         "id": 1,
         "name": "testParameter11",
         "template_id": 1,
-        "type": 0
+        "type": 4
       },
       {
-        "default_value_bool": {
-          "Bool": false,
-          "Valid": false
-        },
-        "default_value_float": {
-          "Float64": 0,
-          "Valid": false
-        },
-        "default_value_int": {
-          "Int64": 0,
-          "Valid": false
-        },
-        "default_value_string": {
-          "String": "TestParameter12",
-          "Valid": true
-        },
+        "default_value": "TestParameter12",
         "description": "testParameter12desc",
         "id": 2,
         "name": "testParameter12",
         "template_id": 1,
-        "type": 0
+        "type": 4
       }
     ],
     "templates": [

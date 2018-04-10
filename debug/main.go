@@ -4,10 +4,10 @@
 package main
 
 import (
-	"github.com/qb0C80aE/clay/extensions"
+	"github.com/qb0C80aE/clay/extension"
 	_ "github.com/qb0C80aE/clay/runtime" // Import runtime package to register Clay runtime
 )
 
 func main() {
-	extensions.RegisteredRuntime().Run()
+	extension.GetRegisteredRuntime().Run()
 }

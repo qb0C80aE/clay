@@ -1,6 +1,6 @@
 package buildtime
 
-import "github.com/qb0C80aE/clay/extensions"
+import "github.com/qb0C80aE/clay/extension"
 
 func init() {
 	var programInformation = &clayProgramInformation{
@@ -12,5 +12,5 @@ func init() {
 			},
 		},
 	}
-	extensions.RegisterProgramInformation(programInformation)
+	extension.RegisterProgramInformation(programInformation)
 }
