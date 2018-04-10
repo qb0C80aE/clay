@@ -1,5 +1,5 @@
 language: go
-go: 1.8
+go: "1.10"
 
 notifications:
   email: false
@@ -15,20 +15,20 @@ before_install:
   - go version
 
 install:
-  - go get github.com/Masterminds/glide
+  - go get -u github.com/golang/dep/cmd/dep
   - go get -u github.com/golang/lint/golint
 
 script:
-  - glide install
+  - dep ensure
   - (result="`find . -type d -name vendor -prune -o -type f -name '*.go' -exec golint {} \;`"; if [ ! -z "${result}" ]; then echo "${result}"; exit 1; fi)
-  - go vet -tags="`echo ${TAGS[@]}`" $(glide novendor)
+  - go vet -tags="`echo ${TAGS[@]}`" ./...
   - go generate -tags=prebuild ./...
   - |
     for tag in ${TAGS[@]}; do
-      echo "go build -v -tags=${tag} $(glide novendor)"
-      go build -v -tags=${tag} $(glide novendor)
+      echo "go build -v -tags=${tag} ./..."
+      go build -v -tags=${tag} ./...
     done
   - go build -v
   - sed -i "s/[0-9]\{14\}/unknown/g" buildtime/build_information.go
-  - go test -tags=integration -v -race $(glide novendor)
+  - go test -tags=integration -v -race ./...
 

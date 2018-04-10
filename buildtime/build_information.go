@@ -9,6 +9,7 @@ func init() {
 			{
 				name:     "clay",
 				revision: "built-manually",
+				version:  "built-manually",
 			},
 		},
 	}
