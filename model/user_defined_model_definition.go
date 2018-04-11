@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"reflect"
 	"sort"
+	"strings"
 	"sync"
 )
 
@@ -35,21 +36,16 @@ var typeNameTypeMap = map[string]reflect.Type{
 // UserDefinedModelDefinition is the model class what represents raw template
 type UserDefinedModelDefinition struct {
 	Base
-	TypeName                       string                             `json:"type_name" binding:"required" clay:"key_parameter" `
-	ResourceName                   string                             `json:"resource_name" binding:"required"`
-	ToBeMigrated                   bool                               `json:"to_be_migrated"`
-	IsControllerEnabled            bool                               `json:"is_controller_enabled"`
-	SQLBeforeMigration             string                             `json:"sql_before_migration"`
-	SQLAfterMigration              string                             `json:"sql_after_migration"`
-	SQLDesignExtraction            string                             `json:"sql_design_extraction"`
-	SQLDesignDeletion              string                             `json:"sql_design_deletion"`
-	IsManyToManyAssociation        bool                               `json:"is_many_to_many_association"`
-	ManyToManyLeftResourceName     string                             `json:"many_to_many_left_resource_name"`
-	ManyToManyLeftResourceKeyName  string                             `json:"many_to_many_left_resource_key_name"`
-	ManyToManyRightResourceName    string                             `json:"many_to_many_right_resource_name"`
-	ManyToManyRightResourceKeyName string                             `json:"many_to_many_right_resource_key_name"`
-	Fields                         []*UserDefinedModelFieldDefinition `json:"fields"`
-	structFieldList                []reflect.StructField
+	TypeName                string                             `json:"type_name" binding:"required" clay:"key_parameter" `
+	ResourceName            string                             `json:"resource_name" binding:"required"`
+	ToBeMigrated            bool                               `json:"to_be_migrated"`
+	IsControllerEnabled     bool                               `json:"is_controller_enabled"`
+	SQLBeforeMigration      string                             `json:"sql_before_migration"`
+	SQLAfterMigration       string                             `json:"sql_after_migration"`
+	SQLDesignExtraction     string                             `json:"sql_design_extraction"`
+	SQLDesignDeletion       string                             `json:"sql_design_deletion"`
+	IsManyToManyAssociation bool                               `json:"is_many_to_many_association"`
+	Fields                  []*UserDefinedModelFieldDefinition `json:"fields"`
 }
 
 // NewUserDefinedModelDefinition creates a template raw model instance
@@ -128,28 +124,61 @@ func (receiver *UserDefinedModelDefinition) Create(model extension.Model, db *go
 	var newDesignAccessor extension.DesignAccessor
 
 	if userDefinedModelDefinition.IsManyToManyAssociation {
-		if len(userDefinedModelDefinition.ManyToManyLeftResourceName) == 0 {
-			logging.Logger().Debug("ManyToManyLeftResourceName is empty")
-			return nil, errors.New("ManyToManyLeftResourceName is empty")
+		manyToManyLeftResourceName := ""
+		manyToManyLeftResourceKeyParameterName := ""
+		manyToManyRightResourceName := ""
+		manyToManyRightResourceKeyParameterName := ""
+
+		for _, field := range structFieldList {
+			jsonKey := ""
+			jsonTag, ok := field.Tag.Lookup("json")
+			if ok {
+				tagStatementList := strings.Split(jsonTag, ",")
+				for _, tagStatement := range tagStatementList {
+					switch tagStatement {
+					case "omitempty", "-":
+						continue
+					default:
+						jsonKey = tagStatement
+						break
+					}
+				}
+				if len(jsonKey) == 0 {
+					jsonKey = field.Name
+				}
+			}
+
+			tag, ok := field.Tag.Lookup("clay")
+			if ok {
+				tagStatementList := strings.Split(tag, ";")
+				for _, tagStatement := range tagStatementList {
+					tagKeyValue := strings.Split(tagStatement, "=")
+					switch tagKeyValue[0] {
+					case "many_to_many_left_resource_name":
+						manyToManyLeftResourceName = tagKeyValue[1]
+						manyToManyLeftResourceKeyParameterName = jsonKey
+					case "many_to_many_right_resource_name":
+						manyToManyRightResourceName = tagKeyValue[1]
+						manyToManyRightResourceKeyParameterName = jsonKey
+					}
+				}
+			}
 		}
-		if len(userDefinedModelDefinition.ManyToManyLeftResourceName) == 0 {
-			logging.Logger().Debug("ManyToManyLeftResourceKeyName is empty")
-			return nil, errors.New("ManyToManyLeftResourceKeyName is empty")
+
+		if len(manyToManyLeftResourceName) == 0 {
+			logging.Logger().Debug("many_to_many_left_resource_name is not defined")
+			return nil, errors.New("many_to_many_left_resource_name is not defined")
 		}
-		if len(userDefinedModelDefinition.ManyToManyLeftResourceName) == 0 {
-			logging.Logger().Debug("ManyToManyRightResourceName is empty")
-			return nil, errors.New("ManyToManyRightResourceName is empty")
-		}
-		if len(userDefinedModelDefinition.ManyToManyLeftResourceName) == 0 {
-			logging.Logger().Debug("ManyToManyRightResourceKeyName is empty")
-			return nil, errors.New("ManyToManyRightResourceKeyName is empty")
+		if len(manyToManyRightResourceName) == 0 {
+			logging.Logger().Debug("many_to_many_right_resource_name is not defined")
+			return nil, errors.New("many_to_many_right_resource_name is not defined")
 		}
 
 		newUserDefinedManyToManyAssociationModel := NewUserDefinedManyToManyAssociationModel()
-		newUserDefinedManyToManyAssociationModel.leftResourceName = userDefinedModelDefinition.ManyToManyLeftResourceName
-		newUserDefinedManyToManyAssociationModel.leftResourceKeyName = userDefinedModelDefinition.ManyToManyLeftResourceKeyName
-		newUserDefinedManyToManyAssociationModel.rightResourceName = userDefinedModelDefinition.ManyToManyRightResourceName
-		newUserDefinedManyToManyAssociationModel.rightResourceKeyName = userDefinedModelDefinition.ManyToManyRightResourceKeyName
+		newUserDefinedManyToManyAssociationModel.leftResourceName = manyToManyLeftResourceName
+		newUserDefinedManyToManyAssociationModel.leftResourceKeyName = manyToManyLeftResourceKeyParameterName
+		newUserDefinedManyToManyAssociationModel.rightResourceName = manyToManyRightResourceName
+		newUserDefinedManyToManyAssociationModel.rightResourceKeyName = manyToManyRightResourceKeyParameterName
 
 		newUserDefinedManyToManyAssociationModel.typeName = userDefinedModelDefinition.TypeName
 		newUserDefinedManyToManyAssociationModel.resourceName = userDefinedModelDefinition.ResourceName

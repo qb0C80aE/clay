@@ -562,7 +562,8 @@ func GetRegisteredModelByContainer(container interface{}) (Model, error) {
 
 	structMetaInformationField, exists := fieldElementType.FieldByName("StructMetaInformation")
 	if !exists {
-		logging.Logger().Debug("the container does not have StructMetaInformation field, it might not be a container")
+		// Caution: comment out in order to suppress at boot time
+		// logging.Logger().Debug("the container does not have StructMetaInformation field, it might not be a container")
 		return nil, errors.New("the container does not have StructMetaInformation field")
 	}
 
