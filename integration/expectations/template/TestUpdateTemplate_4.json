@@ -10,7 +10,7 @@
       "template": null,
       "name": "testParameter21",
       "description": "testParameter21desc",
-      "type": 4,
+      "type": "string",
       "default_value": "TestParameter21"
     }
   ]

@@ -18,7 +18,7 @@
         "template": null,
         "name": "testParameter1",
         "description": "testParameter1desc",
-        "type": 4,
+        "type": "string",
         "default_value": "TestParameter1"
       }
     ]
@@ -35,7 +35,7 @@
         "template": null,
         "name": "testParameter100",
         "description": "testParameter100desc",
-        "type": 4,
+        "type": "string",
         "default_value": "TestParameter100"
       },
       {
@@ -44,7 +44,7 @@
         "template": null,
         "name": "testParameter110",
         "description": "testParameter110desc",
-        "type": 4,
+        "type": "string",
         "default_value": "TestParameter110"
       }
     ]

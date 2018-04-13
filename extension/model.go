@@ -142,8 +142,7 @@ func RegisterModel(model Model) {
 	typeNameStructFieldList := []reflect.StructField{}
 
 	for _, field := range modelFieldList {
-
-		jsonKey := ""
+		jsonKey := field.Name
 		jsonTag, ok := field.Tag.Lookup("json")
 		if ok {
 			tagStatementList := strings.Split(jsonTag, ",")
@@ -155,9 +154,6 @@ func RegisterModel(model Model) {
 					jsonKey = tagStatement
 					break
 				}
-			}
-			if len(jsonKey) == 0 {
-				jsonKey = field.Name
 			}
 		}
 		typeNameJSONKeyStructFieldMap[jsonKey] = field

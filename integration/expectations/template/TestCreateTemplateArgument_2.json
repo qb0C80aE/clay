@@ -4,6 +4,6 @@
   "template": null,
   "name": "testParameter2",
   "description": "testParameter2desc",
-  "type": 2,
+  "type": "float",
   "default_value": "456.789"
 }

@@ -319,16 +319,16 @@ total
 
 --- hash ---
 hash
-hash[testParameter11]={1 1 <nil> testParameter11 testParameter11desc 1 1 false <nil>}
-hash[testParameter12]={2 1 <nil> testParameter12 testParameter12desc 4 TestParameter12 false <nil>}
+hash[testParameter11]={1 1 <nil> testParameter11 testParameter11desc int 1 false <nil>}
+hash[testParameter12]={2 1 <nil> testParameter12 testParameter12desc string TestParameter12 false <nil>}
 
 --- slicemap ---
 slicemap
-slicemap[testParameter1][0]={1 1 <nil> testParameter11 testParameter11desc 1 1 false <nil>}
-slicemap[testParameter2][0]={2 1 <nil> testParameter12 testParameter12desc 4 TestParameter12 false <nil>}
-slicemap[testParameter1X][0]={3 1 <nil> testParameter1X testParameter1Xdesc 1 100 false <nil>}
-slicemap[testParameter1X][1]={4 2 <nil> testParameter1X testParameter1Xdesc 1 200 false <nil>}
-slicemap[testParameter1X][2]={5 3 <nil> testParameter1X testParameter1Xdesc 1 300 false <nil>}
+slicemap[testParameter1][0]={1 1 <nil> testParameter11 testParameter11desc int 1 false <nil>}
+slicemap[testParameter2][0]={2 1 <nil> testParameter12 testParameter12desc string TestParameter12 false <nil>}
+slicemap[testParameter1X][0]={3 1 <nil> testParameter1X testParameter1Xdesc int 100 false <nil>}
+slicemap[testParameter1X][1]={4 2 <nil> testParameter1X testParameter1Xdesc int 200 false <nil>}
+slicemap[testParameter1X][2]={5 3 <nil> testParameter1X testParameter1Xdesc int 300 false <nil>}
 
 --- sequence ---
 sequence

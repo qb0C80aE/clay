@@ -7,9 +7,9 @@ import (
 // UserDefinedModelFieldDefinition is the model class what represents raw template
 type UserDefinedModelFieldDefinition struct {
 	Base
-	Name     string `json:"name" binding:"required"`
+	Name     string `json:"name" validate:"required"`
 	Tag      string `json:"tag"`
-	TypeName string `json:"type_name" binding:"required"`
+	TypeName string `json:"type_name" validate:"required"`
 	IsSlice  bool   `json:"is_slice"`
 }
 

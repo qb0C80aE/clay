@@ -1,4 +1,5 @@
 {
+  "id": 103,
   "name": "test3",
   "template_content": "TestTemplate3",
   "description": "test3desc",
@@ -8,7 +9,7 @@
       "template": null,
       "name": "testParameter31",
       "description": "testParameter31desc",
-      "type": 4,
+      "type": "string",
       "default_value": "TestParameter31",
       "id": 1000
     },
@@ -17,7 +18,7 @@
       "template": null,
       "name": "testParameter32Updated",
       "description": "testParameter32descUpdated",
-      "type": 1,
+      "type": "int",
       "default_value": "99999",
       "id": 1001
     },
@@ -26,10 +27,9 @@
       "template": null,
       "name": "testParameter34",
       "description": "",
-      "type": 4,
+      "type": "string",
       "default_value": "TestParameter34",
       "id": 1002
     }
-  ],
-  "id": 103
+  ]
 }

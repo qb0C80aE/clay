@@ -8,7 +8,7 @@
         "name": "testParameter11",
         "template": null,
         "template_id": 1,
-        "type": 4
+        "type": "string"
       },
       {
         "default_value": "TestParameter12",
@@ -17,7 +17,7 @@
         "name": "testParameter12",
         "template": null,
         "template_id": 1,
-        "type": 4
+        "type": "string"
       }
     ],
     "templates": [

@@ -10,7 +10,7 @@
       "template": null,
       "name": "testParameter31",
       "description": "testParameter31desc",
-      "type": 4,
+      "type": "string",
       "default_value": "TestParameter31"
     },
     {
@@ -19,7 +19,7 @@
       "template": null,
       "name": "testParameter32Updated",
       "description": "testParameter32descUpdated",
-      "type": 1,
+      "type": "int",
       "default_value": "99999"
     },
     {
@@ -28,7 +28,7 @@
       "template": null,
       "name": "testParameter34",
       "description": "",
-      "type": 4,
+      "type": "string",
       "default_value": "TestParameter34"
     }
   ]

@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extension"
@@ -36,8 +37,8 @@ var typeNameTypeMap = map[string]reflect.Type{
 // UserDefinedModelDefinition is the model class what represents raw template
 type UserDefinedModelDefinition struct {
 	Base
-	TypeName                string                             `json:"type_name" binding:"required" clay:"key_parameter" `
-	ResourceName            string                             `json:"resource_name" binding:"required"`
+	TypeName                string                             `json:"type_name" clay:"key_parameter" validate:"required"`
+	ResourceName            string                             `json:"resource_name" validate:"required"`
 	ToBeMigrated            bool                               `json:"to_be_migrated"`
 	IsControllerEnabled     bool                               `json:"is_controller_enabled"`
 	SQLBeforeMigration      string                             `json:"sql_before_migration"`
@@ -45,7 +46,7 @@ type UserDefinedModelDefinition struct {
 	SQLDesignExtraction     string                             `json:"sql_design_extraction"`
 	SQLDesignDeletion       string                             `json:"sql_design_deletion"`
 	IsManyToManyAssociation bool                               `json:"is_many_to_many_association"`
-	Fields                  []*UserDefinedModelFieldDefinition `json:"fields"`
+	Fields                  []*UserDefinedModelFieldDefinition `json:"fields" validate:"gt=0"`
 }
 
 // NewUserDefinedModelDefinition creates a template raw model instance
@@ -100,8 +101,16 @@ func (receiver *UserDefinedModelDefinition) Create(model extension.Model, db *go
 		return nil, err
 	}
 
+	structFieldNameMapForCheckDuplication := map[string]bool{}
+	structFieldJSONKeyMapForCheckDuplication := map[string]bool{}
 	structFieldList := []reflect.StructField{}
 	for _, field := range userDefinedModelDefinition.Fields {
+		if _, exists := structFieldNameMapForCheckDuplication[field.Name]; exists {
+			logging.Logger().Debug("the struct %s has the same name fields %s", userDefinedModelDefinition.TypeName, field.Name)
+			return nil, fmt.Errorf("the struct %s has the same name fields %s", userDefinedModelDefinition.TypeName, field.Name)
+		}
+		structFieldNameMapForCheckDuplication[field.Name] = true
+
 		reflectType, exists := typeNameTypeMap[field.TypeName]
 		if !exists {
 			if field.IsSlice {
@@ -116,6 +125,28 @@ func (receiver *UserDefinedModelDefinition) Create(model extension.Model, db *go
 			Tag:  reflect.StructTag(field.Tag),
 			Type: reflectType,
 		}
+
+		jsonKey := field.Name
+		jsonTag, ok := structField.Tag.Lookup("json")
+		if ok {
+			tagStatementList := strings.Split(jsonTag, ",")
+			for _, tagStatement := range tagStatementList {
+				switch tagStatement {
+				case "omitempty", "-":
+					continue
+				default:
+					jsonKey = tagStatement
+					break
+				}
+			}
+		}
+
+		if _, exists := structFieldJSONKeyMapForCheckDuplication[jsonKey]; exists {
+			logging.Logger().Debug("the struct %s has the same json key fields %s", userDefinedModelDefinition.TypeName, jsonKey)
+			return nil, fmt.Errorf("the struct %s has the same json key fields %s", userDefinedModelDefinition.TypeName, jsonKey)
+		}
+		structFieldJSONKeyMapForCheckDuplication[jsonKey] = true
+
 		structFieldList = append(structFieldList, structField)
 	}
 
@@ -130,7 +161,7 @@ func (receiver *UserDefinedModelDefinition) Create(model extension.Model, db *go
 		manyToManyRightResourceKeyParameterName := ""
 
 		for _, field := range structFieldList {
-			jsonKey := ""
+			jsonKey := field.Name
 			jsonTag, ok := field.Tag.Lookup("json")
 			if ok {
 				tagStatementList := strings.Split(jsonTag, ",")
@@ -142,9 +173,6 @@ func (receiver *UserDefinedModelDefinition) Create(model extension.Model, db *go
 						jsonKey = tagStatement
 						break
 					}
-				}
-				if len(jsonKey) == 0 {
-					jsonKey = field.Name
 				}
 			}
 

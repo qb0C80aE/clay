@@ -320,17 +320,8 @@ func (receiver *Base) LoadToDesign(model extension.Model, db *gorm.DB, data inte
 		slice = slicePointer.Elem()
 		size := slice.Len()
 		for i := 0; i < size; i++ {
-			outputContainerValue := slice.Index(i).Elem()
-			fieldCount := outputContainerValue.NumField()
-			for j := 0; j < fieldCount; j++ {
-				outputContainerFieldValue := outputContainerValue.Field(j)
-				switch outputContainerFieldValue.Kind() {
-				case reflect.Array, reflect.Slice, reflect.Ptr:
-					outputContainerFieldValue.Set(reflect.Zero(outputContainerFieldValue.Type()))
-				}
-			}
-			outputContainer := outputContainerValue.Interface()
-			if err := db.Create(outputContainer).Error; err != nil {
+			outputContainer := slice.Index(i).Interface()
+			if err := db.Set("gorm:save_associations", false).Save(outputContainer).Error; err != nil {
 				logging.Logger().Debug(err.Error())
 				return err
 			}

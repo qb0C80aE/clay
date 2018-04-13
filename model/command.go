@@ -28,7 +28,7 @@ type Command struct {
 	ID               int       `json:"id" form:"id"`
 	Description      string    `json:"description" form:"description"`
 	WorkingDirectory string    `json:"working_directory" form:"working_directory"`
-	CommandLine      string    `json:"command_line" form:"command_line"`
+	CommandLine      string    `json:"command_line" form:"command_line" validate:"required"`
 	Status           string    `json:"status" form:"status"`
 	StdOut           string    `json:"std_out" form:"std_out"`
 	StdErr           string    `json:"std_err" form:"std_err"`
