@@ -1,0 +1,30 @@
+{
+	"type_name": "Link",
+	"resource_name": "links",
+	"to_be_migrated": true,
+	"is_controller_enabled": true,
+	"is_many_to_many_association": false,
+	"fields": [
+		{
+			"name": "SourcePortID",
+			"tag":  "json:\"source_port_id\" gorm:\"primary_key;\" sql:\"type:integer references ports(id)\" clay:\"key_parameter\"",
+			"type_name": "int"
+		},
+		{
+			"name": "SourcePort",
+			"tag":  "json:\"source_port\"",
+			"type_name": "Port"
+		},
+    {
+			"name": "DestinationPortID",
+			"tag":  "json:\"destination_port_id\" gorm:\"primary_key;\" sql:\"type:integer references ports(id)\"",
+			"type_name": "int"
+		},
+		{
+			"name": "DestinationPort",
+			"tag":  "json:\"destination_port\"",
+			"type_name": "Port"
+		}
+	],
+	"sql_after_migration": "create trigger if not exists DeleteLinkBeforePortDeletion before delete on ports begin delete from links where source_port_id = old.id or destination_port_id = old.id; end; create trigger if not exists DeleteLinkBeforeLinkDeletion before delete on links begin delete from links where source_port_id = old.destination_port_id; end; create trigger if not exists DeleteAndInsertLinkBeforeLinkCreation before insert on links begin delete from links where source_port_id = new.source_port_id or source_port_id = new.destination_port_id or destination_port_id = new.source_port_id or destination_port_id = new.destination_port_id; insert into links(source_port_id, destination_port_id) values(new.destination_port_id, new.source_port_id); end; create trigger if not exists DeleteAndInsertLinkBeforeLinkUpdate before update of destination_port_id on links begin delete from links where source_port_id = new.source_port_id or source_port_id = new.destination_port_id or destination_port_id = new.source_port_id or destination_port_id = new.destination_port_id; insert into links(source_port_id, destination_port_id) values(new.destination_port_id, new.source_port_id); end;"
+}

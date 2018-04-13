@@ -1,0 +1,50 @@
+{
+	"type_name": "Subnet",
+	"resource_name": "subnets",
+	"to_be_migrated": true,
+	"is_controller_enabled": true,
+	"is_many_to_many_association": false,
+	"fields": [
+		{
+			"name": "ID",
+			"tag":  "json:\"id\" gorm:\"primary_key;auto_increment\"",
+			"type_name": "int"
+		},
+    {
+			"name": "VlanID",
+			"tag":  "json:\"vlan_id\" gorm:\"unique_index:vlan_id_subnet_name\" sql:\"type:integer references vlans(id)\"",
+			"type_name": "int"
+		},
+    {
+			"name": "Vlan",
+			"tag":  "json:\"vlan\"",
+			"type_name": "Vlan"
+		},
+    {
+			"name": "Name",
+			"tag":  "json:\"name\" gorm:\"not null;unique\"",
+			"type_name": "string"
+		},
+    {
+			"name": "Description",
+			"tag":  "json:\"description\"",
+			"type_name": "string"
+		},
+    {
+			"name": "Address",
+			"tag":  "json:\"address\" gorm:\"not null\" validate:\"omitempty,ipv4\"",
+			"type_name": "string"
+		},
+    {
+			"name": "Prefix",
+			"tag":  "json:\"prefix\" validate:\"omitempty,min=1,max=32\"",
+			"type_name": "int"
+		},
+    {
+			"name": "ToBeDeleted",
+			"tag":  "json:\"to_be_deleted,omitempty\" sql:\"-\"",
+			"type_name": "bool"
+		}
+	],
+	"sql_after_migration": "create trigger if not exists DeleteSubnetBeforeVlanDeletion before delete on vlans begin delete from subnets where vlan_id = old.id; end;"
+}

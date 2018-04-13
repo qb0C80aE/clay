@@ -1,0 +1,36 @@
+{
+	"type_name": "PortGroup",
+	"resource_name": "port_groups",
+	"to_be_migrated": true,
+	"is_controller_enabled": true,
+	"is_many_to_many_association": false,
+	"fields": [
+		{
+			"name": "ID",
+			"tag":  "json:\"id\" gorm:\"primary_key;auto_increment\"",
+			"type_name": "int"
+		},
+		{
+			"name": "Name",
+			"tag":  "json:\"name\" gorm:\"not null;unique\"",
+			"type_name": "string"
+		},
+    {
+			"name": "Description",
+			"tag":  "json:\"description\"",
+			"type_name": "string"
+		},
+    {
+			"name": "Ports",
+			"tag":  "json:\"ports\" gorm:\"ForeignKey:PortID\"",
+			"type_name": "Port",
+      "is_slice": true
+		},
+		{
+			"name": "PortGroupPortAssociations",
+			"tag":  "json:\"port_group_port_associations\" gorm:\"ForeignKey:PortGroupID\"",
+			"type_name": "PortGroupPortAssociation",
+      "is_slice": true
+		}
+	]
+}
