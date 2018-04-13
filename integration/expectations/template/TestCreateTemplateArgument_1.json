@@ -1,9 +1,9 @@
 {
-  "id": 1,
-  "template_id": 1,
-  "template": null,
   "name": "testParameter1",
   "description": "testParameter1desc",
   "type": "int",
-  "default_value": "123"
+  "default_value": "123",
+  "id": 1,
+  "template_id": 1,
+  "template": null
 }

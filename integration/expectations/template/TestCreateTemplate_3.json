@@ -5,22 +5,22 @@
   "description": "test100desc",
   "template_arguments": [
     {
-      "template_id": 100,
-      "template": null,
-      "name": "testParameter100",
       "description": "testParameter100desc",
       "type": "string",
       "default_value": "TestParameter100",
-      "id": 2
-    },
-    {
+      "id": 2,
       "template_id": 100,
       "template": null,
-      "name": "testParameter110",
+      "name": "testParameter100"
+    },
+    {
       "description": "testParameter110desc",
       "type": "string",
       "default_value": "TestParameter110",
-      "id": 10
+      "id": 10,
+      "template_id": 100,
+      "template": null,
+      "name": "testParameter110"
     }
   ]
 }
