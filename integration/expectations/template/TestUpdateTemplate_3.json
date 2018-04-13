@@ -1,7 +1,7 @@
 {
+  "description": "test2desc",
+  "template_arguments": null,
   "id": 102,
   "name": "test2",
-  "template_content": "TestTemplate2",
-  "description": "test2desc",
-  "template_arguments": null
+  "template_content": "TestTemplate2"
 }

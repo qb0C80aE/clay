@@ -6,6 +6,7 @@ import (
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
 	"net/url"
+	"reflect"
 	"time"
 )
 
@@ -63,6 +64,14 @@ func (receiver *Design) Update(_ extension.Model, db *gorm.DB, _ gin.Params, _ u
 	if err := extension.ConvertInputMapToContainer(inputContainer, design); err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
+	}
+
+	mapKeys := reflect.ValueOf(inputContainer).Elem().FieldByName("Content").MapKeys()
+	for _, mapKey := range mapKeys {
+		if _, err := extension.GetAssociatedModelWithResourceName(mapKey.Interface().(string)); err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
 	}
 
 	designAccessors := extension.GetRegisteredDesignAccessorList()

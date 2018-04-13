@@ -1,6 +1,6 @@
 {
   "content": {
-    "template_persistent_parameters": [
+    "template_arguments": [
       {
         "default_value": "TestParameter11",
         "description": "testParameter11desc",

@@ -1,7 +1,26 @@
 {
   "clay_version": "unknown",
   "content": {
-    "template_arguments": [],
+    "template_arguments": [
+      {
+        "id": 1,
+        "template_id": 1,
+        "template": null,
+        "name": "testParameter11",
+        "description": "testParameter11desc",
+        "type": "string",
+        "default_value": "TestParameter11"
+      },
+      {
+        "id": 2,
+        "template_id": 1,
+        "template": null,
+        "name": "testParameter12",
+        "description": "testParameter12desc",
+        "type": "string",
+        "default_value": "TestParameter12"
+      }
+    ],
     "templates": [
       {
         "id": 1,
