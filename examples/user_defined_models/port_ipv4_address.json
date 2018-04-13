@@ -1,0 +1,45 @@
+{
+	"type_name": "PortIpv4Address",
+	"resource_name": "port_ipv4_addresses",
+	"to_be_migrated": true,
+	"is_controller_enabled": true,
+	"is_many_to_many_association": false,
+	"fields": [
+		{
+			"name": "ID",
+			"tag":  "json:\"id\" gorm:\"primary_key;auto_increment\"",
+			"type_name": "int"
+		},
+    {
+			"name": "PortID",
+			"tag":  "json:\"port_id\" sql:\"type:integer references ports(id)\"",
+			"type_name": "int"
+		},
+		{
+			"name": "Port",
+			"tag":  "json:\"port\"",
+			"type_name": "Port"
+		},
+    {
+			"name": "Description",
+			"tag":  "json:\"description\"",
+			"type_name": "string"
+		},
+    {
+			"name": "Address",
+			"tag":  "json:\"address\" gorm:\"not null\" validate:\"omitempty,ipv4\"",
+			"type_name": "string"
+		},
+    {
+			"name": "Prefix",
+			"tag":  "json:\"prefix\" validate:\"omitempty,min=1,max=32\"",
+			"type_name": "int"
+		},
+		{
+			"name": "ToBeDeleted",
+			"tag":  "json:\"to_be_deleted,omitempty\" sql:\"-\"",
+			"type_name": "bool"
+		}
+	],
+	"sql_after_migration": "create trigger if not exists DeletePortIpv4AddressBeforePortDeletion before delete on ports begin delete from port_ipv4_addresses where port_id = old.id; end;"
+}
