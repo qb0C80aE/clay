@@ -5,22 +5,22 @@
   "description": "test3desc",
   "template_arguments": [
     {
+      "name": "testParameter32Updated",
+      "description": "testParameter32descUpdated",
+      "type": "int",
       "default_value": "99999",
       "id": 1001,
       "template_id": 103,
-      "template": null,
-      "name": "testParameter32Updated",
-      "description": "testParameter32descUpdated",
-      "type": 1
+      "template": null
     },
     {
+      "name": "testParameter34",
+      "description": "",
+      "type": "string",
       "default_value": "TestParameter34",
       "id": 1002,
       "template_id": 103,
-      "template": null,
-      "name": "testParameter34",
-      "description": "",
-      "type": 4
+      "template": null
     }
   ]
 }

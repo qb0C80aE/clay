@@ -7,6 +7,7 @@
   "sql_after_migration": "",
   "sql_design_extraction": "",
   "sql_design_deletion": "",
+  "is_many_to_many_association": false,
   "fields": [
     {
       "name": "ID",

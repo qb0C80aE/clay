@@ -8,7 +8,7 @@ import (
 type Template struct {
 	Base
 	ID                int                 `json:"id" form:"id" gorm:"primary_key;auto_increment"`
-	Name              string              `json:"name" form:"name" gorm:"not null;unique"`
+	Name              string              `json:"name" form:"name" gorm:"not null;unique" validate:"required"`
 	TemplateContent   string              `json:"template_content" form:"template_content" sql:"type:text"`
 	Description       string              `json:"description" form:"description" sql:"type:text"`
 	TemplateArguments []*TemplateArgument `json:"template_arguments" gorm:"ForeignKey:template_id"`

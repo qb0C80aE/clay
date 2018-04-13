@@ -4,6 +4,6 @@
   "template": null,
   "name": "templateArgument1Updated",
   "description": "testParameter1descUpdated",
-  "type": 1,
+  "type": "int",
   "default_value": "999"
 }

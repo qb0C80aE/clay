@@ -7,13 +7,13 @@ import (
 
 const (
 	// TemplateArgumentTypeInt indicates that a type of argument is integer
-	TemplateArgumentTypeInt = 1
+	TemplateArgumentTypeInt = "int"
 	// TemplateArgumentTypeFloat indicates that a type of argument is float
-	TemplateArgumentTypeFloat = 2
+	TemplateArgumentTypeFloat = "float"
 	// TemplateArgumentTypeBool indicates that a type of argument is bool
-	TemplateArgumentTypeBool = 3
+	TemplateArgumentTypeBool = "bool"
 	// TemplateArgumentTypeString indicates that a type of argument is string
-	TemplateArgumentTypeString = 4
+	TemplateArgumentTypeString = "string"
 )
 
 // TemplateArgument is the model class what represents model-independent arguments used in templates
@@ -22,10 +22,10 @@ type TemplateArgument struct {
 	ID           int       `json:"id" gorm:"primary_key;auto_increment"`
 	TemplateID   int       `json:"template_id" gorm:"unique_index:template_id_name" sql:"type:integer references templates(id)"`
 	Template     *Template `json:"template" gorm:"ForeignKey:TemplateID"`
-	Name         string    `json:"name" gorm:"unique_index:template_id_name"`
+	Name         string    `json:"name" gorm:"unique_index:template_id_name" validate:"required"`
 	Description  string    `json:"description" form:"description" sql:"type:text"`
-	Type         int       `json:"type" binding:"required,min=1,max=4"`
-	DefaultValue string    `json:"default_value"`
+	Type         string    `json:"type" validate:"oneof=int float bool string"`
+	DefaultValue string    `json:"default_value" validate:"required"`
 	ToBeDeleted  bool      `json:"to_be_deleted,omitempty" sql:"-"`
 }
 

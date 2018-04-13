@@ -18,7 +18,7 @@
         "template": null,
         "name": "testParameter21",
         "description": "testParameter21desc",
-        "type": 4,
+        "type": "string",
         "default_value": "TestParameter21"
       }
     ]
@@ -35,7 +35,7 @@
         "template": null,
         "name": "testParameter32Updated",
         "description": "testParameter32descUpdated",
-        "type": 1,
+        "type": "int",
         "default_value": "99999"
       },
       {
@@ -44,7 +44,7 @@
         "template": null,
         "name": "testParameter34",
         "description": "",
-        "type": 4,
+        "type": "string",
         "default_value": "TestParameter34"
       }
     ]
@@ -61,7 +61,7 @@
         "template": null,
         "name": "testParameter42",
         "description": "testParameter42desc",
-        "type": 4,
+        "type": "string",
         "default_value": "TestParameter42"
       },
       {
@@ -70,7 +70,7 @@
         "template": null,
         "name": "testParameter44",
         "description": "testParameter44desc",
-        "type": 4,
+        "type": "string",
         "default_value": "TestParameter44"
       },
       {
@@ -79,7 +79,7 @@
         "template": null,
         "name": "testParameter45",
         "description": "testParameter45desc",
-        "type": 4,
+        "type": "string",
         "default_value": "TestParameter45"
       }
     ]

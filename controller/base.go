@@ -13,6 +13,7 @@ import (
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
 	"github.com/qb0C80aE/clay/version"
+	validatorpkg "gopkg.in/go-playground/validator.v9"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -29,6 +30,8 @@ type BaseController struct {
 	queryCustomizer  extension.QueryCustomizer
 }
 
+var validator = validatorpkg.New()
+
 // CreateController creates a new instance of actual controller with BaseController
 func CreateController(actualController extension.Controller, model extension.Model) extension.Controller {
 	actualControllerValue := reflect.ValueOf(actualController).Elem()
@@ -42,6 +45,57 @@ func CreateController(actualController extension.Controller, model extension.Mod
 	baseControllerValue := reflect.ValueOf(baseController)
 	actualControllerValue.FieldByName("BaseController").Set(baseControllerValue)
 	return actualController
+}
+
+func executeValidation(c *gin.Context, resourceName string, inputContainer interface{}) error {
+	model, err := extension.GetAssociatedModelWithResourceName(resourceName)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return err
+	}
+
+	modelKey, err := extension.GetRegisteredModelKey(model)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return err
+	}
+
+	// for update method, set key parameter tot container
+	keyParameterValue := c.Param(modelKey.KeyParameter)
+	if len(keyParameterValue) > 0 {
+		containerValue := reflect.ValueOf(inputContainer)
+		for containerValue.Kind() == reflect.Ptr {
+			containerValue = containerValue.Elem()
+		}
+		keyField := containerValue.FieldByName(modelKey.KeyField)
+		switch keyField.Kind() {
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			v, err := strconv.Atoi(keyParameterValue)
+			if err != nil {
+				logging.Logger().Debug(err.Error())
+				return err
+			}
+			keyField.SetInt(int64(v))
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+			v, err := strconv.Atoi(keyParameterValue)
+			if err != nil {
+				logging.Logger().Debug(err.Error())
+				return err
+			}
+			keyField.SetUint(uint64(v))
+		default:
+			keyField.SetString(fmt.Sprintf("%s", keyParameterValue))
+		}
+	}
+
+	// validate again with validator.v9, with not "binding" tag, but "validate" tag
+	validator.SetTagName("validate")
+	if err := validator.Struct(inputContainer); err != nil {
+		logging.Logger().Debug(err.Error())
+		return err
+	}
+
+	return nil
 }
 
 // Bind binds input data to a container instance
@@ -67,6 +121,10 @@ func (receiver *BaseController) Bind(c *gin.Context, resourceName string) (inter
 			return nil, err
 		}
 
+		if err := executeValidation(c, resourceName, container); err != nil {
+			return nil, err
+		}
+
 		return container, nil
 	case "multipart/form-data":
 		inputMap := map[string]interface{}{}
@@ -78,6 +136,10 @@ func (receiver *BaseController) Bind(c *gin.Context, resourceName string) (inter
 
 		if err := c.Bind(container); err != nil {
 			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
+
+		if err := executeValidation(c, resourceName, container); err != nil {
 			return nil, err
 		}
 
