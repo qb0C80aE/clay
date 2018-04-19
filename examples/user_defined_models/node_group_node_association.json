@@ -26,5 +26,14 @@
 			"type_name": "Node"
 		}
 	],
-	"sql_after_migration": "create trigger if not exists DeleteNodeGroupNodeAssociationBeforeNodeGroupDeletion before delete on node_groups begin delete from node_group_node_associations where node_group_id = old.id; end; create trigger if not exists DeleteNodeGroupNodeAssociationBeforeNodeDeletion before delete on nodes begin delete from node_group_node_associations where node_id = old.id; end;"
+	"sql_after_migration": [
+		"create trigger if not exists DeleteNodeGroupNodeAssociationBeforeNodeGroupDeletion before delete on node_groups",
+		"  begin",
+		"    delete from node_group_node_associations where node_group_id = old.id;",
+		"  end;",
+		"create trigger if not exists DeleteNodeGroupNodeAssociationBeforeNodeDeletion before delete on nodes",
+		"  begin",
+		"    delete from node_group_node_associations where node_id = old.id;",
+		"  end;"
+	]	
 }

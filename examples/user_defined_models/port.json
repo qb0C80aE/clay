@@ -3,7 +3,6 @@
 	"resource_name": "ports",
 	"to_be_migrated": true,
 	"is_controller_enabled": true,
-	"is_many_to_many_association": false,
 	"fields": [
 		{
 			"name": "ID",
@@ -68,5 +67,10 @@
 			"type_name": "bool"
 		}
 	],
-	"sql_after_migration": "create trigger if not exists DeletePortBeforeNodeDeletion before delete on nodes begin delete from ports where node_id = old.id; end;"
+	"sql_after_migration": [
+		"create trigger if not exists DeletePortBeforeNodeDeletion before delete on nodes",
+		"  begin",
+		"    delete from ports where node_id = old.id;",
+		"  end;"
+	]
 }

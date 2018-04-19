@@ -3,7 +3,6 @@
 	"resource_name": "nodes",
 	"to_be_migrated": true,
 	"is_controller_enabled": true,
-	"is_many_to_many_association": false,
 	"fields": [
 		{
 			"name": "ID",
