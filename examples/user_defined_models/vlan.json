@@ -33,7 +33,17 @@
       "is_slice": true
     }
 	],
-	"sql_after_migration": "insert or ignore into vlans(id, name) select id, name from (with recursive vlan_id_generator(id) as (select 1 union all select id+1 from vlan_id_generator limit 4095) select id, \"VLAN\"||substr('0000'||id,-4) as name from vlan_id_generator);",
-  "sql_design_extraction": "name <> 'VLAN'||substr('0000'||id,-4) or length(description) > 0",
-  "sql_design_deletion": "delete from vlans where id < 1 or 4095 < id;"
+	"sql_after_migration": [
+		"insert or ignore into vlans(id, name)",
+		"  select id, name",
+		"    from (with recursive vlan_id_generator(id) as (select 1 union all select id+1 from vlan_id_generator limit 4095)",
+		"      select id, \"VLAN\"||substr('0000'||id,-4) as name",
+		"        from vlan_id_generator);"
+	],
+  "sql_design_extraction": [
+		"name <> 'VLAN'||substr('0000'||id,-4) or length(description) > 0"
+	],
+  "sql_design_deletion": [
+		"delete from vlans where id < 1 or 4095 < id;"
+	]
 }

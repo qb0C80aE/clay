@@ -55,11 +55,21 @@ func (receiver *Base) GetStructFields(model extension.Model) []reflect.StructFie
 			}
 
 			switch actualFieldType.Kind() {
-			case reflect.Struct, reflect.Slice, reflect.Array:
+			case reflect.Struct:
 				actualElementType := extension.InspectActualElementType(actualValue.FieldByIndex(field.Index).Interface())
 				newStructField := field
 				newStructField.Type = extension.NewStructFieldTypeProxy(actualElementType.Name(), actualFieldType.Kind())
 				structFieldList = append(structFieldList, newStructField)
+			case reflect.Slice, reflect.Array:
+				actualElementType := extension.InspectActualElementType(actualValue.FieldByIndex(field.Index).Interface())
+				newStructField := field
+				if actualElementType.Kind() == reflect.Struct {
+					newStructField.Type = extension.NewStructFieldTypeProxy(actualElementType.Name(), actualFieldType.Kind())
+					structFieldList = append(structFieldList, newStructField)
+				} else {
+					// primitive array/slice
+					structFieldList = append(structFieldList, field)
+				}
 			default:
 				structFieldList = append(structFieldList, field)
 			}

@@ -41,5 +41,10 @@
 			"type_name": "bool"
 		}
 	],
-	"sql_after_migration": "create trigger if not exists DeletePortIpv4AddressBeforePortDeletion before delete on ports begin delete from port_ipv4_addresses where port_id = old.id; end;"
+	"sql_after_migration": [
+		"create trigger if not exists DeletePortIpv4AddressBeforePortDeletion before delete on ports",
+		"  begin",
+		"    delete from port_ipv4_addresses where port_id = old.id;",
+		"  end;"
+	]
 }

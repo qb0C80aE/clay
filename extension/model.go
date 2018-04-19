@@ -319,11 +319,12 @@ func pruneInputTree(input interface{}, tree structTree) error {
 						return err
 					}
 				}
+			default:
+				// just ignore primitives
 			}
 		}
 	default:
-		logging.Logger().Debug("input is not a map")
-		return errors.New("input is not a map")
+		// just ignore primitive slice/array elements, top-level slice/array/primitives
 	}
 
 	return nil
@@ -398,14 +399,16 @@ func createInputContainerByTypeName(typeName string, inputMap interface{}) (refl
 
 	switch inputMapValue.Type().Kind() {
 	case reflect.Slice, reflect.Array:
+		// zero-length slice/array are not allowed
 		if inputMapValue.Len() == 0 {
-			logging.Logger().Debug("zero-size array input is not allowed")
-			return nil, errors.New("zero-size array input is not allowed")
+			logging.Logger().Debug("zero-length slice/array are not allowed")
+			return nil, errors.New("zero-length slice/array are not allowed")
 		}
 	case reflect.Map:
 	default:
-		logging.Logger().Debug("the input value is neither a map nor slice, array")
-		return nil, errors.New("the input value is neither a map nor slice, array")
+		// top-level non map/slice/array are not allowed
+		logging.Logger().Debug("top-level non map/slice/array are not allowed")
+		return nil, errors.New("top-level non map/slice/array are not allowed")
 	}
 
 	jsonKeyStructFieldMap, exists := typeNameJSONKeyStructFieldMapMap[typeName]
@@ -420,7 +423,7 @@ func createInputContainerByTypeName(typeName string, inputMap interface{}) (refl
 		inputMapKeyValueValue := inputMapValue.MapIndex(reflect.ValueOf(jsonKey))
 		if inputMapKeyValueValue.IsValid() {
 			switch jsonKeyStructField.Type.Kind() {
-			case reflect.Struct, reflect.Slice, reflect.Array:
+			case reflect.Struct:
 				childTypeName := jsonKeyStructField.Type.Name()
 				childStructType, err := createInputContainerByTypeName(childTypeName, inputMapKeyValueValue.Interface())
 				if err != nil {
@@ -428,18 +431,34 @@ func createInputContainerByTypeName(typeName string, inputMap interface{}) (refl
 					return nil, err
 				}
 
-				switch jsonKeyStructField.Type.Kind() {
-				case reflect.Struct:
-					childStructType = reflect.PtrTo(childStructType)
-				case reflect.Slice, reflect.Array:
-					childStructType = reflect.SliceOf(reflect.PtrTo(childStructType))
-				}
+				childStructType = reflect.PtrTo(childStructType)
 
 				newStructField := jsonKeyStructField
 				newStructField.Type = childStructType
 
 				newStructFieldList = append(newStructFieldList, newStructField)
-			default:
+			case reflect.Slice, reflect.Array:
+				childTypeName := jsonKeyStructField.Type.Name()
+				//if len(jsonKeyStructField.Type.Name()) > 0 {
+				if _, isStructFieldTypeProxy := jsonKeyStructField.Type.(*StructFieldTypeProxy); isStructFieldTypeProxy {
+					// if the type of element is a registered struct type
+					childStructType, err := createInputContainerByTypeName(childTypeName, inputMapKeyValueValue.Interface())
+					if err != nil {
+						logging.Logger().Debug(err.Error())
+						return nil, err
+					}
+
+					childStructType = reflect.SliceOf(reflect.PtrTo(childStructType))
+
+					newStructField := jsonKeyStructField
+					newStructField.Type = childStructType
+
+					newStructFieldList = append(newStructFieldList, newStructField)
+				} else {
+					// if the type of element is a primitive type
+					newStructFieldList = append(newStructFieldList, jsonKeyStructField)
+				}
+			default: //primitive
 				newStructFieldList = append(newStructFieldList, jsonKeyStructField)
 			}
 		} else {

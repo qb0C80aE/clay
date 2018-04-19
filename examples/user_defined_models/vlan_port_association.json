@@ -26,5 +26,14 @@
 			"type_name": "Port"
 		}
 	],
-	"sql_after_migration": "create trigger if not exists DeleteVlanInterfaceAssociationBeforeVlanDeletion before delete on vlans begin delete from vlan_port_associations where vlan_id = old.id; end; create trigger if not exists DeleteVlanInterfaceAssociationBeforePortDeletion before delete on ports begin delete from vlan_port_associations where port_id = old.id; end;"
+	"sql_after_migration": [
+		"create trigger if not exists DeleteVlanPortAssociationBeforeVlanDeletion before delete on vlans",
+		"begin",
+		"  delete from vlan_port_associations where vlan_id = old.id;",
+		"end;",
+		"create trigger if not exists DeleteVlanPortAssociationBeforePortDeletion before delete on ports",
+		"begin",
+		"  delete from vlan_port_associations where port_id = old.id;",
+		"end;"
+	]
 }
