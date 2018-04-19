@@ -3,10 +3,10 @@
   "resource_name": "nodes",
   "to_be_migrated": true,
   "is_controller_enabled": true,
-  "sql_before_migration": "",
-  "sql_after_migration": "",
-  "sql_design_extraction": "",
-  "sql_design_deletion": "",
+  "sql_before_migration": null,
+  "sql_after_migration": null,
+  "sql_design_extraction": null,
+  "sql_design_deletion": null,
   "is_many_to_many_association": false,
   "fields": [
     {

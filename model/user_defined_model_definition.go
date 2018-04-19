@@ -41,10 +41,10 @@ type UserDefinedModelDefinition struct {
 	ResourceName            string                             `json:"resource_name" validate:"required"`
 	ToBeMigrated            bool                               `json:"to_be_migrated"`
 	IsControllerEnabled     bool                               `json:"is_controller_enabled"`
-	SQLBeforeMigration      string                             `json:"sql_before_migration"`
-	SQLAfterMigration       string                             `json:"sql_after_migration"`
-	SQLDesignExtraction     string                             `json:"sql_design_extraction"`
-	SQLDesignDeletion       string                             `json:"sql_design_deletion"`
+	SQLBeforeMigration      []string                           `json:"sql_before_migration"`
+	SQLAfterMigration       []string                           `json:"sql_after_migration"`
+	SQLDesignExtraction     []string                           `json:"sql_design_extraction"`
+	SQLDesignDeletion       []string                           `json:"sql_design_deletion"`
 	IsManyToManyAssociation bool                               `json:"is_many_to_many_association"`
 	Fields                  []*UserDefinedModelFieldDefinition `json:"fields" validate:"gt=0"`
 }
@@ -212,10 +212,10 @@ func (receiver *UserDefinedModelDefinition) Create(model extension.Model, db *go
 		newUserDefinedManyToManyAssociationModel.resourceName = userDefinedModelDefinition.ResourceName
 		newUserDefinedManyToManyAssociationModel.toBeMigrated = userDefinedModelDefinition.ToBeMigrated
 		newUserDefinedManyToManyAssociationModel.isControllerEnabled = userDefinedModelDefinition.IsControllerEnabled
-		newUserDefinedManyToManyAssociationModel.sqlBeforeMigration = userDefinedModelDefinition.SQLBeforeMigration
-		newUserDefinedManyToManyAssociationModel.sqlAfterMigration = userDefinedModelDefinition.SQLAfterMigration
-		newUserDefinedManyToManyAssociationModel.sqlDesignExtraction = userDefinedModelDefinition.SQLDesignExtraction
-		newUserDefinedManyToManyAssociationModel.sqlDesignDeletion = userDefinedModelDefinition.SQLDesignDeletion
+		newUserDefinedManyToManyAssociationModel.sqlBeforeMigration = strings.Join(userDefinedModelDefinition.SQLBeforeMigration, "\n")
+		newUserDefinedManyToManyAssociationModel.sqlAfterMigration = strings.Join(userDefinedModelDefinition.SQLAfterMigration, "\n")
+		newUserDefinedManyToManyAssociationModel.sqlDesignExtraction = strings.Join(userDefinedModelDefinition.SQLDesignExtraction, "\n")
+		newUserDefinedManyToManyAssociationModel.sqlDesignDeletion = strings.Join(userDefinedModelDefinition.SQLDesignDeletion, "\n")
 		newUserDefinedManyToManyAssociationModel.structFieldList = structFieldList
 
 		newModel = newUserDefinedManyToManyAssociationModel
@@ -228,10 +228,10 @@ func (receiver *UserDefinedModelDefinition) Create(model extension.Model, db *go
 		newUserDefinedModel.resourceName = userDefinedModelDefinition.ResourceName
 		newUserDefinedModel.toBeMigrated = userDefinedModelDefinition.ToBeMigrated
 		newUserDefinedModel.isControllerEnabled = userDefinedModelDefinition.IsControllerEnabled
-		newUserDefinedModel.sqlBeforeMigration = userDefinedModelDefinition.SQLBeforeMigration
-		newUserDefinedModel.sqlAfterMigration = userDefinedModelDefinition.SQLAfterMigration
-		newUserDefinedModel.sqlDesignExtraction = userDefinedModelDefinition.SQLDesignExtraction
-		newUserDefinedModel.sqlDesignDeletion = userDefinedModelDefinition.SQLDesignDeletion
+		newUserDefinedModel.sqlBeforeMigration = strings.Join(userDefinedModelDefinition.SQLBeforeMigration, "\n")
+		newUserDefinedModel.sqlAfterMigration = strings.Join(userDefinedModelDefinition.SQLAfterMigration, "\n")
+		newUserDefinedModel.sqlDesignExtraction = strings.Join(userDefinedModelDefinition.SQLDesignExtraction, "\n")
+		newUserDefinedModel.sqlDesignDeletion = strings.Join(userDefinedModelDefinition.SQLDesignDeletion, "\n")
 		newUserDefinedModel.structFieldList = structFieldList
 
 		newModel = newUserDefinedModel
