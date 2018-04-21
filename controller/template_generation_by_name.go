@@ -42,8 +42,7 @@ func (receiver *templateGenerationByNameController) GetRouteMap() map[int]map[in
 }
 
 func (receiver *templateGenerationByNameController) OutputGetSingle(c *gin.Context, code int, result interface{}, fields map[string]interface{}) {
-	text := result.(string)
-	c.String(code, text)
+	OutputTextWithType(c, code, result)
 }
 
 func init() {
