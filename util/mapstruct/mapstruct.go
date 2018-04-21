@@ -345,3 +345,20 @@ func SortSlice(slice interface{}, order string) ([]interface{}, error) {
 	})
 	return result, nil
 }
+
+// RemapToStruct remaps map or struct elements into another one
+// It can be used, for example, map -> container, map -> model, container <-> model
+func RemapToStruct(in interface{}, out interface{}) error {
+	byteArray, err := json.Marshal(in)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return err
+	}
+
+	if err := json.Unmarshal(byteArray, out); err != nil {
+		logging.Logger().Debug(err.Error())
+		return err
+	}
+
+	return nil
+}
