@@ -220,11 +220,13 @@ func (receiver *BaseController) GetResourceName() (string, error) {
 func (receiver *BaseController) GetResourceSingleURL() (string, error) {
 	resourceName, err := receiver.GetResourceName()
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		return "", err
 	}
 
 	modelKey, err := extension.GetRegisteredModelKey(receiver.model)
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		return "", err
 	}
 
@@ -235,6 +237,7 @@ func (receiver *BaseController) GetResourceSingleURL() (string, error) {
 func (receiver *BaseController) GetResourceMultiURL() (string, error) {
 	resourceName, err := receiver.GetResourceName()
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		return "", err
 	}
 

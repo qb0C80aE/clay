@@ -22,7 +22,14 @@ func (receiver *templateGenerationController) GetResourceSingleURL() (string, er
 		logging.Logger().Debug(err.Error())
 		return "", err
 	}
-	return fmt.Sprintf("%s/:id/generation", templateResourceName), nil
+
+	modelKey, err := extension.GetRegisteredModelKey(receiver.model)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return "", err
+	}
+
+	return fmt.Sprintf("%s/:%s/generation", templateResourceName, modelKey.KeyParameter), nil
 }
 
 func (receiver *templateGenerationController) GetRouteMap() map[int]map[int]gin.HandlerFunc {

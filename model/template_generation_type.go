@@ -1,5 +1,7 @@
 package model
 
+import "github.com/qb0C80aE/clay/extension"
+
 // TemplateGenerationType is the model class what represents template generation
 type TemplateGenerationType struct {
 	TemplateGeneration
@@ -13,4 +15,8 @@ func NewTemplateGenerationType() *TemplateGenerationType {
 // GetContainerForMigration returns its container for migration, if no need to be migrated, just return null
 func (receiver *TemplateGenerationType) GetContainerForMigration() (interface{}, error) {
 	return nil, nil
+}
+
+func init() {
+	extension.RegisterModel(NewTemplateGenerationType())
 }

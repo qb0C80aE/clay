@@ -1,7 +1,6 @@
 package extension
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -553,22 +552,6 @@ func CreateOutputContainerByResourceName(resourceName string, preloadQuery strin
 	}
 
 	return CreateOutputContainerByTypeName(modelTypeName, preloadQuery)
-}
-
-// ConvertInputMapToContainer maps inputMap elements into given container
-func ConvertInputMapToContainer(inputMap interface{}, container interface{}) error {
-	byteArray, err := json.Marshal(inputMap)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return err
-	}
-
-	if err := json.Unmarshal(byteArray, container); err != nil {
-		logging.Logger().Debug(err.Error())
-		return err
-	}
-
-	return nil
 }
 
 // GetRegisteredModelByContainer returns the model related to given container

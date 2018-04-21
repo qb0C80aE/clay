@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extension"
+	"github.com/qb0C80aE/clay/util/mapstruct"
 	"net/url"
 	"os"
 	"os/exec"
@@ -86,7 +87,7 @@ func (receiver *Command) GetMulti(_ extension.Model, db *gorm.DB, _ gin.Params, 
 // Create corresponds HTTP POST message and handles a request for multi resource to create a new information
 func (receiver *Command) Create(_ extension.Model, db *gorm.DB, _ gin.Params, _ url.Values, inputContainer interface{}) (interface{}, error) {
 	command := NewCommand()
-	if err := extension.ConvertInputMapToContainer(inputContainer, command); err != nil {
+	if err := mapstruct.RemapToStruct(inputContainer, command); err != nil {
 		return nil, err
 	}
 
