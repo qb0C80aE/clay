@@ -35,8 +35,7 @@ func (receiver *templateRawController) GetRouteMap() map[int]map[int]gin.Handler
 }
 
 func (receiver *templateRawController) OutputGetSingle(c *gin.Context, code int, result interface{}, fields map[string]interface{}) {
-	text := result.(string)
-	c.String(code, text)
+	OutputTextWithType(c, code, result)
 }
 
 func init() {
