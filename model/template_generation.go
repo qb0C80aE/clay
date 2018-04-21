@@ -15,10 +15,13 @@ import (
 	"net/http"
 	"net/url"
 	"reflect"
+	"regexp"
 	"strconv"
 	"strings"
 	tplpkg "text/template"
 )
+
+var parameterRegexp = regexp.MustCompile("p\\[(.+)\\]")
 
 // TemplateGeneration is the model class what represents template generation
 type TemplateGeneration struct {
@@ -36,23 +39,90 @@ func (receiver *TemplateGeneration) GetContainerForMigration() (interface{}, err
 }
 
 // GenerateTemplate generates text data based on registered templates
-func (receiver *TemplateGeneration) GenerateTemplate(db *gorm.DB, id string, templateArgumentParameterMap map[interface{}]interface{}) (interface{}, error) {
+// parameters include either id or name
+// actual parameters for template arguments must be included in urlValues as shaped like q[...]=...
+func (receiver *TemplateGeneration) GenerateTemplate(db *gorm.DB, parameters gin.Params, urlValues url.Values) (interface{}, error) {
 	templateArgumentMap := map[interface{}]*TemplateArgument{}
 	templateParameterMap := map[interface{}]interface{}{}
 
-	template := NewTemplate()
-	template.ID, _ = strconv.Atoi(id)
+	templateArgumentParameterMap := map[interface{}]interface{}{}
+	for key := range urlValues {
+		subMatch := parameterRegexp.FindStringSubmatch(key)
+		if len(subMatch) == 2 {
+			templateArgumentParameterMap[subMatch[1]] = urlValues.Get(key)
+		}
+	}
 
-	// GenerateTemplate reset db conditions like preloads, so you should use this method in GetSingle or GetMulti only,
+	templateModel := NewTemplate()
+	templateModelAsContainer := NewTemplate()
+
+	// GenerateTemplate resets db conditions like preloads, so you should use this method in GetSingle or GetMulti only,
 	// and note that all conditions go away after this method.
 	db = db.New()
 
-	if err := db.Preload("TemplateArguments").Select("*").First(template, template.ID).Error; err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
+	_, idExists := parameters.Get("id")
+	templateName, nameExists := parameters.Get("name")
+
+	if idExists {
+		newURLValues := url.Values{}
+		newURLValues.Set("preloads", "template_arguments")
+
+		dbParameter, err := dbpkg.NewParameter(newURLValues)
+		if err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
+
+		db = dbParameter.SetPreloads(db)
+
+		container, err := templateModel.GetSingle(templateModel, db, parameters, newURLValues, "*")
+		if err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
+
+		if err := mapstruct.RemapToStruct(container, templateModelAsContainer); err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
+	} else if nameExists {
+		newURLValues := url.Values{}
+		newURLValues.Set("q[name]", templateName)
+		newURLValues.Set("preloads", "template_arguments")
+
+		dbParameter, err := dbpkg.NewParameter(newURLValues)
+		if err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
+
+		db = dbParameter.FilterFields(db)
+		db = dbParameter.SetPreloads(db)
+
+		container, err := templateModel.GetMulti(templateModel, db, parameters, newURLValues, "*")
+		if err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
+
+		containerValue := reflect.ValueOf(container)
+		if containerValue.Len() == 0 {
+			logging.Logger().Debug("record not found")
+			return nil, errors.New("record not found")
+		}
+
+		result := reflect.ValueOf(container).Index(0).Interface()
+
+		if err := mapstruct.RemapToStruct(result, templateModelAsContainer); err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
+	} else {
+		logging.Logger().Debug("neither id nor name exists in parameters")
+		return nil, errors.New("neither id nor name exists in parameters")
 	}
 
-	for _, templateArgument := range template.TemplateArguments {
+	for _, templateArgument := range templateModelAsContainer.TemplateArguments {
 		var err error
 		templateArgumentMap[templateArgument.Name] = templateArgument
 		switch templateArgument.Type {
@@ -139,7 +209,7 @@ func (receiver *TemplateGeneration) GenerateTemplate(db *gorm.DB, id string, tem
 	for _, templateFuncMap := range templateFuncMaps {
 		tpl = tpl.Funcs(templateFuncMap)
 	}
-	tpl, err := tpl.Parse(template.TemplateContent)
+	tpl, err := tpl.Parse(templateModelAsContainer.TemplateContent)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
@@ -157,12 +227,9 @@ func (receiver *TemplateGeneration) GenerateTemplate(db *gorm.DB, id string, tem
 }
 
 // GetSingle generates text data based on registered templates
-func (receiver *TemplateGeneration) GetSingle(_ extension.Model, db *gorm.DB, parameters gin.Params, urlValues url.Values, queryFields string) (interface{}, error) {
-	templateArgumentParameterMap := make(map[interface{}]interface{}, len(urlValues))
-	for key := range urlValues {
-		templateArgumentParameterMap[key] = urlValues.Get(key)
-	}
-	return receiver.GenerateTemplate(db, parameters.ByName("id"), templateArgumentParameterMap)
+// parameters must be given as p[...]=...
+func (receiver *TemplateGeneration) GetSingle(_ extension.Model, db *gorm.DB, parameters gin.Params, urlValues url.Values, _ string) (interface{}, error) {
+	return receiver.GenerateTemplate(db, parameters, urlValues)
 }
 
 func init() {
@@ -392,7 +459,10 @@ func init() {
 				logging.Logger().Debug(err.Error())
 				return nil, err
 			}
-			db := dbObject.(*gorm.DB)
+
+			// single resets db conditions like preloads, so you should use this method in GetSingle or GetMulti only,
+			// and note that all conditions go away after this method.
+			db := dbObject.(*gorm.DB).New()
 			db, err = parameter.Paginate(db)
 			if err != nil {
 				logging.Logger().Debug(err.Error())
@@ -460,7 +530,10 @@ func init() {
 				logging.Logger().Debug(err.Error())
 				return nil, err
 			}
-			db := dbObject.(*gorm.DB)
+
+			// multi resets db conditions like preloads, so you should use this method in GetSingle or GetMulti only,
+			// and note that all conditions go away after this method.
+			db := dbObject.(*gorm.DB).New()
 			db, err = parameter.Paginate(db)
 			if err != nil {
 				logging.Logger().Debug(err.Error())
@@ -527,7 +600,10 @@ func init() {
 				logging.Logger().Debug(err.Error())
 				return nil, err
 			}
-			db := dbObject.(*gorm.DB)
+
+			// first resets db conditions like preloads, so you should use this method in GetSingle or GetMulti only,
+			// and note that all conditions go away after this method.
+			db := dbObject.(*gorm.DB).New()
 			db, err = parameter.Paginate(db)
 			if err != nil {
 				logging.Logger().Debug(err.Error())
@@ -562,7 +638,10 @@ func init() {
 				logging.Logger().Debug(err.Error())
 				return nil, err
 			}
-			db := dbObject.(*gorm.DB)
+
+			// total resets db conditions like preloads, so you should use this method in GetSingle or GetMulti only,
+			// and note that all conditions go away after this method.
+			db := dbObject.(*gorm.DB).New()
 			total, err := model.GetTotal(model, db)
 			if err != nil {
 				logging.Logger().Debug(err.Error())
@@ -570,14 +649,22 @@ func init() {
 			}
 			return total, nil
 		},
-		"include": func(dbObject interface{}, templateName string, templateArgumentParameterMap map[interface{}]interface{}) (interface{}, error) {
-			db := dbObject.(*gorm.DB)
-			template := NewTemplate()
-			if err := db.Select("*").First(template, "name = ?", templateName).Error; err != nil {
-				logging.Logger().Debug(err.Error())
-				return nil, fmt.Errorf("template %s does not exist", templateName)
+		"include": func(dbObject interface{}, templateName string, query string) (interface{}, error) {
+			// include resets db conditions like preloads, so you should use this method in GetSingle or GetMulti only,
+			// and note that all conditions go away after this method.
+			db := dbObject.(*gorm.DB).New()
+
+			parameters := gin.Params{
+				{
+					Key:   "name",
+					Value: templateName,
+				},
 			}
-			result, err := NewTemplateGeneration().GenerateTemplate(db, strconv.Itoa(template.ID), templateArgumentParameterMap)
+
+			urlValues, err := url.ParseQuery(query)
+
+			result, err := NewTemplateGeneration().GetSingle(nil, db, parameters, urlValues, "")
+
 			if err != nil {
 				logging.Logger().Debug(err.Error())
 				return nil, err

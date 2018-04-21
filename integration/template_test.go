@@ -590,16 +590,21 @@ testParameterStringOverride = {{ .testParameterStringOverride }}`,
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template)
 
 	parameters := map[string]string{
-		"testParameterIntOverride":    "100",
-		"testParameterFloatOverride":  "200.123",
-		"testParameterBoolOverride":   "true",
-		"testParameterStringOverride": "QWERTY",
+		"p[testParameterIntOverride]":    "100",
+		"p[testParameterFloatOverride]":  "200.123",
+		"p[testParameterBoolOverride]":   "true",
+		"p[testParameterStringOverride]": "QWERTY",
 	}
 	responseText, code := Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%d", id), "generation", parameters), nil)
+	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestGenerateTemplate_1.txt"))
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "template_generations_by_name", template.Name, parameters), nil)
 	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestGenerateTemplate_1.txt"))
 
 	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%d", id), "raw", parameters), nil)
 	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestGenerateTemplate_2.txt"))
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "template_raws_by_name", template.Name, parameters), nil)
+	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestGenerateTemplate_2.txt"))
+
 }
 
 func TestTemplate_FuncMaps(t *testing.T) {
@@ -1208,10 +1213,8 @@ sequence[{{$i}}]={{$v}}
 		ID:   id4,
 		Name: "test14",
 		TemplateContent: `include test
-{{- $parameter := map }}
-{{- $parameter := put $parameter "testParameter1X" "999" }}
-{{ include .ModelStore "test12" nil }}
-{{ include .ModelStore "test13" $parameter }}
+{{ include .ModelStore "test12" "" }}
+{{ include .ModelStore "test13" "p[testParameter1X]=999" }}
 `,
 		Description: "test15desc",
 	}
@@ -1231,13 +1234,21 @@ sequence[{{$i}}]={{$v}}
 
 	responseText, code := Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%d", id), "generation", nil), nil)
 	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_FuncMaps_1.txt"))
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "template_generations_by_name", template1.Name, nil), nil)
+	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_FuncMaps_1.txt"))
 
 	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%d", id2), "generation", nil), nil)
+	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_FuncMaps_2.txt"))
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "template_generations_by_name", template2.Name, nil), nil)
 	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_FuncMaps_2.txt"))
 
 	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%d", id3), "generation", nil), nil)
 	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_FuncMaps_3.txt"))
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "template_generations_by_name", template3.Name, nil), nil)
+	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_FuncMaps_3.txt"))
 
 	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%d", id4), "generation", nil), nil)
+	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_FuncMaps_4.txt"))
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "template_generations_by_name", template4.Name, nil), nil)
 	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_FuncMaps_4.txt"))
 }
