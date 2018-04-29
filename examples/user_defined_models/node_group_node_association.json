@@ -12,7 +12,7 @@
 		},
 		{
 			"name": "NodeGroup",
-			"tag":  "json:\"node_group\"",
+			"tag":  "json:\"node_group\" gorm:\"ForeignKey:NodeGroupID\"",
 			"type_name": "NodeGroup"
 		},
 		{
@@ -22,7 +22,7 @@
 		},
 		{
 			"name": "Node",
-			"tag":  "json:\"node\"",
+			"tag":  "json:\"node\" gorm:\"ForeignKey:NodeID\"",
 			"type_name": "Node"
 		}
 	],
@@ -35,5 +35,5 @@
 		"  begin",
 		"    delete from node_group_node_associations where node_id = old.id;",
 		"  end;"
-	]	
+	]
 }

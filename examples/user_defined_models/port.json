@@ -16,7 +16,7 @@
 		},
     {
 			"name": "Node",
-			"tag":  "json:\"node\"",
+			"tag":  "json:\"node\" gorm:\"ForeignKey:NodeID\"",
 			"type_name": "Node"
 		},
 		{

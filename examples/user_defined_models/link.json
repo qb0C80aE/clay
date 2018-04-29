@@ -11,17 +11,17 @@
 		},
 		{
 			"name": "SourcePort",
-			"tag":  "json:\"source_port\"",
+			"tag":  "json:\"source_port\" gorm:\"ForeignKey:SourcePortID\"",
 			"type_name": "Port"
 		},
     {
 			"name": "DestinationPortID",
-			"tag":  "json:\"destination_port_id\" gorm:\"primary_key;\" sql:\"type:integer references ports(id)\"",
+			"tag":  "json:\"destination_port_id\" sql:\"type:integer references ports(id)\"",
 			"type_name": "int"
 		},
 		{
 			"name": "DestinationPort",
-			"tag":  "json:\"destination_port\"",
+			"tag":  "json:\"destination_port\" gorm:\"ForeignKey:DestinationPortID\"",
 			"type_name": "Port"
 		}
 	],
