@@ -38,16 +38,16 @@ var typeNameTypeMap = map[string]reflect.Type{
 // UserDefinedModelDefinition is the model class what represents raw template
 type UserDefinedModelDefinition struct {
 	Base
-	TypeName                string                             `json:"type_name" clay:"key_parameter" validate:"required"`
-	ResourceName            string                             `json:"resource_name" validate:"required"`
-	ToBeMigrated            bool                               `json:"to_be_migrated"`
-	IsControllerEnabled     bool                               `json:"is_controller_enabled"`
-	SQLBeforeMigration      []string                           `json:"sql_before_migration"`
-	SQLAfterMigration       []string                           `json:"sql_after_migration"`
-	SQLDesignExtraction     []string                           `json:"sql_design_extraction"`
-	SQLDesignDeletion       []string                           `json:"sql_design_deletion"`
-	IsManyToManyAssociation bool                               `json:"is_many_to_many_association"`
-	Fields                  []*UserDefinedModelFieldDefinition `json:"fields" validate:"gt=0"`
+	TypeName                    string                             `json:"type_name" clay:"key_parameter" validate:"required"`
+	ResourceName                string                             `json:"resource_name" validate:"required"`
+	ToBeMigrated                bool                               `json:"to_be_migrated"`
+	IsControllerEnabled         bool                               `json:"is_controller_enabled"`
+	SQLBeforeMigration          []string                           `json:"sql_before_migration"`
+	SQLAfterMigration           []string                           `json:"sql_after_migration"`
+	SQLWhereForDesignExtraction []string                           `json:"sql_where_for_design_extraction"`
+	SQLWhereForDesignDeletion   []string                           `json:"sql_where_for_design_deletion"`
+	IsManyToManyAssociation     bool                               `json:"is_many_to_many_association"`
+	Fields                      []*UserDefinedModelFieldDefinition `json:"fields" validate:"gt=0"`
 }
 
 // NewUserDefinedModelDefinition creates a template raw model instance
@@ -215,8 +215,8 @@ func (receiver *UserDefinedModelDefinition) Create(model extension.Model, db *go
 		newUserDefinedManyToManyAssociationModel.isControllerEnabled = userDefinedModelDefinition.IsControllerEnabled
 		newUserDefinedManyToManyAssociationModel.sqlBeforeMigration = strings.Join(userDefinedModelDefinition.SQLBeforeMigration, "\n")
 		newUserDefinedManyToManyAssociationModel.sqlAfterMigration = strings.Join(userDefinedModelDefinition.SQLAfterMigration, "\n")
-		newUserDefinedManyToManyAssociationModel.sqlDesignExtraction = strings.Join(userDefinedModelDefinition.SQLDesignExtraction, "\n")
-		newUserDefinedManyToManyAssociationModel.sqlDesignDeletion = strings.Join(userDefinedModelDefinition.SQLDesignDeletion, "\n")
+		newUserDefinedManyToManyAssociationModel.sqlWhereForDesignExtraction = strings.Join(userDefinedModelDefinition.SQLWhereForDesignExtraction, "\n")
+		newUserDefinedManyToManyAssociationModel.sqlWhereForDesignDeletion = strings.Join(userDefinedModelDefinition.SQLWhereForDesignDeletion, "\n")
 		newUserDefinedManyToManyAssociationModel.structFieldList = structFieldList
 
 		newModel = newUserDefinedManyToManyAssociationModel
@@ -231,8 +231,8 @@ func (receiver *UserDefinedModelDefinition) Create(model extension.Model, db *go
 		newUserDefinedModel.isControllerEnabled = userDefinedModelDefinition.IsControllerEnabled
 		newUserDefinedModel.sqlBeforeMigration = strings.Join(userDefinedModelDefinition.SQLBeforeMigration, "\n")
 		newUserDefinedModel.sqlAfterMigration = strings.Join(userDefinedModelDefinition.SQLAfterMigration, "\n")
-		newUserDefinedModel.sqlDesignExtraction = strings.Join(userDefinedModelDefinition.SQLDesignExtraction, "\n")
-		newUserDefinedModel.sqlDesignDeletion = strings.Join(userDefinedModelDefinition.SQLDesignDeletion, "\n")
+		newUserDefinedModel.sqlWhereForDesignExtraction = strings.Join(userDefinedModelDefinition.SQLWhereForDesignExtraction, "\n")
+		newUserDefinedModel.sqlWhereForDesignDeletion = strings.Join(userDefinedModelDefinition.SQLWhereForDesignDeletion, "\n")
 		newUserDefinedModel.structFieldList = structFieldList
 
 		newModel = newUserDefinedModel
