@@ -12,7 +12,7 @@
 		},
 		{
 			"name": "PortGroup",
-			"tag":  "json:\"port_group\"",
+			"tag":  "json:\"port_group\" gorm:\"ForeignKey:PortGroupID\"",
 			"type_name": "PortGroup"
 		},
 		{
@@ -22,7 +22,7 @@
 		},
 		{
 			"name": "Port",
-			"tag":  "json:\"port\"",
+			"tag":  "json:\"port\" gorm:\"ForeignKey:PortID\"",
 			"type_name": "Port"
 		}
 	],
