@@ -1151,6 +1151,28 @@ sequence
 {{- range $i, $v := $s }}
 sequence[{{ $i }}]={{ $v }}
 {{- end }}
+
+--- net ---
+{{- $a := .Network.ParseCIDR "192.168.0.100/24" }}
+{{ $a.String }}
+{{ $a.NetMask }}
+{{ $a.CIDR }}
+{{ $a.IncreaseHostAddress }}
+{{ $a.DecreaseHostAddress }}
+{{ $a.IncreaseNetworkAddress }}
+{{ $a.DecreaseNetworkAddress }}
+{{ $a.IncreaseIPAddress }}
+{{ $a.DecreaseIPAddress }}
+{{ $a.LimitedBroadcastAddress }}
+{{ $a.NetworkAddress }}
+{{ $a.MaxHostAddress }}
+{{ $a.MinimumHostAddress }}
+{{ $a.IsBroadcastAddress }}
+{{ $a.IsNetworkAddress }}
+{{- $b := .Network.ParseCIDR "192.168.0.200/24" }}
+{{ $a.IsIncluding $b }}
+{{- $c := .Network.ParseCIDR "192.168.1.200/24" }}
+{{ $a.IsIncluding $c }}
 `,
 		Description: "test1desc",
 	}
