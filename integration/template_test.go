@@ -475,24 +475,24 @@ func TestTemplate_Generate(t *testing.T) {
 		ID:   id,
 		Name: "test",
 		TemplateContent: "" +
-			`testParameterInt = {{ .testParameterInt }}
-testParameterInt8 = {{ .testParameterInt8 }}
-testParameterInt16 = {{ .testParameterInt16 }}
-testParameterInt32 = {{ .testParameterInt32 }}
-testParameterInt64 = {{ .testParameterInt64 }}
-testParameterUint = {{ .testParameterUint }}
-testParameterUint8 = {{ .testParameterUint8 }}
-testParameterUint16 = {{ .testParameterUint16 }}
-testParameterUint32 = {{ .testParameterUint32 }}
-testParameterUint64 = {{ .testParameterUint64 }}
-testParameterFloat32 = {{ .testParameterFloat32 }}
-testParameterFloat64 = {{ .testParameterFloat64 }}
-testParameterBool = {{ .testParameterBool }}
-testParameterString = {{ .testParameterString }}
-testParameterIntOverride = {{ .testParameterIntOverride }}
-testParameterFloatOverride = {{ .testParameterFloatOverride }}
-testParameterBoolOverride = {{ .testParameterBoolOverride }}
-testParameterStringOverride = {{ .testParameterStringOverride }}`,
+			`testParameterInt = {{ .Parameter.testParameterInt }}
+testParameterInt8 = {{ .Parameter.testParameterInt8 }}
+testParameterInt16 = {{ .Parameter.testParameterInt16 }}
+testParameterInt32 = {{ .Parameter.testParameterInt32 }}
+testParameterInt64 = {{ .Parameter.testParameterInt64 }}
+testParameterUint = {{ .Parameter.testParameterUint }}
+testParameterUint8 = {{ .Parameter.testParameterUint8 }}
+testParameterUint16 = {{ .Parameter.testParameterUint16 }}
+testParameterUint32 = {{ .Parameter.testParameterUint32 }}
+testParameterUint64 = {{ .Parameter.testParameterUint64 }}
+testParameterFloat32 = {{ .Parameter.testParameterFloat32 }}
+testParameterFloat64 = {{ .Parameter.testParameterFloat64 }}
+testParameterBool = {{ .Parameter.testParameterBool }}
+testParameterString = {{ .Parameter.testParameterString }}
+testParameterIntOverride = {{ .Parameter.testParameterIntOverride }}
+testParameterFloatOverride = {{ .Parameter.testParameterFloatOverride }}
+testParameterBoolOverride = {{ .Parameter.testParameterBoolOverride }}
+testParameterStringOverride = {{ .Parameter.testParameterStringOverride }}`,
 		TemplateArguments: []*model.TemplateArgument{
 			{
 				Name:         "testParameterInt",
@@ -607,7 +607,7 @@ testParameterStringOverride = {{ .testParameterStringOverride }}`,
 
 }
 
-func TestTemplate_FuncMaps(t *testing.T) {
+func TestTemplate_Functions(t *testing.T) {
 	server := SetupServer()
 	defer server.Close()
 
@@ -617,43 +617,43 @@ func TestTemplate_FuncMaps(t *testing.T) {
 		Name: "test1",
 		TemplateContent: `--- calc ---
 i = 100
-{{- $i := 100}}
+{{- $i := 100 }}
 
 i = i + 2
-{{- $i := add $i 2}}
-{{$i}}
+{{- $i := .Core.Add $i 2 }}
+{{ $i }}
 
 i = i - 4
-{{- $i := sub $i 4}}
-{{$i}}
+{{- $i := .Core.Sub $i 4 }}
+{{ $i }}
 
 i = i * 6
-{{- $i := mul $i 6}}
-{{$i}}
+{{- $i := .Core.Mul $i 6 }}
+{{ $i }}
 
 i = i / 2
-{{- $i := div $i 2}}
-{{$i}}
+{{- $i := .Core.Div $i 2 }}
+{{ $i }}
 
 i = i mod 5
-{{- $i := mod $i 5}}
-{{$i}}
+{{- $i := .Core.Mod $i 5 }}
+{{ $i }}
 
 --- conversion ---
-{{- $vint := int "100" }}
-{{- $vint8 := int8 "101" }}
-{{- $vint16 := int16 "102" }}
-{{- $vint32 := int32 "103" }}
-{{- $vint64 := int64 "104" }}
-{{- $vuint := uint "200" }}
-{{- $vuint8 := uint8 "201" }}
-{{- $vuint16 := uint16 "202" }}
-{{- $vuint32 := uint32 "203" }}
-{{- $vuint64 := uint64 "204" }}
-{{- $vfloat32 := float32 "300.1" }}
-{{- $vfloat64 := float64 "300.2" }}
-{{- $vboolean := boolean "false" }}
-{{- $vmap := map "key" "value" }}
+{{- $vint := .Core.Int "100" }}
+{{- $vint8 := .Core.Int8 "101" }}
+{{- $vint16 := .Core.Int16 "102" }}
+{{- $vint32 := .Core.Int32 "103" }}
+{{- $vint64 := .Core.Int64 "104" }}
+{{- $vuint := .Core.Uint "200" }}
+{{- $vuint8 := .Core.Uint8 "201" }}
+{{- $vuint16 := .Core.Uint16 "202" }}
+{{- $vuint32 := .Core.Uint32 "203" }}
+{{- $vuint64 := .Core.Uint64 "204" }}
+{{- $vfloat32 := .Core.Float32 "300.1" }}
+{{- $vfloat64 := .Core.Float64 "300.2" }}
+{{- $vboolean := .Core.Boolean "false" }}
+{{- $vmap := .Core.Map "key" "value" }}
 {{ $vint }}
 {{ $vint8 }}
 {{ $vint16 }}
@@ -668,20 +668,20 @@ i = i mod 5
 {{ $vfloat64 }}
 {{ $vboolean }}
 {{ $vmap }}
-{{- $sint := string $vint }}
-{{- $sint8 := string $vint8 }}
-{{- $sint16 := string $vint16 }}
-{{- $sint32 := string $vint32 }}
-{{- $sint64 := string $vint64 }}
-{{- $suint := string $vuint }}
-{{- $suint8 := string $vuint8 }}
-{{- $suint16 := string $vuint16 }}
-{{- $suint32 := string $vuint32 }}
-{{- $suint64 := string $vuint64 }}
-{{- $sfloat32:= string $vfloat32 }}
-{{- $sfloat64 := string $vfloat64 }}
-{{- $sboolean := string $vboolean }}
-{{- $sobject := string $vmap }}
+{{- $sint := .Core.String $vint }}
+{{- $sint8 := .Core.String $vint8 }}
+{{- $sint16 := .Core.String $vint16 }}
+{{- $sint32 := .Core.String $vint32 }}
+{{- $sint64 := .Core.String $vint64 }}
+{{- $suint := .Core.String $vuint }}
+{{- $suint8 := .Core.String $vuint8 }}
+{{- $suint16 := .Core.String $vuint16 }}
+{{- $suint32 := .Core.String $vuint32 }}
+{{- $suint64 := .Core.String $vuint64 }}
+{{- $sfloat32:= .Core.String $vfloat32 }}
+{{- $sfloat64 := .Core.String $vfloat64 }}
+{{- $sboolean := .Core.String $vboolean }}
+{{- $sobject := .Core.String $vmap }}
 {{ $sint }}
 {{ $sint8 }}
 {{ $sint16 }}
@@ -696,461 +696,461 @@ i = i mod 5
 {{ $sfloat64 }}
 {{ $sboolean }}
 {{ $sobject }}
-{{ int $vint }}
-{{ int $vint8 }}
-{{ int $vint16 }}
-{{ int $vint32 }}
-{{ int $vint64 }}
-{{ int $vuint }}
-{{ int $vuint8 }}
-{{ int $vuint16 }}
-{{ int $vuint32 }}
-{{ int $vuint64 }}
-{{ int $vfloat32 }}
-{{ int $vfloat64 }}
-{{ int8 $vint }}
-{{ int8 $vint8 }}
-{{ int8 $vint16 }}
-{{ int8 $vint32 }}
-{{ int8 $vint64 }}
-{{ int8 $vuint }}
-{{ int8 $vuint8 }}
-{{ int8 $vuint16 }}
-{{ int8 $vuint32 }}
-{{ int8 $vuint64 }}
-{{ int8 $vfloat32 }}
-{{ int8 $vfloat64 }}
-{{ int16 $vint }}
-{{ int16 $vint8 }}
-{{ int16 $vint16 }}
-{{ int16 $vint32 }}
-{{ int16 $vint64 }}
-{{ int16 $vuint }}
-{{ int16 $vuint8 }}
-{{ int16 $vuint16 }}
-{{ int16 $vuint32 }}
-{{ int16 $vuint64 }}
-{{ int16 $vfloat32 }}
-{{ int16 $vfloat64 }}
-{{ int32 $vint }}
-{{ int32 $vint8 }}
-{{ int32 $vint16 }}
-{{ int32 $vint32 }}
-{{ int32 $vint64 }}
-{{ int32 $vuint }}
-{{ int32 $vuint8 }}
-{{ int32 $vuint16 }}
-{{ int32 $vuint32 }}
-{{ int32 $vuint64 }}
-{{ int32 $vfloat32 }}
-{{ int32 $vfloat64 }}
-{{ int64 $vint }}
-{{ int64 $vint8 }}
-{{ int64 $vint16 }}
-{{ int64 $vint32 }}
-{{ int64 $vint64 }}
-{{ int64 $vuint }}
-{{ int64 $vuint8 }}
-{{ int64 $vuint16 }}
-{{ int64 $vuint32 }}
-{{ int64 $vuint64 }}
-{{ int64 $vfloat32 }}
-{{ int64 $vfloat64 }}
-{{ uint $vint }}
-{{ uint $vint8 }}
-{{ uint $vint16 }}
-{{ uint $vint32 }}
-{{ uint $vint64 }}
-{{ uint $vuint }}
-{{ uint $vuint8 }}
-{{ uint $vuint16 }}
-{{ uint $vuint32 }}
-{{ uint $vuint64 }}
-{{ uint $vfloat32 }}
-{{ uint $vfloat64 }}
-{{ uint8 $vint }}
-{{ uint8 $vint8 }}
-{{ uint8 $vint16 }}
-{{ uint8 $vint32 }}
-{{ uint8 $vint64 }}
-{{ uint8 $vuint }}
-{{ uint8 $vuint8 }}
-{{ uint8 $vuint16 }}
-{{ uint8 $vuint32 }}
-{{ uint8 $vuint64 }}
-{{ uint8 $vfloat32 }}
-{{ uint8 $vfloat64 }}
-{{ uint16 $vint }}
-{{ uint16 $vint8 }}
-{{ uint16 $vint16 }}
-{{ uint16 $vint32 }}
-{{ uint16 $vint64 }}
-{{ uint16 $vuint }}
-{{ uint16 $vuint8 }}
-{{ uint16 $vuint16 }}
-{{ uint16 $vuint32 }}
-{{ uint16 $vuint64 }}
-{{ uint16 $vfloat32 }}
-{{ uint16 $vfloat64 }}
-{{ uint32 $vint }}
-{{ uint32 $vint8 }}
-{{ uint32 $vint16 }}
-{{ uint32 $vint32 }}
-{{ uint32 $vint64 }}
-{{ uint32 $vuint }}
-{{ uint32 $vuint8 }}
-{{ uint32 $vuint16 }}
-{{ uint32 $vuint32 }}
-{{ uint32 $vuint64 }}
-{{ uint32 $vfloat32 }}
-{{ uint32 $vfloat64 }}
-{{ uint64 $vint }}
-{{ uint64 $vint8 }}
-{{ uint64 $vint16 }}
-{{ uint64 $vint32 }}
-{{ uint64 $vint64 }}
-{{ uint64 $vuint }}
-{{ uint64 $vuint8 }}
-{{ uint64 $vuint16 }}
-{{ uint64 $vuint32 }}
-{{ uint64 $vuint64 }}
-{{ uint64 $vfloat32 }}
-{{ uint64 $vfloat64 }}
-{{ float32 $vint }}
-{{ float32 $vint8 }}
-{{ float32 $vint16 }}
-{{ float32 $vint32 }}
-{{ float32 $vint64 }}
-{{ float32 $vuint }}
-{{ float32 $vuint8 }}
-{{ float32 $vuint16 }}
-{{ float32 $vuint32 }}
-{{ float32 $vuint64 }}
-{{ float32 $vfloat32 }}
-{{ float32 $vfloat64 }}
-{{ float64 $vint }}
-{{ float64 $vint8 }}
-{{ float64 $vint16 }}
-{{ float64 $vint32 }}
-{{ float64 $vint64 }}
-{{ float64 $vuint }}
-{{ float64 $vuint8 }}
-{{ float64 $vuint16 }}
-{{ float64 $vuint32 }}
-{{ float64 $vuint64 }}
-{{ float64 $vfloat32 }}
-{{ float64 $vfloat64 }}
+{{ .Core.Int $vint }}
+{{ .Core.Int $vint8 }}
+{{ .Core.Int $vint16 }}
+{{ .Core.Int $vint32 }}
+{{ .Core.Int $vint64 }}
+{{ .Core.Int $vuint }}
+{{ .Core.Int $vuint8 }}
+{{ .Core.Int $vuint16 }}
+{{ .Core.Int $vuint32 }}
+{{ .Core.Int $vuint64 }}
+{{ .Core.Int $vfloat32 }}
+{{ .Core.Int $vfloat64 }}
+{{ .Core.Int8 $vint }}
+{{ .Core.Int8 $vint8 }}
+{{ .Core.Int8 $vint16 }}
+{{ .Core.Int8 $vint32 }}
+{{ .Core.Int8 $vint64 }}
+{{ .Core.Int8 $vuint }}
+{{ .Core.Int8 $vuint8 }}
+{{ .Core.Int8 $vuint16 }}
+{{ .Core.Int8 $vuint32 }}
+{{ .Core.Int8 $vuint64 }}
+{{ .Core.Int8 $vfloat32 }}
+{{ .Core.Int8 $vfloat64 }}
+{{ .Core.Int16 $vint }}
+{{ .Core.Int16 $vint8 }}
+{{ .Core.Int16 $vint16 }}
+{{ .Core.Int16 $vint32 }}
+{{ .Core.Int16 $vint64 }}
+{{ .Core.Int16 $vuint }}
+{{ .Core.Int16 $vuint8 }}
+{{ .Core.Int16 $vuint16 }}
+{{ .Core.Int16 $vuint32 }}
+{{ .Core.Int16 $vuint64 }}
+{{ .Core.Int16 $vfloat32 }}
+{{ .Core.Int16 $vfloat64 }}
+{{ .Core.Int32 $vint }}
+{{ .Core.Int32 $vint8 }}
+{{ .Core.Int32 $vint16 }}
+{{ .Core.Int32 $vint32 }}
+{{ .Core.Int32 $vint64 }}
+{{ .Core.Int32 $vuint }}
+{{ .Core.Int32 $vuint8 }}
+{{ .Core.Int32 $vuint16 }}
+{{ .Core.Int32 $vuint32 }}
+{{ .Core.Int32 $vuint64 }}
+{{ .Core.Int32 $vfloat32 }}
+{{ .Core.Int32 $vfloat64 }}
+{{ .Core.Int64 $vint }}
+{{ .Core.Int64 $vint8 }}
+{{ .Core.Int64 $vint16 }}
+{{ .Core.Int64 $vint32 }}
+{{ .Core.Int64 $vint64 }}
+{{ .Core.Int64 $vuint }}
+{{ .Core.Int64 $vuint8 }}
+{{ .Core.Int64 $vuint16 }}
+{{ .Core.Int64 $vuint32 }}
+{{ .Core.Int64 $vuint64 }}
+{{ .Core.Int64 $vfloat32 }}
+{{ .Core.Int64 $vfloat64 }}
+{{ .Core.Uint $vint }}
+{{ .Core.Uint $vint8 }}
+{{ .Core.Uint $vint16 }}
+{{ .Core.Uint $vint32 }}
+{{ .Core.Uint $vint64 }}
+{{ .Core.Uint $vuint }}
+{{ .Core.Uint $vuint8 }}
+{{ .Core.Uint $vuint16 }}
+{{ .Core.Uint $vuint32 }}
+{{ .Core.Uint $vuint64 }}
+{{ .Core.Uint $vfloat32 }}
+{{ .Core.Uint $vfloat64 }}
+{{ .Core.Uint8 $vint }}
+{{ .Core.Uint8 $vint8 }}
+{{ .Core.Uint8 $vint16 }}
+{{ .Core.Uint8 $vint32 }}
+{{ .Core.Uint8 $vint64 }}
+{{ .Core.Uint8 $vuint }}
+{{ .Core.Uint8 $vuint8 }}
+{{ .Core.Uint8 $vuint16 }}
+{{ .Core.Uint8 $vuint32 }}
+{{ .Core.Uint8 $vuint64 }}
+{{ .Core.Uint8 $vfloat32 }}
+{{ .Core.Uint8 $vfloat64 }}
+{{ .Core.Uint16 $vint }}
+{{ .Core.Uint16 $vint8 }}
+{{ .Core.Uint16 $vint16 }}
+{{ .Core.Uint16 $vint32 }}
+{{ .Core.Uint16 $vint64 }}
+{{ .Core.Uint16 $vuint }}
+{{ .Core.Uint16 $vuint8 }}
+{{ .Core.Uint16 $vuint16 }}
+{{ .Core.Uint16 $vuint32 }}
+{{ .Core.Uint16 $vuint64 }}
+{{ .Core.Uint16 $vfloat32 }}
+{{ .Core.Uint16 $vfloat64 }}
+{{ .Core.Uint32 $vint }}
+{{ .Core.Uint32 $vint8 }}
+{{ .Core.Uint32 $vint16 }}
+{{ .Core.Uint32 $vint32 }}
+{{ .Core.Uint32 $vint64 }}
+{{ .Core.Uint32 $vuint }}
+{{ .Core.Uint32 $vuint8 }}
+{{ .Core.Uint32 $vuint16 }}
+{{ .Core.Uint32 $vuint32 }}
+{{ .Core.Uint32 $vuint64 }}
+{{ .Core.Uint32 $vfloat32 }}
+{{ .Core.Uint32 $vfloat64 }}
+{{ .Core.Uint64 $vint }}
+{{ .Core.Uint64 $vint8 }}
+{{ .Core.Uint64 $vint16 }}
+{{ .Core.Uint64 $vint32 }}
+{{ .Core.Uint64 $vint64 }}
+{{ .Core.Uint64 $vuint }}
+{{ .Core.Uint64 $vuint8 }}
+{{ .Core.Uint64 $vuint16 }}
+{{ .Core.Uint64 $vuint32 }}
+{{ .Core.Uint64 $vuint64 }}
+{{ .Core.Uint64 $vfloat32 }}
+{{ .Core.Uint64 $vfloat64 }}
+{{ .Core.Float32 $vint }}
+{{ .Core.Float32 $vint8 }}
+{{ .Core.Float32 $vint16 }}
+{{ .Core.Float32 $vint32 }}
+{{ .Core.Float32 $vint64 }}
+{{ .Core.Float32 $vuint }}
+{{ .Core.Float32 $vuint8 }}
+{{ .Core.Float32 $vuint16 }}
+{{ .Core.Float32 $vuint32 }}
+{{ .Core.Float32 $vuint64 }}
+{{ .Core.Float32 $vfloat32 }}
+{{ .Core.Float32 $vfloat64 }}
+{{ .Core.Float64 $vint }}
+{{ .Core.Float64 $vint8 }}
+{{ .Core.Float64 $vint16 }}
+{{ .Core.Float64 $vint32 }}
+{{ .Core.Float64 $vint64 }}
+{{ .Core.Float64 $vuint }}
+{{ .Core.Float64 $vuint8 }}
+{{ .Core.Float64 $vuint16 }}
+{{ .Core.Float64 $vuint32 }}
+{{ .Core.Float64 $vuint64 }}
+{{ .Core.Float64 $vfloat32 }}
+{{ .Core.Float64 $vfloat64 }}
 
 --- string ---
 join
-{{- $data := slice 1 99.99 "a" false }}
-{{- $sj := join $data ","}}
-join string: {{$sj}}
+{{- $data := .Core.Slice 1 99.99 "a" false }}
+{{- $sj := .Core.Join $data "," }}
+join string: {{ $sj}}
 
 split
-{{- $ss := split $sj ","}}
-split slice: {{$ss}}
+{{- $ss := .Core.Split $sj "," }}
+split slice: {{ $ss }}
 
 --- slice ---
 slice init
-{{- $slice1 := slice}}
-slice1: {{$slice1}}
+{{- $slice1 := .Core.Slice }}
+slice1: {{ $slice1 }}
 
 slice init
-{{- $slice2 := slice 1 2 3 4 5}}
-slice2: {{$slice2}}
+{{- $slice2 := .Core.Slice 1 2 3 4 5 }}
+slice2: {{ $slice2 }}
 
 slice init
-{{- $slice3 := slice 3 4 5 6 7}}
-slice3: {{$slice3}}
+{{- $slice3 := .Core.Slice 3 4 5 6 7 }}
+slice3: {{ $slice3 }}
 
 subslice
-{{- $subslice := subslice $slice3 -1 3}}
-{{$subslice}}
+{{- $subslice := .Core.SubSlice $slice3 -1 3 }}
+{{ $subslice }}
 
 subslice
-{{subslice $slice3 1 -1}}
+{{ .Core.SubSlice $slice3 1 -1 }}
 
 subslice
-{{subslice $slice3 -1 -1}}
+{{ .Core.SubSlice $slice3 -1 -1 }}
 
 subslice
-{{subslice $slice3 1 3}}
+{{ .Core.SubSlice $slice3 1 3 }}
 
 append
-{{- $slice3 := append $slice3 8 9 10}}
-{{$slice3}}
+{{- $slice3 := .Core.Append $slice3 8 9 10 }}
+{{ $slice3 }}
 
 concatenate
-{{concatenate $slice2 $slice3}}
+{{ .Core.Concatenate $slice2 $slice3 }}
 
 fieldslice
-{{- $tpp := multi .ModelStore "template_arguments" ""}}
-{{- $idfields := fieldslice $tpp "ID"}}
-{{- $namefields := fieldslice $tpp "Name"}}
-{{- $idfields := sort $idfields "asc"}}
-{{- $namefields := sort $namefields "asc"}}
-{{$idfields}}
-{{$namefields}}
+{{- $tpp := .ModelStore.Multi "template_arguments" "" }}
+{{- $idfields := .Core.FieldSlice $tpp "ID" }}
+{{- $namefields := .Core.FieldSlice $tpp "Name" }}
+{{- $idfields := .Core.Sort $idfields "asc" }}
+{{- $namefields := .Core.Sort $namefields "asc" }}
+{{ $idfields }}
+{{ $namefields }}
 
 sort
-{{- $sliceint := slice}}
-{{- $v1 := int 3}}
-{{- $v2 := int 1}}
-{{- $v3 := int -5}}
-{{- $v4 := int 2}}
-{{- $v5 := int 4}}
-{{- $sliceint := append $sliceint $v1 $v2 $v3 $v4 $v5}}
-{{- $sliceint := sort $sliceint "asc" }}
-sliceint asc: {{$sliceint}}
-{{- $sliceint := sort $sliceint "desc" }}
-sliceint desc: {{$sliceint}}
-{{- $sliceint8 := slice}}
-{{- $v1 := int8 3}}
-{{- $v2 := int8 1}}
-{{- $v3 := int8 -5}}
-{{- $v4 := int8 2}}
-{{- $v5 := int8 4}}
-{{- $sliceint8 := append $sliceint8 $v1 $v2 $v3 $v4 $v5}}
-{{- $sliceint8 := sort $sliceint8 "asc" }}
-sliceint8 asc: {{$sliceint8}}
-{{- $sliceint8 := sort $sliceint8 "desc" }}
-sliceint8 desc: {{$sliceint8}}
-{{- $sliceint16 := slice}}
-{{- $v1 := int16 3}}
-{{- $v2 := int16 1}}
-{{- $v3 := int16 -5}}
-{{- $v4 := int16 2}}
-{{- $v5 := int16 4}}
-{{- $sliceint16 := append $sliceint16 $v1 $v2 $v3 $v4 $v5}}
-{{- $sliceint16 := sort $sliceint16 "asc" }}
-sliceint16 asc: {{$sliceint16}}
-{{- $sliceint16 := sort $sliceint16 "desc" }}
-sliceint16 desc: {{$sliceint16}}
-{{- $sliceint32 := slice}}
-{{- $v1 := int32 3}}
-{{- $v2 := int32 1}}
-{{- $v3 := int32 -5}}
-{{- $v4 := int32 2}}
-{{- $v5 := int32 4}}
-{{- $sliceint32 := append $sliceint32 $v1 $v2 $v3 $v4 $v5}}
-{{- $sliceint32 := sort $sliceint32 "asc" }}
-sliceint32 asc: {{$sliceint32}}
-{{- $sliceint32 := sort $sliceint32 "desc" }}
-sliceint32 desc: {{$sliceint32}}
-{{- $sliceint64 := slice}}
-{{- $v1 := int64 3}}
-{{- $v2 := int64 1}}
-{{- $v3 := int64 -5}}
-{{- $v4 := int64 2}}
-{{- $v5 := int64 4}}
-{{- $sliceint64 := append $sliceint64 $v1 $v2 $v3 $v4 $v5}}
-{{- $sliceint64 := sort $sliceint64 "asc" }}
-sliceint64 asc: {{$sliceint64}}
-{{- $sliceint64 := sort $sliceint64 "desc" }}
-sliceint64 desc: {{$sliceint64}}
-{{- $sliceuint := slice}}
-{{- $v1 := uint 3}}
-{{- $v2 := uint 1}}
-{{- $v3 := uint 5}}
-{{- $v4 := uint 2}}
-{{- $v5 := uint 4}}
-{{- $sliceuint := append $sliceuint $v1 $v2 $v3 $v4 $v5}}
-{{- $sliceuint := sort $sliceuint "asc" }}
-sliceuint asc: {{$sliceuint}}
-{{- $sliceuint := sort $sliceuint "desc" }}
-sliceuint desc: {{$sliceuint}}
-{{- $sliceuint8 := slice}}
-{{- $v1 := uint8 3}}
-{{- $v2 := uint8 1}}
-{{- $v3 := uint8 5}}
-{{- $v4 := uint8 2}}
-{{- $v5 := uint8 4}}
-{{- $sliceuint8 := append $sliceuint8 $v1 $v2 $v3 $v4 $v5}}
-{{- $sliceuint8 := sort $sliceuint8 "asc" }}
-sliceuint8 asc: {{$sliceuint8}}
-{{- $sliceuint8 := sort $sliceuint8 "desc" }}
-sliceuint8 desc: {{$sliceuint8}}
-{{- $sliceuint16 := slice}}
-{{- $v1 := uint16 3}}
-{{- $v2 := uint16 1}}
-{{- $v3 := uint16 5}}
-{{- $v4 := uint16 2}}
-{{- $v5 := uint16 4}}
-{{- $sliceuint16 := append $sliceuint16 $v1 $v2 $v3 $v4 $v5}}
-{{- $sliceuint16 := sort $sliceuint16 "asc" }}
-sliceuint16 asc: {{$sliceuint16}}
-{{- $sliceuint16 := sort $sliceuint16 "desc" }}
-sliceuint16 desc: {{$sliceuint16}}
-{{- $sliceuint32 := slice}}
-{{- $v1 := uint32 3}}
-{{- $v2 := uint32 1}}
-{{- $v3 := uint32 5}}
-{{- $v4 := uint32 2}}
-{{- $v5 := uint32 4}}
-{{- $sliceuint32 := append $sliceuint32 $v1 $v2 $v3 $v4 $v5}}
-{{- $sliceuint32 := sort $sliceuint32 "asc" }}
-sliceuint32 asc: {{$sliceuint32}}
-{{- $sliceuint32 := sort $sliceuint32 "desc" }}
-sliceuint32 desc: {{$sliceuint32}}
-{{- $sliceuint64 := slice}}
-{{- $v1 := uint64 3}}
-{{- $v2 := uint64 1}}
-{{- $v3 := uint64 5}}
-{{- $v4 := uint64 2}}
-{{- $v5 := uint64 4}}
-{{- $sliceuint64 := append $sliceuint64 $v1 $v2 $v3 $v4 $v5}}
-{{- $sliceuint64 := sort $sliceuint64 "asc" }}
-sliceuint64 asc: {{$sliceuint64}}
-{{- $sliceuint64 := sort $sliceuint64 "desc" }}
-sliceuint64 desc: {{$sliceuint64}}
-{{- $slicefloat32 := slice}}
-{{- $v1 := float32 3.3}}
-{{- $v2 := float32 1}}
-{{- $v3 := float32 -5.1}}
-{{- $v4 := float32 2.2}}
-{{- $v5 := float32 4}}
-{{- $slicefloat32 := append $slicefloat32 $v1 $v2 $v3 $v4 $v5}}
-{{- $slicefloat32 := sort $slicefloat32 "asc" }}
-slicefloat32 asc: {{$slicefloat32}}
-{{- $slicefloat32 := sort $slicefloat32 "desc" }}
-slicefloat32 desc: {{$slicefloat32}}
-{{- $slicefloat64 := slice}}
-{{- $v1 := float64 3.3}}
-{{- $v2 := float64 1}}
-{{- $v3 := float64 -5.1}}
-{{- $v4 := float64 2.2}}
-{{- $v5 := float64 4}}
-{{- $slicefloat64 := append $slicefloat64 $v1 $v2 $v3 $v4 $v5}}
-{{- $slicefloat64 := sort $slicefloat64 "asc" }}
-slicefloat64 asc: {{$slicefloat64}}
-{{- $slicefloat64 := sort $slicefloat64 "desc" }}
-slicefloat64 desc: {{$slicefloat64}}
-{{- $slicestring := slice}}
-{{- $v1 := "3.3"}}
-{{- $v2 := "ABC"}}
-{{- $v3 := "-5.1"}}
-{{- $v4 := "012"}}
-{{- $v5 := "def"}}
-{{- $slicestring := append $slicestring $v1 $v2 $v3 $v4 $v5}}
-{{- $slicestring := sort $slicestring "asc" }}
-slicestring asc: {{$slicestring}}
-{{- $slicestring := sort $slicestring "desc" }}
-slicestring desc: {{$slicestring}}
+{{- $sliceint := .Core.Slice }}
+{{- $v1 := .Core.Int 3 }}
+{{- $v2 := .Core.Int 1 }}
+{{- $v3 := .Core.Int -5 }}
+{{- $v4 := .Core.Int 2 }}
+{{- $v5 := .Core.Int 4 }}
+{{- $sliceint := .Core.Append $sliceint $v1 $v2 $v3 $v4 $v5 }}
+{{- $sliceint := .Core.Sort $sliceint "asc" }}
+sliceint asc: {{ $sliceint }}
+{{- $sliceint := .Core.Sort $sliceint "desc" }}
+sliceint desc: {{ $sliceint }}
+{{- $sliceint8 := .Core.Slice }}
+{{- $v1 := .Core.Int8 3 }}
+{{- $v2 := .Core.Int8 1 }}
+{{- $v3 := .Core.Int8 -5 }}
+{{- $v4 := .Core.Int8 2 }}
+{{- $v5 := .Core.Int8 4 }}
+{{- $sliceint8 := .Core.Append $sliceint8 $v1 $v2 $v3 $v4 $v5 }}
+{{- $sliceint8 := .Core.Sort $sliceint8 "asc" }}
+sliceint8 asc: {{ $sliceint8}}
+{{- $sliceint8 := .Core.Sort $sliceint8 "desc" }}
+sliceint8 desc: {{ $sliceint8}}
+{{- $sliceint16 := .Core.Slice }}
+{{- $v1 := .Core.Int16 3 }}
+{{- $v2 := .Core.Int16 1 }}
+{{- $v3 := .Core.Int16 -5 }}
+{{- $v4 := .Core.Int16 2 }}
+{{- $v5 := .Core.Int16 4 }}
+{{- $sliceint16 := .Core.Append $sliceint16 $v1 $v2 $v3 $v4 $v5 }}
+{{- $sliceint16 := .Core.Sort $sliceint16 "asc" }}
+sliceint16 asc: {{ $sliceint16 }}
+{{- $sliceint16 := .Core.Sort $sliceint16 "desc" }}
+sliceint16 desc: {{ $sliceint16 }}
+{{- $sliceint32 := .Core.Slice }}
+{{- $v1 := .Core.Int32 3 }}
+{{- $v2 := .Core.Int32 1 }}
+{{- $v3 := .Core.Int32 -5 }}
+{{- $v4 := .Core.Int32 2 }}
+{{- $v5 := .Core.Int32 4 }}
+{{- $sliceint32 := .Core.Append $sliceint32 $v1 $v2 $v3 $v4 $v5 }}
+{{- $sliceint32 := .Core.Sort $sliceint32 "asc" }}
+sliceint32 asc: {{ $sliceint32 }}
+{{- $sliceint32 := .Core.Sort $sliceint32 "desc" }}
+sliceint32 desc: {{ $sliceint32 }}
+{{- $sliceint64 := .Core.Slice }}
+{{- $v1 := .Core.Int64 3 }}
+{{- $v2 := .Core.Int64 1 }}
+{{- $v3 := .Core.Int64 -5 }}
+{{- $v4 := .Core.Int64 2 }}
+{{- $v5 := .Core.Int64 4 }}
+{{- $sliceint64 := .Core.Append $sliceint64 $v1 $v2 $v3 $v4 $v5 }}
+{{- $sliceint64 := .Core.Sort $sliceint64 "asc" }}
+sliceint64 asc: {{ $sliceint64 }}
+{{- $sliceint64 := .Core.Sort $sliceint64 "desc" }}
+sliceint64 desc: {{ $sliceint64 }}
+{{- $sliceuint := .Core.Slice }}
+{{- $v1 := .Core.Uint 3 }}
+{{- $v2 := .Core.Uint 1 }}
+{{- $v3 := .Core.Uint 5 }}
+{{- $v4 := .Core.Uint 2 }}
+{{- $v5 := .Core.Uint 4 }}
+{{- $sliceuint := .Core.Append $sliceuint $v1 $v2 $v3 $v4 $v5 }}
+{{- $sliceuint := .Core.Sort $sliceuint "asc" }}
+sliceuint asc: {{ $sliceuint }}
+{{- $sliceuint := .Core.Sort $sliceuint "desc" }}
+sliceuint desc: {{ $sliceuint }}
+{{- $sliceuint8 := .Core.Slice }}
+{{- $v1 := .Core.Uint8 3 }}
+{{- $v2 := .Core.Uint8 1 }}
+{{- $v3 := .Core.Uint8 5 }}
+{{- $v4 := .Core.Uint8 2 }}
+{{- $v5 := .Core.Uint8 4 }}
+{{- $sliceuint8 := .Core.Append $sliceuint8 $v1 $v2 $v3 $v4 $v5 }}
+{{- $sliceuint8 := .Core.Sort $sliceuint8 "asc" }}
+sliceuint8 asc: {{ $sliceuint8}}
+{{- $sliceuint8 := .Core.Sort $sliceuint8 "desc" }}
+sliceuint8 desc: {{ $sliceuint8}}
+{{- $sliceuint16 := .Core.Slice }}
+{{- $v1 := .Core.Uint16 3 }}
+{{- $v2 := .Core.Uint16 1 }}
+{{- $v3 := .Core.Uint16 5 }}
+{{- $v4 := .Core.Uint16 2 }}
+{{- $v5 := .Core.Uint16 4 }}
+{{- $sliceuint16 := .Core.Append $sliceuint16 $v1 $v2 $v3 $v4 $v5 }}
+{{- $sliceuint16 := .Core.Sort $sliceuint16 "asc" }}
+sliceuint16 asc: {{ $sliceuint16 }}
+{{- $sliceuint16 := .Core.Sort $sliceuint16 "desc" }}
+sliceuint16 desc: {{ $sliceuint16 }}
+{{- $sliceuint32 := .Core.Slice }}
+{{- $v1 := .Core.Uint32 3 }}
+{{- $v2 := .Core.Uint32 1 }}
+{{- $v3 := .Core.Uint32 5 }}
+{{- $v4 := .Core.Uint32 2 }}
+{{- $v5 := .Core.Uint32 4 }}
+{{- $sliceuint32 := .Core.Append $sliceuint32 $v1 $v2 $v3 $v4 $v5 }}
+{{- $sliceuint32 := .Core.Sort $sliceuint32 "asc" }}
+sliceuint32 asc: {{ $sliceuint32 }}
+{{- $sliceuint32 := .Core.Sort $sliceuint32 "desc" }}
+sliceuint32 desc: {{ $sliceuint32 }}
+{{- $sliceuint64 := .Core.Slice }}
+{{- $v1 := .Core.Uint64 3 }}
+{{- $v2 := .Core.Uint64 1 }}
+{{- $v3 := .Core.Uint64 5 }}
+{{- $v4 := .Core.Uint64 2 }}
+{{- $v5 := .Core.Uint64 4 }}
+{{- $sliceuint64 := .Core.Append $sliceuint64 $v1 $v2 $v3 $v4 $v5 }}
+{{- $sliceuint64 := .Core.Sort $sliceuint64 "asc" }}
+sliceuint64 asc: {{ $sliceuint64 }}
+{{- $sliceuint64 := .Core.Sort $sliceuint64 "desc" }}
+sliceuint64 desc: {{ $sliceuint64 }}
+{{- $slicefloat64 := .Core.Slice }}
+{{- $v1 := .Core.Float32 3.3 }}
+{{- $v2 := .Core.Float32 1 }}
+{{- $v3 := .Core.Float32 -5.1 }}
+{{- $v4 := .Core.Float32 2.2 }}
+{{- $v5 := .Core.Float32 4 }}
+{{- $slicefloat64 := .Core.Append $slicefloat64 $v1 $v2 $v3 $v4 $v5 }}
+{{- $slicefloat64 := .Core.Sort $slicefloat64 "asc" }}
+slicefloat32 asc: {{ $slicefloat64 }}
+{{- $slicefloat64 := .Core.Sort $slicefloat64 "desc" }}
+slicefloat32 desc: {{ $slicefloat64 }}
+{{- $slicefloat64 := .Core.Slice }}
+{{- $v1 := .Core.Float64 3.3 }}
+{{- $v2 := .Core.Float64 1 }}
+{{- $v3 := .Core.Float64 -5.1 }}
+{{- $v4 := .Core.Float64 2.2 }}
+{{- $v5 := .Core.Float64 4 }}
+{{- $slicefloat64 := .Core.Append $slicefloat64 $v1 $v2 $v3 $v4 $v5 }}
+{{- $slicefloat64 := .Core.Sort $slicefloat64 "asc" }}
+slicefloat64 asc: {{ $slicefloat64 }}
+{{- $slicefloat64 := .Core.Sort $slicefloat64 "desc" }}
+slicefloat64 desc: {{ $slicefloat64 }}
+{{- $slicestring := .Core.Slice }}
+{{- $v1 := "3.3" }}
+{{- $v2 := "ABC" }}
+{{- $v3 := "-5.1" }}
+{{- $v4 := "012" }}
+{{- $v5 := "def" }}
+{{- $slicestring := .Core.Append $slicestring $v1 $v2 $v3 $v4 $v5 }}
+{{- $slicestring := .Core.Sort $slicestring "asc" }}
+slicestring asc: {{ $slicestring}}
+{{- $slicestring := .Core.Sort $slicestring "desc" }}
+slicestring desc: {{ $slicestring}}
 
 --- map ---
 map
-{{- $map1 := map}}
-map1: {{$map1}}
+{{- $map1 := .Core.Map }}
+map1: {{ $map1 }}
 
 map init get
-{{- $map2 := map 1 "A" 2 "B"}}
-map2[1]: {{get $map2 1}}
-map2[2]: {{get $map2 2}}
+{{- $map2 := .Core.Map 1 "A" 2 "B" }}
+map2[1]: {{ .Core.Get $map2 1 }}
+map2[2]: {{ .Core.Get $map2 2 }}
 
 map init get
-{{- $map3 := map 1 "C" 3 "D"}}
-map3[1]: {{get $map3 1}}
-map3[3]: {{get $map3 3}}
+{{- $map3 := .Core.Map 1 "C" 3 "D" }}
+map3[1]: {{ .Core.Get $map3 1 }}
+map3[3]: {{ .Core.Get $map3 3 }}
 
 map exists
-{{exists $map2 0}}
-{{- $e := exists $map2 1}}
-{{if eq $e true}}TRUE!!{{else}}FALSE!!{{end}}
+{{ .Core.Exists $map2 0 }}
+{{- $e := .Core.Exists $map2 1 }}
+{{ if eq $e true }}TRUE!!{{ else }}FALSE!!{{ end }}
 
 map put
-{{- $null := put $map1 4 "E"}}
-{{- $null := put $map1 5 "F"}}
-{{- $null := put $map1 6 "G"}}
-map1[4]: {{get $map1 4}}
-map1[5]: {{get $map1 5}}
-map1[6]: {{get $map1 6}}
+{{- $null := .Core.Put $map1 4 "E" }}
+{{- $null := .Core.Put $map1 5 "F" }}
+{{- $null := .Core.Put $map1 6 "G" }}
+map1[4]: {{ .Core.Get $map1 4 }}
+map1[5]: {{ .Core.Get $map1 5 }}
+map1[6]: {{ .Core.Get $map1 6 }}
 
 map delete
-{{- $null := delete $map1 5}}
-map1[3]: {{get $map1 3}}
-map1[4]: {{get $map1 4}}
-map1[5]: {{get $map1 5}}
-map1[6]: {{get $map1 6}}
-map1[7]: {{get $map1 7}}
+{{- $null := .Core.Delete $map1 5 }}
+map1[3]: {{ .Core.Get $map1 3 }}
+map1[4]: {{ .Core.Get $map1 4 }}
+map1[5]: {{ .Core.Get $map1 5 }}
+map1[6]: {{ .Core.Get $map1 6 }}
+map1[7]: {{ .Core.Get $map1 7 }}
 
 map merge
-{{- $null := merge $map2 $map1}}
-{{- $null := merge $map3 $map1}}
-map1[0]: {{get $map1 0}}
-map1[1]: {{get $map1 1}}
-map1[2]: {{get $map1 2}}
-map1[3]: {{get $map1 3}}
-map1[4]: {{get $map1 4}}
-map1[5]: {{get $map1 5}}
-map1[6]: {{get $map1 6}}
-map1[7]: {{get $map1 7}}
+{{- $null :=  .Core.Merge $map2 $map1 }}
+{{- $null :=  .Core.Merge $map3 $map1 }}
+map1[0]: {{ .Core.Get $map1 0 }}
+map1[1]: {{ .Core.Get $map1 1 }}
+map1[2]: {{ .Core.Get $map1 2 }}
+map1[3]: {{ .Core.Get $map1 3 }}
+map1[4]: {{ .Core.Get $map1 4 }}
+map1[5]: {{ .Core.Get $map1 5 }}
+map1[6]: {{ .Core.Get $map1 6 }}
+map1[7]: {{ .Core.Get $map1 7 }}
 
 map keys
-{{- $keys := keys $map1}}
-{{- $keys := sort $keys "asc"}}
-keys of map1: {{$keys}}
+{{- $keys := .Core.Keys $map1 }}
+{{- $keys := .Core.Sort $keys "asc" }}
+keys of map1: {{ $keys }}
 
 --- model store ---
 multi
-{{- $m := multi .ModelStore "templates" "preloads=TemplateArguments"}}
-{{- $t := index $m 0}}
-{{$t.Name}}
-{{- $p1 := index $t.TemplateArguments 0}}
-{{$p1.Name}}={{$p1.DefaultValue}}
-{{- $p2 := index $t.TemplateArguments 1}}
-{{$p2.Name}}={{$p2.DefaultValue}}
+{{- $m := .ModelStore.Multi "templates" "preloads=TemplateArguments" }}
+{{- $t := index $m 0 }}
+{{ $t.Name }}
+{{- $p1 := index $t.TemplateArguments 0 }}
+{{ $p1.Name }}={{ $p1.DefaultValue }}
+{{- $p2 := index $t.TemplateArguments 1 }}
+{{ $p2.Name }}={{ $p2.DefaultValue }}
 
 single
-{{- $path := printf "/templates/%d" .testParameter11}}
-{{- $s := single .ModelStore $path "preloads=TemplateArguments"}}
-{{$s.Name}}
-{{- $p1 := index $s.TemplateArguments 0}}
-{{$p1.Name}}={{$p1.DefaultValue}}
-{{- $p2 := index $s.TemplateArguments 1}}
-{{$p2.Name}}={{$p2.DefaultValue}}
+{{- $path := printf "/templates/%d" .Parameter.testParameter11 }}
+{{- $s := .ModelStore.Single $path "preloads=TemplateArguments" }}
+{{ $s.Name }}
+{{- $p1 := index $s.TemplateArguments 0 }}
+{{ $p1.Name }}={{ $p1.DefaultValue }}
+{{- $p2 := index $s.TemplateArguments 1 }}
+{{ $p2.Name }}={{ $p2.DefaultValue }}
 
 first
-{{- $f := first .ModelStore "templates" "q[name]=test1&preloads=TemplateArguments"}}
-{{$f.Name}}
-{{- $p1 := index $t.TemplateArguments 0}}
-{{$p1.Name}}={{$p1.DefaultValue}}
-{{- $p2 := index $t.TemplateArguments 1}}
-{{$p2.Name}}={{$p2.DefaultValue}}
+{{- $f := .ModelStore.First "templates" "q[name]=test1&preloads=TemplateArguments" }}
+{{ $f.Name }}
+{{- $p1 := index $t.TemplateArguments 0 }}
+{{ $p1.Name }}={{ $p1.DefaultValue }}
+{{- $p2 := index $t.TemplateArguments 1 }}
+{{ $p2.Name }}={{ $p2.DefaultValue }}
 
 total
-{{- $t := total .ModelStore "/template_arguments"}}
-{{$t}}
+{{- $t := .ModelStore.Total "/template_arguments" }}
+{{ $t }}
 
 --- hash ---
 hash
-{{- $h := hash $s.TemplateArguments "Name"}}
-hash[testParameter11]={{get $h "testParameter11"}}
-hash[testParameter12]={{get $h "testParameter12"}}
+{{- $h := .Core.Hash $s.TemplateArguments "Name" }}
+hash[testParameter11]={{ .Core.Get $h "testParameter11" }}
+hash[testParameter12]={{ .Core.Get $h "testParameter12" }}
 
 --- slicemap ---
 slicemap
-{{- $p := multi .ModelStore "template_arguments" ""}}
-{{- $z := slicemap $p "Name"}}
-{{- $z1 := get $z "testParameter11"}}
-{{- $z2 := get $z "testParameter12"}}
-{{- $z3 := get $z "testParameter1X"}}
+{{- $p := .ModelStore.Multi "template_arguments" "" }}
+{{- $z := .Core.SliceMap $p "Name" }}
+{{- $z1 := .Core.Get $z "testParameter11" }}
+{{- $z2 := .Core.Get $z "testParameter12" }}
+{{- $z3 := .Core.Get $z "testParameter1X" }}
 {{- range $i, $v := $z1 }}
-slicemap[testParameter1][{{$i}}]={{$v}}
-{{- end}}
+slicemap[testParameter1][{{ $i }}]={{ $v }}
+{{- end }}
 {{- range $i, $v := $z2 }}
-slicemap[testParameter2][{{$i}}]={{$v}}
-{{- end}}
+slicemap[testParameter2][{{ $i }}]={{ $v }}
+{{- end }}
 {{- range $i, $v := $z3 }}
-slicemap[testParameter1X][{{$i}}]={{$v}}
-{{- end}}
+slicemap[testParameter1X][{{ $i }}]={{ $v }}
+{{- end }}
 
 --- sequence ---
 sequence
-{{- $s := sequence 1 10}}
-{{- range $i, $v := $s}}
-sequence[{{$i}}]={{$v}}
-{{- end}}
+{{- $s := .Core.Sequence 1 10 }}
+{{- range $i, $v := $s }}
+sequence[{{ $i }}]={{ $v }}
+{{- end }}
 `,
 		Description: "test1desc",
 	}
@@ -1182,7 +1182,7 @@ sequence[{{$i}}]={{$v}}
 	template2 := &model.Template{
 		ID:              id2,
 		Name:            "test12",
-		TemplateContent: `{{.testParameter1X}}`,
+		TemplateContent: `{{ .Parameter.testParameter1X }}`,
 		Description:     "test12desc",
 	}
 	templateArgument21 := &model.TemplateArgument{
@@ -1197,7 +1197,7 @@ sequence[{{$i}}]={{$v}}
 	template3 := &model.Template{
 		ID:              id3,
 		Name:            "test13",
-		TemplateContent: `{{.testParameter1X}}`,
+		TemplateContent: `{{ .Parameter.testParameter1X }}`,
 		Description:     "test13desc",
 	}
 	templateArgument31 := &model.TemplateArgument{
@@ -1213,8 +1213,8 @@ sequence[{{$i}}]={{$v}}
 		ID:   id4,
 		Name: "test14",
 		TemplateContent: `include test
-{{ include .ModelStore "test12" "" }}
-{{ include .ModelStore "test13" "p[testParameter1X]=999" }}
+{{ .Template.Include "test12" "" }}
+{{ .Template.Include "test13" "p[testParameter1X]=999" }}
 `,
 		Description: "test15desc",
 	}
@@ -1233,22 +1233,22 @@ sequence[{{$i}}]={{$v}}
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template4)
 
 	responseText, code := Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%d", id), "generation", nil), nil)
-	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_FuncMaps_1.txt"))
+	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_Functions_1.txt"))
 	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "template_generations_by_name", template1.Name, nil), nil)
-	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_FuncMaps_1.txt"))
+	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_Functions_1.txt"))
 
 	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%d", id2), "generation", nil), nil)
-	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_FuncMaps_2.txt"))
+	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_Functions_2.txt"))
 	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "template_generations_by_name", template2.Name, nil), nil)
-	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_FuncMaps_2.txt"))
+	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_Functions_2.txt"))
 
 	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%d", id3), "generation", nil), nil)
-	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_FuncMaps_3.txt"))
+	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_Functions_3.txt"))
 	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "template_generations_by_name", template3.Name, nil), nil)
-	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_FuncMaps_3.txt"))
+	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_Functions_3.txt"))
 
 	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%d", id4), "generation", nil), nil)
-	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_FuncMaps_4.txt"))
+	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_Functions_4.txt"))
 	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "template_generations_by_name", template4.Name, nil), nil)
-	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_FuncMaps_4.txt"))
+	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_Functions_4.txt"))
 }
