@@ -12,16 +12,16 @@ import (
 // Todo: therefore, methods like BeforeSave do not work.
 type UserDefinedModel struct {
 	Base
-	resourceName        string
-	typeName            string
-	keyParameter        string
-	toBeMigrated        bool
-	isControllerEnabled bool
-	sqlBeforeMigration  string
-	sqlAfterMigration   string
-	sqlDesignExtraction string
-	sqlDesignDeletion   string
-	structFieldList     []reflect.StructField
+	resourceName                string
+	typeName                    string
+	keyParameter                string
+	toBeMigrated                bool
+	isControllerEnabled         bool
+	sqlBeforeMigration          string
+	sqlAfterMigration           string
+	sqlWhereForDesignExtraction string
+	sqlWhereForDesignDeletion   string
+	structFieldList             []reflect.StructField
 }
 
 // NewUserDefinedModel creates an user defined model instance
@@ -113,13 +113,13 @@ func (receiver *UserDefinedModel) ExtractFromDesign(model extension.Model, db *g
 	slicePointer := reflect.New(sliceType)
 	slicePointer.Elem().Set(slice)
 
-	if len(receiver.sqlDesignExtraction) == 0 {
+	if len(receiver.sqlWhereForDesignExtraction) == 0 {
 		if err := db.Select("*").Find(slicePointer.Interface()).Error; err != nil {
 			logging.Logger().Debug(err.Error())
 			return "", nil, err
 		}
 	} else {
-		if err := db.Select("*").Where(receiver.sqlDesignExtraction).Find(slicePointer.Interface()).Error; err != nil {
+		if err := db.Select("*").Where(receiver.sqlWhereForDesignExtraction).Find(slicePointer.Interface()).Error; err != nil {
 			logging.Logger().Debug(err.Error())
 			return "", nil, err
 		}
@@ -142,13 +142,13 @@ func (receiver *UserDefinedModel) DeleteFromDesign(model extension.Model, db *go
 		return err
 	}
 
-	if len(receiver.sqlDesignDeletion) == 0 {
+	if len(receiver.sqlWhereForDesignDeletion) == 0 {
 		if err := db.Delete(inputContainer).Error; err != nil {
 			logging.Logger().Debug(err.Error())
 			return err
 		}
 	} else {
-		if err := db.Exec(receiver.sqlDesignDeletion).Error; err != nil {
+		if err := db.Where(receiver.sqlWhereForDesignDeletion).Delete(inputContainer).Error; err != nil {
 			logging.Logger().Debug(err.Error())
 			return err
 		}

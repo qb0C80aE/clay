@@ -40,10 +40,10 @@
 		"      select id, \"VLAN\"||substr('0000'||id,-4) as name",
 		"        from vlan_id_generator);"
 	],
-  "sql_design_extraction": [
+  "sql_where_for_design_extraction": [
 		"name <> 'VLAN'||substr('0000'||id,-4) or length(description) > 0"
 	],
-  "sql_design_deletion": [
-		"delete from vlans where id < 1 or 4095 < id;"
+  "sql_where_for_design_deletion": [
+		"id < 1 or 4095 < id"
 	]
 }
