@@ -12,6 +12,7 @@ import (
 	"github.com/qb0C80aE/clay/logging"
 	"github.com/qb0C80aE/clay/util/conversion"
 	"github.com/qb0C80aE/clay/util/mapstruct"
+	"github.com/qb0C80aE/clay/util/network"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -27,6 +28,7 @@ type templateParameter struct {
 	ModelStore *modelStore
 	Core       *coreUtil
 	Template   *templateUtil
+	Network    *networkUtil
 	Parameter  map[interface{}]interface{}
 }
 
@@ -39,6 +41,9 @@ type coreUtil struct {
 
 type templateUtil struct {
 	db *gorm.DB
+}
+
+type networkUtil struct {
 }
 
 // TemplateGeneration is the model class what represents template generation
@@ -241,6 +246,7 @@ func (receiver *TemplateGeneration) GenerateTemplate(db *gorm.DB, parameters gin
 		Template: &templateUtil{
 			db: db,
 		},
+		Network:   &networkUtil{},
 		Parameter: templateParameterMap,
 	}
 
@@ -748,6 +754,10 @@ func (receiver *templateUtil) Include(templateName string, query string) (interf
 		return nil, err
 	}
 	return result, nil
+}
+
+func (receiver *networkUtil) ParseCIDR(cidr string) (*network.Ipv4Address, error) {
+	return network.ParseCIDR(cidr)
 }
 
 func init() {
