@@ -23,6 +23,24 @@ import (
 
 var parameterRegexp = regexp.MustCompile("p\\[(.+)\\]")
 
+type templateParameter struct {
+	ModelStore *modelStore
+	Core       *coreUtil
+	Template   *templateUtil
+	Parameter  map[interface{}]interface{}
+}
+
+type modelStore struct {
+	db *gorm.DB
+}
+
+type coreUtil struct {
+}
+
+type templateUtil struct {
+	db *gorm.DB
+}
+
 // TemplateGeneration is the model class what represents template generation
 type TemplateGeneration struct {
 	Base
@@ -202,21 +220,32 @@ func (receiver *TemplateGeneration) GenerateTemplate(db *gorm.DB, parameters gin
 		}
 	}
 
-	templateParameterMap["ModelStore"] = db
-
 	tpl := tplpkg.New("template")
+
 	templateFuncMaps := extension.GetRegisteredTemplateFuncMapList()
 	for _, templateFuncMap := range templateFuncMaps {
 		tpl = tpl.Funcs(templateFuncMap)
 	}
+
 	tpl, err := tpl.Parse(templateModelAsContainer.TemplateContent)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
 
+	templateParameter := &templateParameter{
+		ModelStore: &modelStore{
+			db: db,
+		},
+		Core: &coreUtil{},
+		Template: &templateUtil{
+			db: db,
+		},
+		Parameter: templateParameterMap,
+	}
+
 	var doc bytes.Buffer
-	if err := tpl.Execute(&doc, templateParameterMap); err != nil {
+	if err := tpl.Execute(&doc, templateParameter); err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
@@ -232,447 +261,493 @@ func (receiver *TemplateGeneration) GetSingle(_ extension.Model, db *gorm.DB, pa
 	return receiver.GenerateTemplate(db, parameters, urlValues)
 }
 
-func init() {
-	funcMap := tplpkg.FuncMap{
-		"add": func(a, b int) int { return a + b },
-		"sub": func(a, b int) int { return a - b },
-		"mul": func(a, b int) int { return a * b },
-		"div": func(a, b int) int { return a / b },
-		"mod": func(a, b int) int { return a % b },
-		"int": func(value interface{}) (interface{}, error) {
-			return conversion.ToIntInterface(value)
-		},
-		"int8": func(value interface{}) (interface{}, error) {
-			return conversion.ToInt8Interface(value)
-		},
-		"int16": func(value interface{}) (interface{}, error) {
-			return conversion.ToInt16Interface(value)
-		},
-		"int32": func(value interface{}) (interface{}, error) {
-			return conversion.ToInt32Interface(value)
-		},
-		"int64": func(value interface{}) (interface{}, error) {
-			return conversion.ToInt64Interface(value)
-		},
-		"uint": func(value interface{}) (interface{}, error) {
-			return conversion.ToUintInterface(value)
-		},
-		"uint8": func(value interface{}) (interface{}, error) {
-			return conversion.ToUint8Interface(value)
-		},
-		"uint16": func(value interface{}) (interface{}, error) {
-			return conversion.ToUint16Interface(value)
-		},
-		"uint32": func(value interface{}) (interface{}, error) {
-			return conversion.ToUint32Interface(value)
-		},
-		"uint64": func(value interface{}) (interface{}, error) {
-			return conversion.ToUint64Interface(value)
-		},
-		"float32": func(value interface{}) (interface{}, error) {
-			return conversion.ToFloat32Interface(value)
-		},
-		"float64": func(value interface{}) (interface{}, error) {
-			return conversion.ToFloat64Interface(value)
-		},
-		"string": func(value interface{}) interface{} {
-			return conversion.ToStringInterface(value)
-		},
-		"boolean": func(value interface{}) (interface{}, error) {
-			return conversion.ToBooleanInterface(value)
-		},
-		"split": func(value interface{}, separator string) interface{} {
-			data := fmt.Sprintf("%v", value)
-			return strings.Split(data, separator)
-		},
-		"join": func(slice interface{}, separator string) (interface{}, error) {
-			interfaceSlice, err := mapstruct.SliceToInterfaceSlice(slice)
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return nil, err
-			}
-			stringSlice := make([]string, len(interfaceSlice))
+func (receiver *coreUtil) Add(a, b int) int {
+	return a + b
+}
 
-			for index, item := range interfaceSlice {
-				stringSlice[index] = fmt.Sprintf("%v", item)
-			}
+func (receiver *coreUtil) Sub(a, b int) int {
+	return a - b
+}
 
-			return strings.Join(stringSlice, separator), nil
-		},
-		"slice": func(items ...interface{}) interface{} {
-			slice := []interface{}{}
-			return append(slice, items...)
-		},
-		"subslice": func(sliceInterface interface{}, begin int, end int) (interface{}, error) {
-			slice, err := mapstruct.SliceToInterfaceSlice(sliceInterface)
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return nil, err
-			}
-			if begin < 0 {
-				if end < 0 {
-					return slice[:], nil
-				}
-				return slice[:end], nil
-			}
-			if end < 0 {
-				return slice[begin:], nil
-			}
-			return slice[begin:end], nil
-		},
-		"append": func(sliceInterface interface{}, item ...interface{}) (interface{}, error) {
-			slice, err := mapstruct.SliceToInterfaceSlice(sliceInterface)
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return nil, err
-			}
-			return append(slice, item...), nil
-		},
-		"concatenate": func(sliceInterface1 interface{}, sliceInterface2 interface{}) (interface{}, error) {
-			slice1, err := mapstruct.SliceToInterfaceSlice(sliceInterface1)
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return nil, err
-			}
-			slice2, err := mapstruct.SliceToInterfaceSlice(sliceInterface2)
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return nil, err
-			}
-			return append(slice1, slice2...), nil
-		},
-		"fieldslice": func(slice interface{}, fieldName string) ([]interface{}, error) {
-			return mapstruct.StructSliceToFieldValueInterfaceSlice(slice, fieldName)
-		},
-		"sort": func(slice interface{}, order string) ([]interface{}, error) {
-			return mapstruct.SortSlice(slice, order)
-		},
-		"map": func(pairs ...interface{}) (map[interface{}]interface{}, error) {
-			if len(pairs)%2 == 1 {
-				logging.Logger().Debug("numebr of arguments must be even")
-				return nil, fmt.Errorf("numebr of arguments must be even")
-			}
-			m := make(map[interface{}]interface{}, len(pairs)/2)
-			for i := 0; i < len(pairs); i += 2 {
-				m[pairs[i]] = pairs[i+1]
-			}
-			return m, nil
-		},
-		"exists": func(target map[interface{}]interface{}, key interface{}) bool {
-			_, exists := target[key]
-			return exists
-		},
-		"put": func(target map[interface{}]interface{}, key interface{}, value interface{}) map[interface{}]interface{} {
-			target[key] = value
-			return target
-		},
-		"get": func(target map[interface{}]interface{}, key interface{}) interface{} {
-			return target[key]
-		},
-		"delete": func(target map[interface{}]interface{}, key interface{}) map[interface{}]interface{} {
-			delete(target, key)
-			return target
-		},
-		"merge": func(source, destination map[interface{}]interface{}) map[interface{}]interface{} {
-			for key, value := range source {
-				destination[key] = value
-			}
-			return destination
-		},
-		"keys": func(target map[interface{}]interface{}) ([]interface{}, error) {
-			return mapstruct.MapToKeySlice(target)
-		},
-		"hash": func(slice interface{}, keyField string) (map[interface{}]interface{}, error) {
-			return mapstruct.StructSliceToInterfaceMap(slice, keyField)
-		},
-		"slicemap": func(slice interface{}, keyField string) (map[interface{}]interface{}, error) {
-			sliceMap, err := mapstruct.StructSliceToInterfaceSliceMap(slice, keyField)
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return nil, err
-			}
-			result := make(map[interface{}]interface{}, len(sliceMap))
-			for key, value := range sliceMap {
-				result[key] = value
-			}
-			return result, nil
-		},
-		"sequence": func(begin, end int) interface{} {
-			count := end - begin + 1
-			result := make([]int, count)
-			for i, j := 0, begin; i < count; i, j = i+1, j+1 {
-				result[i] = j
-			}
-			return result
-		},
-		"single": func(dbObject interface{}, pathInterface interface{}, queryInterface interface{}) (interface{}, error) {
-			path := pathInterface.(string)
-			controller, err := extension.GetAssociatedControllerWithPath(path)
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return nil, err
-			}
+func (receiver *coreUtil) Mul(a, b int) int {
+	return a * b
+}
 
-			pathElements := strings.Split(strings.Trim(path, "/"), "/")
-			resourceName := pathElements[0]
-			singleURL, err := controller.GetResourceSingleURL()
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return nil, err
-			}
+func (receiver *coreUtil) Div(a, b int) int {
+	return a / b
+}
 
-			routeElements := strings.Split(strings.Trim(singleURL, "/"), "/")
+func (receiver *coreUtil) Mod(a, b int) int {
+	return a % b
+}
 
-			parameters := gin.Params{}
-			for index, routeElement := range routeElements {
-				if routeElement[:1] == ":" {
-					parameter := gin.Param{
-						Key:   routeElement[1:],
-						Value: pathElements[index],
-					}
-					parameters = append(parameters, parameter)
-				}
-			}
+func (receiver *coreUtil) Int(value interface{}) (interface{}, error) {
+	return conversion.ToIntInterface(value)
+}
 
-			query := queryInterface.(string)
-			URL := "/"
-			if query != "" {
-				URL = "/?" + query
-			}
-			requestForParameter, err := http.NewRequest(
-				http.MethodGet,
-				URL,
-				nil,
-			)
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return nil, err
-			}
-			model, err := extension.GetAssociatedModelWithResourceName(resourceName)
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return nil, err
-			}
-			urlQuery := requestForParameter.URL.Query()
-			parameter, err := dbpkg.NewParameter(urlQuery)
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return nil, err
-			}
+func (receiver *coreUtil) Int8(value interface{}) (interface{}, error) {
+	return conversion.ToInt8Interface(value)
+}
 
-			// single resets db conditions like preloads, so you should use this method in GetSingle or GetMulti only,
-			// and note that all conditions go away after this method.
-			db := dbObject.(*gorm.DB).New()
-			db, err = parameter.Paginate(db)
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return nil, err
-			}
-			db = parameter.SetPreloads(db)
-			db = parameter.FilterFields(db)
-			fields := helper.ParseFields(parameter.DefaultQuery(urlQuery, "fields", "*"))
-			queryFields := helper.QueryFields(model, fields)
+func (receiver *coreUtil) Int16(value interface{}) (interface{}, error) {
+	return conversion.ToInt16Interface(value)
+}
 
-			result, err := model.GetSingle(model, db, parameters, requestForParameter.URL.Query(), queryFields)
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return nil, err
-			}
-			return result, nil
-		},
-		"multi": func(dbObject interface{}, pathInterface interface{}, queryInterface interface{}) (interface{}, error) {
-			path := pathInterface.(string)
-			controller, err := extension.GetAssociatedControllerWithPath(path)
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return nil, err
-			}
+func (receiver *coreUtil) Int32(value interface{}) (interface{}, error) {
+	return conversion.ToInt32Interface(value)
+}
 
-			pathElements := strings.Split(strings.Trim(path, "/"), "/")
-			resourceName := pathElements[0]
-			multiURL, err := controller.GetResourceMultiURL()
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return nil, err
-			}
+func (receiver *coreUtil) Int64(value interface{}) (interface{}, error) {
+	return conversion.ToInt64Interface(value)
+}
 
-			routeElements := strings.Split(strings.Trim(multiURL, "/"), "/")
+func (receiver *coreUtil) Uint(value interface{}) (interface{}, error) {
+	return conversion.ToUintInterface(value)
+}
 
-			parameters := gin.Params{}
-			for index, routeElement := range routeElements {
-				if routeElement[:1] == ":" {
-					parameter := gin.Param{
-						Key:   routeElement[1:],
-						Value: pathElements[index],
-					}
-					parameters = append(parameters, parameter)
-				}
-			}
+func (receiver *coreUtil) Uint8(value interface{}) (interface{}, error) {
+	return conversion.ToUint8Interface(value)
+}
 
-			query := queryInterface.(string)
-			URL := "/"
-			if query != "" {
-				URL = "/?" + query
-			}
-			requestForParameter, err := http.NewRequest(
-				http.MethodGet,
-				URL,
-				nil,
-			)
-			model, err := extension.GetAssociatedModelWithResourceName(resourceName)
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return nil, err
-			}
-			urlQuery := requestForParameter.URL.Query()
-			parameter, err := dbpkg.NewParameter(urlQuery)
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return nil, err
-			}
+func (receiver *coreUtil) Uint16(value interface{}) (interface{}, error) {
+	return conversion.ToUint16Interface(value)
+}
 
-			// multi resets db conditions like preloads, so you should use this method in GetSingle or GetMulti only,
-			// and note that all conditions go away after this method.
-			db := dbObject.(*gorm.DB).New()
-			db, err = parameter.Paginate(db)
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return nil, err
-			}
-			db = parameter.SetPreloads(db)
-			db = parameter.SortRecords(db)
-			db = parameter.FilterFields(db)
-			fields := helper.ParseFields(parameter.DefaultQuery(urlQuery, "fields", "*"))
-			queryFields := helper.QueryFields(model, fields)
-			result, err := model.GetMulti(model, db, parameters, requestForParameter.URL.Query(), queryFields)
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return nil, err
-			}
-			return result, nil
-		},
-		"first": func(dbObject interface{}, pathInterface interface{}, queryInterface interface{}) (interface{}, error) {
-			path := pathInterface.(string)
-			controller, err := extension.GetAssociatedControllerWithPath(path)
-			if err != nil {
-				return nil, err
-			}
+func (receiver *coreUtil) Uint32(value interface{}) (interface{}, error) {
+	return conversion.ToUint32Interface(value)
+}
 
-			pathElements := strings.Split(strings.Trim(path, "/"), "/")
-			resourceName := pathElements[0]
-			multiURL, err := controller.GetResourceMultiURL()
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return nil, err
-			}
+func (receiver *coreUtil) Uint64(value interface{}) (interface{}, error) {
+	return conversion.ToUint64Interface(value)
+}
 
-			routeElements := strings.Split(strings.Trim(multiURL, "/"), "/")
+func (receiver *coreUtil) Float32(value interface{}) (interface{}, error) {
+	return conversion.ToFloat32Interface(value)
+}
 
-			parameters := gin.Params{}
-			for index, routeElement := range routeElements {
-				if routeElement[:1] == ":" {
-					parameter := gin.Param{
-						Key:   routeElement[1:],
-						Value: pathElements[index],
-					}
-					parameters = append(parameters, parameter)
-				}
-			}
+func (receiver *coreUtil) Float64(value interface{}) (interface{}, error) {
+	return conversion.ToFloat64Interface(value)
+}
 
-			query := queryInterface.(string)
-			URL := "/"
-			if query != "" {
-				URL = "/?" + query
-			}
-			requestForParameter, err := http.NewRequest(
-				http.MethodGet,
-				URL,
-				nil,
-			)
-			model, err := extension.GetAssociatedModelWithResourceName(resourceName)
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return nil, err
-			}
-			urlQuery := requestForParameter.URL.Query()
-			parameter, err := dbpkg.NewParameter(urlQuery)
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return nil, err
-			}
+func (receiver *coreUtil) String(value interface{}) interface{} {
+	return conversion.ToStringInterface(value)
+}
 
-			// first resets db conditions like preloads, so you should use this method in GetSingle or GetMulti only,
-			// and note that all conditions go away after this method.
-			db := dbObject.(*gorm.DB).New()
-			db, err = parameter.Paginate(db)
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return nil, err
+func (receiver *coreUtil) Boolean(value interface{}) (interface{}, error) {
+	return conversion.ToBooleanInterface(value)
+}
+
+func (receiver *coreUtil) Split(value interface{}, separator string) interface{} {
+	data := fmt.Sprintf("%v", value)
+	return strings.Split(data, separator)
+}
+
+func (receiver *coreUtil) Join(slice interface{}, separator string) (interface{}, error) {
+	interfaceSlice, err := mapstruct.SliceToInterfaceSlice(slice)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+	stringSlice := make([]string, len(interfaceSlice))
+
+	for index, item := range interfaceSlice {
+		stringSlice[index] = fmt.Sprintf("%v", item)
+	}
+
+	return strings.Join(stringSlice, separator), nil
+}
+
+func (receiver *coreUtil) Slice(items ...interface{}) interface{} {
+	slice := []interface{}{}
+	return append(slice, items...)
+}
+
+func (receiver *coreUtil) SubSlice(sliceInterface interface{}, begin int, end int) (interface{}, error) {
+	slice, err := mapstruct.SliceToInterfaceSlice(sliceInterface)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+	if begin < 0 {
+		if end < 0 {
+			return slice[:], nil
+		}
+		return slice[:end], nil
+	}
+	if end < 0 {
+		return slice[begin:], nil
+	}
+	return slice[begin:end], nil
+}
+
+func (receiver *coreUtil) Append(sliceInterface interface{}, item ...interface{}) (interface{}, error) {
+	slice, err := mapstruct.SliceToInterfaceSlice(sliceInterface)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+	return append(slice, item...), nil
+}
+
+func (receiver *coreUtil) Concatenate(sliceInterface1 interface{}, sliceInterface2 interface{}) (interface{}, error) {
+	slice1, err := mapstruct.SliceToInterfaceSlice(sliceInterface1)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+	slice2, err := mapstruct.SliceToInterfaceSlice(sliceInterface2)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+	return append(slice1, slice2...), nil
+}
+
+func (receiver *coreUtil) FieldSlice(slice interface{}, fieldName string) ([]interface{}, error) {
+	return mapstruct.StructSliceToFieldValueInterfaceSlice(slice, fieldName)
+}
+
+func (receiver *coreUtil) Sort(slice interface{}, order string) ([]interface{}, error) {
+	return mapstruct.SortSlice(slice, order)
+}
+
+func (receiver *coreUtil) Map(pairs ...interface{}) (map[interface{}]interface{}, error) {
+	if len(pairs)%2 == 1 {
+		logging.Logger().Debug("numebr of arguments must be even")
+		return nil, fmt.Errorf("numebr of arguments must be even")
+	}
+	m := make(map[interface{}]interface{}, len(pairs)/2)
+	for i := 0; i < len(pairs); i += 2 {
+		m[pairs[i]] = pairs[i+1]
+	}
+	return m, nil
+}
+
+func (receiver *coreUtil) Exists(target map[interface{}]interface{}, key interface{}) bool {
+	_, exists := target[key]
+	return exists
+}
+
+func (receiver *coreUtil) Put(target map[interface{}]interface{}, key interface{}, value interface{}) map[interface{}]interface{} {
+	target[key] = value
+	return target
+}
+
+func (receiver *coreUtil) Get(target map[interface{}]interface{}, key interface{}) interface{} {
+	return target[key]
+}
+
+func (receiver *coreUtil) Delete(target map[interface{}]interface{}, key interface{}) map[interface{}]interface{} {
+	delete(target, key)
+	return target
+}
+
+func (receiver *coreUtil) Merge(source, destination map[interface{}]interface{}) map[interface{}]interface{} {
+	for key, value := range source {
+		destination[key] = value
+	}
+	return destination
+}
+
+func (receiver *coreUtil) Keys(target map[interface{}]interface{}) ([]interface{}, error) {
+	return mapstruct.MapToKeySlice(target)
+}
+
+func (receiver *coreUtil) Hash(slice interface{}, keyField string) (map[interface{}]interface{}, error) {
+	return mapstruct.StructSliceToInterfaceMap(slice, keyField)
+}
+
+func (receiver *coreUtil) SliceMap(slice interface{}, keyField string) (map[interface{}]interface{}, error) {
+	sliceMap, err := mapstruct.StructSliceToInterfaceSliceMap(slice, keyField)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+	result := make(map[interface{}]interface{}, len(sliceMap))
+	for key, value := range sliceMap {
+		result[key] = value
+	}
+	return result, nil
+}
+
+func (receiver *coreUtil) Sequence(begin, end int) interface{} {
+	count := end - begin + 1
+	result := make([]int, count)
+	for i, j := 0, begin; i < count; i, j = i+1, j+1 {
+		result[i] = j
+	}
+	return result
+}
+
+func (receiver *modelStore) Single(pathInterface interface{}, queryInterface interface{}) (interface{}, error) {
+	path := pathInterface.(string)
+	controller, err := extension.GetAssociatedControllerWithPath(path)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+
+	pathElements := strings.Split(strings.Trim(path, "/"), "/")
+	resourceName := pathElements[0]
+	singleURL, err := controller.GetResourceSingleURL()
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+
+	routeElements := strings.Split(strings.Trim(singleURL, "/"), "/")
+
+	parameters := gin.Params{}
+	for index, routeElement := range routeElements {
+		if routeElement[:1] == ":" {
+			parameter := gin.Param{
+				Key:   routeElement[1:],
+				Value: pathElements[index],
 			}
-			db = parameter.SetPreloads(db)
-			db = parameter.SortRecords(db)
-			db = parameter.FilterFields(db)
-			fields := helper.ParseFields(parameter.DefaultQuery(urlQuery, "fields", "*"))
-			queryFields := helper.QueryFields(model, fields)
-			result, err := model.GetMulti(model, db, parameters, requestForParameter.URL.Query(), queryFields)
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return nil, err
+			parameters = append(parameters, parameter)
+		}
+	}
+
+	query := queryInterface.(string)
+	URL := "/"
+	if query != "" {
+		URL = "/?" + query
+	}
+	requestForParameter, err := http.NewRequest(
+		http.MethodGet,
+		URL,
+		nil,
+	)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+	model, err := extension.GetAssociatedModelWithResourceName(resourceName)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+	urlQuery := requestForParameter.URL.Query()
+	parameter, err := dbpkg.NewParameter(urlQuery)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+
+	// single resets db conditions like preloads, so you should use this method in GetSingle or GetMulti only,
+	// and note that all conditions go away after this method.
+	db := receiver.db.New()
+	db, err = parameter.Paginate(db)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+	db = parameter.SetPreloads(db)
+	db = parameter.FilterFields(db)
+	fields := helper.ParseFields(parameter.DefaultQuery(urlQuery, "fields", "*"))
+	queryFields := helper.QueryFields(model, fields)
+
+	result, err := model.GetSingle(model, db, parameters, requestForParameter.URL.Query(), queryFields)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+	return result, nil
+}
+
+func (receiver *modelStore) Multi(pathInterface interface{}, queryInterface interface{}) (interface{}, error) {
+	path := pathInterface.(string)
+	controller, err := extension.GetAssociatedControllerWithPath(path)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+
+	pathElements := strings.Split(strings.Trim(path, "/"), "/")
+	resourceName := pathElements[0]
+	multiURL, err := controller.GetResourceMultiURL()
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+
+	routeElements := strings.Split(strings.Trim(multiURL, "/"), "/")
+
+	parameters := gin.Params{}
+	for index, routeElement := range routeElements {
+		if routeElement[:1] == ":" {
+			parameter := gin.Param{
+				Key:   routeElement[1:],
+				Value: pathElements[index],
 			}
+			parameters = append(parameters, parameter)
+		}
+	}
 
-			resultValue := reflect.ValueOf(result)
-			if resultValue.Len() == 0 {
-				logging.Logger().Debug("no record selected")
-				return nil, errors.New("no record selected")
+	query := queryInterface.(string)
+	URL := "/"
+	if query != "" {
+		URL = "/?" + query
+	}
+	requestForParameter, err := http.NewRequest(
+		http.MethodGet,
+		URL,
+		nil,
+	)
+	model, err := extension.GetAssociatedModelWithResourceName(resourceName)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+	urlQuery := requestForParameter.URL.Query()
+	parameter, err := dbpkg.NewParameter(urlQuery)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+
+	// multi resets db conditions like preloads, so you should use this method in GetSingle or GetMulti only,
+	// and note that all conditions go away after this method.
+	db := receiver.db.New()
+	db, err = parameter.Paginate(db)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+	db = parameter.SetPreloads(db)
+	db = parameter.SortRecords(db)
+	db = parameter.FilterFields(db)
+	fields := helper.ParseFields(parameter.DefaultQuery(urlQuery, "fields", "*"))
+	queryFields := helper.QueryFields(model, fields)
+	result, err := model.GetMulti(model, db, parameters, requestForParameter.URL.Query(), queryFields)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+	return result, nil
+}
+
+func (receiver *modelStore) First(pathInterface interface{}, queryInterface interface{}) (interface{}, error) {
+	path := pathInterface.(string)
+	controller, err := extension.GetAssociatedControllerWithPath(path)
+	if err != nil {
+		return nil, err
+	}
+
+	pathElements := strings.Split(strings.Trim(path, "/"), "/")
+	resourceName := pathElements[0]
+	multiURL, err := controller.GetResourceMultiURL()
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+
+	routeElements := strings.Split(strings.Trim(multiURL, "/"), "/")
+
+	parameters := gin.Params{}
+	for index, routeElement := range routeElements {
+		if routeElement[:1] == ":" {
+			parameter := gin.Param{
+				Key:   routeElement[1:],
+				Value: pathElements[index],
 			}
+			parameters = append(parameters, parameter)
+		}
+	}
 
-			return resultValue.Index(0).Interface(), nil
-		},
-		"total": func(dbObject interface{}, pathInterface interface{}) (interface{}, error) {
-			path := pathInterface.(string)
-			pathElements := strings.Split(strings.Trim(path, "/"), "/")
-			resourceName := pathElements[0]
+	query := queryInterface.(string)
+	URL := "/"
+	if query != "" {
+		URL = "/?" + query
+	}
+	requestForParameter, err := http.NewRequest(
+		http.MethodGet,
+		URL,
+		nil,
+	)
+	model, err := extension.GetAssociatedModelWithResourceName(resourceName)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+	urlQuery := requestForParameter.URL.Query()
+	parameter, err := dbpkg.NewParameter(urlQuery)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
 
-			model, err := extension.GetAssociatedModelWithResourceName(resourceName)
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return nil, err
-			}
+	// first resets db conditions like preloads, so you should use this method in GetSingle or GetMulti only,
+	// and note that all conditions go away after this method.
+	db := receiver.db.New()
+	db, err = parameter.Paginate(db)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+	db = parameter.SetPreloads(db)
+	db = parameter.SortRecords(db)
+	db = parameter.FilterFields(db)
+	fields := helper.ParseFields(parameter.DefaultQuery(urlQuery, "fields", "*"))
+	queryFields := helper.QueryFields(model, fields)
+	result, err := model.GetMulti(model, db, parameters, requestForParameter.URL.Query(), queryFields)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
 
-			// total resets db conditions like preloads, so you should use this method in GetSingle or GetMulti only,
-			// and note that all conditions go away after this method.
-			db := dbObject.(*gorm.DB).New()
-			total, err := model.GetTotal(model, db)
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return nil, err
-			}
-			return total, nil
-		},
-		"include": func(dbObject interface{}, templateName string, query string) (interface{}, error) {
-			// include resets db conditions like preloads, so you should use this method in GetSingle or GetMulti only,
-			// and note that all conditions go away after this method.
-			db := dbObject.(*gorm.DB).New()
+	resultValue := reflect.ValueOf(result)
+	if resultValue.Len() == 0 {
+		logging.Logger().Debug("no record selected")
+		return nil, errors.New("no record selected")
+	}
 
-			parameters := gin.Params{
-				{
-					Key:   "name",
-					Value: templateName,
-				},
-			}
+	return resultValue.Index(0).Interface(), nil
+}
 
-			urlValues, err := url.ParseQuery(query)
+func (receiver *modelStore) Total(pathInterface interface{}) (interface{}, error) {
+	path := pathInterface.(string)
+	pathElements := strings.Split(strings.Trim(path, "/"), "/")
+	resourceName := pathElements[0]
 
-			result, err := NewTemplateGeneration().GetSingle(nil, db, parameters, urlValues, "")
+	model, err := extension.GetAssociatedModelWithResourceName(resourceName)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
 
-			if err != nil {
-				logging.Logger().Debug(err.Error())
-				return nil, err
-			}
-			return result, nil
+	// total resets db conditions like preloads, so you should use this method in GetSingle or GetMulti only,
+	// and note that all conditions go away after this method.
+	db := receiver.db.New()
+	total, err := model.GetTotal(model, db)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+	return total, nil
+}
+
+func (receiver *templateUtil) Include(templateName string, query string) (interface{}, error) {
+	// include resets db conditions like preloads, so you should use this method in GetSingle or GetMulti only,
+	// and note that all conditions go away after this method.
+	db := receiver.db.New()
+
+	parameters := gin.Params{
+		{
+			Key:   "name",
+			Value: templateName,
 		},
 	}
-	extension.RegisterTemplateFuncMap(funcMap)
+
+	urlValues, err := url.ParseQuery(query)
+
+	result, err := NewTemplateGeneration().GetSingle(nil, db, parameters, urlValues, "")
+
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+	return result, nil
 }
 
 func init() {
