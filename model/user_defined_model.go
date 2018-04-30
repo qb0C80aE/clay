@@ -17,6 +17,7 @@ type UserDefinedModel struct {
 	keyParameter                string
 	toBeMigrated                bool
 	isControllerEnabled         bool
+	isDesignAccessDisabled      bool
 	sqlBeforeMigration          string
 	sqlAfterMigration           string
 	sqlWhereForDesignExtraction string
@@ -99,6 +100,11 @@ func (receiver *UserDefinedModel) ExtractFromDesign(model extension.Model, db *g
 		return "", nil, err
 	}
 
+	if receiver.isDesignAccessDisabled {
+		logging.Logger().Debugf("design access for %s is disabled, skipped", resourceName)
+		return "", nil, nil
+	}
+
 	outputContainer, err := extension.CreateOutputContainerByResourceName(resourceName, "")
 	if err != nil {
 		logging.Logger().Debug(err.Error())
@@ -134,6 +140,11 @@ func (receiver *UserDefinedModel) DeleteFromDesign(model extension.Model, db *go
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return err
+	}
+
+	if receiver.isDesignAccessDisabled {
+		logging.Logger().Debugf("design access for %s is disabled, skipped", resourceName)
+		return nil
 	}
 
 	inputContainer, err := extension.CreateOutputContainerByResourceName(resourceName, "")

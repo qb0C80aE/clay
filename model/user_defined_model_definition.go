@@ -47,6 +47,7 @@ type UserDefinedModelDefinition struct {
 	SQLWhereForDesignExtraction []string                           `json:"sql_where_for_design_extraction"`
 	SQLWhereForDesignDeletion   []string                           `json:"sql_where_for_design_deletion"`
 	IsManyToManyAssociation     bool                               `json:"is_many_to_many_association"`
+	IsDesignAccessDisabled      bool                               `json:"is_design_access_disabled"`
 	Fields                      []*UserDefinedModelFieldDefinition `json:"fields" validate:"gt=0"`
 }
 
@@ -213,6 +214,7 @@ func (receiver *UserDefinedModelDefinition) Create(model extension.Model, db *go
 		newUserDefinedManyToManyAssociationModel.resourceName = userDefinedModelDefinition.ResourceName
 		newUserDefinedManyToManyAssociationModel.toBeMigrated = userDefinedModelDefinition.ToBeMigrated
 		newUserDefinedManyToManyAssociationModel.isControllerEnabled = userDefinedModelDefinition.IsControllerEnabled
+		newUserDefinedManyToManyAssociationModel.isDesignAccessDisabled = userDefinedModelDefinition.IsDesignAccessDisabled
 		newUserDefinedManyToManyAssociationModel.sqlBeforeMigration = strings.Join(userDefinedModelDefinition.SQLBeforeMigration, "\n")
 		newUserDefinedManyToManyAssociationModel.sqlAfterMigration = strings.Join(userDefinedModelDefinition.SQLAfterMigration, "\n")
 		newUserDefinedManyToManyAssociationModel.sqlWhereForDesignExtraction = strings.Join(userDefinedModelDefinition.SQLWhereForDesignExtraction, "\n")
@@ -229,6 +231,7 @@ func (receiver *UserDefinedModelDefinition) Create(model extension.Model, db *go
 		newUserDefinedModel.resourceName = userDefinedModelDefinition.ResourceName
 		newUserDefinedModel.toBeMigrated = userDefinedModelDefinition.ToBeMigrated
 		newUserDefinedModel.isControllerEnabled = userDefinedModelDefinition.IsControllerEnabled
+		newUserDefinedModel.isDesignAccessDisabled = userDefinedModelDefinition.IsDesignAccessDisabled
 		newUserDefinedModel.sqlBeforeMigration = strings.Join(userDefinedModelDefinition.SQLBeforeMigration, "\n")
 		newUserDefinedModel.sqlAfterMigration = strings.Join(userDefinedModelDefinition.SQLAfterMigration, "\n")
 		newUserDefinedModel.sqlWhereForDesignExtraction = strings.Join(userDefinedModelDefinition.SQLWhereForDesignExtraction, "\n")

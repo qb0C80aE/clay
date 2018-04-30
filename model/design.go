@@ -53,7 +53,10 @@ func (receiver *Design) GetSingle(_ extension.Model, db *gorm.DB, _ gin.Params, 
 			logging.Logger().Debug(err.Error())
 			return nil, err
 		}
-		design.Content[key] = value
+
+		if len(key) > 0 {
+			design.Content[key] = value
+		}
 	}
 
 	return design, nil
