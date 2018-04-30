@@ -44,14 +44,14 @@ func Connect(dbMode string) (*gorm.DB, error) {
 	case "memory":
 		dbPath = ":memory:"
 	case "", "file":
-		if dbFilePath := os.Getenv("DB_FILE_PATH"); dbFilePath != "" {
+		if dbFilePath := os.Getenv("CLAY_DB_FILE_PATH"); dbFilePath != "" {
 			dbPath = dbFilePath
 		} else {
 			dbPath = "clay.db"
 		}
 	default:
-		logging.Logger().Criticalf("invalid DB_MODE '%s'", dbMode)
-		return nil, fmt.Errorf("invalid DB_MODE '%s'", dbMode)
+		logging.Logger().Criticalf("invalid CLAY_DB_FILE_PATH '%s'", dbMode)
+		return nil, fmt.Errorf("invalid CLAY_DB_FILE_PATH '%s'", dbMode)
 	}
 
 	db, err := gorm.Open("sqlite3", dbPath)
