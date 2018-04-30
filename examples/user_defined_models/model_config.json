@@ -1,0 +1,14 @@
+[
+	"node.json",
+	"node_group.json",
+	"node_group_node_association.json",
+	"port.json",
+	"port_group.json",
+	"port_group_port_association.json",
+	"link.json",
+	"port_ipv4_address.json",
+	"node_route.json",
+	"vlan.json",
+	"subnet.json",
+	"vlan_port_association.json"
+]
