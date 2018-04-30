@@ -20,17 +20,17 @@ func (clayRuntime *clayRuntime) Run() {
 	host := "localhost"
 	port := "8080"
 
-	if h := os.Getenv("HOST"); h != "" {
+	if h := os.Getenv("CLAY_HOST"); h != "" {
 		host = h
 	}
 
-	if p := os.Getenv("PORT"); p != "" {
+	if p := os.Getenv("CLAY_PORT"); p != "" {
 		if _, err := strconv.Atoi(p); err == nil {
 			port = p
 		}
 	}
 
-	dbMode := os.Getenv("DB_MODE")
+	dbMode := os.Getenv("CLAY_DB_MODE")
 	db, err := dbpkg.Connect(dbMode)
 	if err != nil {
 		logging.Logger().Critical(err.Error())
