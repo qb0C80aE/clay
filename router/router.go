@@ -17,7 +17,7 @@ func Setup(engine *gin.Engine) error {
 	initializerList := extension.GetRegisteredInitializerList()
 	for _, initializer := range initializerList {
 		if err := initializer.DoBeforeRouterSetup(engine); err != nil {
-			return nil
+			return err
 		}
 	}
 
@@ -28,7 +28,7 @@ func Setup(engine *gin.Engine) error {
 
 	for _, initializer := range initializerList {
 		if err := initializer.DoAfterRouterSetup(engine); err != nil {
-			return nil
+			return err
 		}
 	}
 
