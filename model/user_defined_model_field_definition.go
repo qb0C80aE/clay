@@ -4,7 +4,7 @@ import (
 	"github.com/qb0C80aE/clay/extension"
 )
 
-// UserDefinedModelFieldDefinition is the model class what represents raw template
+// UserDefinedModelFieldDefinition is the model class what represents user defined model field definition
 type UserDefinedModelFieldDefinition struct {
 	Base
 	Name     string `json:"name" validate:"required"`
