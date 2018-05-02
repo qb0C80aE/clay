@@ -111,13 +111,13 @@ func AssociateControllerWithPath(path string, controller Controller) {
 	newPathElementList := []string{}
 	for _, pathElement := range pathElementList {
 		if pathElement[:1] == ":" {
-			newPathElementList = append(newPathElementList, "[0-9a-z_]+")
+			newPathElementList = append(newPathElementList, "[^/]+")
 		} else {
 			newPathElementList = append(newPathElementList, pathElement)
 		}
 	}
 
-	newPath := strings.Join(newPathElementList, "/")
+	newPath := fmt.Sprintf("^%s$", strings.Join(newPathElementList, "/"))
 
 	if oldPair, exists := pathControllerMap[newPath]; exists {
 		if oldPair.controller != controller {
