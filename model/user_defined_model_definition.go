@@ -35,7 +35,7 @@ var typeNameTypeMap = map[string]reflect.Type{
 	"string":  reflect.TypeOf(string("")),
 }
 
-// UserDefinedModelDefinition is the model class what represents raw template
+// UserDefinedModelDefinition is the model class what represents user defined model
 type UserDefinedModelDefinition struct {
 	Base
 	TypeName                    string                             `json:"type_name" clay:"key_parameter" validate:"required"`
