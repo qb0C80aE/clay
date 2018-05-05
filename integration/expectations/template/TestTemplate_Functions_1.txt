@@ -1,3 +1,6 @@
+--- query ---
+map[query1:[123] query2:[abc]]
+
 --- calc ---
 i = 100
 

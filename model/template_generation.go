@@ -30,6 +30,7 @@ type templateParameter struct {
 	Template   *templateUtil
 	Network    *networkUtil
 	Parameter  map[interface{}]interface{}
+	Query      url.Values
 }
 
 type modelStore struct {
@@ -211,6 +212,7 @@ func (receiver *TemplateGeneration) GenerateTemplate(db *gorm.DB, parameters gin
 		},
 		Network:   &networkUtil{},
 		Parameter: templateParameterMap,
+		Query:     urlValues,
 	}
 
 	var doc bytes.Buffer
