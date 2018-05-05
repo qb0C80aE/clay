@@ -47,20 +47,19 @@ func CreateController(actualController extension.Controller, model extension.Mod
 	return actualController
 }
 
-func executeValidation(c *gin.Context, resourceName string, inputContainer interface{}) error {
+func executeValidation(c *gin.Context, resourceName string, inputContainer interface{}, keyParameterSpecifier string) error {
 	model, err := extension.GetAssociatedModelWithResourceName(resourceName)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return err
 	}
 
-	modelKey, err := extension.GetRegisteredModelKey(model)
+	// for update method, set/override key parameter to container
+	modelKey, err := extension.GetModelKey(model, keyParameterSpecifier)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return err
 	}
-
-	// for update method, set key parameter tot container
 	keyParameterValue := c.Param(modelKey.KeyParameter)
 	if len(keyParameterValue) > 0 {
 		containerValue := reflect.ValueOf(inputContainer)
@@ -121,7 +120,7 @@ func (receiver *BaseController) Bind(c *gin.Context, resourceName string) (inter
 			return nil, err
 		}
 
-		if err := executeValidation(c, resourceName, container); err != nil {
+		if err := executeValidation(c, resourceName, container, c.Request.URL.Query().Get("key_parameter")); err != nil {
 			return nil, err
 		}
 
@@ -139,7 +138,7 @@ func (receiver *BaseController) Bind(c *gin.Context, resourceName string) (inter
 			return nil, err
 		}
 
-		if err := executeValidation(c, resourceName, container); err != nil {
+		if err := executeValidation(c, resourceName, container, c.Request.URL.Query().Get("key_parameter")); err != nil {
 			return nil, err
 		}
 
@@ -224,13 +223,7 @@ func (receiver *BaseController) GetResourceSingleURL() (string, error) {
 		return "", err
 	}
 
-	modelKey, err := extension.GetRegisteredModelKey(receiver.model)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return "", err
-	}
-
-	return fmt.Sprintf("%s/:%s", resourceName, modelKey.KeyParameter), nil
+	return fmt.Sprintf("%s/:key_parameter", resourceName), nil
 }
 
 // GetResourceMultiURL builds a resource url what represents multi resources based on the argument

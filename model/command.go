@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extension"
+	"github.com/qb0C80aE/clay/logging"
 	"github.com/qb0C80aE/clay/util/mapstruct"
 	"net/url"
 	"os"
@@ -51,8 +52,18 @@ func (receiver *Command) GetContainerForMigration() (interface{}, error) {
 }
 
 // GetSingle corresponds HTTP GET message and handles a request for a single resource to get the information
-func (receiver *Command) GetSingle(_ extension.Model, db *gorm.DB, parameters gin.Params, _ url.Values, queryFields string) (interface{}, error) {
-	id, _ := strconv.Atoi(parameters.ByName("id"))
+func (receiver *Command) GetSingle(model extension.Model, db *gorm.DB, parameters gin.Params, _ url.Values, queryFields string) (interface{}, error) {
+	modelKey, err := model.GetModelKey(model, "")
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+
+	id, err := strconv.Atoi(parameters.ByName(modelKey.KeyParameter))
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
 
 	result, exists := commandIDCommandMap[id]
 
@@ -111,8 +122,18 @@ func (receiver *Command) Create(_ extension.Model, db *gorm.DB, _ gin.Params, _ 
 }
 
 // Delete corresponds HTTP DELETE message and handles a request for a single resource to delete the specific information
-func (receiver *Command) Delete(_ extension.Model, db *gorm.DB, parameters gin.Params, _ url.Values) error {
-	id, _ := strconv.Atoi(parameters.ByName("id"))
+func (receiver *Command) Delete(model extension.Model, db *gorm.DB, parameters gin.Params, _ url.Values) error {
+	modelKey, err := model.GetModelKey(model, "")
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return err
+	}
+
+	id, err := strconv.Atoi(parameters.ByName(modelKey.KeyParameter))
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return err
+	}
 
 	commandIDCommandMapMutex.Lock()
 	defer commandIDCommandMapMutex.Unlock()

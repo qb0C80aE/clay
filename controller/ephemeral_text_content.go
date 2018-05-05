@@ -17,12 +17,19 @@ func newEphemeralTextContentController() *ephemeralTextContentController {
 }
 
 func (receiver *ephemeralTextContentController) GetResourceSingleURL() (string, error) {
+	modelKey, err := receiver.model.GetModelKey(receiver.model, "")
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return "", err
+	}
+
 	ephemeralTextResourceName, err := extension.GetAssociatedResourceNameWithModel(model.NewEphemeralText())
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return "", err
 	}
-	return fmt.Sprintf("%s/:name/content", ephemeralTextResourceName), nil
+
+	return fmt.Sprintf("%s/:%s/content", ephemeralTextResourceName, modelKey.KeyParameter), nil
 }
 
 func (receiver *ephemeralTextContentController) GetRouteMap() map[int]map[int]gin.HandlerFunc {

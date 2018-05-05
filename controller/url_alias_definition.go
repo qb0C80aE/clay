@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	dbpkg "github.com/qb0C80aE/clay/db"
 	"github.com/qb0C80aE/clay/extension"
@@ -19,6 +20,22 @@ type urlAliasDefinitionController struct {
 
 func newURLAliasDefinitionController() *urlAliasDefinitionController {
 	return CreateController(&urlAliasDefinitionController{}, model.NewURLAliasDefinition()).(*urlAliasDefinitionController)
+}
+
+func (receiver *urlAliasDefinitionController) GetResourceSingleURL() (string, error) {
+	modelKey, err := receiver.model.GetModelKey(receiver.model, "")
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return "", err
+	}
+
+	resourceName, err := receiver.GetResourceName()
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return "", err
+	}
+
+	return fmt.Sprintf("%s/:%s", resourceName, modelKey.KeyParameter), nil
 }
 
 func (receiver *urlAliasDefinitionController) GetRouteMap() map[int]map[int]gin.HandlerFunc {

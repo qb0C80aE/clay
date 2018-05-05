@@ -33,8 +33,18 @@ func (receiver *CommandExecution) GetContainerForMigration() (interface{}, error
 }
 
 // Create corresponds HTTP POST message and handles a request for multi resource to create a new information
-func (receiver *CommandExecution) Create(_ extension.Model, db *gorm.DB, parameters gin.Params, _ url.Values, _ interface{}) (interface{}, error) {
-	id, _ := strconv.Atoi(parameters.ByName("id"))
+func (receiver *CommandExecution) Create(model extension.Model, db *gorm.DB, parameters gin.Params, _ url.Values, _ interface{}) (interface{}, error) {
+	modelKey, err := model.GetModelKey(model, "")
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+
+	id, err := strconv.Atoi(parameters.ByName(modelKey.KeyParameter))
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
 
 	commandIDCommandMapMutex.Lock()
 	defer commandIDCommandMapMutex.Unlock()
@@ -61,8 +71,18 @@ func (receiver *CommandExecution) Create(_ extension.Model, db *gorm.DB, paramet
 }
 
 // Delete corresponds HTTP DELETE message and handles a request for a single resource to delete the specific information
-func (receiver *CommandExecution) Delete(_ extension.Model, db *gorm.DB, parameters gin.Params, _ url.Values) error {
-	id, _ := strconv.Atoi(parameters.ByName("id"))
+func (receiver *CommandExecution) Delete(model extension.Model, db *gorm.DB, parameters gin.Params, _ url.Values) error {
+	modelKey, err := model.GetModelKey(model, "")
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return err
+	}
+
+	id, err := strconv.Atoi(parameters.ByName(modelKey.KeyParameter))
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return err
+	}
 
 	commandIDCommandMapMutex.Lock()
 	defer commandIDCommandMapMutex.Unlock()

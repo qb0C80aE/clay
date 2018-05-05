@@ -37,7 +37,13 @@ func (receiver *URLAliasDefinition) GetContainerForMigration() (interface{}, err
 
 // GetSingle corresponds HTTP GET message and handles a request for a single resource to get the information
 func (receiver *URLAliasDefinition) GetSingle(model extension.Model, db *gorm.DB, parameters gin.Params, urlValues url.Values, queryFields string) (interface{}, error) {
-	result, exists := nameURLAliasDefinitionMap[parameters.ByName("name")]
+	modelKey, err := model.GetModelKey(model, "")
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+
+	result, exists := nameURLAliasDefinitionMap[parameters.ByName(modelKey.KeyParameter)]
 
 	if !exists {
 		logging.Logger().Debug("record not found")

@@ -5,6 +5,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
+	"github.com/qb0C80aE/clay/util/mapstruct"
 	"net/url"
 )
 
@@ -24,15 +25,29 @@ func (receiver *TemplateRaw) GetContainerForMigration() (interface{}, error) {
 }
 
 // GetSingle corresponds HTTP GET message and handles a request for a single resource to get the information
-func (receiver *TemplateRaw) GetSingle(_ extension.Model, db *gorm.DB, parameters gin.Params, _ url.Values, queryFields string) (interface{}, error) {
-	template := NewTemplate()
+func (receiver *TemplateRaw) GetSingle(model extension.Model, db *gorm.DB, parameters gin.Params, urlValues url.Values, queryFields string) (interface{}, error) {
+	templateModel := NewTemplate()
+	templateModelAsContainer := NewTemplate()
 
-	if err := db.Select(queryFields).First(template, parameters.ByName("id")).Error; err != nil {
+	db = db.New()
+
+	newURLValues := url.Values{}
+	if len(urlValues.Get("key_parameter")) > 0 {
+		newURLValues.Set("key_parameter", urlValues.Get("key_parameter"))
+	}
+
+	container, err := templateModel.GetSingle(templateModel, db, parameters, newURLValues, "*")
+	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
 
-	return template.TemplateContent, nil
+	if err := mapstruct.RemapToStruct(container, templateModelAsContainer); err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+
+	return templateModelAsContainer.TemplateContent, nil
 }
 
 func init() {

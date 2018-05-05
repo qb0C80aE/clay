@@ -83,66 +83,29 @@ func (receiver *TemplateGeneration) GenerateTemplate(db *gorm.DB, parameters gin
 	// and note that all conditions go away after this method.
 	db = db.New()
 
-	_, idExists := parameters.Get("id")
-	templateName, nameExists := parameters.Get("name")
+	newURLValues := url.Values{}
+	if len(urlValues.Get("key_parameter")) > 0 {
+		newURLValues.Set("key_parameter", urlValues.Get("key_parameter"))
+	}
+	newURLValues.Set("preloads", "template_arguments")
 
-	if idExists {
-		newURLValues := url.Values{}
-		newURLValues.Set("preloads", "template_arguments")
+	dbParameter, err := dbpkg.NewParameter(newURLValues)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
 
-		dbParameter, err := dbpkg.NewParameter(newURLValues)
-		if err != nil {
-			logging.Logger().Debug(err.Error())
-			return nil, err
-		}
+	db = dbParameter.SetPreloads(db)
 
-		db = dbParameter.SetPreloads(db)
+	container, err := templateModel.GetSingle(templateModel, db, parameters, newURLValues, "*")
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
 
-		container, err := templateModel.GetSingle(templateModel, db, parameters, newURLValues, "*")
-		if err != nil {
-			logging.Logger().Debug(err.Error())
-			return nil, err
-		}
-
-		if err := mapstruct.RemapToStruct(container, templateModelAsContainer); err != nil {
-			logging.Logger().Debug(err.Error())
-			return nil, err
-		}
-	} else if nameExists {
-		newURLValues := url.Values{}
-		newURLValues.Set("q[name]", templateName)
-		newURLValues.Set("preloads", "template_arguments")
-
-		dbParameter, err := dbpkg.NewParameter(newURLValues)
-		if err != nil {
-			logging.Logger().Debug(err.Error())
-			return nil, err
-		}
-
-		db = dbParameter.FilterFields(db)
-		db = dbParameter.SetPreloads(db)
-
-		container, err := templateModel.GetMulti(templateModel, db, parameters, newURLValues, "*")
-		if err != nil {
-			logging.Logger().Debug(err.Error())
-			return nil, err
-		}
-
-		containerValue := reflect.ValueOf(container)
-		if containerValue.Len() == 0 {
-			logging.Logger().Debug("record not found")
-			return nil, errors.New("record not found")
-		}
-
-		result := reflect.ValueOf(container).Index(0).Interface()
-
-		if err := mapstruct.RemapToStruct(result, templateModelAsContainer); err != nil {
-			logging.Logger().Debug(err.Error())
-			return nil, err
-		}
-	} else {
-		logging.Logger().Debug("neither id nor name exists in parameters")
-		return nil, errors.New("neither id nor name exists in parameters")
+	if err := mapstruct.RemapToStruct(container, templateModelAsContainer); err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
 	}
 
 	for _, templateArgument := range templateModelAsContainer.TemplateArguments {
@@ -232,7 +195,7 @@ func (receiver *TemplateGeneration) GenerateTemplate(db *gorm.DB, parameters gin
 		tpl = tpl.Funcs(templateFuncMap)
 	}
 
-	tpl, err := tpl.Parse(templateModelAsContainer.TemplateContent)
+	tpl, err = tpl.Parse(templateModelAsContainer.TemplateContent)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
@@ -740,12 +703,18 @@ func (receiver *templateUtil) Include(templateName string, query string) (interf
 
 	parameters := gin.Params{
 		{
-			Key:   "name",
+			Key:   "key_parameter",
 			Value: templateName,
 		},
 	}
 
 	urlValues, err := url.ParseQuery(query)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+
+	urlValues.Set("key_parameter", "name")
 
 	result, err := NewTemplateGeneration().GetSingle(nil, db, parameters, urlValues, "")
 

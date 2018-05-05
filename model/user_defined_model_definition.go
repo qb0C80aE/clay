@@ -63,7 +63,13 @@ func (receiver *UserDefinedModelDefinition) GetContainerForMigration() (interfac
 
 // GetSingle corresponds HTTP GET message and handles a request for a single resource to get the information
 func (receiver *UserDefinedModelDefinition) GetSingle(model extension.Model, db *gorm.DB, parameters gin.Params, urlValues url.Values, queryFields string) (interface{}, error) {
-	result, exists := typeNameUserDefinedModelDefinitionMap[parameters.ByName("type_name")]
+	modelKey, err := model.GetModelKey(model, "")
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+
+	result, exists := typeNameUserDefinedModelDefinitionMap[parameters.ByName(modelKey.KeyParameter)]
 
 	if !exists {
 		return nil, errors.New("record not found")

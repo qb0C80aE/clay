@@ -36,7 +36,7 @@ func (receiver *EphemeralText) GetContainerForMigration() (interface{}, error) {
 
 // GetSingle corresponds HTTP GET message and handles a request for a single resource to get the information
 func (receiver *EphemeralText) GetSingle(model extension.Model, db *gorm.DB, parameters gin.Params, _ url.Values, queryFields string) (interface{}, error) {
-	modelKey, err := extension.GetRegisteredModelKey(model)
+	modelKey, err := model.GetModelKey(model, "")
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
@@ -97,7 +97,7 @@ func (receiver *EphemeralText) Create(_ extension.Model, _ *gorm.DB, _ gin.Param
 
 // Update corresponds HTTP PUT message and handles a request for a single resource to update the specific information
 func (receiver *EphemeralText) Update(model extension.Model, _ *gorm.DB, parameters gin.Params, _ url.Values, inputContainer interface{}) (interface{}, error) {
-	modelKey, err := extension.GetRegisteredModelKey(model)
+	modelKey, err := model.GetModelKey(model, "")
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
@@ -123,7 +123,7 @@ func (receiver *EphemeralText) Update(model extension.Model, _ *gorm.DB, paramet
 
 // Delete corresponds HTTP DELETE message and handles a request for a single resource to delete the specific information
 func (receiver *EphemeralText) Delete(model extension.Model, db *gorm.DB, parameters gin.Params, _ url.Values) error {
-	modelKey, err := extension.GetRegisteredModelKey(model)
+	modelKey, err := model.GetModelKey(model, "")
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return err

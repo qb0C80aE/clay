@@ -1,8 +1,10 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/qb0C80aE/clay/extension"
+	"github.com/qb0C80aE/clay/logging"
 	"github.com/qb0C80aE/clay/model"
 )
 
@@ -12,6 +14,22 @@ type commandController struct {
 
 func newCommandController() *commandController {
 	return CreateController(&commandController{}, model.NewCommand()).(*commandController)
+}
+
+func (receiver *commandController) GetResourceSingleURL() (string, error) {
+	modelKey, err := receiver.model.GetModelKey(receiver.model, "")
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return "", err
+	}
+
+	resourceName, err := receiver.GetResourceName()
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return "", err
+	}
+
+	return fmt.Sprintf("%s/:%s", resourceName, modelKey.KeyParameter), nil
 }
 
 func (receiver *commandController) GetRouteMap() map[int]map[int]gin.HandlerFunc {
