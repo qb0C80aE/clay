@@ -2,6 +2,7 @@ package model
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extension"
@@ -11,12 +12,11 @@ import (
 	"os"
 	"os/exec"
 	"sort"
-	"strconv"
 	"sync"
 )
 
-var commandIDCommandMap = map[int]*Command{}
-var commandIDCommandMapMutex = new(sync.Mutex)
+var commandNameCommandMap = map[string]*Command{}
+var commandNameCommandMapMutex = new(sync.Mutex)
 
 const (
 	commandStatusCreated  = "created"
@@ -27,7 +27,7 @@ const (
 // Command is the model class what represents command to execute something
 type Command struct {
 	Base
-	ID               int       `json:"id" form:"id"`
+	Name             string    `json:"name" form:"name" clay:"key_parameter" validate:"required"`
 	Description      string    `json:"description" form:"description"`
 	WorkingDirectory string    `json:"working_directory" form:"working_directory"`
 	CommandLine      string    `json:"command_line" form:"command_line" validate:"required"`
@@ -59,13 +59,9 @@ func (receiver *Command) GetSingle(model extension.Model, db *gorm.DB, parameter
 		return nil, err
 	}
 
-	id, err := strconv.Atoi(parameters.ByName(modelKey.KeyParameter))
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
+	name := parameters.ByName(modelKey.KeyParameter)
 
-	result, exists := commandIDCommandMap[id]
+	result, exists := commandNameCommandMap[name]
 
 	if !exists {
 		return nil, errors.New("record not found")
@@ -76,20 +72,20 @@ func (receiver *Command) GetSingle(model extension.Model, db *gorm.DB, parameter
 
 // GetMulti corresponds HTTP GET message and handles a request for multi resource to get the list of information
 func (receiver *Command) GetMulti(_ extension.Model, db *gorm.DB, _ gin.Params, _ url.Values, queryFields string) (interface{}, error) {
-	commandIDCommandMapMutex.Lock()
-	defer commandIDCommandMapMutex.Unlock()
+	commandNameCommandMapMutex.Lock()
+	defer commandNameCommandMapMutex.Unlock()
 
-	keyList := make([]int, 0, len(commandIDCommandMap))
-	for key := range commandIDCommandMap {
+	keyList := make([]string, 0, len(commandNameCommandMap))
+	for key := range commandNameCommandMap {
 		keyList = append(keyList, key)
 	}
 
-	sort.Ints(keyList)
+	sort.Strings(keyList)
 
-	commandList := make([]*Command, len(commandIDCommandMap))
+	commandList := make([]*Command, len(commandNameCommandMap))
 
 	for i, key := range keyList {
-		commandList[i] = commandIDCommandMap[key]
+		commandList[i] = commandNameCommandMap[key]
 	}
 
 	return commandList, nil
@@ -111,12 +107,15 @@ func (receiver *Command) Create(_ extension.Model, db *gorm.DB, _ gin.Params, _ 
 
 	command.Status = commandStatusCreated
 
-	commandIDCommandMapMutex.Lock()
-	defer commandIDCommandMapMutex.Unlock()
+	commandNameCommandMapMutex.Lock()
+	defer commandNameCommandMapMutex.Unlock()
 
-	id := len(commandIDCommandMap) + 1
-	command.ID = id
-	commandIDCommandMap[id] = command
+	if _, exists := commandNameCommandMap[command.Name]; exists {
+		logging.Logger().Debugf("command %s already exists", command.Name)
+		return nil, fmt.Errorf("command %s already exists", command.Name)
+	}
+
+	commandNameCommandMap[command.Name] = command
 
 	return command, nil
 }
@@ -129,19 +128,15 @@ func (receiver *Command) Delete(model extension.Model, db *gorm.DB, parameters g
 		return err
 	}
 
-	id, err := strconv.Atoi(parameters.ByName(modelKey.KeyParameter))
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return err
-	}
+	name := parameters.ByName(modelKey.KeyParameter)
 
-	commandIDCommandMapMutex.Lock()
-	defer commandIDCommandMapMutex.Unlock()
+	commandNameCommandMapMutex.Lock()
+	defer commandNameCommandMapMutex.Unlock()
 
-	result, exists := commandIDCommandMap[id]
+	result, exists := commandNameCommandMap[name]
 
 	if !exists {
-		commandIDCommandMapMutex.Unlock()
+		commandNameCommandMapMutex.Unlock()
 		return errors.New("record not found")
 	}
 
@@ -149,14 +144,14 @@ func (receiver *Command) Delete(model extension.Model, db *gorm.DB, parameters g
 		return errors.New("command is running")
 	}
 
-	delete(commandIDCommandMap, id)
+	delete(commandNameCommandMap, name)
 
 	return nil
 }
 
 // GetTotal returns the count of for multi resource
 func (receiver *Command) GetTotal(_ extension.Model, _ *gorm.DB) (int, error) {
-	return len(commandIDCommandMap), nil
+	return len(commandNameCommandMap), nil
 }
 
 func init() {

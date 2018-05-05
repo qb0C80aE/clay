@@ -11,7 +11,6 @@ import (
 	"io"
 	"net/url"
 	"os/exec"
-	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -20,6 +19,7 @@ import (
 // CommandExecution is the model class what represents command execution
 type CommandExecution struct {
 	Base
+	Name string `json:"name" clay:"key_parameter"`
 }
 
 // NewCommandExecution creates a commandExecution model instance
@@ -40,16 +40,12 @@ func (receiver *CommandExecution) Create(model extension.Model, _ *gorm.DB, para
 		return nil, err
 	}
 
-	id, err := strconv.Atoi(parameters.ByName(modelKey.KeyParameter))
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
+	name := parameters.ByName(modelKey.KeyParameter)
 
-	commandIDCommandMapMutex.Lock()
-	defer commandIDCommandMapMutex.Unlock()
+	commandNameCommandMapMutex.Lock()
+	defer commandNameCommandMapMutex.Unlock()
 
-	command, exists := commandIDCommandMap[id]
+	command, exists := commandNameCommandMap[name]
 
 	if !exists {
 		return nil, errors.New("record not found")
@@ -78,16 +74,12 @@ func (receiver *CommandExecution) Delete(model extension.Model, _ *gorm.DB, para
 		return err
 	}
 
-	id, err := strconv.Atoi(parameters.ByName(modelKey.KeyParameter))
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return err
-	}
+	name := parameters.ByName(modelKey.KeyParameter)
 
-	commandIDCommandMapMutex.Lock()
-	defer commandIDCommandMapMutex.Unlock()
+	commandNameCommandMapMutex.Lock()
+	defer commandNameCommandMapMutex.Unlock()
 
-	command, exists := commandIDCommandMap[id]
+	command, exists := commandNameCommandMap[name]
 
 	if !exists {
 		return errors.New("record not found")
