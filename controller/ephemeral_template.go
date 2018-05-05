@@ -8,15 +8,15 @@ import (
 	"github.com/qb0C80aE/clay/model"
 )
 
-type ephemeralTextController struct {
+type ephemeralTemplateController struct {
 	BaseController
 }
 
-func newEphemeralTextController() *ephemeralTextController {
-	return CreateController(&ephemeralTextController{}, model.NewEphemeralText()).(*ephemeralTextController)
+func newEphemeralTemplateController() *ephemeralTemplateController {
+	return CreateController(&ephemeralTemplateController{}, model.NewEphemeralTemplate()).(*ephemeralTemplateController)
 }
 
-func (receiver *ephemeralTextController) GetResourceSingleURL() (string, error) {
+func (receiver *ephemeralTemplateController) GetResourceSingleURL() (string, error) {
 	modelKey, err := receiver.model.GetModelKey(receiver.model, "")
 	if err != nil {
 		logging.Logger().Debug(err.Error())
@@ -32,7 +32,7 @@ func (receiver *ephemeralTextController) GetResourceSingleURL() (string, error) 
 	return fmt.Sprintf("%s/:%s", resourceName, modelKey.KeyParameter), nil
 }
 
-func (receiver *ephemeralTextController) GetRouteMap() map[int]map[int]gin.HandlerFunc {
+func (receiver *ephemeralTemplateController) GetRouteMap() map[int]map[int]gin.HandlerFunc {
 	routeMap := map[int]map[int]gin.HandlerFunc{
 		extension.MethodGet: {
 			extension.URLSingle: receiver.GetSingle,
@@ -52,5 +52,5 @@ func (receiver *ephemeralTextController) GetRouteMap() map[int]map[int]gin.Handl
 }
 
 func init() {
-	extension.RegisterController(newEphemeralTextController())
+	extension.RegisterController(newEphemeralTemplateController())
 }
