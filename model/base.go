@@ -35,8 +35,8 @@ func (receiver *Base) GenerateTableName(model extension.Model, db *gorm.DB) stri
 }
 
 // GetModelKey returns its key fields
-func (receiver *Base) GetModelKey(model extension.Model) (extension.ModelKey, error) {
-	return extension.GetRegisteredModelKey(model)
+func (receiver *Base) GetModelKey(model extension.Model, keyParameterSpecifier string) (extension.ModelKey, error) {
+	return extension.GetModelKey(model, keyParameterSpecifier)
 }
 
 // GetStructFields returns its struct fields used to create containers
@@ -95,13 +95,13 @@ func (receiver *Base) GetSingle(model extension.Model, db *gorm.DB, parameters g
 		return nil, err
 	}
 
-	modelKey, err := extension.GetRegisteredModelKey(model)
+	modelKey, err := model.GetModelKey(model, urlValues.Get("key_parameter"))
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
 
-	if err := db.Select(queryFields).First(result, fmt.Sprintf("%s = ?", modelKey.KeyParameter), parameters.ByName(modelKey.KeyParameter)).Error; err != nil {
+	if err := db.Select(queryFields).First(result, fmt.Sprintf("%s = ?", modelKey.KeyParameter), parameters.ByName("key_parameter")).Error; err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
@@ -152,10 +152,10 @@ func (receiver *Base) Create(_ extension.Model, db *gorm.DB, _ gin.Params, _ url
 }
 
 // Update corresponds HTTP PUT message and handles a request for a single resource to update the specific information
-func (receiver *Base) Update(model extension.Model, db *gorm.DB, parameters gin.Params, _ url.Values, inputContainer interface{}) (interface{}, error) {
+func (receiver *Base) Update(model extension.Model, db *gorm.DB, parameters gin.Params, urlValues url.Values, inputContainer interface{}) (interface{}, error) {
 	value := reflect.ValueOf(inputContainer)
 
-	modelKey, err := extension.GetRegisteredModelKey(model)
+	modelKey, err := model.GetModelKey(model, urlValues.Get("key_parameter"))
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
@@ -163,9 +163,9 @@ func (receiver *Base) Update(model extension.Model, db *gorm.DB, parameters gin.
 
 	switch value.Elem().FieldByName(modelKey.KeyField).Kind() {
 	case reflect.String:
-		value.Elem().FieldByName(modelKey.KeyField).SetString(parameters.ByName(modelKey.KeyParameter))
+		value.Elem().FieldByName(modelKey.KeyField).SetString(parameters.ByName("key_parameter"))
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		id, err := strconv.Atoi(parameters.ByName(modelKey.KeyParameter))
+		id, err := strconv.Atoi(parameters.ByName("key_parameter"))
 		if err != nil {
 			logging.Logger().Debug(err.Error())
 			return nil, err
@@ -192,8 +192,8 @@ func (receiver *Base) Update(model extension.Model, db *gorm.DB, parameters gin.
 }
 
 // Delete corresponds HTTP DELETE message and handles a request for a single resource to delete the specific information
-func (receiver *Base) Delete(model extension.Model, db *gorm.DB, parameters gin.Params, _ url.Values) error {
-	modelKey, err := model.GetModelKey(model)
+func (receiver *Base) Delete(model extension.Model, db *gorm.DB, parameters gin.Params, urlValues url.Values) error {
+	modelKey, err := model.GetModelKey(model, urlValues.Get("key_parameter"))
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return err
@@ -211,7 +211,7 @@ func (receiver *Base) Delete(model extension.Model, db *gorm.DB, parameters gin.
 		return err
 	}
 
-	if err := db.First(target, fmt.Sprintf("%s = ?", modelKey.KeyParameter), parameters.ByName(modelKey.KeyParameter)).Error; err != nil {
+	if err := db.First(target, fmt.Sprintf("%s = ?", modelKey.KeyParameter), parameters.ByName("key_parameter")).Error; err != nil {
 		logging.Logger().Debug(err.Error())
 		return err
 	}
@@ -412,7 +412,7 @@ func (receiver *Base) deleteMarkedItemsInSlices(db *gorm.DB, data interface{}) e
 						return err
 					}
 
-					modelKey, err := extension.GetRegisteredModelKey(model)
+					modelKey, err := model.GetModelKey(model, "")
 					if err != nil {
 						logging.Logger().Debug(err.Error())
 						return err
@@ -435,7 +435,7 @@ func (receiver *Base) deleteMarkedItemsInSlices(db *gorm.DB, data interface{}) e
 
 					parameters := gin.Params{
 						{
-							Key:   modelKey.KeyParameter,
+							Key:   "key_parameter",
 							Value: keyParameterValue,
 						},
 					}

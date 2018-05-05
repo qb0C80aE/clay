@@ -17,12 +17,19 @@ func newCommandExecutionController() *commandExecutionController {
 }
 
 func (receiver *commandExecutionController) GetResourceSingleURL() (string, error) {
-	commandResourceName, err := extension.GetAssociatedResourceNameWithModel(model.NewCommand())
+	modelKey, err := receiver.model.GetModelKey(receiver.model, "")
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return "", err
 	}
-	return fmt.Sprintf("%s/:id/execution", commandResourceName), nil
+
+	resourceName, err := receiver.GetResourceName()
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return "", err
+	}
+
+	return fmt.Sprintf("%s/:%s/execution", resourceName, modelKey.KeyParameter), nil
 }
 
 func (receiver *commandExecutionController) GetRouteMap() map[int]map[int]gin.HandlerFunc {

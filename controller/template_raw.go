@@ -22,7 +22,8 @@ func (receiver *templateRawController) GetResourceSingleURL() (string, error) {
 		logging.Logger().Debug(err.Error())
 		return "", err
 	}
-	return fmt.Sprintf("%s/:id/raw", templateResourceName), nil
+
+	return fmt.Sprintf("%s/:key_parameter/raw", templateResourceName), nil
 }
 
 func (receiver *templateRawController) GetRouteMap() map[int]map[int]gin.HandlerFunc {

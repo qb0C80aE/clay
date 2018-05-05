@@ -17,7 +17,7 @@ var typeNameModelMap = map[string]Model{}
 var resourceNameModelMap = map[string]Model{}
 var typeNameResourceNameMap = map[string]string{}
 var resourceNameTypeNameMap = map[string]string{}
-var typeNameModelKeyMap = map[string]ModelKey{}
+var typeNameDefaultModelKeyMap = map[string]ModelKey{}
 
 var typeNameStructFieldListMap = map[string][]reflect.StructField{}
 var typeNameJSONKeyStructFieldMapMap = map[string]map[string]reflect.StructField{}
@@ -75,7 +75,7 @@ type Model interface {
 	GetResourceName(model Model) (string, error)
 	GenerateTableName(model Model, db *gorm.DB) string
 	GetStructFields(model Model) []reflect.StructField
-	GetModelKey(model Model) (ModelKey, error)
+	GetModelKey(model Model, keyParameterSpecifier string) (ModelKey, error)
 	GetContainerForMigration() (interface{}, error)
 	GetSingle(model Model, db *gorm.DB, parameters gin.Params, urlValues url.Values, queryString string) (interface{}, error)
 	GetMulti(model Model, db *gorm.DB, parameters gin.Params, urlValues url.Values, queryString string) (interface{}, error)
@@ -87,7 +87,7 @@ type Model interface {
 	GetTotal(model Model, db *gorm.DB) (int, error)
 }
 
-// ModelKey is the type that has keys used in clay for "to_be_deleted" (delete specific children in update) logic or any other key replacement logic.
+// ModelKey is the type that defines the key parameter of types. It's used in various functions like "to_be_deleted" (delete specific children in update) logic or any other key replacement logic.
 type ModelKey struct {
 	KeyParameter string
 	KeyField     string
@@ -132,6 +132,57 @@ func GetActualValue(object interface{}) reflect.Value {
 	return objectValue
 }
 
+// GetModelKey returns the model key of given model
+// If key_parameter is not empty, this returns overwritten one
+func GetModelKey(model Model, keyParameterSpecifier string) (ModelKey, error) {
+	modelKey, err := GetRegisteredDefaultModelKey(model)
+	if err != nil {
+		return ModelKey{}, err
+	}
+
+	if len(keyParameterSpecifier) > 0 {
+		container, err := CreateContainerByTypeName(model.GetTypeName(model))
+		if err != nil {
+			return ModelKey{}, err
+		}
+
+		containerType := GetActualType(container)
+
+		jsonKey := ""
+		fieldName := ""
+		for i := 0; i < containerType.NumField(); i++ {
+			field := containerType.Field(i)
+			jsonTag, ok := field.Tag.Lookup("json")
+			if ok {
+				tagStatementList := strings.Split(jsonTag, ",")
+				for _, tagStatement := range tagStatementList {
+					switch tagStatement {
+					case "omitempty", "-":
+						continue
+					default:
+						if keyParameterSpecifier == tagStatement {
+							jsonKey = tagStatement
+							fieldName = field.Name
+							break
+						}
+					}
+				}
+			}
+		}
+
+		if len(fieldName) == 0 {
+			return ModelKey{}, fmt.Errorf("key_parameter %s does not exist in %s", keyParameterSpecifier, containerType.String())
+		}
+
+		modelKey = ModelKey{
+			KeyParameter: jsonKey,
+			KeyField:     fieldName,
+		}
+	}
+
+	return modelKey, nil
+}
+
 // RegisterModel registers a model to migrate automatically, and to generate new instances in processing requests
 func RegisterModel(model Model) {
 	modelList = append(modelList, model)
@@ -165,7 +216,7 @@ func RegisterModel(model Model) {
 			for _, tagStatement := range tagStatementList {
 				switch tagStatement {
 				case "key_parameter":
-					typeNameModelKeyMap[modelTypeName] = ModelKey{
+					typeNameDefaultModelKeyMap[modelTypeName] = ModelKey{
 						KeyParameter: jsonKey,
 						KeyField:     field.Name,
 					}
@@ -175,8 +226,8 @@ func RegisterModel(model Model) {
 		}
 	}
 
-	if _, exists := typeNameModelKeyMap[modelTypeName]; !exists {
-		typeNameModelKeyMap[modelTypeName] = ModelKey{
+	if _, exists := typeNameDefaultModelKeyMap[modelTypeName]; !exists {
+		typeNameDefaultModelKeyMap[modelTypeName] = ModelKey{
 			KeyParameter: "id",
 			KeyField:     "ID",
 		}
@@ -195,10 +246,10 @@ func GetRegisteredModelList() []Model {
 	return result
 }
 
-// GetRegisteredModelKey returns the registered model key
-func GetRegisteredModelKey(model Model) (ModelKey, error) {
+// GetRegisteredDefaultModelKey returns the registered default model key
+func GetRegisteredDefaultModelKey(model Model) (ModelKey, error) {
 	modelTypeName := model.GetTypeName(model)
-	result, exists := typeNameModelKeyMap[modelTypeName]
+	result, exists := typeNameDefaultModelKeyMap[modelTypeName]
 	if !exists {
 		logging.Logger().Debugf("the model key of '%s' has not been registered yet", modelTypeName)
 		return ModelKey{}, fmt.Errorf("the model key of '%s' has not been registered yet", modelTypeName)

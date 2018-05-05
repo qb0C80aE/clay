@@ -595,14 +595,22 @@ testParameterStringOverride = {{ .Parameter.testParameterStringOverride }}`,
 		"p[testParameterBoolOverride]":   "true",
 		"p[testParameterStringOverride]": "QWERTY",
 	}
+	parametersByName := map[string]string{
+		"p[testParameterIntOverride]":    "100",
+		"p[testParameterFloatOverride]":  "200.123",
+		"p[testParameterBoolOverride]":   "true",
+		"p[testParameterStringOverride]": "QWERTY",
+		"key_parameter":                  "name",
+	}
+
 	responseText, code := Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%d", id), "generation", parameters), nil)
 	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestGenerateTemplate_1.txt"))
-	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "template_generations_by_name", template.Name, parameters), nil)
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%s", template.Name), "generation", parametersByName), nil)
 	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestGenerateTemplate_1.txt"))
 
 	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%d", id), "raw", parameters), nil)
 	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestGenerateTemplate_2.txt"))
-	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "template_raws_by_name", template.Name, parameters), nil)
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%s", template.Name), "raw", parametersByName), nil)
 	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestGenerateTemplate_2.txt"))
 
 }
@@ -1254,23 +1262,27 @@ sequence[{{ $i }}]={{ $v }}
 
 	Execute(t, http.MethodPost, GenerateMultiResourceURL(server, "templates", nil), template4)
 
+	parametersByName := map[string]string{
+		"key_parameter": "name",
+	}
+
 	responseText, code := Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%d", id), "generation", nil), nil)
 	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_Functions_1.txt"))
-	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "template_generations_by_name", template1.Name, nil), nil)
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%s", template1.Name), "generation", parametersByName), nil)
 	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_Functions_1.txt"))
 
 	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%d", id2), "generation", nil), nil)
 	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_Functions_2.txt"))
-	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "template_generations_by_name", template2.Name, nil), nil)
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%s", template2.Name), "generation", parametersByName), nil)
 	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_Functions_2.txt"))
 
 	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%d", id3), "generation", nil), nil)
 	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_Functions_3.txt"))
-	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "template_generations_by_name", template3.Name, nil), nil)
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%s", template3.Name), "generation", parametersByName), nil)
 	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_Functions_3.txt"))
 
 	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%d", id4), "generation", nil), nil)
 	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_Functions_4.txt"))
-	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, "template_generations_by_name", template4.Name, nil), nil)
+	responseText, code = Execute(t, http.MethodGet, GenerateSingleResourceURL(server, fmt.Sprintf("templates/%s", template4.Name), "generation", parametersByName), nil)
 	CheckResponseText(t, code, http.StatusOK, responseText, LoadExpectation(t, "template/TestTemplate_Functions_4.txt"))
 }
