@@ -677,16 +677,16 @@ func (receiver *BaseController) DoBeforeDBMigration(_ *gorm.DB) error {
 }
 
 // DoAfterDBMigration execute initialization process after DB migration
-func (receiver *BaseController) DoAfterDBMigration(db *gorm.DB) error {
+func (receiver *BaseController) DoAfterDBMigration(_ *gorm.DB) error {
 	return nil
 }
 
 // DoBeforeRouterSetup execute initialization process before Router initialization
-func (receiver *BaseController) DoBeforeRouterSetup(r *gin.Engine) error {
+func (receiver *BaseController) DoBeforeRouterSetup(_ *gin.Engine) error {
 	return nil
 }
 
 // DoAfterRouterSetup execute initialization process after Router initialization
-func (receiver *BaseController) DoAfterRouterSetup(r *gin.Engine) error {
+func (receiver *BaseController) DoAfterRouterSetup(_ *gin.Engine) error {
 	return nil
 }
