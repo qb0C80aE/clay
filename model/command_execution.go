@@ -33,7 +33,7 @@ func (receiver *CommandExecution) GetContainerForMigration() (interface{}, error
 }
 
 // Create corresponds HTTP POST message and handles a request for multi resource to create a new information
-func (receiver *CommandExecution) Create(model extension.Model, db *gorm.DB, parameters gin.Params, _ url.Values, _ interface{}) (interface{}, error) {
+func (receiver *CommandExecution) Create(model extension.Model, _ *gorm.DB, parameters gin.Params, _ url.Values, _ interface{}) (interface{}, error) {
 	modelKey, err := model.GetModelKey(model, "")
 	if err != nil {
 		logging.Logger().Debug(err.Error())
@@ -71,7 +71,7 @@ func (receiver *CommandExecution) Create(model extension.Model, db *gorm.DB, par
 }
 
 // Delete corresponds HTTP DELETE message and handles a request for a single resource to delete the specific information
-func (receiver *CommandExecution) Delete(model extension.Model, db *gorm.DB, parameters gin.Params, _ url.Values) error {
+func (receiver *CommandExecution) Delete(model extension.Model, _ *gorm.DB, parameters gin.Params, _ url.Values) error {
 	modelKey, err := model.GetModelKey(model, "")
 	if err != nil {
 		logging.Logger().Debug(err.Error())
