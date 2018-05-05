@@ -1,5 +1,8 @@
 --- query ---
-map[query1:[456] query2:[def] key_parameter:[name]]
+len="3"
+query1="456"
+query2="def"
+key_parameter="name"
 
 --- calc ---
 i = 100
