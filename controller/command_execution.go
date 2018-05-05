@@ -6,6 +6,8 @@ import (
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
 	"github.com/qb0C80aE/clay/model"
+	"github.com/qb0C80aE/clay/version"
+	"net/http"
 )
 
 type commandExecutionController struct {
@@ -23,13 +25,13 @@ func (receiver *commandExecutionController) GetResourceSingleURL() (string, erro
 		return "", err
 	}
 
-	resourceName, err := receiver.GetResourceName()
+	commandResourceName, err := extension.GetAssociatedResourceNameWithModel(model.NewCommand())
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return "", err
 	}
 
-	return fmt.Sprintf("%s/:%s/execution", resourceName, modelKey.KeyParameter), nil
+	return fmt.Sprintf("%s/:%s/execution", commandResourceName, modelKey.KeyParameter), nil
 }
 
 func (receiver *commandExecutionController) GetRouteMap() map[int]map[int]gin.HandlerFunc {
@@ -42,6 +44,31 @@ func (receiver *commandExecutionController) GetRouteMap() map[int]map[int]gin.Ha
 		},
 	}
 	return routeMap
+}
+
+func (receiver *commandExecutionController) Create(c *gin.Context) {
+	ver, err := version.New(c)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
+		return
+	}
+
+	// don't bind, just call Create of the model. the Content-Type and Body have nothing
+	// The result is Command
+	result, err := receiver.model.Create(receiver.model, nil, c.Params, c.Request.URL.Query(), nil)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
+		return
+	}
+
+	if version.Range("1.0.0", "<=", ver) && version.Range(ver, "<", "2.0.0") {
+		// conditional branch by version.
+		// 1.0.0 <= this version < 2.0.0 !!
+	}
+
+	receiver.outputHandler.OutputCreate(c, http.StatusCreated, result)
 }
 
 func init() {
