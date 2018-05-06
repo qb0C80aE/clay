@@ -1,22 +1,18 @@
 package extension
 
-// ProgramInformation is the interface what handles the build information like build time, and sub module revisions
-// * BuildTime returns its build time
-// * SubModuleInformationList returns its sub module information list
-type ProgramInformation interface {
-	BuildTime() string
-	SubModuleInformationList() []SubModuleInformation
-}
-
-// SubModuleInformation is the interface what handles the build information of sub module revisions
-// * Name returns its name
-// * Revision returns its revision
-type SubModuleInformation interface {
-	Name() string
-	Revision() string
-}
-
 var registeredProgramInformation ProgramInformation
+
+// ProgramInformation is the interface what handles the build information like build time, version, and commit hash
+// * GetBuildTime returns its build time
+// * GetBranch returns branch
+// * GetVersion returns version tag
+// * GetCommitHash returns commit hash
+type ProgramInformation interface {
+	GetBuildTime() string
+	GetBranch() string
+	GetVersion() string
+	GetCommitHash() string
+}
 
 // RegisterProgramInformation registers the program information
 func RegisterProgramInformation(programInformation ProgramInformation) {

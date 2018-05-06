@@ -1,34 +1,24 @@
 package buildtime
 
-import "github.com/qb0C80aE/clay/extension"
-
 type clayProgramInformation struct {
-	buildTime                    string
-	claySubModuleInformationList []*claySubModuleInformation
+	buildTime  string
+	branch     string
+	version    string
+	commitHash string
 }
 
-type claySubModuleInformation struct {
-	name     string
-	revision string
-	version  string
-}
-
-func (clayProgramInformation *clayProgramInformation) BuildTime() string {
+func (clayProgramInformation *clayProgramInformation) GetBuildTime() string {
 	return clayProgramInformation.buildTime
 }
 
-func (clayProgramInformation *clayProgramInformation) SubModuleInformationList() []extension.SubModuleInformation {
-	result := make([]extension.SubModuleInformation, len(clayProgramInformation.claySubModuleInformationList))
-	for i, subModuleInformation := range clayProgramInformation.claySubModuleInformationList {
-		result[i] = subModuleInformation
-	}
-	return result
+func (clayProgramInformation *clayProgramInformation) GetBranch() string {
+	return clayProgramInformation.branch
 }
 
-func (claySubModuleInformation *claySubModuleInformation) Name() string {
-	return claySubModuleInformation.name
+func (clayProgramInformation *clayProgramInformation) GetVersion() string {
+	return clayProgramInformation.version
 }
 
-func (claySubModuleInformation *claySubModuleInformation) Revision() string {
-	return claySubModuleInformation.revision
+func (clayProgramInformation *clayProgramInformation) GetCommitHash() string {
+	return clayProgramInformation.commitHash
 }
