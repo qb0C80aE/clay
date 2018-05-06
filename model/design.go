@@ -37,7 +37,7 @@ func (receiver *Design) GetSingle(_ extension.Model, db *gorm.DB, _ gin.Params, 
 	programInformation := extension.GetRegisteredProgramInformation()
 
 	design := NewDesign()
-	design.ClayVersion = programInformation.BuildTime()
+	design.ClayVersion = programInformation.GetBuildTime()
 	design.GeneratedDate = ""
 	design.Content = map[string]interface{}{}
 

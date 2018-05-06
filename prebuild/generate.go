@@ -5,12 +5,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/BurntSushi/toml"
-	"io/ioutil"
+	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/plumbing"
 	"os"
-	"os/exec"
 	"path/filepath"
-	"strings"
 	"text/template"
 	"time"
 )
@@ -23,93 +21,66 @@ import "github.com/qb0C80aE/clay/extension"
 
 func init() {
 	var programInformation = &clayProgramInformation{
-		buildTime: "{{.BuildTime}}",
-		claySubModuleInformationList: []*claySubModuleInformation{
-			{{- range $i, $subModule := .SubModules}}
-			{
-				name:     "{{$subModule.Name}}",
-				revision: "{{$subModule.Revision}}",
-				version:  "{{$subModule.Version}}",
-			},
-			{{- end }}
-		},
+		buildTime:  "{{ .BuildTime }}",
+		branch:     "{{ .Branch }}",
+		version:    "{{ .Version }}",
+		commitHash: "{{ .CommitHash }}",
 	}
 	extension.RegisterProgramInformation(programInformation)
 }
 `))
 
-type depLock struct {
-	Projects []*depLockProject `toml:"projects"`
-}
-
-type depLockProject struct {
-	Name     string `toml:"name"`
-	Revision string `toml:"revision"`
-	Version  string `toml:"version"`
-}
-
-func claySubModules(cwd string, depLockProjects []*depLockProject) ([]*depLockProject, error) {
-	result := []*depLockProject{}
-
-	out, err := exec.Command("git", "rev-parse", "@").Output()
-	if err != nil {
-		return nil, err
-	}
-	clayInfo := &depLockProject{
-		Name:     "clay",
-		Revision: strings.TrimSpace(string(out)),
-		Version:  strings.TrimSpace(string(out)),
-	}
-	result = append(result, clayInfo)
-
-	for _, depLockProject := range depLockProjects {
-		_, err := os.Stat(filepath.Join(cwd, "vendor", depLockProject.Name, "clay_module.go"))
-		if err != nil {
-			continue
-		}
-		result = append(result, depLockProject)
-	}
-	return result, nil
-}
-
 func main() {
+	now := time.Now().UTC().Format(time.RFC3339)
+
 	cwd, err := filepath.Abs("..")
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
 
-	buf, err := ioutil.ReadFile(filepath.Join(cwd, "Gopkg.toml"))
-	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-
-	var depLock depLock
-	err = toml.Unmarshal(buf, &depLock)
-	clayModules, err := claySubModules(cwd, depLock.Projects)
-	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-
-	t := time.Now()
-	const layout = "20060102150405"
-	now := t.Format(layout)
-
 	f, err := os.Create(filepath.Join(cwd, "buildtime", "build_information.go"))
 	defer f.Close()
-
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
 	}
+
+	repository, err := git.PlainOpen(cwd)
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+
+	head, err := repository.Head()
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+
+	tagsIterator, err := repository.Tags()
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+
+	version := "v0.0.0"
+	tagsIterator.ForEach(func(reference *plumbing.Reference) error {
+		if head.Hash().String() == reference.Hash().String() {
+			version = reference.Name().Short()
+		}
+		return nil
+	})
 
 	clayVersionTemplate.Execute(f, struct {
 		BuildTime  string
-		SubModules []*depLockProject
+		Branch     string
+		Version    string
+		CommitHash string
 	}{
 		BuildTime:  now,
-		SubModules: clayModules,
+		Branch:     head.Name().Short(),
+		Version:    version,
+		CommitHash: head.Hash().String(),
 	})
 }

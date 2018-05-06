@@ -12,11 +12,13 @@ var versionCmd = &cobra.Command{
 	Long:  `Shows clay and all submodule versions.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		programInformation := extension.GetRegisteredProgramInformation()
-		fmt.Printf("Clay build-%s\n", programInformation.BuildTime())
-		subModuleInformationList := programInformation.SubModuleInformationList()
-		for _, subModuleInformation := range subModuleInformationList {
-			fmt.Printf("  module %s\n    revision: %s\n", subModuleInformation.Name(), subModuleInformation.Revision())
-		}
+		fmt.Printf(
+			"Clay %s\nbranch: %s\ncommit hash: %s\nbuild time: %s\n",
+			programInformation.GetVersion(),
+			programInformation.GetBranch(),
+			programInformation.GetCommitHash(),
+			programInformation.GetBuildTime(),
+		)
 		return
 	},
 }
