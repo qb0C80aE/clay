@@ -624,7 +624,10 @@ func TestTemplate_Functions(t *testing.T) {
 		ID:   id,
 		Name: "test1",
 		TemplateContent: `--- query ---
-{{ .Query }}
+len="{{ len .Query }}"
+query1="{{ .Query.Get "query1" }}"
+query2="{{ .Query.Get "query2" }}"
+key_parameter="{{ .Query.Get "key_parameter" }}"
 
 --- calc ---
 i = 100
