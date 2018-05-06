@@ -1,0 +1,58 @@
+{
+	"general": {
+		"user_defined_models_directory": "./examples",
+		"ephemeral_templates_directory": "./examples"
+	},
+	"user_defined_models": [
+		{
+			"file_name": "node.json"
+		},
+		{
+			"file_name": "node_group.json"
+		},
+		{
+			"file_name": "node_group_node_association.json"
+		},
+		{
+			"file_name": "port.json"
+		},
+		{
+			"file_name": "port_group.json"
+		},
+		{
+			"file_name": "port_group_port_association.json"
+		},
+		{
+			"file_name": "link.json"
+		},
+		{
+			"file_name": "port_ipv4_address.json"
+		},
+		{
+			"file_name": "node_route.json"
+		},
+		{
+			"file_name": "vlan.json"
+		},
+		{
+			"file_name": "subnet.json"
+		},
+		{
+			"file_name": "vlan_port_association.json"
+		}
+	],
+	"ephemeral_templates": [
+		{
+			"name": "index",
+			"file_name": "index.html"
+		}
+	],
+	"url_aliases": [
+		{
+			"name": "ui",
+			"from": "/ui",
+			"to": "/ephemeral_templates/index/generation",
+			"query": "output_type=html"
+		}
+	]
+}
