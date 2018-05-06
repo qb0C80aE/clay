@@ -1,0 +1,63 @@
+{{- $core := .Core -}}
+{{- $layer3Interfaces := .ModelStore.Multi "diagram_layer3_interfaces" "preloads=node.node_type,subnet" -}}
+{{- $diagramNodeMap := $core.Map -}}
+{{- $interfaceMap := $core.Map -}}
+{
+  "nodes": [
+  {{ range $i, $layer3Interface := $layer3Interfaces.Records }}
+    {{ $diagramNodeKey := printf "%d_3_3" $layer3Interface.SubnetID }}
+    {{ $diagramNodeCount := len $diagramNodeMap }}
+    {{ $subnetExists := $core.Exists $diagramNodeMap $diagramNodeKey }}
+    {{ if ne $subnetExists true }}
+      {{ if ne $diagramNodeCount 0 }},{{ end }}{
+      "name": "{{ printf "%s/%d" $layer3Interface.Subnet.Address $layer3Interface.Subnet.Prefix }}",
+      "icon": "/ui/files/images/diagram/Segment.png",
+      "meta": {
+        "node_extra_information": "{{ printf "(VLAN %04d)" $layer3Interface.VlanID }}",
+        "diagram_node_id": "{{ $diagramNodeKey }}"
+      }
+    }
+      {{ $diagramNodeMap := $core.Put $diagramNodeMap $diagramNodeKey true }}
+    {{ end}}
+
+    {{ $diagramNodeKey := printf "%d_3_1" $layer3Interface.Node.ID }}
+    {{ $diagramNodeCount := len $diagramNodeMap }}
+    {{ $nodeExists := $core.Exists $diagramNodeMap $diagramNodeKey }}
+    {{ if ne $nodeExists true }}
+    {{ if ne $diagramNodeCount 0 }},{{ end }}{
+      "name": "{{ $layer3Interface.Node.Name }}",
+      "icon": "/ui/files/images/diagram/{{ $layer3Interface.Node.NodeType.Name }}_{{ $layer3Interface.Node.Virtual }}.png",
+      "meta": {
+        "node_extra_information": "-",
+        "diagram_node_id": "{{ $diagramNodeKey }}"
+      }
+    }
+      {{ $diagramNodeMap := $core.Put $diagramNodeMap $diagramNodeKey true }}
+    {{ end}}
+  {{ end }}
+  ],
+  "links": [
+  {{ range $i, $layer3Interface := $layer3Interfaces.Records }}
+    {{ $interfaceCount := len $interfaceMap }}
+    {{ if eq $layer3Interface.IsConnected true }}
+      {{ if ne $interfaceCount 0 }},{{ end }}{
+        "source": "{{ $layer3Interface.Node.Name }}",
+        "target": "{{ printf "%s/%d" $layer3Interface.Subnet.Address $layer3Interface.Subnet.Prefix }}",
+        "meta": {
+          "interface": {
+            "source": "{{ $layer3Interface.Name }}",
+            "target": ""
+          },
+          "mac_address": null,
+          {{ $ipv4AddressLen := len $layer3Interface.Ipv4Address }}
+          "ipv4_address": {
+            "source": "{{ if eq $ipv4AddressLen 0 }}-{{ else }}{{ $layer3Interface.Ipv4Address }}{{ end }}",
+            "target": ""
+          }
+        }
+    }
+        {{ $interfaceMap := $core.Put $interfaceMap true true }}
+      {{ end}}
+    {{ end }}
+  ]
+}

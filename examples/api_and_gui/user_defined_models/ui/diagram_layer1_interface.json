@@ -1,0 +1,97 @@
+{
+  "type_name": "DiagramLayer1Interface",
+  "resource_name": "diagram_layer1_interfaces",
+  "to_be_migrated": false,
+  "is_controller_enabled": true,
+  "is_design_access_disabled": true,
+  "fields": [
+    {
+      "name": "ID",
+      "tag": "json:\"id\" yaml:\"id\"",
+      "type_name": "string"
+    },
+    {
+      "name": "Name",
+      "tag": "json:\"name\" yaml:\"name\"",
+      "type_name": "string"
+    },
+    {
+      "name": "Number",
+      "tag": "json:\"number\" yaml:\"number\"",
+      "type_name": "string"
+    },
+    {
+      "name": "NodeID",
+      "tag": "json:\"node_id\" yaml:\"node_id\"",
+      "type_name": "int"
+    },
+    {
+      "name": "Node",
+      "tag": "json:\"node\" yaml:\"node\" gorm:\"ForeignKey:NodeID\"",
+      "type_name": "Node"
+    },
+    {
+      "name": "DestinationID",
+      "tag": "json:\"destination_id\" yaml:\"destination_id\"",
+      "type_name": "string"
+    },
+    {
+      "name": "DestinationName",
+      "tag": "json:\"destination_name\" yaml:\"destination_name\"",
+      "type_name": "string"
+    },
+    {
+      "name": "DestinationNumber",
+      "tag": "json:\"destination_number\" yaml:\"destination_number\"",
+      "type_name": "string"
+    },
+    {
+      "name": "DestinationNodeID",
+      "tag": "json:\"destination_node_id\" yaml:\"destination_node_id\"",
+      "type_name": "int"
+    },
+    {
+      "name": "DestinationNode",
+      "tag": "json:\"destination_node\" yaml:\"destination_node\" gorm:\"ForeignKey:DestinationNodeID\"",
+      "type_name": "Node"
+    }
+  ],
+  "sql_after_migration": [
+    "drop view if exists diagram_layer1_interfaces;",
+    "create view if not exists diagram_layer1_interfaces as",
+    "  select group_concat(id, ',') id,",
+    "    node_id,",
+    "    group_concat(number, ',') number,",
+    "    group_concat(name, ',') name,",
+    "    destination_id,",
+    "    destination_node_id,",
+    "    group_concat(destination_number, ',') destination_number,",
+    "    group_concat(destination_name, ',') destination_name",
+    "  from (",
+    "    select ports.id id,",
+    "      ports.node_id node_id,",
+    "      ports.number number,",
+    "      ports.name name,",
+    "      destination_port_ids.id destination_id,",
+    "      destination_port_ids.node_id destination_node_id,",
+    "      destination_ports.number destination_number,",
+    "      destination_ports.name destination_name",
+    "    from ports",
+    "      left outer join links",
+    "        on ports.id = links.source_port_id",
+    "      left outer join ports destination_ports",
+    "        on links.destination_port_id = destination_ports.id",
+    "      inner join (",
+    "        select group_concat(id, ',') as id,",
+    "            node_id from (",
+    "              select ports.id id,",
+    "                ports.node_id node_id",
+    "              from ports",
+    "              order by id asc)",
+    "        group by node_id) as destination_port_ids",
+    "        on destination_ports.node_id = destination_port_ids.node_id",
+    "     order by id asc)",
+    "  group by node_id,",
+    "    destination_node_id;"
+  ]
+}

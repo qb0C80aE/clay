@@ -1,0 +1,255 @@
+{{/* <script> */}}
+
+var storedCallbackTemplateInformationUpdated = null;
+
+function showTemplateInformation(templateID, callbackTemplateInformationUpdated) {
+  storedCallbackTemplateInformationUpdated = callbackTemplateInformationUpdated;
+
+  if (templateID == null) {
+    var template = {
+      name: '',
+      description: '',
+      template_content: '',
+      template_arguments: []
+    };
+    repaintTemplateInformation(template, true);
+  } else {
+    getResource('templates', templateID, 'preloads=template_arguments', function(template) {
+      repaintTemplateInformation(template, true);
+    });
+  }
+}
+
+function repaintTemplateInformation(template, initializeTabSelection) {
+  $('#template_information_float_panel #template_arguments_tab div[name=deleted_template_arguments]').children().remove();
+
+  var template_information_table = $('#template_information_float_panel #template_information_tab #template_information_table');
+
+  template_information_table.find('input[name=id]').val(template.id);
+  template_information_table.find('input[name=name]').val(template.name);
+  template_information_table.find('input[name=description]').val(template.description);
+  template_information_table.find('textarea[name=template_content]').val(template.template_content);
+
+  if (initializeTabSelection) {
+    $('#template_information_float_panel a[href="#template_information_tab"]').tab('show');
+  }
+  $('#template_information_float_panel').fadeIn(50);
+
+  $('#template_information_float_panel #template_arguments_tab #template_arguments_table').DataTable({
+    sDom: '<"row"<"col-sm-5"l><"col-sm-6 right"f>>tip',
+    order: [[1, 'asc']],
+    scrollX: true,
+    paginate: true,
+    destroy: true,
+    data: template.template_arguments,
+    columns: [
+      {title: '', sortable: false, render: function (data, type, full, meta) {
+          return createButtonElement('delete_template_argument_btn', 'btn btn-default', 'glyphicon glyphicon-minus', '').outerHTML +
+            createHiddenElement('id', full.id).outerHTML;
+        }
+      },
+      {title: 'Name', data: 'name', defaultContent: '', sortable: false, render: function (data, type, full, meta) {
+          return createTextElement('name', 'in-table', '', 'parameter name', data).outerHTML;
+        }
+      },
+      {title: 'Description', data: 'description', defaultContent: '', sortable: false, render: function (data, type, full, meta) {
+          return createTextElement('description', 'in-table', '', 'description', data).outerHTML;
+        }
+      },
+      {title: 'Type', data: 'type', defaultContent: '', sortable: false, render: function (data, type, full, meta) {
+        var options = [
+          {id: 'int', name: 'int'},
+          {id: 'float', name: 'float'},
+          {id: 'bool', name: 'bool'},
+          {id: 'string', name: 'string'}
+        ];
+        return createSelectElement('type', 'in-table', '', options, data).outerHTML;
+        }
+      },
+      {title: 'DefaultValue', data: 'default_value', defaultContent: '', sortable: false, render: function (data, type, full, meta) {
+          return createTextElement('default_value', 'in-table', '', '0', data).outerHTML;
+        }
+      }
+    ],
+    drawCallback: function(settings) {
+      $('#template_information_float_panel #template_arguments_tab #template_arguments_table select[name=type]').select2({
+        width: '96px'
+      });
+      $('#template_information_float_panel #template_arguments_tab #template_arguments_table select[name=default_value_bool]').select2({
+        width: '96px'
+      });
+    }
+  });
+
+  $('#page_cover').fadeIn(50);
+}
+
+$('#template_information_float_panel a[data-toggle=tab]').on('shown.bs.tab', function(e) {
+  $('#template_information_float_panel #template_arguments_tab #template_arguments_table').DataTable().draw();
+});
+
+$('#template_information_float_panel #template_arguments_tab').on('click', 'button[name=add_template_argument_btn]', function() {
+  var data = {
+    id: null,
+    name: '',
+    description: '',
+    default_value: ''
+  };
+  $('#template_information_float_panel #template_arguments_tab #template_arguments_table').DataTable().row.add(data).draw();
+  $('#template_information_float_panel #template_arguments_tab #template_arguments_table').DataTable().draw();
+});
+
+$('#template_information_float_panel #template_arguments_tab #template_arguments_table').on('click', 'button[name=delete_template_argument_btn]', function() {
+  var tr = $(this).closest('tr');
+  var deletedTemplateArgumentID = tr.find('input[name=id]').val();
+  if ((deletedTemplateArgumentID != null) && (deletedTemplateArgumentID != undefined) && (deletedTemplateArgumentID != '') && (deletedTemplateArgumentID != 0)) {
+    $('#template_information_float_panel #template_arguments_tab div[name=deleted_template_arguments]').append(createHiddenElement('deleted', deletedTemplateArgumentID));
+  }
+  $('#template_information_float_panel #template_arguments_tab #template_arguments_table').DataTable().row(tr).remove().draw();
+});
+
+$('#template_information_panel #template_preview_tab').on('click', 'button[name=generate_template_btn]', function() {
+  var templateID = $('#template_information_panel').find('input[name=id]').val();
+  if ((templateID == null) || (templateID == undefined) || (templateID == '')) {
+    alert('Register template first.');
+    return;
+  }
+
+  var parameter = $('#template_information_panel #template_preview_tab').find('input[name=template_argument_parameter]').val();
+
+  getResourceAsText('templates/' + templateID, 'generation', parameter, function(template) {
+		var link = document.createElement('a');
+		link.href = window.URL.createObjectURL(new Blob([template]));
+		link.download = 'generated.txt';
+		link.click();
+  });
+});
+
+$('#template_information_panel #template_preview_tab').on('click', 'button[name=refresh_template_btn]', function() {
+  previewTemplateInformation();
+});
+
+$('#template_information_panel').on('click', 'button[name=cancel_template_btn]', function() {
+  $('#template_information_float_panel').fadeOut(50, function() {
+    $('#page_cover').fadeOut(50);
+  });
+});
+
+$('#template_information_panel').on('click', 'button[name=update_template_btn]', function() {
+  if (!confirm('Are you sure to register/update the template?')) {
+    return;
+  }
+
+  var deletedTemplateArgumentIDMap = {};
+  var inputDeletedTemplateArguments = $('#template_information_float_panel #template_arguments_tab div[name=deleted_template_arguments]').find('input[name=deleted]');
+  for (var i = 0; i < inputDeletedTemplateArguments.length; i = i + 1) {
+    var inputDeletedTemplateArgument = inputDeletedTemplateArguments[i];
+    var deletedTemplateArgumentID = parseInt($(inputDeletedTemplateArgument).val());
+    deletedTemplateArgumentIDMap[deletedTemplateArgumentID] = deletedTemplateArgumentID;
+  }
+
+  var templateID = $('#template_information_panel').find('input[name=id]').val();
+  if ((templateID == null) || (templateID == undefined) || (templateID == '')) {
+    templateID = 0;
+  }
+
+  var templateName = $('#template_information_panel').find('input[name=name]').val();
+  var templateDescription = $('#template_information_panel').find('input[name=description]').val();
+  var templateContent = $('#template_information_panel').find('textarea[name=template_content]').val();
+
+  var template = {
+    id: parseInt(templateID),
+    name: templateName,
+    description: templateDescription,
+    template_content: templateContent,
+    template_arguments: []
+  };
+  if (templateID == 0) {
+    delete(template['id']);
+  }
+
+  $('#template_information_float_panel #template_arguments_tab #template_arguments_table').DataTable().rows().every(function(){
+    var templateArgumentTr = $(this.node());
+    var templateArgumentID = templateArgumentTr.find('input[name=id]').val();
+    var templateArgumentName = templateArgumentTr.find('input[name=name]').val();
+    var templateArgumentType = templateArgumentTr.find('select[name=type]').val();
+    var templateArgumentDescription = templateArgumentTr.find('input[name=description]').val();
+    var templateArgumentDefaultValue = templateArgumentTr.find('input[name=default_value]').val();
+
+    var templateArgument = {
+      id: parseInt(templateArgumentID),
+      template_id: parseInt(templateID),
+      name: templateArgumentName,
+      type: templateArgumentType,
+      description: templateArgumentDescription,
+      default_value: templateArgumentDefaultValue
+    };
+    if (templateArgumentID == 0) {
+      delete(templateArgument['id']);
+    }
+    if (templateID == 0) {
+      delete(templateArgument['template_id']);
+    }
+
+    template.template_arguments.push(templateArgument);
+  });
+
+  for (templateArgumentID in deletedTemplateArgumentIDMap) {
+    var templateArgument = {
+      id: parseInt(templateArgumentID),
+      to_be_deleted: true
+    };
+
+    template.template_arguments.push(templateArgument);
+  }
+
+  if (template.id == undefined) {
+    postResource('templates', template, '', function(result, xhr) {
+      showProcessResult(result, xhr, 201, "The template information has been registered successfully.");
+      postProcessUpdateTemplate(result, xhr);
+    });
+  } else {
+    putResource('templates', template.id, template, '', function(result, xhr) {
+      showProcessResult(result, xhr, 200, "The template information has been updated successfully.");
+      postProcessUpdateTemplate(result, xhr);
+    });
+  }
+
+});
+
+function postProcessUpdateTemplate(result, xhr) {
+  var templateID = result.id;
+
+  getResource('templates', templateID, 'preloads=template_arguments', function(template) {
+    repaintTemplateInformation(template, false);
+    if ((storedCallbackTemplateInformationUpdated != null) && (storedCallbackTemplateInformationUpdated != undefined)) {
+      storedCallbackTemplateInformationUpdated();
+    }
+  });
+}
+
+function deleteTemplateInformation(templateID, callbackTemplateInformationDeleted) {
+  if (!confirm('Are you sure to delete the template?')) {
+    return;
+  }
+
+  deleteResource('templates', templateID, '', function(result, xhr) {
+    showProcessResult(result, xhr, 204, "The template information has been deleted successfully.");
+    callbackTemplateInformationDeleted();
+  });
+}
+
+function previewTemplateInformation() {
+  var templateID = $('#template_information_panel').find('input[name=id]').val();
+  if ((templateID == null) || (templateID == undefined) || (templateID == '')) {
+    $('#template_information_panel #template_preview_tab').find('input[name=template_argument_parameter]').val('');
+    $('#template_information_panel #template_preview_tab').find('textarea[name=template_preview]').val('#Register template first.');
+    return;
+  }
+
+  var parameter = $('#template_information_panel #template_preview_tab').find('input[name=template_argument_parameter]').val();
+
+  getResourceAsText('templates/' + templateID, 'generation', parameter, function(template) {
+    $('#template_information_panel #template_preview_tab').find('textarea[name=template_preview]').val(template);
+  });
+}

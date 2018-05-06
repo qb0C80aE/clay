@@ -1,0 +1,18 @@
+<div class="alert alert-info alert-dismissible" id="alert_info">
+	<button class="close" type="button" id="alert_info_close">×</button>
+	<div id="information_message"></div>
+</div>
+<div class="alert alert-danger alert-dismissible" id="alert_error">
+	<button class="close" type="button" id="alert_error_close">×</button>
+	<div id="error_message"></div>
+</div>
+
+<script language="javascript">
+  $('#alert_info_close').on('click', function() {
+    $('#alert_info').hide();
+  });
+
+  $('#alert_error_close').on('click', function() {
+    $('#alert_error').hide();
+  });
+</script>

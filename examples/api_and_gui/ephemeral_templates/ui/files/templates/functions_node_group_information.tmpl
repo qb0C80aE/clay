@@ -1,0 +1,193 @@
+{{/* <script> */}}
+
+var storedCallbackNodeGroupInformationUpdated = null;
+
+function showNodeGroupInformation(nodeGroupID, callbackNodeGroupInformationUpdated) {
+  storedCallbackNodeGroupInformationUpdated = callbackNodeGroupInformationUpdated;
+
+  if (nodeGroupID == null) {
+    var nodeGroup = {
+      name: '',
+      description: '',
+      node_group_node_associations: []
+    };
+    repaintNodeGroupInformation(nodeGroup, true);
+  } else {
+    getResource('node_groups', nodeGroupID, 'preloads=node_group_node_associations.node', function(nodeGroup) {
+      repaintNodeGroupInformation(nodeGroup, true);
+    });
+  }
+}
+
+function repaintNodeGroupInformation(nodeGroup, initializeTabSelection) {
+  $('#node_group_information_float_panel #node_group_members_tab div[name=deleted_node_group_members]').children().remove();
+
+  var node_group_information_table = $('#node_group_information_float_panel #node_group_information_tab #node_group_information_table');
+
+  node_group_information_table.find('input[name=id]').val(nodeGroup.id);
+  node_group_information_table.find('input[name=name]').val(nodeGroup.name);
+  node_group_information_table.find('input[name=description]').val(nodeGroup.description);
+
+  if (initializeTabSelection) {
+    $('#node_group_information_float_panel a[href="#node_group_information_tab"]').tab('show');
+  }
+  $('#node_group_information_float_panel').fadeIn(50);
+
+  $('#node_group_information_float_panel #node_group_members_tab #node_group_members_table').DataTable({
+    sDom: '<"row"<"col-sm-5"l><"col-sm-6 right"f>>tip',
+    order: [[1, 'asc']],
+    scrollX: true,
+    paginate: true,
+    destroy: true,
+    data: nodeGroup.node_group_node_associations,
+    columns: [
+      {title: '', sortable: false, render: function (data, type, full, meta) {
+          return createButtonElement('delete_node_group_member_btn', 'btn btn-default', 'glyphicon glyphicon-minus', '').outerHTML;
+        }
+      },
+      {title: 'Node', data: 'node', defaultContent: '', sortable: false, render: function (data, type, full, meta) {
+          var options = [];
+          var value = null;
+          if ((data != null) && (data != undefined)) {
+            options = [{id: data.id, name: data.name}];
+            value = data.id;
+          }
+          return createSelectElement('node_group_member_node_id', 'in-table', '', options, value).outerHTML;
+        }
+      }
+    ],
+    drawCallback: function(settings) {
+      $('#node_group_information_float_panel #node_group_members_tab #node_group_members_table select[name=node_group_member_node_id]').select2({
+        minimumInputLength: 1,
+        ajax: {
+          url:'/ui/select2',
+          dataType: 'json',
+          delay: 50,
+          data: function(params) {
+            return { 'resource_name': 'node_select2', 'terms_order': 'name', 'terms': params.term, 'limit': 10 };
+          }
+        },
+        width: '256px',
+        placeholder: 'None',
+      });
+    }
+  });
+
+  $('#page_cover').fadeIn(50);
+}
+
+$('#node_group_information_float_panel a[data-toggle=tab]').on('shown.bs.tab', function(e) {
+  $('#node_group_information_float_panel #node_group_members_tab #node_group_members_table').DataTable().draw();
+})
+
+$('#node_group_information_float_panel #node_group_members_tab').on('click', 'button[name=add_node_group_member_btn]', function() {
+  var data = {
+    id: null,
+    node: {
+      node_group_id: null,
+      node_id: null,
+    }
+  };
+  $('#node_group_information_float_panel #node_group_members_tab #node_group_members_table').DataTable().row.add(data).draw();
+  $('#node_group_information_float_panel #node_group_members_tab #node_group_members_table').DataTable().draw();
+});
+
+$('#node_group_information_float_panel #node_group_members_tab #node_group_members_table').on('click', 'button[name=delete_node_group_member_btn]', function() {
+  var tr = $(this).closest('tr');
+  var deletedMemberNodeID = tr.find('select[name=node_group_member_node_id]').val();
+  if ((deletedMemberNodeID != null) && (deletedMemberNodeID != undefined) && (deletedMemberNodeID != '') && (deletedMemberNodeID != 0)) {
+    $('#node_group_information_float_panel #node_group_members_tab div[name=deleted_node_group_members]').append(createHiddenElement('deleted', deletedMemberNodeID));
+  }
+  $('#node_group_information_float_panel #node_group_members_tab #node_group_members_table').DataTable().row(tr).remove().draw();
+});
+
+$('#node_group_information_panel').on('click', 'button[name=cancel_node_group_btn]', function() {
+  $('#node_group_information_float_panel').fadeOut(50, function() {
+    $('#page_cover').fadeOut(50);
+  });
+});
+
+$('#node_group_information_panel').on('click', 'button[name=update_node_group_btn]', function() {
+  if (!confirm('Are you sure to register/update the node group?')) {
+    return;
+  }
+
+  var deletedMemberIDMap = {};
+  var inputDeletedMembers = $('#node_group_information_float_panel #node_group_members_tab div[name=deleted_node_group_members]').find('input[name=deleted]');
+  for (var i = 0; i < inputDeletedMembers.length; i = i + 1) {
+    var inputDeletedMember = inputDeletedMembers[i];
+    var deletedMemberID = parseInt($(inputDeletedMember).val());
+    deletedMemberIDMap[deletedMemberID] = deletedMemberID;
+  }
+
+  var nodeGroupID = $('#node_group_information_panel').find('input[name=id]').val();
+  if ((nodeGroupID == null) || (nodeGroupID == undefined) || (nodeGroupID == '')) {
+    nodeGroupID = 0;
+  }
+  var nodeGroupName = $('#node_group_information_panel').find('input[name=name]').val();
+  var nodeGroupDescription = $('#node_group_information_panel').find('input[name=description]').val();
+
+  var nodeGroup = {
+    id: parseInt(nodeGroupID),
+    name: nodeGroupName,
+    description: nodeGroupDescription,
+    node_group_node_associations: []
+  };
+  if (nodeGroupID == 0) {
+    delete(nodeGroup['id']);
+  }
+
+  $('#node_group_information_float_panel #node_group_members_tab #node_group_members_table').DataTable().rows().every(function(){
+    var memberNodeTr = $(this.node());
+    var memberNodeID = memberNodeTr.find('select[name=node_group_member_node_id]').val();
+
+    var nodeGroupNodeAssociation = {
+      node_id: parseInt(memberNodeID),
+    };
+
+    nodeGroup.node_group_node_associations.push(nodeGroupNodeAssociation);
+  });
+
+  for (deletedMemberID in deletedMemberIDMap) {
+    var nodeGroupNodeAssociation = {
+      node_group_id: parseInt(nodeGroup.id),
+      node_id: parseInt(deletedMemberID),
+      to_be_deleted: true
+    };
+    nodeGroup.node_group_node_associations.push(nodeGroupNodeAssociation);
+  }
+
+  if (nodeGroup.id == undefined) {
+    postResource('node_groups', nodeGroup, '', function(result, xhr) {
+      showProcessResult(result, xhr, 201, "The node group information has been registered successfully.");
+      postProcessUpdateNodeGroup(result, xhr);
+    });
+  } else {
+    putResource('node_groups', nodeGroup.id, nodeGroup, '', function(result, xhr) {
+      showProcessResult(result, xhr, 200, "The node group information has been updated successfully.");
+      postProcessUpdateNodeGroup(result, xhr);
+    });
+  }
+});
+
+function postProcessUpdateNodeGroup(result, xhr) {
+  var nodeGroupID = result.id;
+
+  getResource('node_groups', nodeGroupID, 'preloads=node_group_node_associations.node', function(nodeGroup) {
+    repaintNodeGroupInformation(nodeGroup, false);
+    if ((storedCallbackNodeGroupInformationUpdated != null) && (storedCallbackNodeGroupInformationUpdated != undefined)) {
+      storedCallbackNodeGroupInformationUpdated();
+    }
+  });
+}
+
+function deleteNodeGroupInformation(nodeGroupID, callbackNodeGroupInformationDeleted) {
+  if (!confirm('Are you sure to delete the node group?')) {
+    return;
+  }
+
+  deleteResource('node_groups', nodeGroupID, '', function(result, xhr) {
+    showProcessResult(result, xhr, 204, "The node group information has been deleted successfully.");
+    callbackNodeGroupInformationDeleted();
+  });
+}

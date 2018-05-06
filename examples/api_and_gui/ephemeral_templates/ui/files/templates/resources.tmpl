@@ -1,0 +1,424 @@
+{{ .ModelStore.Single "ephemeral_templates/headerpart.tmpl/generation" "ui_menu=design" }}
+{{ .ModelStore.Single "ephemeral_templates/node_information.tmpl/generation" "" }}
+{{ .ModelStore.Single "ephemeral_templates/node_group_information.tmpl/generation" "" }}
+{{ .ModelStore.Single "ephemeral_templates/port_group_information.tmpl/generation" "" }}
+{{ .ModelStore.Single "ephemeral_templates/vlan_information.tmpl/generation" "" }}
+{{ .ModelStore.Single "ephemeral_templates/template_information.tmpl/generation" "" }}
+
+<div id="main_panel">
+
+	<div class="container-fluid">
+	  <div class="row">
+	    <ul class="nav nav-tabs">
+	      <li class="active"><a href="#nodes_tab" data-toggle="tab">Nodes</a></li>
+				<li><a href="#vlans_tab" data-toggle="tab">VLANs</a></li>
+				<li><a href="#node_groups_tab" data-toggle="tab">NodeGroups</a></li>
+				<li><a href="#port_groups_tab" data-toggle="tab">PortGroups</a></li>
+				<li><a href="#templates_tab" data-toggle="tab">Templates</a></li>
+	    </ul>
+	  </div>
+	</div>
+
+	<br>
+
+	<div class="tab-content clearfix">
+
+		<div class="tab-pane active" id="nodes_tab">
+			<div class="panel panel-default panel-custom" id="nodes_panel">
+				<div class="panel-heading">
+					<h1 class="panel-title">
+						<span style="display: table-cell; vertical-align: middle; text-align: left; width=90%">
+							<span class="glyphicon glyphicon-hdd"></span> Nodes
+						</span>
+						<span class="input-group-btn">
+							<button class="btn btn-default" name="add_node_btn" type="button">
+								<span class="glyphicon glyphicon-plus"></span>
+							</button>
+						</span>
+					</h1>
+				</div>
+				<div class="panel-body">
+					<table id="nodes_table" class="table table-striped table-bordered table-hover">
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<div class="tab-pane" id="vlans_tab">
+			<div class="panel panel-default" id="vlans_panel">
+				<div class="panel-heading">
+					<h1 class="panel-title">
+						<span class="glyphicon glyphicon-th-large"></span> VLANs
+					</h1>
+				</div>
+				<div class="panel-body">
+					<table id="vlans_table" class="table table-striped table-bordered table-hover">
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<div class="tab-pane" id="node_groups_tab">
+			<div class="panel panel-default" id="node_groups_panel">
+				<div class="panel-heading">
+					<h1 class="panel-title">
+						<span style="display: table-cell; vertical-align: middle; text-align: left; width=90%">
+							<span class="glyphicon glyphicon-list-alt"></span> Node Groups
+						</span>
+						<span class="input-group-btn">
+							<button class="btn btn-default" name="add_node_group_btn" type="button">
+								<span class="glyphicon glyphicon-plus"></span>
+							</button>
+						</span>
+					</h1>
+				</div>
+				<div class="panel-body">
+					<table id="node_groups_table" class="table table-striped table-bordered table-hover">
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<div class="tab-pane" id="port_groups_tab">
+			<div class="panel panel-default" id="port_groups_panel">
+				<div class="panel-heading">
+					<h1 class="panel-title">
+						<span style="display: table-cell; vertical-align: middle; text-align: left; width=90%">
+							<span class="glyphicon glyphicon-list-alt"></span> Port Groups
+						</span>
+						<span class="input-group-btn">
+							<button class="btn btn-default" name="add_port_group_btn" type="button">
+								<span class="glyphicon glyphicon-plus"></span>
+							</button>
+						</span>
+					</h1>
+				</div>
+				<div class="panel-body">
+					<table id="port_groups_table" class="table table-striped table-bordered table-hover">
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<div class="tab-pane" id="templates_tab">
+			<div class="panel panel-default" id="templates_panel">
+				<div class="panel-heading">
+					<h1 class="panel-title">
+						<span style="display: table-cell; vertical-align: middle; text-align: left; width=90%">
+							<span class="glyphicon glyphicon-file"></span> Templates
+						</span>
+						<span class="input-group-btn">
+							<button class="btn btn-default" name="add_template_btn" type="button">
+								<span class="glyphicon glyphicon-plus"></span>
+							</button>
+						</span>
+					</h1>
+				</div>
+				<div class="panel-body">
+					<table id="templates_table" class="table table-striped table-bordered table-hover">
+					</table>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+
+<script language="javascript">
+$(function() {
+
+	{{ .ModelStore.Single "ephemeral_templates/functions.tmpl/generation" "" }}
+	{{ .ModelStore.Single "ephemeral_templates/functions_node_information.tmpl/generation" "" }}
+	{{ .ModelStore.Single "ephemeral_templates/functions_node_group_information.tmpl/generation" "" }}
+	{{ .ModelStore.Single "ephemeral_templates/functions_port_group_information.tmpl/generation" "" }}
+	{{ .ModelStore.Single "ephemeral_templates/functions_vlan_information.tmpl/generation" "" }}
+	{{ .ModelStore.Single "ephemeral_templates/functions_template_information.tmpl/generation" "" }}
+
+	function onLoad() {
+		$('#main_panel #nodes_tab #nodes_panel').fadeIn(150, function() {
+			$('#main_panel #nodes_tab #nodes_panel #nodes_table').DataTable({
+				ajax: {
+					url: '/ui/datatables?resource_name=nodes&resource_preloads=node_type&columns=null,name,node_type_id,virtual,description'
+				},
+				serverSide: true,
+				order: [[1, 'asc']],
+				scrollX: true,
+				paginate : true,
+				destroy: true,
+				columns: [
+					{title: '', sortable: false, render: function (data, type, full, meta) {
+							var buttonElements = [
+								{name: 'edit_node_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-edit', text: ''},
+								{name: 'delete_node_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-minus', text: ''}
+							];
+							return createButtonGroupElement(buttonElements).outerHTML +
+								createHiddenElement('id', full.id).outerHTML;
+						}
+					},
+					{title: 'Name', data: 'name', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+							return createReadOnlyTextElement('name', 'in-table', '', '', data).outerHTML;
+						}
+					},
+					{title: 'Type', data: 'node_type.name', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+							return createReadOnlyTextElement('node_type_name', 'in-table', '', '', data).outerHTML;
+						}
+					},
+					{title: 'Physical/Virtual', data: 'virtual', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+							var diaplayVirtual = null;
+							if (data == true) {
+								diaplayVirtual = 'Virtual';
+							} else {
+								diaplayVirtual = 'Physical';
+							}
+							return createReadOnlyTextElement('virtual', 'in-table', '', '', diaplayVirtual).outerHTML;
+						}
+					},
+					{title: 'Description', data: 'description', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+							return createReadOnlyTextElement('description', 'in-table', '', '', data).outerHTML;
+						}
+					}
+				]
+			});
+
+			$('#main_panel #vlans_tab #vlans_table').DataTable({
+				ajax: {
+					url: '/ui/datatables?resource_name=vlans&resource_preloads=subnets&columns=null,id,name,null,description'
+				},
+				serverSide: true,
+				order: [[1, 'asc']],
+				scrollX: true,
+				paginate : true,
+				destroy: true,
+				columns: [
+					{title: '', sortable: false, render: function (data, type, full, meta) {
+							return createButtonElement('edit_vlan_btn', 'btn btn-default', 'glyphicon glyphicon-edit', '').outerHTML;
+						}
+					},
+          {title: 'VLAN ID', data: 'id', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+							return createReadOnlyTextElement('id', 'in-table', '', '', data).outerHTML;
+						}
+					},
+					{title: 'Name', data: 'name', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+							return createReadOnlyTextElement('name', 'in-table', '', '', data).outerHTML;
+						}
+					},
+          {title: 'Subnets', defaultContent: '', sortable: false, render: function (data, type, full, meta) {
+							return createIPv4TableElement(full.subnets, false, false, true).outerHTML;
+						}
+					},
+					{title: 'Description', data: 'description', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+							return createReadOnlyTextElement('description', 'in-table', '', '', data).outerHTML;
+						}
+					}
+				]
+			});
+
+			$('#main_panel #node_groups_tab #node_groups_table').DataTable({
+				ajax: {
+					url: '/ui/datatables?resource_name=node_groups&resource_preloads=node_group_node_associations.node&columns=null,name,null,description'
+				},
+				serverSide: true,
+				order: [[1, 'asc']],
+				scrollX: true,
+				paginate : true,
+				destroy: true,
+				columns: [
+					{title: '', sortable: false, render: function (data, type, full, meta) {
+							var buttonElements = [
+								{name: 'edit_node_group_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-edit', text: ''},
+								{name: 'delete_node_group_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-minus', text: ''}
+							];
+							return createButtonGroupElement(buttonElements).outerHTML +
+								createHiddenElement('id', full.id).outerHTML;
+						}
+					},
+					{title: 'Name', data: 'name', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+							return createReadOnlyTextElement('name', 'in-table', '', '', data).outerHTML;
+						}
+					},
+					{title: 'Members', data: 'node_group_node_associations', defaultContent: '', sortable: false, render: function (data, type, full, meta) {
+							var text = '';
+							for (var i = 0; i < data.length; i = i + 1) {
+								if (i != 0) {
+									text = text + ',';
+								}
+								text = text + createReadOnlyTextElement('member', 'in-table', '', '', data[i].node.name).outerHTML;
+							}
+							return text;
+						}
+					},
+					{title: 'Description', data: 'description', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+							return createReadOnlyTextElement('description', 'in-table', '', '', data).outerHTML;
+						}
+					}
+				]
+			});
+
+			$('#main_panel #port_groups_tab #port_groups_table').DataTable({
+				ajax: {
+					url: '/ui/datatables?resource_name=port_groups&resource_preloads=port_group_port_associations.port&columns=null,name,null,description'
+				},
+				serverSide: true,
+				order: [[1, 'asc']],
+				scrollX: true,
+				paginate : true,
+				destroy: true,
+				columns: [
+					{title: '', sortable: false, render: function (data, type, full, meta) {
+							var buttonElements = [
+								{name: 'edit_port_group_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-edit', text: ''},
+								{name: 'delete_port_group_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-minus', text: ''}
+							];
+							return createButtonGroupElement(buttonElements).outerHTML +
+								createHiddenElement('id', full.id).outerHTML;
+						}
+					},
+					{title: 'Name', data: 'name', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+							return createReadOnlyTextElement('name', 'in-table', '', '', data).outerHTML;
+						}
+					},
+					{title: 'Members', data: 'port_group_port_associations', defaultContent: '', sortable: false, render: function (data, type, full, meta) {
+							var text = '';
+							for (var i = 0; i < data.length; i = i + 1) {
+								if (i != 0) {
+									text = text + ',';
+								}
+								text = text + createReadOnlyTextElement('member', 'in-table', '', '', data[i].port.name).outerHTML;
+							}
+							return text;
+						}
+					},
+					{title: 'Description', data: 'description', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+							return createReadOnlyTextElement('description', 'in-table', '', '', data).outerHTML;
+						}
+					}
+				]
+			});
+
+			$('#main_panel #templates_tab #templates_table').DataTable({
+				ajax: {
+					url: '/ui/datatables?resource_name=templates&resource_preloads=template_arguments&resource_fields=name,description,template_arguments&columns=null,name,null,description'
+				},
+				serverSide: true,
+				order: [[1, 'asc']],
+				scrollX: true,
+				paginate : true,
+				destroy: true,
+				columns: [
+					{title: '', sortable: false, render: function (data, type, full, meta) {
+							var buttonElements = [
+								{name: 'edit_template_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-edit', text: ''},
+								{name: 'delete_template_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-minus', text: ''}
+							];
+							return createButtonGroupElement(buttonElements).outerHTML +
+								createHiddenElement('id', full.id).outerHTML;
+						}
+					},
+					{title: 'Name', data: 'name', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+							return createReadOnlyTextElement('name', 'in-table', '', '', data).outerHTML;
+						}
+					},
+					{title: 'Arguments', data: 'template_arguments', defaultContent: '', sortable: false, render: function (data, type, full, meta) {
+							var text = '';
+							for (var i = 0; i < data.length; i = i + 1) {
+								if (i != 0) {
+									text = text + '<br>';
+								}
+								var record = data[i];
+								text = text + createReadOnlyTextElement('template_argument', 'in-table template-argument', '', '', record.name + ' [type = ' + record.type + ', default = ' + record.default_value + ']').outerHTML;
+							}
+							return text;
+						}
+					},
+					{title: 'Description', data: 'description', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+							return createReadOnlyTextElement('description', 'in-table', '', '', data).outerHTML;
+						}
+					}
+				]
+			});
+		});
+	}
+
+	$('#main_panel #nodes_tab #nodes_panel button[name=add_node_btn]').on('click', function() {
+		showNodeInformation(null, onLoad);
+	});
+
+	$('#main_panel #nodes_tab #nodes_panel #nodes_table').on('click', 'button[name=edit_node_btn]', function() {
+		var tr = $(this).closest('tr');
+		var nodeID = tr.find('input[name=id]').val();
+		showNodeInformation(nodeID, onLoad);
+	});
+
+	$('#main_panel #nodes_tab #nodes_panel #nodes_table').on('click', 'button[name=delete_node_btn]', function() {
+		var tr = $(this).closest('tr');
+		var nodeID = tr.find('input[name=id]').val();
+		deleteNodeInformation(nodeID, onLoad);
+	});
+
+	$('#main_panel #vlans_tab #vlans_panel #vlans_table').on('click', 'button[name=edit_vlan_btn]', function() {
+		var tr = $(this).closest('tr');
+		var vlanID = tr.find('input[name=id]').val();
+		showVlanInformation(vlanID, onLoad);
+	});
+
+	$('#main_panel #node_groups_tab #node_groups_panel button[name=add_node_group_btn]').on('click', function() {
+		showNodeGroupInformation(null, onLoad);
+	});
+
+	$('#main_panel #node_groups_tab #node_groups_panel #node_groups_table').on('click', 'button[name=edit_node_group_btn]', function() {
+		var tr = $(this).closest('tr');
+		var nodeGroupID = tr.find('input[name=id]').val();
+		showNodeGroupInformation(nodeGroupID, onLoad);
+	});
+
+	$('#main_panel #node_groups_tab #node_groups_panel #node_groups_table').on('click', 'button[name=delete_node_group_btn]', function() {
+		var tr = $(this).closest('tr');
+		var nodeGroupID = tr.find('input[name=id]').val();
+		deleteNodeGroupInformation(nodeGroupID, onLoad);
+	});
+
+	$('#main_panel #port_groups_tab #port_groups_panel button[name=add_port_group_btn]').on('click', function() {
+		showPortGroupInformation(null, onLoad);
+	});
+
+	$('#main_panel #port_groups_tab #port_groups_panel #port_groups_table').on('click', 'button[name=edit_port_group_btn]', function() {
+		var tr = $(this).closest('tr');
+		var portGroupID = tr.find('input[name=id]').val();
+		showPortGroupInformation(portGroupID, onLoad);
+	});
+
+	$('#main_panel #port_groups_tab #port_groups_panel #port_groups_table').on('click', 'button[name=delete_port_group_btn]', function() {
+		var tr = $(this).closest('tr');
+		var portGroupID = tr.find('input[name=id]').val();
+		deletePortGroupInformation(portGroupID, onLoad);
+	});
+
+	$('#main_panel #templates_tab #templates_panel button[name=add_template_btn]').on('click', function() {
+		showTemplateInformation(null, onLoad);
+	});
+
+	$('#main_panel #templates_tab #templates_panel #templates_table').on('click', 'button[name=edit_template_btn]', function() {
+		var tr = $(this).closest('tr');
+		var templateID = tr.find('input[name=id]').val();
+		showTemplateInformation(templateID, onLoad);
+	});
+
+	$('#main_panel #templates_tab #templates_panel #templates_table').on('click', 'button[name=delete_template_btn]', function() {
+		var tr = $(this).closest('tr');
+		var templateID = tr.find('input[name=id]').val();
+		deleteTemplateInformation(templateID, onLoad);
+	});
+
+	$('#main_panel a[data-toggle=tab]').on('shown.bs.tab', function(e) {
+	  $('#main_panel #nodes_tab #nodes_panel #nodes_table').DataTable().draw();
+		$('#main_panel #vlans_tab #vlans_panel #vlans_table').DataTable().draw();
+		$('#main_panel #node_groups_tab #node_groups_panel #node_groups_table').DataTable().draw();
+		$('#main_panel #port_groups_tab #port_groups_panel #port_groups_table').DataTable().draw();
+		$('#main_panel #templates_tab #templates_panel #templates_table').DataTable().draw();
+	})
+
+	onLoad();
+
+});
+</script>
+{{ .ModelStore.Single "ephemeral_templates/footerpart.tmpl/generation" "" }}

@@ -1,0 +1,106 @@
+{
+  "type_name": "DiagramLayer3Interface",
+  "resource_name": "diagram_layer3_interfaces",
+  "to_be_migrated": false,
+  "is_controller_enabled": true,
+  "is_design_access_disabled": true,
+  "fields": [
+    {
+      "name": "Name",
+      "tag": "json:\"name\" yaml:\"name\"",
+      "type_name": "string"
+    },
+    {
+      "name": "NodeID",
+      "tag": "json:\"node_id\" yaml:\"node_id\"",
+      "type_name": "int"
+    },
+    {
+      "name": "Node",
+      "tag": "json:\"node\" yaml:\"node\" gorm:\"ForeignKey:NodeID\"",
+      "type_name": "Node"
+    },
+    {
+      "name": "MacAddress",
+      "tag": "json:\"mac_address\" yaml:\"mac_address\"",
+      "type_name": "string"
+    },
+    {
+      "name": "Ipv4Address",
+      "tag": "json:\"ipv4_address\" yaml:\"ipv4_address\"",
+      "type_name": "string"
+    },
+    {
+      "name": "VlanID",
+      "tag": "json:\"vlan_id\" yaml:\"vlan_id\"",
+      "type_name": "int"
+    },
+    {
+      "name": "Vlan",
+      "tag": "json:\"vlan\" yaml:\"vlan\" gorm:\"ForeignKey:VlanID\"",
+      "type_name": "Vlan"
+    },
+    {
+      "name": "SubnetID",
+      "tag": "json:\"subnet_id\" yaml:\"subnet_id\"",
+      "type_name": "int"
+    },
+    {
+      "name": "Subnet",
+      "tag": "json:\"subnet\" yaml:\"subnet\" gorm:\"ForeignKey:SubnetID\"",
+      "type_name": "Subnet"
+    },
+    {
+      "name": "IsConnected",
+      "tag": "json:\"is_connected\" yaml:\"is_connected\"",
+      "type_name": "bool"
+    }
+  ],
+  "sql_after_migration": [
+    "drop view if exists diagram_layer3_interfaces;",
+    "create view if not exists diagram_layer3_interfaces as",
+    "  select group_concat(ports.name, ',') name,",
+    "    ports.node_id node_id,",
+    "    group_concat(ports.mac_address, ',') mac_address,",
+    "    group_concat(port_ipv4_addresses.address||'/'||port_ipv4_addresses.prefix, ',') ipv4_address,",
+    "    vlan_port_associations.vlan_id vlan_id,",
+    "    subnets.id subnet_id,",
+    "    connection_check.connected is_connected",
+    "  from ports",
+    "    inner join port_ipv4_addresses",
+    "      on ports.id = port_ipv4_addresses.port_id",
+    "    inner join vlan_port_associations",
+    "      on ports.id = vlan_port_associations.port_id",
+    "    inner join subnets",
+    "      on vlan_port_associations.vlan_id = subnets.vlan_id",
+    "    left outer join (",
+    "      select ports.node_id node_id,",
+    "        ports.number number,",
+    "        vlan_check.connected connected",
+    "      from ports",
+    "        inner join vlan_port_associations",
+    "          on ports.id = vlan_port_associations.port_id",
+    "        left outer join (",
+    "          select ports.node_id node_id,",
+    "            vlan_port_associations.vlan_id vlan_id,",
+    "            max(case when links.source_port_id is null then 0 else 1 end) connected",
+    "            from ports",
+    "          inner join vlan_port_associations",
+    "            on ports.id = vlan_port_associations.port_id",
+    "          left outer join links",
+    "            on ports.id = links.source_port_id",
+    "          group by node_id,",
+    "          vlan_id) vlan_check",
+    "          on ports.node_id = vlan_check.node_id",
+    "          and vlan_port_associations.vlan_id = vlan_check.vlan_id",
+    "      group by ports.node_id,",
+    "        ports.number,",
+    "        vlan_check.connected) connection_check",
+    "      on ports.node_id = connection_check.node_id",
+    "      and ports.number = connection_check.number",
+    "  group by ports.node_id,",
+    "    vlan_port_associations.vlan_id,",
+    "    subnets.id,",
+    "    connection_check.connected;"
+  ]
+}

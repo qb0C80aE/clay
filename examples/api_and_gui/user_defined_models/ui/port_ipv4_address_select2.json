@@ -1,0 +1,58 @@
+{
+  "type_name": "PortIpv4AddressSelect2",
+  "resource_name": "port_ipv4_address_select2",
+  "to_be_migrated": false,
+  "is_controller_enabled": true,
+  "is_design_access_disabled": true,
+  "fields": [
+    {
+      "name": "ID",
+      "tag": "json:\"id\" yaml:\"id\" gorm:\"primary_key\"",
+      "type_name": "int"
+    },
+    {
+      "name": "PortID",
+      "tag": "json:\"port_id\" yaml:\"port_id\"",
+      "type_name": "int"
+    },
+    {
+      "name": "Text",
+      "tag": "json:\"text\" yaml:\"text\"",
+      "type_name": "string"
+    },
+    {
+      "name": "NodeName",
+      "tag": "json:\"node_name\" yaml:\"node_name\"",
+      "type_name": "string"
+    },
+    {
+      "name": "PortName",
+      "tag": "json:\"port_name\" yaml:\"port_name\"",
+      "type_name": "string"
+    },
+    {
+      "name": "Ipv4Address",
+      "tag": "json:\"ipv4_address\" yaml:\"ipv4_address\"",
+      "type_name": "string"
+    },
+    {
+      "name": "Ipv4Prefix",
+      "tag": "json:\"ipv4_prefix\" yaml:\"ipv4_prefix\"",
+      "type_name": "int"
+    }
+  ],
+  "sql_after_migration": [
+    "drop view if exists port_ipv4_address_select2;",
+    "create view if not exists port_ipv4_address_select2 as",
+    "  select layer3_interfaces.ipv4_address_id id,",
+    "    layer3_interfaces.id interface_id,",
+    "    layer3_interfaces.ipv4_address||' ('||nodes.name||'.'||layer3_interfaces.name||')' text,",
+    "    nodes.name node_name,",
+    "    layer3_interfaces.name port_name,",
+    "    layer3_interfaces.ipv4_address ipv4_address,",
+    "    layer3_interfaces.ipv4_prefix ipv4_prefix",
+    "  from layer3_interfaces",
+    "    inner join nodes",
+    "      on layer3_interfaces.node_id = nodes.id;"
+  ]
+}

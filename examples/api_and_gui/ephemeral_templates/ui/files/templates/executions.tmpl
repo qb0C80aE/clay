@@ -1,0 +1,134 @@
+{{ .ModelStore.Single "ephemeral_templates/headerpart.tmpl/generation" "ui_menu=process" }}
+{{ .ModelStore.Single "ephemeral_templates/execution_information.tmpl/generation" "" }}
+
+<div id="main_panel">
+	<div class="container-fluid">
+		<div class="panel panel-default panel-custom" id="executions_panel">
+			<div class="panel-heading">
+				<h1 class="panel-title">
+					<span style="display: table-cell; vertical-align: middle; text-align: left; width=90%">
+						<span class="glyphicon glyphicon-tasks"></span> Executions
+					</span>
+					<span class="input-group-btn">
+						<button class="btn btn-default" name="add_execution_btn" type="button">
+							<span class="glyphicon glyphicon-plus"></span>
+						</button>
+						<button class="btn btn-default" name="refresh_execution_btn" type="button">
+							<span class="glyphicon glyphicon-refresh"></span>
+						</button>
+					</span>
+				</h1>
+			</div>
+			<div class="panel-body">
+				<table id="executions_table" class="table table-striped table-bordered table-hover">
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script language="javascript">
+$(function() {
+
+	{{ .ModelStore.Single "ephemeral_templates/functions.tmpl/generation" "" }}
+	{{ .ModelStore.Single "ephemeral_templates/functions_execution_information.tmpl/generation" "" }}
+
+	function onLoad() {
+		$('#main_panel #executions_panel').fadeIn(150, function() {
+			$('#main_panel #executions_panel #executions_table').DataTable({
+				ajax: {
+					url: '/ui/datatables?resource_name=commands&columns=null,name,description,working_directory,command_line,status,exit_code'
+				},
+				serverSide: true,
+				order: [[1, 'asc']],
+				scrollX: true,
+				paginate : true,
+				destroy: true,
+				columns: [
+					{title: '', sortable: false, render: function (data, type, full, meta) {
+							var buttonElements = [
+								{name: 'show_execution_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-info-sign', text: ''},
+								{name: 'delete_execution_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-minus', text: ''}
+							];
+							if (full.status == 'running') {
+								buttonElements.push({name: 'stop_execution_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-stop', text: ''});
+							} else {
+								buttonElements.push({name: 'run_execution_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-play', text: ''});
+							}
+							return createButtonGroupElement(buttonElements).outerHTML;
+						}
+					},
+					{title: 'Name', data: 'name', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+							return createReadOnlyTextElement('name', 'in-table', '', '', data).outerHTML;
+						}
+					},
+					{title: 'Description', data: 'description', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+							return createReadOnlyTextElement('description', 'in-table', '', '', data).outerHTML;
+						}
+					},
+					{title: 'CommandLine', data: 'command_line', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+							return createReadOnlyTextElement('command_line', 'in-table', '', '', data).outerHTML;
+						}
+					},
+					{title: 'Status', data: 'status', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+							return createReadOnlyTextElement('status', 'in-table', '', '', data).outerHTML;
+						}
+					},
+					{title: 'ExitCode', data: 'exit_code', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+							return createReadOnlyTextElement('exit_code', 'in-table', '', '', data).outerHTML;
+						}
+					},
+					{title: 'Killed', data: 'killed', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+							return createReadOnlyTextElement('killed', 'in-table', '', '', data).outerHTML;
+						}
+					},
+					{title: 'Started at', data: 'started_at', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+							return createReadOnlyTextElement('started_at', 'in-table', '', '', data).outerHTML;
+						}
+					},
+					{title: 'Finished at', data: 'finished_at', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+							return createReadOnlyTextElement('finished_at', 'in-table', '', '', data).outerHTML;
+						}
+					}
+				]
+			});
+		});
+	}
+
+	$('#main_panel #executions_panel button[name=add_execution_btn]').on('click', function() {
+		showExecutionInformation(null, onLoad);
+	});
+
+	$('#main_panel #executions_panel button[name=refresh_execution_btn]').on('click', function() {
+		onLoad();
+	});
+
+	$('#main_panel #executions_panel #executions_table').on('click', 'button[name=run_execution_btn]', function() {
+		var tr = $(this).closest('tr');
+		var executionName = tr.find('input[name=name]').val();
+		runExecution(executionName, onLoad);
+	});
+
+	$('#main_panel #executions_panel #executions_table').on('click', 'button[name=stop_execution_btn]', function() {
+		var tr = $(this).closest('tr');
+		var executionName = tr.find('input[name=name]').val();
+		stopExecution(executionName, onLoad);
+	});
+
+	$('#main_panel #executions_panel #executions_table').on('click', 'button[name=show_execution_btn]', function() {
+		var tr = $(this).closest('tr');
+		var executionName = tr.find('input[name=name]').val();
+		showExecutionInformation(executionName, onLoad);
+	});
+
+	$('#main_panel #executions_panel #executions_table').on('click', 'button[name=delete_execution_btn]', function() {
+		var tr = $(this).closest('tr');
+		var executionName = tr.find('input[name=name]').val();
+		deleteExecutionInformation(executionName, onLoad);
+	});
+
+	onLoad();
+
+});
+</script>
+{{ .ModelStore.Single "ephemeral_templates/footerpart.tmpl/generation" "" }}
