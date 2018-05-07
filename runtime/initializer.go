@@ -9,7 +9,9 @@ import (
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
 	"github.com/qb0C80aE/clay/model"
+	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"os"
 	"path"
@@ -22,15 +24,17 @@ type clayRuntimeInitializer struct {
 }
 
 type clayConfig struct {
-	General            *clayConfigGeneral             `json:"general"`
-	UserDefinedModels  []*clayConfigUserDefinedModel  `json:"user_defined_models"`
-	EphemeralTemplates []*clayConfigEphemeralTemplate `json:"ephemeral_templates"`
-	URLAliases         []*clayConfigURLAlias          `json:"url_aliases"`
+	General                *clayConfigGeneral                 `json:"general"`
+	UserDefinedModels      []*clayConfigUserDefinedModel      `json:"user_defined_models"`
+	EphemeralTemplates     []*clayConfigEphemeralTemplate     `json:"ephemeral_templates"`
+	EphemeralBinaryObjects []*clayConfigEphemeralBinaryObject `json:"ephemeral_binary_objects"`
+	URLAliases             []*clayConfigURLAlias              `json:"url_aliases"`
 }
 
 type clayConfigGeneral struct {
-	UserDefinedModelsDirectory  string `json:"user_defined_models_directory"`
-	EphemeralTemplatesDirectory string `json:"ephemeral_templates_directory"`
+	UserDefinedModelsDirectory      string `json:"user_defined_models_directory"`
+	EphemeralTemplatesDirectory     string `json:"ephemeral_templates_directory"`
+	EphemeralBinaryObjectsDirectory string `json:"ephemeral_binary_objects_directory"`
 }
 
 type clayConfigUserDefinedModel struct {
@@ -38,6 +42,11 @@ type clayConfigUserDefinedModel struct {
 }
 
 type clayConfigEphemeralTemplate struct {
+	Name     string `json:"name"`
+	FileName string `json:"file_name"`
+}
+
+type clayConfigEphemeralBinaryObject struct {
 	Name     string `json:"name"`
 	FileName string `json:"file_name"`
 }
@@ -121,6 +130,11 @@ func (receiver *clayRuntimeInitializer) initialize() {
 		os.Exit(1)
 	}
 
+	if err := receiver.loadEphemeralBinaryObjects(config, host, port); err != nil {
+		logging.Logger().Critical(err.Error())
+		os.Exit(1)
+	}
+
 	if err := receiver.loadURLAliases(config, host, port); err != nil {
 		logging.Logger().Critical(err.Error())
 		os.Exit(1)
@@ -186,6 +200,74 @@ func (receiver *clayRuntimeInitializer) loadEphemeralTemplates(config *clayConfi
 		url := fmt.Sprintf("http://%s:%s/ephemeral_templates", host, port)
 		request, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
 		request.Header.Set("Content-Type", "application/json")
+
+		client := &http.Client{}
+		response, err := client.Do(request)
+		if err != nil {
+			logging.Logger().Critical(err.Error())
+			return err
+		}
+		defer response.Body.Close()
+
+		responseBody, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			logging.Logger().Critical(err.Error())
+			return err
+		}
+
+		if response.StatusCode != http.StatusCreated {
+			logging.Logger().Critical(fmt.Errorf("status code was %d", response.StatusCode))
+			logging.Logger().Critical(string(responseBody))
+			return fmt.Errorf("status code was %d", response.StatusCode)
+		}
+	}
+	return nil
+}
+
+func (receiver *clayRuntimeInitializer) loadEphemeralBinaryObjects(config *clayConfig, host string, port string) error {
+	for _, ephemeralBinaryObject := range config.EphemeralBinaryObjects {
+		filePath := filepath.Join(config.General.EphemeralBinaryObjectsDirectory, ephemeralBinaryObject.FileName)
+
+		var bytesBuffer bytes.Buffer
+		multipartWriter := multipart.NewWriter(&bytesBuffer)
+
+		nameWriter, err := multipartWriter.CreateFormField("name")
+		if err != nil {
+			logging.Logger().Critical(err.Error())
+			return err
+		}
+
+		if _, err := nameWriter.Write([]byte(ephemeralBinaryObject.Name)); err != nil {
+			logging.Logger().Critical(err.Error())
+			return err
+		}
+
+		contentWriter, err := multipartWriter.CreateFormFile("content", ephemeralBinaryObject.FileName)
+		if err != nil {
+			logging.Logger().Critical(err.Error())
+			return err
+		}
+
+		file, err := os.Open(filePath)
+		if err != nil {
+			logging.Logger().Critical(err.Error())
+			return err
+		}
+		defer file.Close()
+
+		if _, err = io.Copy(contentWriter, file); err != nil {
+			logging.Logger().Critical(err.Error())
+			return err
+		}
+
+		if err := multipartWriter.Close(); err != nil {
+			logging.Logger().Critical(err.Error())
+			return err
+		}
+
+		url := fmt.Sprintf("http://%s:%s/ephemeral_binary_objects", host, port)
+		request, err := http.NewRequest("POST", url, &bytesBuffer)
+		request.Header.Set("Content-Type", multipartWriter.FormDataContentType())
 
 		client := &http.Client{}
 		response, err := client.Do(request)
