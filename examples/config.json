@@ -52,7 +52,7 @@
 			"name": "ui",
 			"from": "/ui",
 			"to": "/ephemeral_templates/index/generation",
-			"query": "output_type=html"
+			"query": "content_type=text/html%3b%20charset=utf-8"
 		}
 	]
 }

@@ -42,7 +42,7 @@ func (receiver *ephemeralTemplateRawController) GetRouteMap() map[int]map[int]gi
 }
 
 func (receiver *ephemeralTemplateRawController) OutputGetSingle(c *gin.Context, code int, result interface{}, fields map[string]interface{}) {
-	OutputTextWithType(c, code, result)
+	OutputTextWithContentType(c, code, result)
 }
 
 func init() {

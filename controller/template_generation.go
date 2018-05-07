@@ -36,28 +36,20 @@ func (receiver *templateGenerationController) GetRouteMap() map[int]map[int]gin.
 }
 
 func (receiver *templateGenerationController) OutputGetSingle(c *gin.Context, code int, result interface{}, _ map[string]interface{}) {
-	OutputTextWithType(c, code, result)
+	OutputTextWithContentType(c, code, result)
 }
 
-// OutputTextWithType outputs the result text in the given type
-func OutputTextWithType(c *gin.Context, code int, result interface{}) {
+// OutputTextWithContentType outputs the result text in the given type
+func OutputTextWithContentType(c *gin.Context, code int, result interface{}) {
 	text := result.(string)
 
-	outputType := c.Request.URL.Query().Get("output_type")
+	contentType := c.Request.URL.Query().Get("content_type")
 
-	switch outputType {
-	case "html":
-		c.Data(code, "text/html; charset=utf-8", []byte(text))
-	case "js":
-		c.Data(code, "application/javascript; charset=utf-8", []byte(text))
-	case "css":
-		c.Data(code, "text/css; charset=utf-8", []byte(text))
-	case "json":
-		c.Data(code, "application/json; charset=utf-8", []byte(text))
-	case "yaml":
-		c.Data(code, "application/x-yaml; charset=utf-8", []byte(text))
-	default:
+	switch contentType {
+	case "":
 		c.String(code, text)
+	default:
+		c.Data(code, contentType, []byte(text))
 	}
 }
 
