@@ -1249,8 +1249,8 @@ sequence[{{ $i }}]={{ $v }}
 		ID:   id4,
 		Name: "test14",
 		TemplateContent: `include test
-{{ .Template.Include "test12" "" }}
-{{ .Template.Include "test13" "p[testParameter1X]=999" }}
+{{ .ModelStore.Single "templates/test12/generation" "key_parameter=name" }}
+{{ .ModelStore.Single "templates/test12/generation" "key_parameter=name&p[testParameter1X]=999" }}
 `,
 		Description: "test15desc",
 	}
