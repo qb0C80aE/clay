@@ -27,7 +27,6 @@ var parameterRegexp = regexp.MustCompile("p\\[(.+)\\]")
 type templateParameter struct {
 	ModelStore *modelStore
 	Core       *coreUtil
-	Template   *templateUtil
 	Network    *networkUtil
 	Parameter  map[interface{}]interface{}
 	Query      url.Values
@@ -38,10 +37,6 @@ type modelStore struct {
 }
 
 type coreUtil struct {
-}
-
-type templateUtil struct {
-	db *gorm.DB
 }
 
 type networkUtil struct {
@@ -206,10 +201,7 @@ func (receiver *TemplateGeneration) GenerateTemplate(db *gorm.DB, parameters gin
 		ModelStore: &modelStore{
 			db: db,
 		},
-		Core: &coreUtil{},
-		Template: &templateUtil{
-			db: db,
-		},
+		Core:      &coreUtil{},
 		Network:   &networkUtil{},
 		Parameter: templateParameterMap,
 		Query:     urlValues,
@@ -459,7 +451,6 @@ func (receiver *modelStore) Single(pathInterface interface{}, queryInterface int
 	}
 
 	pathElements := strings.Split(strings.Trim(path, "/"), "/")
-	resourceName := pathElements[0]
 	singleURL, err := controller.GetResourceSingleURL()
 	if err != nil {
 		logging.Logger().Debug(err.Error())
@@ -493,11 +484,9 @@ func (receiver *modelStore) Single(pathInterface interface{}, queryInterface int
 		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
-	model, err := extension.GetAssociatedModelWithResourceName(resourceName)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
+
+	model := controller.GetModel()
+
 	urlQuery := requestForParameter.URL.Query()
 	parameter, err := dbpkg.NewParameter(urlQuery)
 	if err != nil {
@@ -535,7 +524,6 @@ func (receiver *modelStore) Multi(pathInterface interface{}, queryInterface inte
 	}
 
 	pathElements := strings.Split(strings.Trim(path, "/"), "/")
-	resourceName := pathElements[0]
 	multiURL, err := controller.GetResourceMultiURL()
 	if err != nil {
 		logging.Logger().Debug(err.Error())
@@ -565,11 +553,9 @@ func (receiver *modelStore) Multi(pathInterface interface{}, queryInterface inte
 		URL,
 		nil,
 	)
-	model, err := extension.GetAssociatedModelWithResourceName(resourceName)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
+
+	model := controller.GetModel()
+
 	urlQuery := requestForParameter.URL.Query()
 	parameter, err := dbpkg.NewParameter(urlQuery)
 	if err != nil {
@@ -696,35 +682,6 @@ func (receiver *modelStore) Total(pathInterface interface{}) (interface{}, error
 		return nil, err
 	}
 	return total, nil
-}
-
-func (receiver *templateUtil) Include(templateName string, query string) (interface{}, error) {
-	// include resets db conditions like preloads, so you should use this method in GetSingle or GetMulti only,
-	// and note that all conditions go away after this method.
-	db := receiver.db.New()
-
-	parameters := gin.Params{
-		{
-			Key:   "key_parameter",
-			Value: templateName,
-		},
-	}
-
-	urlValues, err := url.ParseQuery(query)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-
-	urlValues.Set("key_parameter", "name")
-
-	result, err := NewTemplateGeneration().GetSingle(nil, db, parameters, urlValues, "")
-
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-	return result, nil
 }
 
 func (receiver *networkUtil) ParseCIDR(cidr string) (*network.Ipv4Address, error) {
