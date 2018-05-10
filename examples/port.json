@@ -1,76 +1,76 @@
 {
-	"type_name": "Port",
-	"resource_name": "ports",
-	"to_be_migrated": true,
-	"is_controller_enabled": true,
-	"fields": [
-		{
-			"name": "ID",
-			"tag":  "json:\"id\" gorm:\"primary_key;auto_increment\"",
-			"type_name": "int"
-		},
+  "type_name": "Port",
+  "resource_name": "ports",
+  "to_be_migrated": true,
+  "is_controller_enabled": true,
+  "fields": [
     {
-			"name": "NodeID",
-			"tag":  "json:\"node_id\" gorm:\"unique_index:node_id_port_name\" sql:\"type:integer references nodes(id)\"",
-			"type_name": "int"
-		},
+      "name": "ID",
+      "tag": "json:\"id\" yaml:\"id\" gorm:\"primary_key;auto_increment\"",
+      "type_name": "int"
+    },
     {
-			"name": "Node",
-			"tag":  "json:\"node\" gorm:\"ForeignKey:NodeID\"",
-			"type_name": "Node"
-		},
-		{
-			"name": "Name",
-			"tag":  "json:\"name\" gorm:\"not null;unique_index:node_id_port_name\"",
-			"type_name": "string"
-		},
+      "name": "NodeID",
+      "tag": "json:\"node_id\" yaml:\"node_id\" gorm:\"unique_index:node_id_port_name\" sql:\"type:integer references nodes(id)\"",
+      "type_name": "int"
+    },
     {
-			"name": "Description",
-			"tag":  "json:\"description\"",
-			"type_name": "string"
-		},
-		{
-			"name": "Number",
-			"tag":  "json:\"number\" validate:\"min=1\"",
-			"type_name": "int"
-		},
-		{
-			"name": "MACAddress",
-			"tag":  "json:\"mac_address\" validate:\"omitempty,mac\"",
-			"type_name": "string"
-		},
-		{
-			"name": "Ipv4Addresses",
-			"tag":  "json:\"ipv4_addresses\" gorm:\"ForeignKey:PortID\"",
-			"type_name": "PortIpv4Address",
+      "name": "Node",
+      "tag": "json:\"node\" yaml:\"node\" gorm:\"ForeignKey:NodeID\"",
+      "type_name": "Node"
+    },
+    {
+      "name": "Name",
+      "tag": "json:\"name\" yaml:\"name\" gorm:\"not null;unique_index:node_id_port_name\"",
+      "type_name": "string"
+    },
+    {
+      "name": "Description",
+      "tag": "json:\"description\" yaml:\"description\"",
+      "type_name": "string"
+    },
+    {
+      "name": "Number",
+      "tag": "json:\"number\" yaml:\"number\" validate:\"min=1\"",
+      "type_name": "int"
+    },
+    {
+      "name": "MACAddress",
+      "tag": "json:\"mac_address\" yaml:\"mac_address\" validate:\"omitempty,mac\"",
+      "type_name": "string"
+    },
+    {
+      "name": "Ipv4Addresses",
+      "tag": "json:\"ipv4_addresses\" yaml:\"ipv4_addresses\" gorm:\"ForeignKey:PortID\"",
+      "type_name": "PortIpv4Address",
       "is_slice": true
-		},
-		{
-			"name": "Tagged",
-			"tag":  "json:\"tagged\"",
-			"type_name": "bool"
-		},
-		{
-			"name": "Link",
-			"tag":  "json:\"link\" gorm:\"ForeignKey:SourcePortID\"",
-			"type_name": "Link"
-		},
-		{
-			"name": "PortGroupPortAssociations",
-			"tag":  "json:\"port_group_port_associations\" gorm:\"ForeignKey:PortID\"",
-			"type_name": "PortGroupPortAssociation",
+    },
+    {
+      "name": "Tagged",
+      "tag": "json:\"tagged\" yaml:\"tagged\"",
+      "type_name": "bool"
+    },
+    {
+      "name": "Link",
+      "tag": "json:\"link\" yaml:\"link\" gorm:\"ForeignKey:SourcePortID\"",
+      "type_name": "Link"
+    },
+    {
+      "name": "PortGroupPortAssociations",
+      "tag": "json:\"port_group_port_associations\" yaml:\"port_group_port_associations\" gorm:\"ForeignKey:PortID\"",
+      "type_name": "PortGroupPortAssociation",
       "is_slice": true
-		},
-		{
-			"name": "ToBeDeleted",
-			"tag":  "json:\"to_be_deleted,omitempty\" sql:\"-\"",
-			"type_name": "bool"
-		}
-	],
-	"sql_after_migration": [
-		"create trigger if not exists DeletePortBeforeNodeDeletion before delete on nodes",
-		"  begin",
-		"    delete from ports where node_id = old.id;",
-		"  end;"
-	]
+    },
+    {
+      "name": "ToBeDeleted",
+      "tag": "json:\"to_be_deleted,omitempty\" sql:\"-\"",
+      "type_name": "bool"
+    }
+  ],
+  "sql_after_migration": [
+    "create trigger if not exists DeletePortBeforeNodeDeletion before delete on nodes",
+    "  begin",
+    "    delete from ports where node_id = old.id;",
+    "  end;"
+  ]
 }

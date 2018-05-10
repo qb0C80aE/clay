@@ -438,7 +438,7 @@ func createOutputContainerByTypeName(typeName string, preloadTree structTree) (r
 	tableNameStructField := reflect.StructField{
 		Name: "StructMetaInformation",
 		Type: structFieldTypeProxyType,
-		Tag:  reflect.StructTag(fmt.Sprintf("json:\"-,omitempty\" sql:\"-\" clay:\"type_name=%s\"", typeName)),
+		Tag:  reflect.StructTag(fmt.Sprintf("json:\"-,omitempty\" yaml:\"-,omitempty\" sql:\"-\" clay:\"type_name=%s\"", typeName)),
 	}
 	newStructFieldList = append(newStructFieldList, tableNameStructField)
 

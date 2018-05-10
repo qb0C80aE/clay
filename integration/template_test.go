@@ -1189,6 +1189,17 @@ sequence[{{ $i }}]={{ $v }}
 {{ $a.IsIncluding $b }}
 {{- $c := .Network.ParseCIDR "192.168.1.200/24" }}
 {{ $a.IsIncluding $c }}
+
+--- json, yaml ---
+{{- $x := .ModelStore.Multi "templates" "preloads=template_arguments&fields=id,name" }}
+{{- $x2 := .Core.Map }}
+{{- $x2 := .Core.Put $x2 "title" "test" }}
+{{- $x2 := .Core.Put $x2 "abc" 100 }}
+{{- $x3 := .Core.Put $x2 "records" $x.Records }}
+json
+{{ .Core.JSON $x2 "	" }}
+yaml
+{{ .Core.YAML $x2 }}
 `,
 		Description: "test1desc",
 	}

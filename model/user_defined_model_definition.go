@@ -38,17 +38,17 @@ var typeNameTypeMap = map[string]reflect.Type{
 // UserDefinedModelDefinition is the model class what represents user defined model
 type UserDefinedModelDefinition struct {
 	Base
-	TypeName                    string                             `json:"type_name" clay:"key_parameter" validate:"required"`
-	ResourceName                string                             `json:"resource_name" validate:"required"`
-	ToBeMigrated                bool                               `json:"to_be_migrated"`
-	IsControllerEnabled         bool                               `json:"is_controller_enabled"`
-	SQLBeforeMigration          []string                           `json:"sql_before_migration"`
-	SQLAfterMigration           []string                           `json:"sql_after_migration"`
-	SQLWhereForDesignExtraction []string                           `json:"sql_where_for_design_extraction"`
-	SQLWhereForDesignDeletion   []string                           `json:"sql_where_for_design_deletion"`
-	IsManyToManyAssociation     bool                               `json:"is_many_to_many_association"`
-	IsDesignAccessDisabled      bool                               `json:"is_design_access_disabled"`
-	Fields                      []*UserDefinedModelFieldDefinition `json:"fields" validate:"gt=0"`
+	TypeName                    string                             `json:"type_name" yaml:"type_name" clay:"key_parameter" validate:"required"`
+	ResourceName                string                             `json:"resource_name" yaml:"resource_name" validate:"required"`
+	ToBeMigrated                bool                               `json:"to_be_migrated" yaml:"to_be_migrated"`
+	IsControllerEnabled         bool                               `json:"is_controller_enabled" yaml:"is_controller_enabled"`
+	SQLBeforeMigration          []string                           `json:"sql_before_migration" yaml:"sql_before_migration"`
+	SQLAfterMigration           []string                           `json:"sql_after_migration" yaml:"sql_after_migration"`
+	SQLWhereForDesignExtraction []string                           `json:"sql_where_for_design_extraction" yaml:"sql_where_for_design_extraction"`
+	SQLWhereForDesignDeletion   []string                           `json:"sql_where_for_design_deletion" yaml:"sql_where_for_design_deletion"`
+	IsManyToManyAssociation     bool                               `json:"is_many_to_many_association" yaml:"is_many_to_many_association"`
+	IsDesignAccessDisabled      bool                               `json:"is_design_access_disabled" yaml:"is_design_access_disabled"`
+	Fields                      []*UserDefinedModelFieldDefinition `json:"fields" yaml:"fields" validate:"gt=0"`
 }
 
 // NewUserDefinedModelDefinition creates a template raw model instance

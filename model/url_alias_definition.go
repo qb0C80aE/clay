@@ -19,10 +19,10 @@ var nameURLAliasDefinitionMapMutex = new(sync.Mutex)
 // URLAliasDefinition is the model class what represents url alias definitions
 type URLAliasDefinition struct {
 	Base
-	Name  string `json:"name" clay:"key_parameter" validate:"required"`
-	From  string `json:"from" validate:"required"`
-	To    string `json:"to" validate:"required"`
-	Query string `json:"query"`
+	Name  string `json:"name" yaml:"name" clay:"key_parameter" validate:"required"`
+	From  string `json:"from" yaml:"from" validate:"required"`
+	To    string `json:"to" yaml:"to" validate:"required"`
+	Query string `json:"query" yaml:"query"`
 }
 
 // NewURLAliasDefinition creates a template raw model instance

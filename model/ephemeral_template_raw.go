@@ -12,7 +12,7 @@ import (
 // EphemeralTemplateRaw is the model class what represents ephemeral template raw
 type EphemeralTemplateRaw struct {
 	Base
-	Name string `json:"name" clay:"key_parameter"`
+	Name string `json:"name" yaml:"name" clay:"key_parameter"`
 }
 
 // NewEphemeralTemplateRaw creates a ephemeral template raw model instance

@@ -14,9 +14,9 @@ import (
 // Design is the model class what represents the whole object model store
 type Design struct {
 	Base
-	ClayVersion   string                 `json:"clay_version,omitempty"`
-	GeneratedDate string                 `json:"generated_date,omitempty"`
-	Content       map[string]interface{} `json:"content"`
+	ClayVersion   string                 `json:"clay_version,omitempty" yaml:"clay_version,omitempty"`
+	GeneratedDate string                 `json:"generated_date,omitempty" yaml:"generated_date,omitempty"`
+	Content       map[string]interface{} `json:"content" yaml:"content"`
 }
 
 // NewDesign creates a design model instance

@@ -1,39 +1,39 @@
 {
-	"type_name": "PortGroupPortAssociation",
-	"resource_name": "port_group_port_associations",
-	"to_be_migrated": true,
-	"is_controller_enabled": true,
-	"is_many_to_many_association": true,
-	"fields": [
-		{
-			"name": "PortGroupID",
-			"tag":  "json:\"port_group_id\" gorm:\"not null;unique_index:port_group_id_port_id\" sql:\"type:integer references port_groups(id)\" clay:\"many_to_many_left_resource_name=port_groups\"",
-			"type_name": "int"
-		},
-		{
-			"name": "PortGroup",
-			"tag":  "json:\"port_group\" gorm:\"ForeignKey:PortGroupID\"",
-			"type_name": "PortGroup"
-		},
-		{
-			"name": "PortID",
-			"tag":  "json:\"port_id\" gorm:\"not null;unique_index:port_group_id_port_id\" sql:\"type:integer references ports(id)\" clay:\"many_to_many_right_resource_name=ports\"",
-			"type_name": "int"
-		},
-		{
-			"name": "Port",
-			"tag":  "json:\"port\" gorm:\"ForeignKey:PortID\"",
-			"type_name": "Port"
-		}
-	],
-	"sql_after_migration": [
-		"create trigger if not exists DeletePortGroupPortAssociationBeforePortGroupDeletion before delete on port_groups",
-		"  begin",
-		"    delete from port_group_port_associations where port_group_id = old.id;",
-		"  end;",
-		"create trigger if not exists DeletePortGroupPortAssociationBeforePortDeletion before delete on ports",
-		"  begin",
-		"    delete from port_group_port_associations where port_id = old.id;",
-		"  end;"
-	]
+  "type_name": "PortGroupPortAssociation",
+  "resource_name": "port_group_port_associations",
+  "to_be_migrated": true,
+  "is_controller_enabled": true,
+  "is_many_to_many_association": true,
+  "fields": [
+    {
+      "name": "PortGroupID",
+      "tag": "json:\"port_group_id\" yaml:\"port_group_id\" gorm:\"not null;unique_index:port_group_id_port_id\" sql:\"type:integer references port_groups(id)\" clay:\"many_to_many_left_resource_name=port_groups\"",
+      "type_name": "int"
+    },
+    {
+      "name": "PortGroup",
+      "tag": "json:\"port_group\" yaml:\"port_group\" gorm:\"ForeignKey:PortGroupID\"",
+      "type_name": "PortGroup"
+    },
+    {
+      "name": "PortID",
+      "tag": "json:\"port_id\" yaml:\"port_id\" gorm:\"not null;unique_index:port_group_id_port_id\" sql:\"type:integer references ports(id)\" clay:\"many_to_many_right_resource_name=ports\"",
+      "type_name": "int"
+    },
+    {
+      "name": "Port",
+      "tag": "json:\"port\" yaml:\"port\" gorm:\"ForeignKey:PortID\"",
+      "type_name": "Port"
+    }
+  ],
+  "sql_after_migration": [
+    "create trigger if not exists DeletePortGroupPortAssociationBeforePortGroupDeletion before delete on port_groups",
+    "  begin",
+    "    delete from port_group_port_associations where port_group_id = old.id;",
+    "  end;",
+    "create trigger if not exists DeletePortGroupPortAssociationBeforePortDeletion before delete on ports",
+    "  begin",
+    "    delete from port_group_port_associations where port_id = old.id;",
+    "  end;"
+  ]
 }

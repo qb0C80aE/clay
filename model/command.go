@@ -27,18 +27,18 @@ const (
 // Command is the model class what represents command to execute something
 type Command struct {
 	Base
-	Name             string    `json:"name" form:"name" clay:"key_parameter" validate:"required"`
-	Description      string    `json:"description" form:"description"`
-	WorkingDirectory string    `json:"working_directory" form:"working_directory"`
-	CommandLine      string    `json:"command_line" form:"command_line" validate:"required"`
-	Status           string    `json:"status" form:"status"`
-	StdOut           string    `json:"std_out" form:"std_out"`
-	StdErr           string    `json:"std_err" form:"std_err"`
-	ExitCode         int       `json:"exit_code" form:"exit_code"`
-	Killed           bool      `json:"killed" form:"killed"`
-	StartedAt        string    `json:"started_at" form:"started_at"`
-	FinishedAt       string    `json:"finished_at" form:"finished_at"`
-	Cmd              *exec.Cmd `json:"cmd,omitempty"`
+	Name             string    `json:"name" yaml:"name" form:"name" clay:"key_parameter" validate:"required"`
+	Description      string    `json:"description" yaml:"description" form:"description"`
+	WorkingDirectory string    `json:"working_directory" yaml:"working_directory" form:"working_directory"`
+	CommandLine      string    `json:"command_line" yaml:"command_line" form:"command_line" validate:"required"`
+	Status           string    `json:"status" yaml:"status" form:"status"`
+	StdOut           string    `json:"std_out" yaml:"std_out" form:"std_out"`
+	StdErr           string    `json:"std_err" yaml:"std_err" form:"std_err"`
+	ExitCode         int       `json:"exit_code" yaml:"exit_code" form:"exit_code"`
+	Killed           bool      `json:"killed" yaml:"killed" form:"killed"`
+	StartedAt        string    `json:"started_at" yaml:"started_at" form:"started_at"`
+	FinishedAt       string    `json:"finished_at" yaml:"finished_at" form:"finished_at"`
+	Cmd              *exec.Cmd `json:"cmd,omitempty" yaml:"cmd,omitempty"`
 }
 
 // NewCommand creates a command model instance
