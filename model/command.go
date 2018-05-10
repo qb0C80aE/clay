@@ -149,8 +149,8 @@ func (receiver *Command) Delete(model extension.Model, db *gorm.DB, parameters g
 	return nil
 }
 
-// GetTotal returns the count of for multi resource
-func (receiver *Command) GetTotal(_ extension.Model, _ *gorm.DB) (int, error) {
+// GetCount returns the record count under current db conditions
+func (receiver *Command) GetCount(_ extension.Model, _ *gorm.DB) (int, error) {
 	return len(commandNameCommandMap), nil
 }
 

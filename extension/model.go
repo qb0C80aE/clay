@@ -70,6 +70,7 @@ func NewStructFieldTypeProxy(name string, kind reflect.Kind) *StructFieldTypePro
 // * Delete corresponds HTTP DELETE message and handles a request for a single resource to delete the specific information
 // * Patch corresponds HTTP PATCH message and handles a request for a single resource to update partially the specific information
 // * GetOptions corresponds HTTP OPTIONS message and handles a request for multi resources to retrieve its supported options
+// * GetCount returns the record count under current db conditions
 type Model interface {
 	GetTypeName(model Model) string
 	GetResourceName(model Model) (string, error)
@@ -84,7 +85,7 @@ type Model interface {
 	Delete(model Model, db *gorm.DB, parameters gin.Params, urlValues url.Values) error
 	Patch(model Model, db *gorm.DB, parameters gin.Params, urlValues url.Values, inputContainer interface{}) (interface{}, error)
 	GetOptions(model Model, db *gorm.DB, parameters gin.Params, urlValues url.Values) error
-	GetTotal(model Model, db *gorm.DB) (int, error)
+	GetCount(model Model, db *gorm.DB) (int, error)
 }
 
 // ModelKey is the type that defines the key parameter of types. It's used in various functions like "to_be_deleted" (delete specific children in update) logic or any other key replacement logic.

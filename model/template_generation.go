@@ -550,7 +550,39 @@ func (receiver *modelStore) Multi(pathInterface interface{}, queryInterface inte
 		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
-	return result, nil
+
+	// reset all conditions in order to get the total number of records
+	db = db.New()
+	total, err := model.GetCount(model, db)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+
+	// reset conditions except for limit and offset in order to get the record count before limitation
+	db = db.New()
+	db = parameter.SetPreloads(db)
+	db = parameter.SortRecords(db)
+	db = parameter.FilterFields(db)
+	countBeforePagination, err := model.GetCount(model, db)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+
+	type multiResult struct {
+		Records               interface{}
+		Total                 interface{}
+		CountBeforePagination interface{}
+	}
+
+	multiResultObject := &multiResult{
+		Records: result,
+		Total:   total,
+		CountBeforePagination: countBeforePagination,
+	}
+
+	return multiResultObject, nil
 }
 
 func (receiver *modelStore) First(pathInterface interface{}, queryInterface interface{}) (interface{}, error) {
@@ -619,28 +651,6 @@ func (receiver *modelStore) First(pathInterface interface{}, queryInterface inte
 	}
 
 	return resultValue.Index(0).Interface(), nil
-}
-
-func (receiver *modelStore) Total(pathInterface interface{}) (interface{}, error) {
-	path := pathInterface.(string)
-	pathElements := strings.Split(strings.Trim(path, "/"), "/")
-	resourceName := pathElements[0]
-
-	model, err := extension.GetAssociatedModelWithResourceName(resourceName)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-
-	// total resets db conditions like preloads, so you should use this method in GetSingle or GetMulti only,
-	// and note that all conditions go away after this method.
-	db := receiver.db.New()
-	total, err := model.GetTotal(model, db)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-	return total, nil
 }
 
 func (receiver *networkUtil) ParseCIDR(cidr string) (*network.Ipv4Address, error) {

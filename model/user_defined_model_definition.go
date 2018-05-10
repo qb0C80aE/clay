@@ -264,8 +264,8 @@ func (receiver *UserDefinedModelDefinition) Create(model extension.Model, db *go
 	return userDefinedModelDefinition, nil
 }
 
-// GetTotal returns the count of for multi resource
-func (receiver *UserDefinedModelDefinition) GetTotal(_ extension.Model, _ *gorm.DB) (int, error) {
+// GetCount returns the record count under current db conditions
+func (receiver *UserDefinedModelDefinition) GetCount(_ extension.Model, _ *gorm.DB) (int, error) {
 	return len(typeNameUserDefinedModelDefinitionMap), nil
 }
 

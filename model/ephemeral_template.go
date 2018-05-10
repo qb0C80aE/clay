@@ -146,8 +146,8 @@ func (receiver *EphemeralTemplate) Delete(model extension.Model, db *gorm.DB, pa
 	return nil
 }
 
-// GetTotal returns the count of for multi resource
-func (receiver *EphemeralTemplate) GetTotal(_ extension.Model, _ *gorm.DB) (int, error) {
+// GetCount returns the record count under current db conditions
+func (receiver *EphemeralTemplate) GetCount(_ extension.Model, _ *gorm.DB) (int, error) {
 	return len(nameEphemeralTemplateMap), nil
 }
 

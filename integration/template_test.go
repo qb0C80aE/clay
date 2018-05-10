@@ -900,8 +900,8 @@ concatenate
 
 fieldslice
 {{- $tpp := .ModelStore.Multi "template_arguments" "" }}
-{{- $idfields := .Core.FieldSlice $tpp "ID" }}
-{{- $namefields := .Core.FieldSlice $tpp "Name" }}
+{{- $idfields := .Core.FieldSlice $tpp.Records "ID" }}
+{{- $namefields := .Core.FieldSlice $tpp.Records "Name" }}
 {{- $idfields := .Core.Sort $idfields "asc" }}
 {{- $namefields := .Core.Sort $namefields "asc" }}
 {{ $idfields }}
@@ -1107,8 +1107,8 @@ keys of map1: {{ $keys }}
 
 --- model store ---
 multi
-{{- $m := .ModelStore.Multi "templates" "preloads=TemplateArguments" }}
-{{- $t := index $m 0 }}
+{{- $m:= .ModelStore.Multi "templates" "preloads=TemplateArguments" }}
+{{- $t := index $m.Records 0 }}
 {{ $t.Name }}
 {{- $p1 := index $t.TemplateArguments 0 }}
 {{ $p1.Name }}={{ $p1.DefaultValue }}
@@ -1132,9 +1132,11 @@ first
 {{- $p2 := index $t.TemplateArguments 1 }}
 {{ $p2.Name }}={{ $p2.DefaultValue }}
 
-total
-{{- $t := .ModelStore.Total "/template_arguments" }}
-{{ $t }}
+total, paginaiton
+{{- $t := .ModelStore.Multi "/template_arguments" "limit=2&q[name]=%25X" }}
+{{ len $t.Records }}
+{{ $t.Total }}
+{{ $t.CountBeforePagination }}
 
 --- hash ---
 hash
@@ -1145,7 +1147,7 @@ hash[testParameter12]={{ .Core.Get $h "testParameter12" }}
 --- slicemap ---
 slicemap
 {{- $p := .ModelStore.Multi "template_arguments" "" }}
-{{- $z := .Core.SliceMap $p "Name" }}
+{{- $z := .Core.SliceMap $p.Records "Name" }}
 {{- $z1 := .Core.Get $z "testParameter11" }}
 {{- $z2 := .Core.Get $z "testParameter12" }}
 {{- $z3 := .Core.Get $z "testParameter1X" }}
