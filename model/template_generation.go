@@ -13,7 +13,6 @@ import (
 	"github.com/qb0C80aE/clay/util/conversion"
 	"github.com/qb0C80aE/clay/util/mapstruct"
 	"github.com/qb0C80aE/clay/util/network"
-	"net/http"
 	"net/url"
 	"reflect"
 	"regexp"
@@ -444,42 +443,26 @@ func (receiver *coreUtil) Sequence(begin, end int) interface{} {
 
 func (receiver *modelStore) Single(pathInterface interface{}, queryInterface interface{}) (interface{}, error) {
 	path := pathInterface.(string)
+
 	controller, err := extension.GetAssociatedControllerWithPath(path)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
 
-	pathElements := strings.Split(strings.Trim(path, "/"), "/")
 	singleURL, err := controller.GetResourceSingleURL()
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
 
-	routeElements := strings.Split(strings.Trim(singleURL, "/"), "/")
-
-	parameters := gin.Params{}
-	for index, routeElement := range routeElements {
-		if routeElement[:1] == ":" {
-			parameter := gin.Param{
-				Key:   routeElement[1:],
-				Value: pathElements[index],
-			}
-			parameters = append(parameters, parameter)
-		}
+	parameters, err := extension.CreateParametersFromPathAntRoute(path, singleURL)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
 	}
 
-	query := queryInterface.(string)
-	URL := "/"
-	if query != "" {
-		URL = "/?" + query
-	}
-	requestForParameter, err := http.NewRequest(
-		http.MethodGet,
-		URL,
-		nil,
-	)
+	urlValues, err := url.ParseQuery(queryInterface.(string))
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
@@ -487,8 +470,7 @@ func (receiver *modelStore) Single(pathInterface interface{}, queryInterface int
 
 	model := controller.GetModel()
 
-	urlQuery := requestForParameter.URL.Query()
-	parameter, err := dbpkg.NewParameter(urlQuery)
+	parameter, err := dbpkg.NewParameter(urlValues)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
@@ -504,10 +486,10 @@ func (receiver *modelStore) Single(pathInterface interface{}, queryInterface int
 	}
 	db = parameter.SetPreloads(db)
 	db = parameter.FilterFields(db)
-	fields := helper.ParseFields(parameter.DefaultQuery(urlQuery, "fields", "*"))
+	fields := helper.ParseFields(parameter.DefaultQuery(urlValues, "fields", "*"))
 	queryFields := helper.QueryFields(model, fields)
 
-	result, err := model.GetSingle(model, db, parameters, requestForParameter.URL.Query(), queryFields)
+	result, err := model.GetSingle(model, db, parameters, urlValues, queryFields)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
@@ -517,47 +499,34 @@ func (receiver *modelStore) Single(pathInterface interface{}, queryInterface int
 
 func (receiver *modelStore) Multi(pathInterface interface{}, queryInterface interface{}) (interface{}, error) {
 	path := pathInterface.(string)
+
 	controller, err := extension.GetAssociatedControllerWithPath(path)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
 
-	pathElements := strings.Split(strings.Trim(path, "/"), "/")
 	multiURL, err := controller.GetResourceMultiURL()
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
 
-	routeElements := strings.Split(strings.Trim(multiURL, "/"), "/")
-
-	parameters := gin.Params{}
-	for index, routeElement := range routeElements {
-		if routeElement[:1] == ":" {
-			parameter := gin.Param{
-				Key:   routeElement[1:],
-				Value: pathElements[index],
-			}
-			parameters = append(parameters, parameter)
-		}
+	parameters, err := extension.CreateParametersFromPathAntRoute(path, multiURL)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
 	}
 
-	query := queryInterface.(string)
-	URL := "/"
-	if query != "" {
-		URL = "/?" + query
+	urlValues, err := url.ParseQuery(queryInterface.(string))
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
 	}
-	requestForParameter, err := http.NewRequest(
-		http.MethodGet,
-		URL,
-		nil,
-	)
 
 	model := controller.GetModel()
 
-	urlQuery := requestForParameter.URL.Query()
-	parameter, err := dbpkg.NewParameter(urlQuery)
+	parameter, err := dbpkg.NewParameter(urlValues)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
@@ -574,9 +543,9 @@ func (receiver *modelStore) Multi(pathInterface interface{}, queryInterface inte
 	db = parameter.SetPreloads(db)
 	db = parameter.SortRecords(db)
 	db = parameter.FilterFields(db)
-	fields := helper.ParseFields(parameter.DefaultQuery(urlQuery, "fields", "*"))
+	fields := helper.ParseFields(parameter.DefaultQuery(urlValues, "fields", "*"))
 	queryFields := helper.QueryFields(model, fields)
-	result, err := model.GetMulti(model, db, parameters, requestForParameter.URL.Query(), queryFields)
+	result, err := model.GetMulti(model, db, parameters, urlValues, queryFields)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
@@ -586,49 +555,39 @@ func (receiver *modelStore) Multi(pathInterface interface{}, queryInterface inte
 
 func (receiver *modelStore) First(pathInterface interface{}, queryInterface interface{}) (interface{}, error) {
 	path := pathInterface.(string)
+
 	controller, err := extension.GetAssociatedControllerWithPath(path)
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
 
-	pathElements := strings.Split(strings.Trim(path, "/"), "/")
-	resourceName := pathElements[0]
 	multiURL, err := controller.GetResourceMultiURL()
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
 
-	routeElements := strings.Split(strings.Trim(multiURL, "/"), "/")
-
-	parameters := gin.Params{}
-	for index, routeElement := range routeElements {
-		if routeElement[:1] == ":" {
-			parameter := gin.Param{
-				Key:   routeElement[1:],
-				Value: pathElements[index],
-			}
-			parameters = append(parameters, parameter)
-		}
-	}
-
-	query := queryInterface.(string)
-	URL := "/"
-	if query != "" {
-		URL = "/?" + query
-	}
-	requestForParameter, err := http.NewRequest(
-		http.MethodGet,
-		URL,
-		nil,
-	)
-	model, err := extension.GetAssociatedModelWithResourceName(resourceName)
+	parameters, err := extension.CreateParametersFromPathAntRoute(path, multiURL)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
-	urlQuery := requestForParameter.URL.Query()
-	parameter, err := dbpkg.NewParameter(urlQuery)
+
+	urlValues, err := url.ParseQuery(queryInterface.(string))
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+
+	model := controller.GetModel()
+
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+
+	parameter, err := dbpkg.NewParameter(urlValues)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
@@ -645,9 +604,9 @@ func (receiver *modelStore) First(pathInterface interface{}, queryInterface inte
 	db = parameter.SetPreloads(db)
 	db = parameter.SortRecords(db)
 	db = parameter.FilterFields(db)
-	fields := helper.ParseFields(parameter.DefaultQuery(urlQuery, "fields", "*"))
+	fields := helper.ParseFields(parameter.DefaultQuery(urlValues, "fields", "*"))
 	queryFields := helper.QueryFields(model, fields)
-	result, err := model.GetMulti(model, db, parameters, requestForParameter.URL.Query(), queryFields)
+	result, err := model.GetMulti(model, db, parameters, urlValues, queryFields)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
