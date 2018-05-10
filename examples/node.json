@@ -21,19 +21,19 @@
     },
     {
       "name": "Ports",
-      "tag": "json:\"ports\" yaml:\"ports\" gorm:\"ForeignKey:NodeID\"",
+      "tag": "json:\"ports\" yaml:\"ports\" gorm:\"ForeignKey:NodeID\" validate:\"omitempty,dive\"",
       "type_name": "Port",
       "is_slice": true
     },
     {
       "name": "NodeGroupNodeAssociations",
-      "tag": "json:\"node_group_node_associations\" yaml:\"node_group_node_associations\" gorm:\"ForeignKey:NodeID\"",
+      "tag": "json:\"node_group_node_associations\" yaml:\"node_group_node_associations\" gorm:\"ForeignKey:NodeID\" validate:\"omitempty,dive\"",
       "type_name": "NodeGroupNodeAssociation",
       "is_slice": true
     },
     {
       "name": "Routes",
-      "tag": "json:\"routes\" yaml:\"routes\" gorm:\"ForeignKey:NodeID\"",
+      "tag": "json:\"routes\" yaml:\"routes\" gorm:\"ForeignKey:NodeID\" validate:\"omitempty,dive\"",
       "type_name": "NodeRoute",
       "is_slice": true
     }

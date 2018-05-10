@@ -12,7 +12,7 @@
     },
     {
       "name": "Vlan",
-      "tag": "json:\"vlan\" yaml:\"vlan\" gorm:\"ForeignKey:VlanID\"",
+      "tag": "json:\"vlan\" yaml:\"vlan\" gorm:\"ForeignKey:VlanID\" validate:\"omitempty,dive\"",
       "type_name": "Vlan"
     },
     {
@@ -22,7 +22,7 @@
     },
     {
       "name": "Port",
-      "tag": "json:\"port\" yaml:\"port\" gorm:\"ForeignKey:PortID\"",
+      "tag": "json:\"port\" yaml:\"port\" gorm:\"ForeignKey:PortID\" validate:\"omitempty,dive\"",
       "type_name": "Port"
     }
   ],

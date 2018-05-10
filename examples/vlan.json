@@ -22,13 +22,13 @@
     },
     {
       "name": "Subnets",
-      "tag": "json:\"subnets\" yaml:\"subnets\" gorm:\"ForeignKey:VlanID\"",
+      "tag": "json:\"subnets\" yaml:\"subnets\" gorm:\"ForeignKey:VlanID\" validate:\"omitempty,dive\"",
       "type_name": "Subnet",
       "is_slice": true
     },
     {
       "name": "VlanPortAssociations",
-      "tag": "json:\"vlan_port_associations\" yaml:\"vlan_port_associations\" gorm:\"ForeignKey:VlanID\"",
+      "tag": "json:\"vlan_port_associations\" yaml:\"vlan_port_associations\" gorm:\"ForeignKey:VlanID\" validate:\"omitempty,dive\"",
       "type_name": "VlanPortAssociation",
       "is_slice": true
     }

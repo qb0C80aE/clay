@@ -22,13 +22,13 @@
     },
     {
       "name": "Ports",
-      "tag": "json:\"ports\" yaml:\"ports\" gorm:\"ForeignKey:PortID\"",
+      "tag": "json:\"ports\" yaml:\"ports\" gorm:\"ForeignKey:PortID\" validate:\"omitempty,dive\"",
       "type_name": "Port",
       "is_slice": true
     },
     {
       "name": "PortGroupPortAssociations",
-      "tag": "json:\"port_group_port_associations\" yaml:\"port_group_port_associations\" gorm:\"ForeignKey:PortGroupID\"",
+      "tag": "json:\"port_group_port_associations\" yaml:\"port_group_port_associations\" gorm:\"ForeignKey:PortGroupID\" validate:\"omitempty,dive\"",
       "type_name": "PortGroupPortAssociation",
       "is_slice": true
     }
