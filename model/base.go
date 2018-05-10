@@ -361,6 +361,49 @@ func (receiver *Base) DoAfterRouterSetup(_ *gin.Engine) error {
 	return nil
 }
 
+func (receiver *Base) deleteMarkedItem(db *gorm.DB, itemValue reflect.Value) error {
+	model, err := extension.GetRegisteredModelByContainer(itemValue.Addr().Interface())
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return err
+	}
+
+	modelKey, err := model.GetModelKey(model, "")
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return err
+	}
+
+	keyFieldValue := itemValue.FieldByName(modelKey.KeyField)
+	keyParameterValue := ""
+
+	switch keyFieldValue.Kind() {
+	case reflect.String:
+		keyParameterValue = keyFieldValue.Interface().(string)
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		keyParameterValue = strconv.Itoa(int(keyFieldValue.Int()))
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		keyParameterValue = strconv.Itoa(int(keyFieldValue.Int()))
+	default:
+		logging.Logger().Debugf("the field %s does not exist, or is neither int nor string", modelKey.KeyField)
+		return fmt.Errorf("the field %s does not exist, or is neither int nor string", modelKey.KeyField)
+	}
+
+	parameters := gin.Params{
+		{
+			Key:   "key_parameter",
+			Value: keyParameterValue,
+		},
+	}
+
+	if err := model.Delete(model, db, parameters, nil); err != nil {
+		logging.Logger().Debug(err.Error())
+		return err
+	}
+
+	return nil
+}
+
 func (receiver *Base) deleteMarkedItemsInSlices(db *gorm.DB, data interface{}) error {
 	valueOfData := reflect.ValueOf(data)
 	for valueOfData.Kind() == reflect.Ptr {
@@ -406,41 +449,7 @@ func (receiver *Base) deleteMarkedItemsInSlices(db *gorm.DB, data interface{}) e
 				}
 
 				if toBeDeleted {
-					model, err := extension.GetRegisteredModelByContainer(itemValue.Addr().Interface())
-					if err != nil {
-						logging.Logger().Debug(err.Error())
-						return err
-					}
-
-					modelKey, err := model.GetModelKey(model, "")
-					if err != nil {
-						logging.Logger().Debug(err.Error())
-						return err
-					}
-
-					keyFieldValue := itemValue.FieldByName(modelKey.KeyField)
-					keyParameterValue := ""
-
-					switch keyFieldValue.Kind() {
-					case reflect.String:
-						keyParameterValue = keyFieldValue.Interface().(string)
-					case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-						keyParameterValue = strconv.Itoa(int(keyFieldValue.Int()))
-					case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-						keyParameterValue = strconv.Itoa(int(keyFieldValue.Int()))
-					default:
-						logging.Logger().Debugf("the field %s does not exist, or is neither int nor string", modelKey.KeyField)
-						return fmt.Errorf("the field %s does not exist, or is neither int nor string", modelKey.KeyField)
-					}
-
-					parameters := gin.Params{
-						{
-							Key:   "key_parameter",
-							Value: keyParameterValue,
-						},
-					}
-
-					if err := model.Delete(model, db, parameters, nil); err != nil {
+					if err := receiver.deleteMarkedItem(db, itemValue); err != nil {
 						logging.Logger().Debug(err.Error())
 						return err
 					}
@@ -453,6 +462,20 @@ func (receiver *Base) deleteMarkedItemsInSlices(db *gorm.DB, data interface{}) e
 			if err := receiver.deleteMarkedItemsInSlices(db, valueOfData.FieldByName(structField.Name).Interface()); err != nil {
 				logging.Logger().Debug(err.Error())
 				return err
+			}
+
+			toBeDeleted := false
+			toBeDeletedFieldValue := fieldValue.FieldByName("ToBeDeleted")
+			if toBeDeletedFieldValue.IsValid() {
+				toBeDeleted = toBeDeletedFieldValue.Bool()
+			}
+
+			if toBeDeleted {
+				if err := receiver.deleteMarkedItem(db, fieldValue); err != nil {
+					logging.Logger().Debug(err.Error())
+					return err
+				}
+				valueOfData.FieldByName(structField.Name).Set(reflect.Zero(valueOfData.FieldByName(structField.Name).Type()))
 			}
 		}
 	}
