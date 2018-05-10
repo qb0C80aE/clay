@@ -7,7 +7,6 @@ import (
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
 	"net/http"
-	"strings"
 )
 
 type urlAliasController struct {
@@ -62,7 +61,6 @@ func (receiver *urlAliasController) GetSingle(c *gin.Context) {
 		return
 	}
 
-	pathElements := strings.Split(receiver.to, "/")
 	singleURL, err := controller.GetResourceSingleURL()
 	if err != nil {
 		logging.Logger().Debug(err.Error())
@@ -70,20 +68,13 @@ func (receiver *urlAliasController) GetSingle(c *gin.Context) {
 		return
 	}
 
-	routeElements := strings.Split(singleURL, "/")
-
-	parameters := gin.Params{}
-	for index, routeElement := range routeElements {
-		if routeElement[:1] == ":" {
-			parameter := gin.Param{
-				Key:   routeElement[1:],
-				Value: pathElements[index],
-			}
-			parameters = append(parameters, parameter)
-		}
+	c.Params, err = extension.CreateParametersFromPathAntRoute(receiver.to, singleURL)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
+		return
 	}
 
-	c.Params = parameters
 	c.Request.URL.RawQuery = fmt.Sprintf("%s&%s", receiver.query, c.Request.URL.RawQuery)
 	c.Request.URL.Path = receiver.to
 

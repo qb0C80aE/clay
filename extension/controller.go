@@ -219,3 +219,32 @@ func SetupController(relativePath string, controllerList []Controller) error {
 
 	return nil
 }
+
+// CreateParametersFromPathAntRoute creates parameters from actual access url path (like /test/1/generation) and routing url (like /test/:id/generation)
+func CreateParametersFromPathAntRoute(path, route string) (gin.Params, error) {
+	pathElements := strings.Split(strings.Trim(path, "/"), "/")
+	routeElements := strings.Split(strings.Trim(route, "/"), "/")
+
+	if len(pathElements) != len(routeElements) {
+		logging.Logger().Debugf("the number of elements in path(%v) and route(%v) does not match", pathElements, routeElements)
+		return gin.Params{}, fmt.Errorf("the number of elements in path(%v) and route(%v) does not match", pathElements, routeElements)
+	}
+
+	if len(pathElements) == 0 {
+		logging.Logger().Debugf("the number of elements in path(%v) and route(%v) is zero", pathElements, routeElements)
+		return gin.Params{}, fmt.Errorf("the number of elements in path(%v) and route(%v) is zero", pathElements, routeElements)
+	}
+
+	parameters := gin.Params{}
+	for index, routeElement := range routeElements {
+		if routeElement[:1] == ":" {
+			parameter := gin.Param{
+				Key:   routeElement[1:],
+				Value: pathElements[index],
+			}
+			parameters = append(parameters, parameter)
+		}
+	}
+
+	return parameters, nil
+}

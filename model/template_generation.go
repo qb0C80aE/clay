@@ -443,30 +443,23 @@ func (receiver *coreUtil) Sequence(begin, end int) interface{} {
 
 func (receiver *modelStore) Single(pathInterface interface{}, queryInterface interface{}) (interface{}, error) {
 	path := pathInterface.(string)
+
 	controller, err := extension.GetAssociatedControllerWithPath(path)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
 
-	pathElements := strings.Split(strings.Trim(path, "/"), "/")
 	singleURL, err := controller.GetResourceSingleURL()
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
 
-	routeElements := strings.Split(strings.Trim(singleURL, "/"), "/")
-
-	parameters := gin.Params{}
-	for index, routeElement := range routeElements {
-		if routeElement[:1] == ":" {
-			parameter := gin.Param{
-				Key:   routeElement[1:],
-				Value: pathElements[index],
-			}
-			parameters = append(parameters, parameter)
-		}
+	parameters, err := extension.CreateParametersFromPathAntRoute(path, singleURL)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
 	}
 
 	urlValues, err := url.ParseQuery(queryInterface.(string))
@@ -506,30 +499,23 @@ func (receiver *modelStore) Single(pathInterface interface{}, queryInterface int
 
 func (receiver *modelStore) Multi(pathInterface interface{}, queryInterface interface{}) (interface{}, error) {
 	path := pathInterface.(string)
+
 	controller, err := extension.GetAssociatedControllerWithPath(path)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
 
-	pathElements := strings.Split(strings.Trim(path, "/"), "/")
 	multiURL, err := controller.GetResourceMultiURL()
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
 
-	routeElements := strings.Split(strings.Trim(multiURL, "/"), "/")
-
-	parameters := gin.Params{}
-	for index, routeElement := range routeElements {
-		if routeElement[:1] == ":" {
-			parameter := gin.Param{
-				Key:   routeElement[1:],
-				Value: pathElements[index],
-			}
-			parameters = append(parameters, parameter)
-		}
+	parameters, err := extension.CreateParametersFromPathAntRoute(path, multiURL)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
 	}
 
 	urlValues, err := url.ParseQuery(queryInterface.(string))
@@ -569,30 +555,23 @@ func (receiver *modelStore) Multi(pathInterface interface{}, queryInterface inte
 
 func (receiver *modelStore) First(pathInterface interface{}, queryInterface interface{}) (interface{}, error) {
 	path := pathInterface.(string)
+
 	controller, err := extension.GetAssociatedControllerWithPath(path)
 	if err != nil {
+		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
 
-	pathElements := strings.Split(strings.Trim(path, "/"), "/")
-	resourceName := pathElements[0]
 	multiURL, err := controller.GetResourceMultiURL()
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
 
-	routeElements := strings.Split(strings.Trim(multiURL, "/"), "/")
-
-	parameters := gin.Params{}
-	for index, routeElement := range routeElements {
-		if routeElement[:1] == ":" {
-			parameter := gin.Param{
-				Key:   routeElement[1:],
-				Value: pathElements[index],
-			}
-			parameters = append(parameters, parameter)
-		}
+	parameters, err := extension.CreateParametersFromPathAntRoute(path, multiURL)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
 	}
 
 	urlValues, err := url.ParseQuery(queryInterface.(string))
@@ -601,7 +580,7 @@ func (receiver *modelStore) First(pathInterface interface{}, queryInterface inte
 		return nil, err
 	}
 
-	model, err := extension.GetAssociatedModelWithResourceName(resourceName)
+	model := controller.GetModel()
 
 	if err != nil {
 		logging.Logger().Debug(err.Error())
