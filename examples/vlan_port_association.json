@@ -1,39 +1,39 @@
 {
-	"type_name": "VlanPortAssociation",
-	"resource_name": "vlan_port_associations",
-	"to_be_migrated": true,
-	"is_controller_enabled": true,
-	"is_many_to_many_association": true,
-	"fields": [
-		{
-			"name": "VlanID",
-			"tag":  "json:\"vlan_id\" gorm:\"not null;unique_index:vlan_id_port_id\" sql:\"type:integer references vlans(id)\" clay:\"many_to_many_left_resource_name=vlans\"",
-			"type_name": "int"
-		},
-		{
-			"name": "Vlan",
-			"tag":  "json:\"vlan\" gorm:\"ForeignKey:VlanID\"",
-			"type_name": "Vlan"
-		},
-		{
-			"name": "PortID",
-			"tag":  "json:\"port_id\" gorm:\"not null;unique_index:vlan_id_port_id\" sql:\"type:integer references ports(id)\" clay:\"many_to_many_right_resource_name=ports\"",
-			"type_name": "int"
-		},
-		{
-			"name": "Port",
-			"tag":  "json:\"port\" gorm:\"ForeignKey:PortID\"",
-			"type_name": "Port"
-		}
-	],
-	"sql_after_migration": [
-		"create trigger if not exists DeleteVlanPortAssociationBeforeVlanDeletion before delete on vlans",
-		"begin",
-		"  delete from vlan_port_associations where vlan_id = old.id;",
-		"end;",
-		"create trigger if not exists DeleteVlanPortAssociationBeforePortDeletion before delete on ports",
-		"begin",
-		"  delete from vlan_port_associations where port_id = old.id;",
-		"end;"
-	]
+  "type_name": "VlanPortAssociation",
+  "resource_name": "vlan_port_associations",
+  "to_be_migrated": true,
+  "is_controller_enabled": true,
+  "is_many_to_many_association": true,
+  "fields": [
+    {
+      "name": "VlanID",
+      "tag": "json:\"vlan_id\" yaml:\"vlan_id\" gorm:\"not null;unique_index:vlan_id_port_id\" sql:\"type:integer references vlans(id)\" clay:\"many_to_many_left_resource_name=vlans\"",
+      "type_name": "int"
+    },
+    {
+      "name": "Vlan",
+      "tag": "json:\"vlan\" yaml:\"vlan\" gorm:\"ForeignKey:VlanID\"",
+      "type_name": "Vlan"
+    },
+    {
+      "name": "PortID",
+      "tag": "json:\"port_id\" yaml:\"port_id\" gorm:\"not null;unique_index:vlan_id_port_id\" sql:\"type:integer references ports(id)\" clay:\"many_to_many_right_resource_name=ports\"",
+      "type_name": "int"
+    },
+    {
+      "name": "Port",
+      "tag": "json:\"port\" yaml:\"port\" gorm:\"ForeignKey:PortID\"",
+      "type_name": "Port"
+    }
+  ],
+  "sql_after_migration": [
+    "create trigger if not exists DeleteVlanPortAssociationBeforeVlanDeletion before delete on vlans",
+    "begin",
+    "  delete from vlan_port_associations where vlan_id = old.id;",
+    "end;",
+    "create trigger if not exists DeleteVlanPortAssociationBeforePortDeletion before delete on ports",
+    "begin",
+    "  delete from vlan_port_associations where port_id = old.id;",
+    "end;"
+  ]
 }

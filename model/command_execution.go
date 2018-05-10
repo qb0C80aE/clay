@@ -19,7 +19,7 @@ import (
 // CommandExecution is the model class what represents command execution
 type CommandExecution struct {
 	Base
-	Name string `json:"name" clay:"key_parameter"`
+	Name string `json:"name" yaml:"name" clay:"key_parameter"`
 }
 
 // NewCommandExecution creates a commandExecution model instance

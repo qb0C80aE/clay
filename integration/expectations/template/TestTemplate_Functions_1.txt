@@ -369,3 +369,148 @@ false
 false
 true
 false
+
+--- json, yaml ---
+json
+{
+	"abc": 100,
+	"records": [
+		{
+			"id": 1,
+			"name": "test1",
+			"template_content": "",
+			"description": "",
+			"template_arguments": [
+				{
+					"id": 1,
+					"template_id": 1,
+					"template": null,
+					"name": "testParameter11",
+					"description": "testParameter11desc",
+					"type": "int",
+					"default_value": "1"
+				},
+				{
+					"id": 2,
+					"template_id": 1,
+					"template": null,
+					"name": "testParameter12",
+					"description": "testParameter12desc",
+					"type": "string",
+					"default_value": "TestParameter12"
+				},
+				{
+					"id": 3,
+					"template_id": 1,
+					"template": null,
+					"name": "testParameter1X",
+					"description": "testParameter1Xdesc",
+					"type": "int",
+					"default_value": "100"
+				}
+			]
+		},
+		{
+			"id": 2,
+			"name": "test12",
+			"template_content": "",
+			"description": "",
+			"template_arguments": [
+				{
+					"id": 4,
+					"template_id": 2,
+					"template": null,
+					"name": "testParameter1X",
+					"description": "testParameter1Xdesc",
+					"type": "int",
+					"default_value": "200"
+				}
+			]
+		},
+		{
+			"id": 3,
+			"name": "test13",
+			"template_content": "",
+			"description": "",
+			"template_arguments": [
+				{
+					"id": 5,
+					"template_id": 3,
+					"template": null,
+					"name": "testParameter1X",
+					"description": "testParameter1Xdesc",
+					"type": "int",
+					"default_value": "300"
+				}
+			]
+		},
+		{
+			"id": 4,
+			"name": "test14",
+			"template_content": "",
+			"description": "",
+			"template_arguments": []
+		}
+	],
+	"title": "test"
+}
+yaml
+abc: 100
+records:
+- id: 1
+  name: test1
+  template_content: ""
+  description: ""
+  template_arguments:
+  - id: 1
+    template_id: 1
+    template: null
+    name: testParameter11
+    description: testParameter11desc
+    type: int
+    default_value: "1"
+  - id: 2
+    template_id: 1
+    template: null
+    name: testParameter12
+    description: testParameter12desc
+    type: string
+    default_value: TestParameter12
+  - id: 3
+    template_id: 1
+    template: null
+    name: testParameter1X
+    description: testParameter1Xdesc
+    type: int
+    default_value: "100"
+- id: 2
+  name: test12
+  template_content: ""
+  description: ""
+  template_arguments:
+  - id: 4
+    template_id: 2
+    template: null
+    name: testParameter1X
+    description: testParameter1Xdesc
+    type: int
+    default_value: "200"
+- id: 3
+  name: test13
+  template_content: ""
+  description: ""
+  template_arguments:
+  - id: 5
+    template_id: 3
+    template: null
+    name: testParameter1X
+    description: testParameter1Xdesc
+    type: int
+    default_value: "300"
+- id: 4
+  name: test14
+  template_content: ""
+  description: ""
+  template_arguments: []
+title: test
+

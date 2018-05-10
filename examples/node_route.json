@@ -1,78 +1,78 @@
 {
-	"type_name": "NodeRoute",
-	"resource_name": "node_routes",
-	"to_be_migrated": true,
-	"is_controller_enabled": true,
-	"is_many_to_many_association": false,
-	"fields": [
-		{
-			"name": "ID",
-			"tag":  "json:\"id\" gorm:\"primary_key;auto_increment\"",
-			"type_name": "int"
-		},
+  "type_name": "NodeRoute",
+  "resource_name": "node_routes",
+  "to_be_migrated": true,
+  "is_controller_enabled": true,
+  "is_many_to_many_association": false,
+  "fields": [
     {
-			"name": "NodeID",
-			"tag":  "json:\"node_id\" sql:\"type:integer references nodes(id)\"",
-			"type_name": "int"
-		},
+      "name": "ID",
+      "tag": "json:\"id\" yaml:\"id\" gorm:\"primary_key;auto_increment\"",
+      "type_name": "int"
+    },
     {
-			"name": "Node",
-			"tag":  "json:\"node\"",
-			"type_name": "Node"
-		},
+      "name": "NodeID",
+      "tag": "json:\"node_id\" yaml:\"node_id\" sql:\"type:integer references nodes(id)\"",
+      "type_name": "int"
+    },
     {
-			"name": "Description",
-			"tag":  "json:\"description\"",
-			"type_name": "string"
-		},
+      "name": "Node",
+      "tag": "json:\"node\" yaml:\"node\"",
+      "type_name": "Node"
+    },
     {
-			"name": "Address",
-			"tag":  "json:\"address\" gorm:\"not null\" validate:\"omitempty,ipv4\"",
-			"type_name": "string"
-		},
+      "name": "Description",
+      "tag": "json:\"description\" yaml:\"description\"",
+      "type_name": "string"
+    },
     {
-			"name": "Prefix",
-			"tag":  "json:\"prefix\" validate:\"omitempty,min=1,max=32\"",
-			"type_name": "int"
-		},
+      "name": "Address",
+      "tag": "json:\"address\" yaml:\"address\" gorm:\"not null\" validate:\"omitempty,ipv4\"",
+      "type_name": "string"
+    },
     {
-			"name": "OutputPortID",
-			"tag":  "json:\"output_port_id\" sql:\"type:integer references ports(id)\"",
-			"type_name": "int"
-		},
-		{
-			"name": "OutputPort",
-			"tag":  "json:\"output_port\" gorm:\"ForeignKey:OutputPortID\"",
-			"type_name": "Port"
-		},
+      "name": "Prefix",
+      "tag": "json:\"prefix\" yaml:\"prefix\" validate:\"omitempty,min=1,max=32\"",
+      "type_name": "int"
+    },
     {
-			"name": "GatewayPortIpv4AddressID",
-			"tag":  "json:\"gateway_port_ipv4_address_id\" sql:\"type:integer references port_ipv4_addresses(id)\"",
-			"type_name": "int"
-		},
-		{
-			"name": "GatewayPortIpv4Address",
-			"tag":  "json:\"gateway_port_ipv4_address\" gorm:\"ForeignKey:GatewayPortIpv4AddressID\"",
-			"type_name": "PortIpv4Address"
-		},
-		{
-			"name": "ToBeDeleted",
-			"tag":  "json:\"to_be_deleted,omitempty\" sql:\"-\"",
-			"type_name": "bool"
-		}
-	],
-	"sql_after_migration": [
-		"create trigger if not exists DeleteNodeRouteBeforeNodeDeletion before delete on nodes",
-		"  begin",
-		"    delete from node_routes where node_id = old.id;",
-		"  end;",
-		"create trigger if not exists UpdateNodeRouteBeforePortDeletion before delete on ports",
-		"  begin",
-		"    update node_routes set output_port_id = null where output_port_id = old.id;",
-		"  end;",
-		"create trigger if not exists UpdateNodeRouteBeforePortIpv4AddressDeletion before delete on port_ipv4_addresses",
-		"  begin",
-		"    update node_routes set gateway_port_ipv4_address_id = null where gateway_port_ipv4_address_id = old.id;",
-		"end;"
-	]
+      "name": "OutputPortID",
+      "tag": "json:\"output_port_id\" yaml:\"output_port_id\" sql:\"type:integer references ports(id)\"",
+      "type_name": "int"
+    },
+    {
+      "name": "OutputPort",
+      "tag": "json:\"output_port\" yaml:\"output_port\" gorm:\"ForeignKey:OutputPortID\"",
+      "type_name": "Port"
+    },
+    {
+      "name": "GatewayPortIpv4AddressID",
+      "tag": "json:\"gateway_port_ipv4_address_id\" yaml:\"gateway_port_ipv4_address_id\" sql:\"type:integer references port_ipv4_addresses(id)\"",
+      "type_name": "int"
+    },
+    {
+      "name": "GatewayPortIpv4Address",
+      "tag": "json:\"gateway_port_ipv4_address\" yaml:\"gateway_port_ipv4_address\" gorm:\"ForeignKey:GatewayPortIpv4AddressID\"",
+      "type_name": "PortIpv4Address"
+    },
+    {
+      "name": "ToBeDeleted",
+      "tag": "json:\"to_be_deleted,omitempty\" sql:\"-\"",
+      "type_name": "bool"
+    }
+  ],
+  "sql_after_migration": [
+    "create trigger if not exists DeleteNodeRouteBeforeNodeDeletion before delete on nodes",
+    "  begin",
+    "    delete from node_routes where node_id = old.id;",
+    "  end;",
+    "create trigger if not exists UpdateNodeRouteBeforePortDeletion before delete on ports",
+    "  begin",
+    "    update node_routes set output_port_id = null where output_port_id = old.id;",
+    "  end;",
+    "create trigger if not exists UpdateNodeRouteBeforePortIpv4AddressDeletion before delete on port_ipv4_addresses",
+    "  begin",
+    "    update node_routes set gateway_port_ipv4_address_id = null where gateway_port_ipv4_address_id = old.id;",
+    "end;"
+  ]
 }

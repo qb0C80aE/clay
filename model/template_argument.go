@@ -19,14 +19,14 @@ const (
 // TemplateArgument is the model class what represents model-independent arguments used in templates
 type TemplateArgument struct {
 	Base
-	ID           int       `json:"id" gorm:"primary_key;auto_increment"`
-	TemplateID   int       `json:"template_id" gorm:"unique_index:template_id_name" sql:"type:integer references templates(id)"`
-	Template     *Template `json:"template" gorm:"ForeignKey:TemplateID"`
-	Name         string    `json:"name" gorm:"unique_index:template_id_name" validate:"required"`
-	Description  string    `json:"description" form:"description" sql:"type:text"`
-	Type         string    `json:"type" validate:"oneof=int float bool string"`
-	DefaultValue string    `json:"default_value" validate:"required"`
-	ToBeDeleted  bool      `json:"to_be_deleted,omitempty" sql:"-"`
+	ID           int       `json:"id" yaml:"id" gorm:"primary_key;auto_increment"`
+	TemplateID   int       `json:"template_id" yaml:"template_id" gorm:"unique_index:template_id_name" sql:"type:integer references templates(id)"`
+	Template     *Template `json:"template" yaml:"template" gorm:"ForeignKey:TemplateID"`
+	Name         string    `json:"name" yaml:"name" gorm:"unique_index:template_id_name" validate:"required"`
+	Description  string    `json:"description" yaml:"description" form:"description" sql:"type:text"`
+	Type         string    `json:"type" yaml:"type" validate:"oneof=int float bool string"`
+	DefaultValue string    `json:"default_value" yaml:"default_value" validate:"required"`
+	ToBeDeleted  bool      `json:"to_be_deleted,omitempty" yaml:"to_be_deleted,omitempty" sql:"-"`
 }
 
 // NewTemplateArgument creates a template argument model instance

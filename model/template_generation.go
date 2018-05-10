@@ -2,6 +2,7 @@ package model
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -13,6 +14,7 @@ import (
 	"github.com/qb0C80aE/clay/util/conversion"
 	"github.com/qb0C80aE/clay/util/mapstruct"
 	"github.com/qb0C80aE/clay/util/network"
+	"gopkg.in/yaml.v2"
 	"net/url"
 	"reflect"
 	"regexp"
@@ -651,6 +653,60 @@ func (receiver *modelStore) First(pathInterface interface{}, queryInterface inte
 	}
 
 	return resultValue.Index(0).Interface(), nil
+}
+
+func (receiver *coreUtil) convertToStringKeyMap(dataInterface interface{}) interface{} {
+	reflectValue := reflect.ValueOf(dataInterface)
+	for (reflectValue.Kind() == reflect.Ptr) || (reflectValue.Kind() == reflect.Interface) {
+		reflectValue = reflectValue.Elem()
+	}
+
+	switch reflectValue.Kind() {
+	case reflect.Map:
+		result := map[string]interface{}{}
+		mapKeys := reflectValue.MapKeys()
+
+		for _, key := range mapKeys {
+			itemValue := reflectValue.MapIndex(key)
+			itemInterface := itemValue.Interface()
+			item := receiver.convertToStringKeyMap(itemInterface)
+			result[fmt.Sprintf("%v", key)] = item
+		}
+
+		return result
+	default:
+		return dataInterface
+	}
+}
+
+func (receiver *coreUtil) JSON(dataInterface interface{}, indentInterface interface{}) (interface{}, error) {
+	indent := indentInterface.(string)
+
+	switch len(indent) {
+	case 0:
+		result, err := json.Marshal(receiver.convertToStringKeyMap(dataInterface))
+		if err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
+		return string(result), nil
+	default:
+		result, err := json.MarshalIndent(receiver.convertToStringKeyMap(dataInterface), "", indent)
+		if err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
+		return string(result), nil
+	}
+}
+
+func (receiver *coreUtil) YAML(dataInterface interface{}) (interface{}, error) {
+	result, err := yaml.Marshal(receiver.convertToStringKeyMap(dataInterface))
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+	return string(result), nil
 }
 
 func (receiver *networkUtil) ParseCIDR(cidr string) (*network.Ipv4Address, error) {
