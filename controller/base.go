@@ -395,9 +395,23 @@ func (receiver *BaseController) GetSingle(c *gin.Context) {
 		return
 	}
 
+	resourceName, err := receiver.model.GetResourceName(receiver.model)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
+		return
+	}
+
+	resultForQueryFields, err := extension.CreateOutputContainerByResourceName(resourceName, c.Request.URL.Query().Get("preloads"))
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
+		return
+	}
+
 	db = parameter.SetPreloads(db)
 	fields := helper.ParseFields(c.DefaultQuery("fields", "*"))
-	queryFields := helper.QueryFields(receiver.model, fields)
+	queryFields := helper.QueryFields(resultForQueryFields, fields)
 
 	result, err := receiver.model.GetSingle(receiver.model, db, c.Params, c.Request.URL.Query(), queryFields)
 	if err != nil {
@@ -438,11 +452,25 @@ func (receiver *BaseController) GetMulti(c *gin.Context) {
 		return
 	}
 
+	resourceName, err := receiver.model.GetResourceName(receiver.model)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
+		return
+	}
+
+	elementOfResultForQueryFields, err := extension.CreateOutputContainerByResourceName(resourceName, c.Request.URL.Query().Get("preloads"))
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
+		return
+	}
+
 	db = parameter.SetPreloads(db)
 	db = parameter.SortRecords(db)
 	db = parameter.FilterFields(db)
 	fields := helper.ParseFields(c.DefaultQuery("fields", "*"))
-	queryFields := helper.QueryFields(receiver.model, fields)
+	queryFields := helper.QueryFields(elementOfResultForQueryFields, fields)
 
 	result, err := receiver.model.GetMulti(receiver.model, db, c.Params, c.Request.URL.Query(), queryFields)
 	if err != nil {
