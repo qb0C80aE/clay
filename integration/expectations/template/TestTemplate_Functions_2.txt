@@ -320,8 +320,10 @@ test1
 testParameter11=1
 testParameter12=TestParameter12
 
-total
+total, paginaiton
+2
 5
+3
 
 --- hash ---
 hash

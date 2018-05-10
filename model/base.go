@@ -229,8 +229,8 @@ func (receiver *Base) GetOptions(_ extension.Model, _ *gorm.DB, _ gin.Params, _ 
 	return nil
 }
 
-// GetTotal returns the count of for multi resource
-func (receiver *Base) GetTotal(model extension.Model, db *gorm.DB) (int, error) {
+// GetCount returns the record count under current db conditions
+func (receiver *Base) GetCount(model extension.Model, db *gorm.DB) (int, error) {
 	resourceName, err := model.GetResourceName(model)
 	if err != nil {
 		logging.Logger().Debug(err.Error())

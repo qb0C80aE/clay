@@ -268,8 +268,9 @@ func (receiver *BaseController) OutputGetSingle(c *gin.Context, code int, result
 }
 
 // OutputGetMulti corresponds HTTP GET message and handles the output of multiple result from logic classes
-func (receiver *BaseController) OutputGetMulti(c *gin.Context, code int, result interface{}, total int, fields map[string]interface{}) {
+func (receiver *BaseController) OutputGetMulti(c *gin.Context, code int, result interface{}, total int, countBeforePagination int, fields map[string]interface{}) {
 	c.Header("Total", strconv.Itoa(total))
+	c.Header("Count-Before-Pagination", strconv.Itoa(countBeforePagination))
 	_, allFieldExists := fields["*"]
 	if (fields == nil) || ((len(fields) == 1) && allFieldExists) {
 		if _, ok := c.GetQuery("pretty"); ok {
@@ -450,10 +451,21 @@ func (receiver *BaseController) GetMulti(c *gin.Context) {
 		return
 	}
 
-	// reset conditions
+	// reset all conditions in order to get the total number of records
 	db = db.New()
+	total, err := receiver.model.GetCount(receiver.model, db)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
+		return
+	}
 
-	total, err := receiver.model.GetTotal(receiver.model, db)
+	// reset conditions except for limit and offset in order to get the record count before limitation
+	db = db.New()
+	db = parameter.SetPreloads(db)
+	db = parameter.SortRecords(db)
+	db = parameter.FilterFields(db)
+	countBeforePagination, err := receiver.model.GetCount(receiver.model, db)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
@@ -474,7 +486,7 @@ func (receiver *BaseController) GetMulti(c *gin.Context) {
 			receiver.outputHandler.OutputGetSingle(c, http.StatusOK, reflect.ValueOf(result).Index(0).Interface(), fields)
 		}
 	} else {
-		receiver.outputHandler.OutputGetMulti(c, http.StatusOK, result, total, fields)
+		receiver.outputHandler.OutputGetMulti(c, http.StatusOK, result, total, countBeforePagination, fields)
 	}
 }
 

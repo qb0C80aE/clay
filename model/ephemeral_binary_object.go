@@ -171,8 +171,8 @@ func (receiver *EphemeralBinaryObject) Delete(model extension.Model, db *gorm.DB
 	return nil
 }
 
-// GetTotal returns the count of for multi resource
-func (receiver *EphemeralBinaryObject) GetTotal(_ extension.Model, _ *gorm.DB) (int, error) {
+// GetCount returns the record count under current db conditions
+func (receiver *EphemeralBinaryObject) GetCount(_ extension.Model, _ *gorm.DB) (int, error) {
 	return len(nameEphemeralBinaryObjectMap), nil
 }
 
