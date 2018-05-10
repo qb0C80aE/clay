@@ -13,7 +13,6 @@ import (
 	"github.com/qb0C80aE/clay/util/conversion"
 	"github.com/qb0C80aE/clay/util/mapstruct"
 	"github.com/qb0C80aE/clay/util/network"
-	"net/http"
 	"net/url"
 	"reflect"
 	"regexp"
@@ -470,16 +469,7 @@ func (receiver *modelStore) Single(pathInterface interface{}, queryInterface int
 		}
 	}
 
-	query := queryInterface.(string)
-	URL := "/"
-	if query != "" {
-		URL = "/?" + query
-	}
-	requestForParameter, err := http.NewRequest(
-		http.MethodGet,
-		URL,
-		nil,
-	)
+	urlValues, err := url.ParseQuery(queryInterface.(string))
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
@@ -487,8 +477,7 @@ func (receiver *modelStore) Single(pathInterface interface{}, queryInterface int
 
 	model := controller.GetModel()
 
-	urlQuery := requestForParameter.URL.Query()
-	parameter, err := dbpkg.NewParameter(urlQuery)
+	parameter, err := dbpkg.NewParameter(urlValues)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
@@ -504,10 +493,10 @@ func (receiver *modelStore) Single(pathInterface interface{}, queryInterface int
 	}
 	db = parameter.SetPreloads(db)
 	db = parameter.FilterFields(db)
-	fields := helper.ParseFields(parameter.DefaultQuery(urlQuery, "fields", "*"))
+	fields := helper.ParseFields(parameter.DefaultQuery(urlValues, "fields", "*"))
 	queryFields := helper.QueryFields(model, fields)
 
-	result, err := model.GetSingle(model, db, parameters, requestForParameter.URL.Query(), queryFields)
+	result, err := model.GetSingle(model, db, parameters, urlValues, queryFields)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
@@ -543,21 +532,15 @@ func (receiver *modelStore) Multi(pathInterface interface{}, queryInterface inte
 		}
 	}
 
-	query := queryInterface.(string)
-	URL := "/"
-	if query != "" {
-		URL = "/?" + query
+	urlValues, err := url.ParseQuery(queryInterface.(string))
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
 	}
-	requestForParameter, err := http.NewRequest(
-		http.MethodGet,
-		URL,
-		nil,
-	)
 
 	model := controller.GetModel()
 
-	urlQuery := requestForParameter.URL.Query()
-	parameter, err := dbpkg.NewParameter(urlQuery)
+	parameter, err := dbpkg.NewParameter(urlValues)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
@@ -574,9 +557,9 @@ func (receiver *modelStore) Multi(pathInterface interface{}, queryInterface inte
 	db = parameter.SetPreloads(db)
 	db = parameter.SortRecords(db)
 	db = parameter.FilterFields(db)
-	fields := helper.ParseFields(parameter.DefaultQuery(urlQuery, "fields", "*"))
+	fields := helper.ParseFields(parameter.DefaultQuery(urlValues, "fields", "*"))
 	queryFields := helper.QueryFields(model, fields)
-	result, err := model.GetMulti(model, db, parameters, requestForParameter.URL.Query(), queryFields)
+	result, err := model.GetMulti(model, db, parameters, urlValues, queryFields)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
@@ -612,23 +595,20 @@ func (receiver *modelStore) First(pathInterface interface{}, queryInterface inte
 		}
 	}
 
-	query := queryInterface.(string)
-	URL := "/"
-	if query != "" {
-		URL = "/?" + query
-	}
-	requestForParameter, err := http.NewRequest(
-		http.MethodGet,
-		URL,
-		nil,
-	)
-	model, err := extension.GetAssociatedModelWithResourceName(resourceName)
+	urlValues, err := url.ParseQuery(queryInterface.(string))
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
-	urlQuery := requestForParameter.URL.Query()
-	parameter, err := dbpkg.NewParameter(urlQuery)
+
+	model, err := extension.GetAssociatedModelWithResourceName(resourceName)
+
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+
+	parameter, err := dbpkg.NewParameter(urlValues)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
@@ -645,9 +625,9 @@ func (receiver *modelStore) First(pathInterface interface{}, queryInterface inte
 	db = parameter.SetPreloads(db)
 	db = parameter.SortRecords(db)
 	db = parameter.FilterFields(db)
-	fields := helper.ParseFields(parameter.DefaultQuery(urlQuery, "fields", "*"))
+	fields := helper.ParseFields(parameter.DefaultQuery(urlValues, "fields", "*"))
 	queryFields := helper.QueryFields(model, fields)
-	result, err := model.GetMulti(model, db, parameters, requestForParameter.URL.Query(), queryFields)
+	result, err := model.GetMulti(model, db, parameters, urlValues, queryFields)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
