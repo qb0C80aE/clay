@@ -361,6 +361,10 @@ func (receiver *Base) DoAfterRouterSetup(_ *gin.Engine) error {
 	return nil
 }
 
+/*
+// This logic can not specify m2m records.
+// By using multiple gorm:primary_key for m2m association model, db.Delete deletes a record correctly using those keys,
+// So this logic should me simply replaced with db.Delete after getting to use multiple primary keys.
 func (receiver *Base) deleteMarkedItem(db *gorm.DB, itemValue reflect.Value) error {
 	model, err := extension.GetRegisteredModelByContainer(itemValue.Addr().Interface())
 	if err != nil {
@@ -403,6 +407,7 @@ func (receiver *Base) deleteMarkedItem(db *gorm.DB, itemValue reflect.Value) err
 
 	return nil
 }
+*/
 
 func (receiver *Base) deleteMarkedItemsInSlices(db *gorm.DB, data interface{}) error {
 	valueOfData := reflect.ValueOf(data)
@@ -449,7 +454,8 @@ func (receiver *Base) deleteMarkedItemsInSlices(db *gorm.DB, data interface{}) e
 				}
 
 				if toBeDeleted {
-					if err := receiver.deleteMarkedItem(db, itemValue); err != nil {
+					//if err := receiver.deleteMarkedItem(db, itemValue); err != nil {
+					if err := db.Delete(itemValue.Addr().Interface()).Error; err != nil {
 						logging.Logger().Debug(err.Error())
 						return err
 					}
@@ -471,7 +477,8 @@ func (receiver *Base) deleteMarkedItemsInSlices(db *gorm.DB, data interface{}) e
 			}
 
 			if toBeDeleted {
-				if err := receiver.deleteMarkedItem(db, fieldValue); err != nil {
+				// if err := receiver.deleteMarkedItem(db, fieldValue); err != nil {
+				if err := db.Delete(fieldValue.Addr().Interface()).Error; err != nil {
 					logging.Logger().Debug(err.Error())
 					return err
 				}
