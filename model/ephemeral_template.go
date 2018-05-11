@@ -19,7 +19,7 @@ var nameEphemeralTemplateMapMutex = new(sync.Mutex)
 // EphemeralTemplate is the model class what represents ephemeral template data which can exist at runtime only
 type EphemeralTemplate struct {
 	Base
-	Name            string `json:"name" yaml:"name" form:"name" gorm:"primary_key" clay:"key_parameter" validate:"required"`
+	Name            string `json:"name" yaml:"name" form:"name" gorm:"primary_key" validate:"required"`
 	TemplateContent string `json:"template_content" yaml:"template_content" form:"template_content" sql:"type:text"`
 	Description     string `json:"description" yaml:"description" form:"description" sql:"type:text"`
 }

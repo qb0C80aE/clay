@@ -19,7 +19,7 @@ var nameEphemeralBinaryObjectMapMutex = new(sync.Mutex)
 // EphemeralBinaryObject is the model class what represents ephemeral binary object data which can exist at runtime only
 type EphemeralBinaryObject struct {
 	Base
-	Name        string `json:"name" yaml:"name" form:"name" gorm:"primary_key" clay:"key_parameter" validate:"required"`
+	Name        string `json:"name" yaml:"name" form:"name" gorm:"primary_key" validate:"required"`
 	Content     []byte `json:"content" yaml:"content" form:"content"`
 	Description string `json:"description" yaml:"description" form:"description" sql:"type:text"`
 }

@@ -38,7 +38,7 @@ var typeNameTypeMap = map[string]reflect.Type{
 // UserDefinedModelDefinition is the model class what represents user defined model
 type UserDefinedModelDefinition struct {
 	Base
-	TypeName                    string                             `json:"type_name" yaml:"type_name" clay:"key_parameter" validate:"required"`
+	TypeName                    string                             `json:"type_name" yaml:"type_name" gorm:"primary_key" validate:"required"`
 	ResourceName                string                             `json:"resource_name" yaml:"resource_name" validate:"required"`
 	ToBeMigrated                bool                               `json:"to_be_migrated" yaml:"to_be_migrated"`
 	IsControllerEnabled         bool                               `json:"is_controller_enabled" yaml:"is_controller_enabled"`

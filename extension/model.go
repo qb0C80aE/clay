@@ -211,12 +211,12 @@ func RegisterModel(model Model) {
 
 		typeNameStructFieldList = append(typeNameStructFieldList, field)
 
-		tag, ok := field.Tag.Lookup("clay")
+		tag, ok := field.Tag.Lookup("gorm")
 		if ok {
 			tagStatementList := strings.Split(tag, ";")
 			for _, tagStatement := range tagStatementList {
 				switch tagStatement {
-				case "key_parameter":
+				case "primary_key":
 					typeNameDefaultModelKeyMap[modelTypeName] = ModelKey{
 						KeyParameter: jsonKey,
 						KeyField:     field.Name,

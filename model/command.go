@@ -27,7 +27,7 @@ const (
 // Command is the model class what represents command to execute something
 type Command struct {
 	Base
-	Name             string    `json:"name" yaml:"name" form:"name" clay:"key_parameter" validate:"required"`
+	Name             string    `json:"name" yaml:"name" form:"name" gorm:"primary_key" validate:"required"`
 	Description      string    `json:"description" yaml:"description" form:"description"`
 	WorkingDirectory string    `json:"working_directory" yaml:"working_directory" form:"working_directory"`
 	CommandLine      string    `json:"command_line" yaml:"command_line" form:"command_line" validate:"required"`

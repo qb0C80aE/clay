@@ -12,7 +12,7 @@ import (
 // EphemeralBinaryObjectRaw is the model class what represents ephemeral binary object raw
 type EphemeralBinaryObjectRaw struct {
 	Base
-	Name string `json:"name" yaml:"name" clay:"key_parameter"`
+	Name string `json:"name" yaml:"name" gorm:"primary_key"`
 }
 
 // NewEphemeralBinaryObjectRaw creates a ephemeral binary object raw model instance

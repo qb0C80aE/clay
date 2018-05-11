@@ -6,7 +6,7 @@
   "fields": [
     {
       "name": "SourcePortID",
-      "tag": "json:\"source_port_id\" yaml:\"source_port_id\" gorm:\"primary_key;\" sql:\"type:integer references ports(id)\" clay:\"key_parameter\"",
+      "tag": "json:\"source_port_id\" yaml:\"source_port_id\" gorm:\"primary_key\" sql:\"type:integer references ports(id)\"",
       "type_name": "int"
     },
     {
