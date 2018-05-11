@@ -17,7 +17,7 @@
     },
     {
       "name": "Node",
-      "tag": "json:\"node\" yaml:\"node\"",
+      "tag": "json:\"node\" yaml:\"node\" validate:\"omitempty,dive\"",
       "type_name": "Node"
     },
     {
@@ -27,12 +27,12 @@
     },
     {
       "name": "Address",
-      "tag": "json:\"address\" yaml:\"address\" gorm:\"not null\" validate:\"omitempty,ipv4\"",
+      "tag": "json:\"address\" yaml:\"address\" gorm:\"not null\" validate:\"ipv4\"",
       "type_name": "string"
     },
     {
       "name": "Prefix",
-      "tag": "json:\"prefix\" yaml:\"prefix\" validate:\"omitempty,min=1,max=32\"",
+      "tag": "json:\"prefix\" yaml:\"prefix\" validate:\"min=1,max=32\"",
       "type_name": "int"
     },
     {
@@ -42,7 +42,7 @@
     },
     {
       "name": "OutputPort",
-      "tag": "json:\"output_port\" yaml:\"output_port\" gorm:\"ForeignKey:OutputPortID\"",
+      "tag": "json:\"output_port\" yaml:\"output_port\" gorm:\"ForeignKey:OutputPortID\" validate:\"omitempty,dive\"",
       "type_name": "Port"
     },
     {
@@ -52,12 +52,12 @@
     },
     {
       "name": "GatewayPortIpv4Address",
-      "tag": "json:\"gateway_port_ipv4_address\" yaml:\"gateway_port_ipv4_address\" gorm:\"ForeignKey:GatewayPortIpv4AddressID\"",
+      "tag": "json:\"gateway_port_ipv4_address\" yaml:\"gateway_port_ipv4_address\" gorm:\"ForeignKey:GatewayPortIpv4AddressID\" validate:\"omitempty,dive\"",
       "type_name": "PortIpv4Address"
     },
     {
       "name": "ToBeDeleted",
-      "tag": "json:\"to_be_deleted,omitempty\" sql:\"-\"",
+      "tag": "json:\"to_be_deleted,omitempty\" yaml:\"to_be_deleted,omitempty\" sql:\"-\"",
       "type_name": "bool"
     }
   ],

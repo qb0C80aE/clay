@@ -12,7 +12,7 @@
     },
     {
       "name": "NodeGroup",
-      "tag": "json:\"node_group\" yaml:\"node_group\" gorm:\"ForeignKey:NodeGroupID\"",
+      "tag": "json:\"node_group\" yaml:\"node_group\" gorm:\"ForeignKey:NodeGroupID\" validate:\"omitempty,dive\"",
       "type_name": "NodeGroup"
     },
     {
@@ -22,7 +22,7 @@
     },
     {
       "name": "Node",
-      "tag": "json:\"node\" yaml:\"node\" gorm:\"ForeignKey:NodeID\"",
+      "tag": "json:\"node\" yaml:\"node\" gorm:\"ForeignKey:NodeID\" validate:\"omitempty,dive\"",
       "type_name": "Node"
     }
   ],
