@@ -21,7 +21,7 @@ type TemplateArgument struct {
 	Base
 	ID           int       `json:"id" yaml:"id" gorm:"primary_key;auto_increment"`
 	TemplateID   int       `json:"template_id" yaml:"template_id" gorm:"unique_index:template_id_name" sql:"type:integer references templates(id)"`
-	Template     *Template `json:"template" yaml:"template" gorm:"ForeignKey:TemplateID"`
+	Template     *Template `json:"template" yaml:"template" gorm:"ForeignKey:TemplateID" validate:"omitempty,dive"`
 	Name         string    `json:"name" yaml:"name" gorm:"unique_index:template_id_name" validate:"required"`
 	Description  string    `json:"description" yaml:"description" form:"description" sql:"type:text"`
 	Type         string    `json:"type" yaml:"type" validate:"oneof=int float bool string"`
