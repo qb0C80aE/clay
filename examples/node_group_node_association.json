@@ -7,7 +7,7 @@
   "fields": [
     {
       "name": "NodeGroupID",
-      "tag": "json:\"node_group_id\" yaml:\"node_group_id\" gorm:\"not null;unique_index:node_group_id_node_id\" sql:\"type:integer references node_groups(id)\" clay:\"many_to_many_left_resource_name=node_groups\"",
+      "tag": "json:\"node_group_id\" yaml:\"node_group_id\" gorm:\"primary_key\" sql:\"type:integer references node_groups(id)\" clay:\"many_to_many_left_resource_name=node_groups\"",
       "type_name": "int"
     },
     {
@@ -17,13 +17,18 @@
     },
     {
       "name": "NodeID",
-      "tag": "json:\"node_id\" yaml:\"node_id\" gorm:\"not null;unique_index:node_group_id_node_id\" sql:\"type:integer references nodes(id)\" clay:\"many_to_many_right_resource_name=nodes\"",
+      "tag": "json:\"node_id\" yaml:\"node_id\" gorm:\"primary_key\" sql:\"type:integer references nodes(id)\" clay:\"many_to_many_right_resource_name=nodes\"",
       "type_name": "int"
     },
     {
       "name": "Node",
       "tag": "json:\"node\" yaml:\"node\" gorm:\"ForeignKey:NodeID\" validate:\"omitempty,dive\"",
       "type_name": "Node"
+    },
+    {
+      "name": "ToBeDeleted",
+      "tag": "json:\"to_be_deleted,omitempty\" yaml:\"to_be_deleted,omitempty\" sql:\"-\"",
+      "type_name": "bool"
     }
   ],
   "sql_after_migration": [

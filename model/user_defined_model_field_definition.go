@@ -7,7 +7,7 @@ import (
 // UserDefinedModelFieldDefinition is the model class what represents user defined model field definition
 type UserDefinedModelFieldDefinition struct {
 	Base
-	Name     string `json:"name" yaml:"name" validate:"required"`
+	Name     string `json:"name" yaml:"name" gorm:"primary_key" validate:"required"`
 	Tag      string `json:"tag" yaml:"tag"`
 	TypeName string `json:"type_name" yaml:"type_name" validate:"required"`
 	IsSlice  bool   `json:"is_slice" yaml:"is_slice"`

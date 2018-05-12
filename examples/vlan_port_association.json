@@ -7,7 +7,7 @@
   "fields": [
     {
       "name": "VlanID",
-      "tag": "json:\"vlan_id\" yaml:\"vlan_id\" gorm:\"not null;unique_index:vlan_id_port_id\" sql:\"type:integer references vlans(id)\" clay:\"many_to_many_left_resource_name=vlans\"",
+      "tag": "json:\"vlan_id\" yaml:\"vlan_id\" gorm:\"primary_key\" sql:\"type:integer references vlans(id)\" clay:\"many_to_many_left_resource_name=vlans\"",
       "type_name": "int"
     },
     {
@@ -17,7 +17,7 @@
     },
     {
       "name": "PortID",
-      "tag": "json:\"port_id\" yaml:\"port_id\" gorm:\"not null;unique_index:vlan_id_port_id\" sql:\"type:integer references ports(id)\" clay:\"many_to_many_right_resource_name=ports\"",
+      "tag": "json:\"port_id\" yaml:\"port_id\" gorm:\"primary_key\" sql:\"type:integer references ports(id)\" clay:\"many_to_many_right_resource_name=ports\"",
       "type_name": "int"
     },
     {

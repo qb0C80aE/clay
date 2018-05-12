@@ -14,7 +14,7 @@ import (
 // EphemeralTemplateGeneration is the model class what represents ephemeral template generation
 type EphemeralTemplateGeneration struct {
 	Base
-	Name string `json:"name" yaml:"name" clay:"key_parameter"`
+	Name string `json:"name" yaml:"name" gorm:"primary_key"`
 }
 
 // NewEphemeralTemplateGeneration creates a ephemeral template generation model instance
