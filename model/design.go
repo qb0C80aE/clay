@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extension"
@@ -10,6 +11,12 @@ import (
 	"reflect"
 	"time"
 )
+
+type master struct {
+	Name string
+	SQL  string
+	Type string
+}
 
 // Design is the model class what represents the whole object model store
 type Design struct {
@@ -64,6 +71,20 @@ func (receiver *Design) GetSingle(_ extension.Model, db *gorm.DB, _ gin.Params, 
 
 // Update deletes and updates all models bases on the given data
 func (receiver *Design) Update(_ extension.Model, db *gorm.DB, _ gin.Params, _ url.Values, inputContainer interface{}) (interface{}, error) {
+	triggerList := []*master{}
+
+	if err := db.Table("sqlite_master").Where("type = ?", "trigger").Find(&triggerList).Error; err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+
+	for _, trigger := range triggerList {
+		if err := db.Exec(fmt.Sprintf("drop trigger %s", trigger.Name)).Error; err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
+	}
+
 	design := NewDesign()
 	if err := mapstruct.RemapToStruct(inputContainer, design); err != nil {
 		logging.Logger().Debug(err.Error())
@@ -92,14 +113,42 @@ func (receiver *Design) Update(_ extension.Model, db *gorm.DB, _ gin.Params, _ u
 		}
 	}
 
+	for _, trigger := range triggerList {
+		if err := db.Exec(trigger.SQL).Error; err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
+	}
+
 	return design, nil
 }
 
 // Delete deletes all models
 func (receiver *Design) Delete(_ extension.Model, db *gorm.DB, _ gin.Params, _ url.Values) error {
+	triggerList := []*master{}
+
+	if err := db.Table("sqlite_master").Where("type = ?", "trigger").Find(&triggerList).Error; err != nil {
+		logging.Logger().Debug(err.Error())
+		return err
+	}
+
+	for _, trigger := range triggerList {
+		if err := db.Exec(fmt.Sprintf("drop trigger %s", trigger.Name)).Error; err != nil {
+			logging.Logger().Debug(err.Error())
+			return err
+		}
+	}
+
 	designAccessors := extension.GetRegisteredDesignAccessorList()
 	for _, accessor := range designAccessors {
 		if err := accessor.DeleteFromDesign(accessor, db); err != nil {
+			logging.Logger().Debug(err.Error())
+			return err
+		}
+	}
+
+	for _, trigger := range triggerList {
+		if err := db.Exec(trigger.SQL).Error; err != nil {
 			logging.Logger().Debug(err.Error())
 			return err
 		}
