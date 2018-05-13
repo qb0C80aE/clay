@@ -9,23 +9,7 @@ import (
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
 	"github.com/spf13/cobra"
-	"strings"
 )
-
-func getEnvironmentalVariable(name string, defaultValue string) string {
-	value := strings.Trim(os.Getenv(name), " ")
-	if len(value) == 0 {
-		return defaultValue
-	}
-
-	return value
-}
-
-var clayConfigFilePath = getEnvironmentalVariable("CLAY_CONFIG_FILE_PATH", "(default)")
-var clayHost = getEnvironmentalVariable("CLAY_HOST", "(default)")
-var clayPort = getEnvironmentalVariable("CLAY_PORT", "(default)")
-var clayDBMode = getEnvironmentalVariable("CLAY_DB_MODE", "(default)")
-var clayDBFilePath = getEnvironmentalVariable("CLAY_DB_FILE_PATH", "(default)")
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -35,17 +19,25 @@ var rootCmd = &cobra.Command{
 By default, clay boots the system model store server.
 If you want to know what API endpoints clay has, send a GET request to the path '/' of the clay server.`,
 	Run: func(cmd *cobra.Command, args []string) {
+		defaultEnvironmentalVariableSet := extension.GetDefaultEnvironmentalVariableSet()
+		environmentalVariableSet := extension.GetCurrentEnvironmentalVariableSet()
+
 		logging.Logger().Debugf(`Environmental Variables:
-  CLAY_CONFIG_FILE_PATH   [Default: "./clay_config.json", Current: "%s"]
-  CLAY_HOST               [Default: "localhost"         , Current: "%s"]
-  CLAY_PORT               [Default: "8080"              , Current: "%s"]
-  CLAY_DB_MODE            [Default: "file"              , Current: "%s"]
-  CLAY_DB_FILE_PATH       [Default: "./clay.db"         , Current: "%s"]`,
-			clayConfigFilePath,
-			clayHost,
-			clayPort,
-			clayDBMode,
-			clayDBFilePath,
+  CLAY_CONFIG_FILE_PATH   [Default: %-21v Current: %v]
+  CLAY_HOST               [Default: %-21v Current: %v]
+  CLAY_PORT               [Default: %-21v Current: %v]
+  CLAY_DB_MODE            [Default: %-21v Current: %v]
+  CLAY_DB_FILE_PATH       [Default: %-21v Current: %v]`,
+			fmt.Sprintf(`"%s",`, defaultEnvironmentalVariableSet.GetClayConfigFilePath()),
+			fmt.Sprintf(`"%s"`, environmentalVariableSet.GetClayConfigFilePath()),
+			fmt.Sprintf(`"%s",`, defaultEnvironmentalVariableSet.GetClayHost()),
+			fmt.Sprintf(`"%s"`, environmentalVariableSet.GetClayHost()),
+			fmt.Sprintf(`"%s",`, defaultEnvironmentalVariableSet.GetClayPort()),
+			fmt.Sprintf(`"%s"`, environmentalVariableSet.GetClayPort()),
+			fmt.Sprintf(`"%s",`, defaultEnvironmentalVariableSet.GetClayDBMode()),
+			fmt.Sprintf(`"%s"`, environmentalVariableSet.GetClayDBMode()),
+			fmt.Sprintf(`"%s",`, defaultEnvironmentalVariableSet.GetClayDBFilePath()),
+			fmt.Sprintf(`"%s"`, environmentalVariableSet.GetClayDBFilePath()),
 		)
 		extension.GetRegisteredRuntime().Run()
 	},
@@ -63,16 +55,19 @@ func Execute() {
 func init() {
 	cobra.OnInitialize()
 
+	defaultEnvironmentalVariableSet := extension.GetDefaultEnvironmentalVariableSet()
+	environmentalVariableSet := extension.GetCurrentEnvironmentalVariableSet()
+
 	rootCmd.SetUsageTemplate(fmt.Sprintf(`Usage:{{if .Runnable}}
   {{.UseLine}}{{end}}{{if .HasAvailableSubCommands}}
   {{.CommandPath}} [command]{{end}}
 
 Environmental Variables:
-  CLAY_CONFIG_FILE_PATH   [Default: "./clay_config.json", Current: "%s"]
-  CLAY_HOST               [Default: "localhost"         , Current: "%s"]
-  CLAY_PORT               [Default: "8080"              , Current: "%s"]
-  CLAY_DB_MODE            [Default: "file"              , Current: "%s"]
-  CLAY_DB_FILE_PATH       [Default: "./clay.db"         , Current: "%s"]{{if gt (len .Aliases) 0}}
+  CLAY_CONFIG_FILE_PATH   [Default: %-21v Current: %v]
+  CLAY_HOST               [Default: %-21v Current: %v]
+  CLAY_PORT               [Default: %-21v Current: %v]
+  CLAY_DB_MODE            [Default: %-21v Current: %v]
+  CLAY_DB_FILE_PATH       [Default: %-21v Current: %v]{{if gt (len .Aliases) 0}}
 
 Aliases:
   {{.NameAndAliases}}{{end}}{{if .HasExample}}
@@ -94,11 +89,16 @@ Additional help topics:{{range .Commands}}{{if .IsAdditionalHelpTopicCommand}}
 
 Use "{{.CommandPath}} [command] --help" for more information about a command.{{end}}
 `,
-		clayConfigFilePath,
-		clayHost,
-		clayPort,
-		clayDBMode,
-		clayDBFilePath,
+		fmt.Sprintf(`"%s",`, defaultEnvironmentalVariableSet.GetClayConfigFilePath()),
+		fmt.Sprintf(`"%s"`, environmentalVariableSet.GetClayConfigFilePath()),
+		fmt.Sprintf(`"%s",`, defaultEnvironmentalVariableSet.GetClayHost()),
+		fmt.Sprintf(`"%s"`, environmentalVariableSet.GetClayHost()),
+		fmt.Sprintf(`"%s",`, defaultEnvironmentalVariableSet.GetClayPort()),
+		fmt.Sprintf(`"%s"`, environmentalVariableSet.GetClayPort()),
+		fmt.Sprintf(`"%s",`, defaultEnvironmentalVariableSet.GetClayDBMode()),
+		fmt.Sprintf(`"%s"`, environmentalVariableSet.GetClayDBMode()),
+		fmt.Sprintf(`"%s",`, defaultEnvironmentalVariableSet.GetClayDBFilePath()),
+		fmt.Sprintf(`"%s"`, environmentalVariableSet.GetClayDBFilePath()),
 	),
 	)
 }

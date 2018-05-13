@@ -16,7 +16,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"strconv"
 	"time"
 )
 
@@ -59,24 +58,15 @@ type clayConfigURLAlias struct {
 }
 
 func (receiver *clayRuntimeInitializer) initialize() {
-	configFilePath := os.Getenv("CLAY_CONFIG_FILE_PATH")
+	environmentalVariableSet := extension.GetCurrentEnvironmentalVariableSet()
+	configFilePath := environmentalVariableSet.GetClayConfigFilePath()
 
-	host := "localhost"
-	port := "8080"
-
-	if h := os.Getenv("CLAY_HOST"); h != "" {
-		host = h
-	}
-
-	if p := os.Getenv("CLAY_PORT"); p != "" {
-		if _, err := strconv.Atoi(p); err == nil {
-			port = p
-		}
-	}
+	host := environmentalVariableSet.GetClayHost()
+	port := environmentalVariableSet.GetClayPortInt()
 
 	maxRetry := 10
 	for i := 1; i <= maxRetry; i++ {
-		url := fmt.Sprintf("http://%s:%s", host, port)
+		url := fmt.Sprintf("http://%s:%d", host, port)
 		request, _ := http.NewRequest("GET", url, nil)
 		client := &http.Client{}
 		response, err := client.Do(request)
@@ -141,7 +131,7 @@ func (receiver *clayRuntimeInitializer) initialize() {
 	}
 }
 
-func (receiver *clayRuntimeInitializer) loadUserDefinedModels(config *clayConfig, host string, port string) error {
+func (receiver *clayRuntimeInitializer) loadUserDefinedModels(config *clayConfig, host string, port int) error {
 	for _, userDefinedModel := range config.UserDefinedModels {
 		filePath := filepath.Join(config.General.UserDefinedModelsDirectory, userDefinedModel.FileName)
 		jsonData, err := ioutil.ReadFile(filePath)
@@ -150,7 +140,7 @@ func (receiver *clayRuntimeInitializer) loadUserDefinedModels(config *clayConfig
 			return err
 		}
 
-		url := fmt.Sprintf("http://%s:%s/user_defined_model_definitions", host, port)
+		url := fmt.Sprintf("http://%s:%d/user_defined_model_definitions", host, port)
 		request, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
 		request.Header.Set("Content-Type", "application/json")
 
@@ -178,7 +168,7 @@ func (receiver *clayRuntimeInitializer) loadUserDefinedModels(config *clayConfig
 	return nil
 }
 
-func (receiver *clayRuntimeInitializer) loadEphemeralTemplates(config *clayConfig, host string, port string) error {
+func (receiver *clayRuntimeInitializer) loadEphemeralTemplates(config *clayConfig, host string, port int) error {
 	for _, ephemeralTemplate := range config.EphemeralTemplates {
 		filePath := filepath.Join(config.General.EphemeralTemplatesDirectory, ephemeralTemplate.FileName)
 		data, err := ioutil.ReadFile(filePath)
@@ -197,7 +187,7 @@ func (receiver *clayRuntimeInitializer) loadEphemeralTemplates(config *clayConfi
 			return err
 		}
 
-		url := fmt.Sprintf("http://%s:%s/ephemeral_templates", host, port)
+		url := fmt.Sprintf("http://%s:%d/ephemeral_templates", host, port)
 		request, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
 		request.Header.Set("Content-Type", "application/json")
 
@@ -224,7 +214,7 @@ func (receiver *clayRuntimeInitializer) loadEphemeralTemplates(config *clayConfi
 	return nil
 }
 
-func (receiver *clayRuntimeInitializer) loadEphemeralBinaryObjects(config *clayConfig, host string, port string) error {
+func (receiver *clayRuntimeInitializer) loadEphemeralBinaryObjects(config *clayConfig, host string, port int) error {
 	for _, ephemeralBinaryObject := range config.EphemeralBinaryObjects {
 		filePath := filepath.Join(config.General.EphemeralBinaryObjectsDirectory, ephemeralBinaryObject.FileName)
 
@@ -265,7 +255,7 @@ func (receiver *clayRuntimeInitializer) loadEphemeralBinaryObjects(config *clayC
 			return err
 		}
 
-		url := fmt.Sprintf("http://%s:%s/ephemeral_binary_objects", host, port)
+		url := fmt.Sprintf("http://%s:%d/ephemeral_binary_objects", host, port)
 		request, err := http.NewRequest("POST", url, &bytesBuffer)
 		request.Header.Set("Content-Type", multipartWriter.FormDataContentType())
 
@@ -292,7 +282,7 @@ func (receiver *clayRuntimeInitializer) loadEphemeralBinaryObjects(config *clayC
 	return nil
 }
 
-func (receiver *clayRuntimeInitializer) loadURLAliases(config *clayConfig, host string, port string) error {
+func (receiver *clayRuntimeInitializer) loadURLAliases(config *clayConfig, host string, port int) error {
 	for _, urlAliasDefinition := range config.URLAliases {
 		urlAliasDefinitionModel := model.NewURLAliasDefinition()
 		urlAliasDefinitionModel.Name = urlAliasDefinition.Name
@@ -306,7 +296,7 @@ func (receiver *clayRuntimeInitializer) loadURLAliases(config *clayConfig, host 
 			return err
 		}
 
-		url := fmt.Sprintf("http://%s:%s/url_alias_definitions", host, port)
+		url := fmt.Sprintf("http://%s:%d/url_alias_definitions", host, port)
 		request, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
 		request.Header.Set("Content-Type", "application/json")
 

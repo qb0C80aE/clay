@@ -1,7 +1,6 @@
 package db
 
 import (
-	"os"
 	"strings"
 
 	"fmt"
@@ -39,19 +38,21 @@ func defaultTableNameHandler(db *gorm.DB, defaultTableName string) string {
 
 // Connect connects to its database and returns the instance
 func Connect(dbMode string) (*gorm.DB, error) {
+	environmentalVariableSet := extension.GetCurrentEnvironmentalVariableSet()
+	defaultEnvironmentalVariableSet := extension.GetDefaultEnvironmentalVariableSet()
 	var dbPath string
 	switch dbMode {
 	case "memory":
 		dbPath = ":memory:"
 	case "", "file":
-		if dbFilePath := os.Getenv("CLAY_DB_FILE_PATH"); dbFilePath != "" {
-			dbPath = dbFilePath
+		if environmentalVariableSet.GetClayDBFilePath() != "" {
+			dbPath = environmentalVariableSet.GetClayDBFilePath()
 		} else {
-			dbPath = "clay.db"
+			dbPath = defaultEnvironmentalVariableSet.GetClayDBFilePath()
 		}
 	default:
-		logging.Logger().Criticalf("invalid CLAY_DB_FILE_PATH '%s'", dbMode)
-		return nil, fmt.Errorf("invalid CLAY_DB_FILE_PATH '%s'", dbMode)
+		logging.Logger().Criticalf("invalid db mode '%s'", dbMode)
+		return nil, fmt.Errorf("invalid mode'%s'", dbMode)
 	}
 
 	db, err := gorm.Open("sqlite3", dbPath)
