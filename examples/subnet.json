@@ -48,8 +48,8 @@
   ],
   "sql_after_migration": [
     "create trigger if not exists DeleteSubnetBeforeVlanDeletion before delete on vlans",
-    "begin",
-    "  delete from subnets where vlan_id = old.id;",
-    "end;"
+    "  begin",
+    "    delete from subnets where vlan_id = old.id;",
+    "  end;"
   ]
 }
