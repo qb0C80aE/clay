@@ -61,10 +61,11 @@ func (receiver *EphemeralTemplateGeneration) GetSingle(model extension.Model, db
 		ModelStore: &modelStore{
 			db: db,
 		},
-		Core:      &coreUtil{},
-		Network:   &networkUtil{},
-		Parameter: map[interface{}]interface{}{},
-		Query:     urlValues,
+		Core:               &coreUtil{},
+		Network:            &networkUtil{},
+		Parameter:          map[interface{}]interface{}{},
+		Query:              urlValues,
+		ProgramInformation: extension.GetRegisteredProgramInformation(),
 	}
 
 	var doc bytes.Buffer

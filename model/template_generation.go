@@ -26,11 +26,12 @@ import (
 var parameterRegexp = regexp.MustCompile("p\\[(.+)\\]")
 
 type templateParameter struct {
-	ModelStore *modelStore
-	Core       *coreUtil
-	Network    *networkUtil
-	Parameter  map[interface{}]interface{}
-	Query      url.Values
+	ModelStore         *modelStore
+	Core               *coreUtil
+	Network            *networkUtil
+	Parameter          map[interface{}]interface{}
+	Query              url.Values
+	ProgramInformation extension.ProgramInformation
 }
 
 type modelStore struct {
@@ -202,10 +203,11 @@ func (receiver *TemplateGeneration) GenerateTemplate(db *gorm.DB, parameters gin
 		ModelStore: &modelStore{
 			db: db,
 		},
-		Core:      &coreUtil{},
-		Network:   &networkUtil{},
-		Parameter: templateParameterMap,
-		Query:     urlValues,
+		Core:               &coreUtil{},
+		Network:            &networkUtil{},
+		Parameter:          templateParameterMap,
+		Query:              urlValues,
+		ProgramInformation: extension.GetRegisteredProgramInformation(),
 	}
 
 	var doc bytes.Buffer
