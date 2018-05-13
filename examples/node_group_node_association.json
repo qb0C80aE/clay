@@ -32,10 +32,12 @@
     }
   ],
   "sql_after_migration": [
+    "drop trigger if exists DeleteNodeGroupNodeAssociationBeforeNodeGroupDeletion;",
     "create trigger if not exists DeleteNodeGroupNodeAssociationBeforeNodeGroupDeletion before delete on node_groups",
     "  begin",
     "    delete from node_group_node_associations where node_group_id = old.id;",
     "  end;",
+    "drop trigger if exists DeleteNodeGroupNodeAssociationBeforeNodeDeletion;",
     "create trigger if not exists DeleteNodeGroupNodeAssociationBeforeNodeDeletion before delete on nodes",
     "  begin",
     "    delete from node_group_node_associations where node_id = old.id;",

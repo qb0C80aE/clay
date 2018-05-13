@@ -62,14 +62,17 @@
     }
   ],
   "sql_after_migration": [
+    "drop trigger if exists DeleteNodeRouteBeforeNodeDeletion;",
     "create trigger if not exists DeleteNodeRouteBeforeNodeDeletion before delete on nodes",
     "  begin",
     "    delete from node_routes where node_id = old.id;",
     "  end;",
+    "drop trigger if exists UpdateNodeRouteBeforePortDeletion;",
     "create trigger if not exists UpdateNodeRouteBeforePortDeletion before delete on ports",
     "  begin",
     "    update node_routes set output_port_id = null where output_port_id = old.id;",
     "  end;",
+    "drop trigger if exists UpdateNodeRouteBeforePortIpv4AddressDeletion;",
     "create trigger if not exists UpdateNodeRouteBeforePortIpv4AddressDeletion before delete on port_ipv4_addresses",
     "  begin",
     "    update node_routes set gateway_port_ipv4_address_id = null where gateway_port_ipv4_address_id = old.id;",
