@@ -74,6 +74,7 @@
     }
   ],
   "sql_after_migration": [
+    "drop trigger if exists DeletePortBeforeNodeDeletion;",
     "create trigger if not exists DeletePortBeforeNodeDeletion before delete on nodes",
     "  begin",
     "    delete from ports where node_id = old.id;",

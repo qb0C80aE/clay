@@ -32,10 +32,12 @@
     }
   ],
   "sql_after_migration": [
+    "drop trigger if exists DeletePortGroupPortAssociationBeforePortGroupDeletion;",
     "create trigger if not exists DeletePortGroupPortAssociationBeforePortGroupDeletion before delete on port_groups",
     "  begin",
     "    delete from port_group_port_associations where port_group_id = old.id;",
     "  end;",
+    "drop trigger if exists DeletePortGroupPortAssociationBeforePortDeletion;",
     "create trigger if not exists DeletePortGroupPortAssociationBeforePortDeletion before delete on ports",
     "  begin",
     "    delete from port_group_port_associations where port_id = old.id;",
