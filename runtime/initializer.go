@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"github.com/qb0C80aE/clay/asset"
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
 	"github.com/qb0C80aE/clay/model"
@@ -57,6 +58,63 @@ type clayConfigURLAlias struct {
 	Query string `json:"query"`
 }
 
+func (receiver *clayRuntimeInitializer) readFile(filePath string) ([]byte, error) {
+	environmentalVariableSet := extension.GetCurrentEnvironmentalVariableSet()
+	switch environmentalVariableSet.GetClayAssetMode() {
+	case "internal":
+		file, err := asset.Assets.Open(filePath)
+		if err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
+		defer file.Close()
+
+		return ioutil.ReadAll(file)
+	case "external":
+		return ioutil.ReadFile(filePath)
+	}
+
+	logging.Logger().Debugf("invalid asset mode %s", environmentalVariableSet.GetClayAssetMode())
+	return nil, fmt.Errorf("invalid asset mode %s", environmentalVariableSet.GetClayAssetMode())
+}
+
+func (receiver *clayRuntimeInitializer) copyFromFile(writer io.Writer, filePath string) error {
+	environmentalVariableSet := extension.GetCurrentEnvironmentalVariableSet()
+	switch environmentalVariableSet.GetClayAssetMode() {
+	case "internal":
+		file, err := asset.Assets.Open(filePath)
+		if err != nil {
+			logging.Logger().Debug(err.Error())
+			return err
+		}
+		defer file.Close()
+
+		if _, err = io.Copy(writer, file); err != nil {
+			logging.Logger().Critical(err.Error())
+			return err
+		}
+
+		return nil
+	case "external":
+		file, err := os.Open(filePath)
+		if err != nil {
+			logging.Logger().Critical(err.Error())
+			return err
+		}
+		defer file.Close()
+
+		if _, err = io.Copy(writer, file); err != nil {
+			logging.Logger().Critical(err.Error())
+			return err
+		}
+
+		return nil
+	}
+
+	logging.Logger().Debugf("invalid asset mode %s", environmentalVariableSet.GetClayAssetMode())
+	return fmt.Errorf("invalid asset mode %s", environmentalVariableSet.GetClayAssetMode())
+}
+
 func (receiver *clayRuntimeInitializer) initialize() {
 	environmentalVariableSet := extension.GetCurrentEnvironmentalVariableSet()
 	configFilePath := environmentalVariableSet.GetClayConfigFilePath()
@@ -98,7 +156,7 @@ func (receiver *clayRuntimeInitializer) initialize() {
 		configFilePath = path.Join(dir, "clay_config.json")
 	}
 
-	configJSONData, err := ioutil.ReadFile(configFilePath)
+	configJSONData, err := receiver.readFile(configFilePath)
 	if err != nil {
 		logging.Logger().Debugf("cloud not load %s, just boot up without initial configuration", configFilePath)
 		return
@@ -134,7 +192,7 @@ func (receiver *clayRuntimeInitializer) initialize() {
 func (receiver *clayRuntimeInitializer) loadUserDefinedModels(config *clayConfig, host string, port int) error {
 	for _, userDefinedModel := range config.UserDefinedModels {
 		filePath := filepath.Join(config.General.UserDefinedModelsDirectory, userDefinedModel.FileName)
-		jsonData, err := ioutil.ReadFile(filePath)
+		jsonData, err := receiver.readFile(filePath)
 		if err != nil {
 			logging.Logger().Critical(err.Error())
 			return err
@@ -171,7 +229,7 @@ func (receiver *clayRuntimeInitializer) loadUserDefinedModels(config *clayConfig
 func (receiver *clayRuntimeInitializer) loadEphemeralTemplates(config *clayConfig, host string, port int) error {
 	for _, ephemeralTemplate := range config.EphemeralTemplates {
 		filePath := filepath.Join(config.General.EphemeralTemplatesDirectory, ephemeralTemplate.FileName)
-		data, err := ioutil.ReadFile(filePath)
+		data, err := receiver.readFile(filePath)
 		if err != nil {
 			logging.Logger().Critical(err.Error())
 			return err
@@ -238,14 +296,7 @@ func (receiver *clayRuntimeInitializer) loadEphemeralBinaryObjects(config *clayC
 			return err
 		}
 
-		file, err := os.Open(filePath)
-		if err != nil {
-			logging.Logger().Critical(err.Error())
-			return err
-		}
-		defer file.Close()
-
-		if _, err = io.Copy(contentWriter, file); err != nil {
+		if err := receiver.copyFromFile(contentWriter, filePath); err != nil {
 			logging.Logger().Critical(err.Error())
 			return err
 		}

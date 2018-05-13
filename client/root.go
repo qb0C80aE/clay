@@ -27,7 +27,8 @@ If you want to know what API endpoints clay has, send a GET request to the path 
   CLAY_HOST               [Default: %-21v Current: %v]
   CLAY_PORT               [Default: %-21v Current: %v]
   CLAY_DB_MODE            [Default: %-21v Current: %v]
-  CLAY_DB_FILE_PATH       [Default: %-21v Current: %v]`,
+  CLAY_DB_FILE_PATH       [Default: %-21v Current: %v]
+  CLAY_ASSET_MODE         [Default: %-21v Current: %v]`,
 			fmt.Sprintf(`"%s",`, defaultEnvironmentalVariableSet.GetClayConfigFilePath()),
 			fmt.Sprintf(`"%s"`, environmentalVariableSet.GetClayConfigFilePath()),
 			fmt.Sprintf(`"%s",`, defaultEnvironmentalVariableSet.GetClayHost()),
@@ -38,6 +39,8 @@ If you want to know what API endpoints clay has, send a GET request to the path 
 			fmt.Sprintf(`"%s"`, environmentalVariableSet.GetClayDBMode()),
 			fmt.Sprintf(`"%s",`, defaultEnvironmentalVariableSet.GetClayDBFilePath()),
 			fmt.Sprintf(`"%s"`, environmentalVariableSet.GetClayDBFilePath()),
+			fmt.Sprintf(`"%s",`, defaultEnvironmentalVariableSet.GetClayAssetMode()),
+			fmt.Sprintf(`"%s"`, environmentalVariableSet.GetClayAssetMode()),
 		)
 		extension.GetRegisteredRuntime().Run()
 	},
@@ -67,7 +70,8 @@ Environmental Variables:
   CLAY_HOST               [Default: %-21v Current: %v]
   CLAY_PORT               [Default: %-21v Current: %v]
   CLAY_DB_MODE            [Default: %-21v Current: %v]
-  CLAY_DB_FILE_PATH       [Default: %-21v Current: %v]{{if gt (len .Aliases) 0}}
+  CLAY_DB_FILE_PATH       [Default: %-21v Current: %v]
+  CLAY_ASSET_MODE         [Default: %-21v Current: %v]{{if gt (len .Aliases) 0}}
 
 Aliases:
   {{.NameAndAliases}}{{end}}{{if .HasExample}}
@@ -99,6 +103,8 @@ Use "{{.CommandPath}} [command] --help" for more information about a command.{{e
 		fmt.Sprintf(`"%s"`, environmentalVariableSet.GetClayDBMode()),
 		fmt.Sprintf(`"%s",`, defaultEnvironmentalVariableSet.GetClayDBFilePath()),
 		fmt.Sprintf(`"%s"`, environmentalVariableSet.GetClayDBFilePath()),
+		fmt.Sprintf(`"%s",`, defaultEnvironmentalVariableSet.GetClayAssetMode()),
+		fmt.Sprintf(`"%s"`, environmentalVariableSet.GetClayAssetMode()),
 	),
 	)
 }
