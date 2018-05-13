@@ -24,8 +24,25 @@ func GetRegisteredRuntime() Runtime {
 	return registeredRuntime
 }
 
-// EnvironmentalVariableSet contains variable environments used in Clay
-type EnvironmentalVariableSet struct {
+// EnvironmentalVariableSet is the interface what handles variable environments used in Clay
+// * GetClayConfigFilePath returns CLAY_CONFIG_FILE_PATH
+// * GetClayHost returns CLAY_HOST
+// * GetClayPort returns CLAY_PORT
+// * GetClayPortInt returns CLAY_PORT as interger
+// * GetClayDBMode returns CLAY_DB_MODE
+// * GetClayDBFilePath returns CLAY_DB_FILE_PATH
+// * GetClayAssetMode returns CLAY_ASSET_MODE
+type EnvironmentalVariableSet interface {
+	GetClayConfigFilePath() string
+	GetClayHost() string
+	GetClayPort() string
+	GetClayPortInt() int
+	GetClayDBMode() string
+	GetClayDBFilePath() string
+	GetClayAssetMode() string
+}
+
+type environmentalVariableSet struct {
 	clayConfigFilePath string
 	clayHost           string
 	clayPort           string
@@ -43,27 +60,25 @@ func getEnvironmentalVariable(name string, defaultValue string) string {
 	return value
 }
 
-var defaultEnvironmentVariableSet = EnvironmentalVariableSet{
-	clayConfigFilePath: "./clay_config.json",
-	clayHost:           "localhost",
-	clayPort:           "8080",
-	clayDBMode:         "file",
-	clayDBFilePath:     "./clay.db",
-	clayAssetMode:      "external",
-}
+var defaultEnvironmentalVariableSet EnvironmentalVariableSet
+var currentEnvironmentalVariableSet EnvironmentalVariableSet
 
-var currentEnvironmentalVariableSet = EnvironmentalVariableSet{
-	clayConfigFilePath: getEnvironmentalVariable("CLAY_CONFIG_FILE_PATH", defaultEnvironmentVariableSet.clayConfigFilePath),
-	clayHost:           getEnvironmentalVariable("CLAY_HOST", defaultEnvironmentVariableSet.clayHost),
-	clayPort:           getEnvironmentalVariable("CLAY_PORT", defaultEnvironmentVariableSet.clayPort),
-	clayDBMode:         getEnvironmentalVariable("CLAY_DB_MODE", defaultEnvironmentVariableSet.clayDBMode),
-	clayDBFilePath:     getEnvironmentalVariable("CLAY_DB_FILE_PATH", defaultEnvironmentVariableSet.clayDBFilePath),
-	clayAssetMode:      getEnvironmentalVariable("CLAY_ASSET_MODE", defaultEnvironmentVariableSet.clayAssetMode),
+// RegisterDefaultEnvironmentalVariableSet registers default environmental variable set, and create current environmental variable set
+func RegisterDefaultEnvironmentalVariableSet(newEnvironmentalVariableSet EnvironmentalVariableSet) {
+	defaultEnvironmentalVariableSet = newEnvironmentalVariableSet
+	currentEnvironmentalVariableSet = &environmentalVariableSet{
+		clayConfigFilePath: getEnvironmentalVariable("CLAY_CONFIG_FILE_PATH", defaultEnvironmentalVariableSet.GetClayConfigFilePath()),
+		clayHost:           getEnvironmentalVariable("CLAY_HOST", defaultEnvironmentalVariableSet.GetClayHost()),
+		clayPort:           getEnvironmentalVariable("CLAY_PORT", defaultEnvironmentalVariableSet.GetClayPort()),
+		clayDBMode:         getEnvironmentalVariable("CLAY_DB_MODE", defaultEnvironmentalVariableSet.GetClayDBMode()),
+		clayDBFilePath:     getEnvironmentalVariable("CLAY_DB_FILE_PATH", defaultEnvironmentalVariableSet.GetClayDBFilePath()),
+		clayAssetMode:      getEnvironmentalVariable("CLAY_ASSET_MODE", defaultEnvironmentalVariableSet.GetClayAssetMode()),
+	}
 }
 
 // GetDefaultEnvironmentalVariableSet returns default environmental variable set
 func GetDefaultEnvironmentalVariableSet() EnvironmentalVariableSet {
-	return defaultEnvironmentVariableSet
+	return defaultEnvironmentalVariableSet
 }
 
 // GetCurrentEnvironmentalVariableSet returns CLAY_CONFIG_FILE_PATH
@@ -71,42 +86,35 @@ func GetCurrentEnvironmentalVariableSet() EnvironmentalVariableSet {
 	return currentEnvironmentalVariableSet
 }
 
-// GetClayConfigFilePath returns CLAY_CONFIG_FILE_PATH
-func (receiver *EnvironmentalVariableSet) GetClayConfigFilePath() string {
+func (receiver *environmentalVariableSet) GetClayConfigFilePath() string {
 	return receiver.clayConfigFilePath
 }
 
-// GetClayHost returns CLAY_HOST
-func (receiver *EnvironmentalVariableSet) GetClayHost() string {
+func (receiver *environmentalVariableSet) GetClayHost() string {
 	return receiver.clayHost
 }
 
-// GetClayPort returns CLAY_POTY
-func (receiver *EnvironmentalVariableSet) GetClayPort() string {
+func (receiver *environmentalVariableSet) GetClayPort() string {
 	return receiver.clayPort
 }
 
-// GetClayPortInt returns CLAY_POTY as interger
-func (receiver *EnvironmentalVariableSet) GetClayPortInt() int {
+func (receiver *environmentalVariableSet) GetClayPortInt() int {
 	port, err := strconv.Atoi(receiver.clayPort)
 	if err != nil {
-		port, _ = strconv.Atoi(defaultEnvironmentVariableSet.clayPort)
+		port, _ = strconv.Atoi(receiver.clayPort)
 	}
 
 	return port
 }
 
-// GetClayDBMode returns CLAY_DB_MODE
-func (receiver *EnvironmentalVariableSet) GetClayDBMode() string {
+func (receiver *environmentalVariableSet) GetClayDBMode() string {
 	return receiver.clayDBMode
 }
 
-// GetClayDBFilePath returns CLAY_DB_FILE_PATH
-func (receiver *EnvironmentalVariableSet) GetClayDBFilePath() string {
+func (receiver *environmentalVariableSet) GetClayDBFilePath() string {
 	return receiver.clayDBFilePath
 }
 
-// GetClayAssetMode returns CLAY_ASSET_MODE
-func (receiver *EnvironmentalVariableSet) GetClayAssetMode() string {
+func (receiver *environmentalVariableSet) GetClayAssetMode() string {
 	return receiver.clayAssetMode
 }
