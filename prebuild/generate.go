@@ -1,5 +1,9 @@
 // +build prebuild
-// execute '[CLAY_...=...] go generate -tags=prebuild prebuild/generate.go' or 'go generate -tags=prebuild ./...' or '[CLAY_...=...] go generate -tags=prebuild prebuild/...' to generate build_information.go manually
+// execute '[BUILD_ASSET=true|false] [BUILD_ASSET_SOURCE=...] [CLAY_...=...] go generate -tags=prebuild prebuild/generate.go' or '[BUILD_ASSET=true|false] [BUILD_ASSET_SOURCE=...] [CLAY_...=...] go generate -tags=prebuild ./...' or '[BUILD_ASSET=true|false] [BUILD_ASSET_SOURCE=...] [CLAY_...=...] go generate -tags=prebuild prebuild/...' to generate build_information.go manually
+// ex.internal asset mode:
+// CLAY_ASSET_MODE=internal BUILD_ASSET=true BUILD_ASSET_SOURCE=../examples/api_and_gui go generate -tags=prebuild prebuild/generate.go
+// ex.external asset mode (default):
+// go generate -tags=prebuild prebuild/generate.go
 
 package main
 
@@ -10,6 +14,7 @@ import (
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"text/template"
 	"time"
@@ -109,4 +114,13 @@ func main() {
 		ClayDBFilePath:     environmentalVariable.GetClayDBFilePath(),
 		ClayAssetMode:      environmentalVariable.GetClayAssetMode(),
 	})
+
+	if os.Getenv("BUILD_ASSET") == "true" {
+		output, err := exec.Command("go-assets-builder", "-p", "asset", "-o", "../asset/asset.go", os.Getenv("BUILD_ASSET_SOURCE"), "-s", "/").CombinedOutput()
+		fmt.Println(string(output))
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+	}
 }
