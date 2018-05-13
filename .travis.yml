@@ -22,7 +22,7 @@ script:
   - dep ensure
   - (result="`find . -type d -name vendor -prune -o -type f -name '*.go' -exec golint {} \;`"; if [ ! -z "${result}" ]; then echo "${result}"; exit 1; fi)
   - go vet -tags="`echo ${TAGS[@]}`" ./...
-  - cp buildtime/build_information.go /tmp
+  - cp buildtime/buildtime.go /tmp
   - go generate -tags=prebuild ./...
   - |
     for tag in ${TAGS[@]}; do
@@ -30,6 +30,6 @@ script:
       go build -v -tags=${tag} ./...
     done
   - go build -v
-  - cp /tmp/build_information.go buildtime/build_information.go
+  - cp /tmp/buildtime.go buildtime/buildtime.go
   - go test -tags=integration -v -race ./...
 
