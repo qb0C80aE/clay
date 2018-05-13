@@ -146,7 +146,7 @@ var clientCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(clientCmd)
+	rootCmd.AddCommand(clientCmd)
 	clientCmd.PersistentFlags().StringP("output", "o", "", "Filename to output retrieved resource data")
 	clientCmd.PersistentFlags().BoolP("verbose", "v", false, "Display status code")
 }
