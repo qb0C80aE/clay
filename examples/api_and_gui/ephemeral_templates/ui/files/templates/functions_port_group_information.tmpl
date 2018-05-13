@@ -1,0 +1,197 @@
+{{/* <script> */}}
+
+var storedCallbackPortGroupInformationUpdated = null;
+
+function showPortGroupInformation(portGroupID, callbackPortGroupInformationUpdated) {
+  storedCallbackPortGroupInformationUpdated = callbackPortGroupInformationUpdated;
+
+  if (portGroupID == null) {
+    var portGroup = {
+      name: '',
+      description: '',
+      port_group_port_associations: []
+    };
+    repaintPortGroupInformation(portGroup, true);
+  } else {
+    getResource('port_groups', portGroupID, 'preloads=port_group_port_associations.port.node', function(portGroup) {
+      repaintPortGroupInformation(portGroup, true);
+    });
+  }
+}
+
+function repaintPortGroupInformation(portGroup, initializeTabSelection) {
+  $('#port_group_information_float_panel #port_group_members_tab div[name=deleted_port_group_members]').children().remove();
+
+  var port_group_information_table = $('#port_group_information_float_panel #port_group_information_tab #port_group_information_table');
+
+  port_group_information_table.find('input[name=id]').val(portGroup.id);
+  port_group_information_table.find('input[name=name]').val(portGroup.name);
+  port_group_information_table.find('input[name=description]').val(portGroup.description);
+
+  if (initializeTabSelection) {
+    $('#port_group_information_float_panel a[href="#port_group_information_tab"]').tab('show');
+  }
+  $('#port_group_information_float_panel').fadeIn(50);
+
+  $('#port_group_information_float_panel #port_group_members_tab #port_group_members_table').DataTable({
+    sDom: '<"row"<"col-sm-5"l><"col-sm-6 right"f>>tip',
+    order: [[1, 'asc']],
+    scrollX: true,
+    paginate: true,
+    destroy: true,
+    data: portGroup.port_group_port_associations,
+    columns: [
+      {title: '', sortable: false, render: function (data, type, full, meta) {
+          return createButtonElement('delete_port_group_member_btn', 'btn btn-default', 'glyphicon glyphicon-minus', '').outerHTML;
+        }
+      },
+      {title: 'Port', data: 'port', defaultContent: '', sortable: false, render: function (data, type, full, meta) {
+          var options = [];
+          var value = null;
+          if ((data != null) && (data != undefined)) {
+            var text = '';
+            if ((data.node != null) && (data.node != undefined)) {
+              text = data.node.name + '.' + data.name;
+            }
+            options = [{id: data.id, name: text}];
+            value = data.id;
+          }
+          return createSelectElement('port_group_member_port_id', 'in-table', '', options, value).outerHTML;
+        }
+      }
+    ],
+    drawCallback: function(settings) {
+      $('#port_group_information_float_panel #port_group_members_tab #port_group_members_table select[name=port_group_member_port_id]').select2({
+        minimumInputLength: 1,
+        ajax: {
+          url:'/ui/select2',
+          dataType: 'json',
+          delay: 50,
+          data: function(params) {
+            return { 'resource_name': 'port_select2', 'terms_order': 'node_name,name', 'terms': params.term, 'limit': 10 };
+          }
+        },
+        width: '256px',
+        placeholder: 'None',
+      });
+    }
+  });
+
+  $('#page_cover').fadeIn(50);
+}
+
+$('#port_group_information_float_panel a[data-toggle=tab]').on('shown.bs.tab', function(e) {
+  $('#port_group_information_float_panel #port_group_members_tab #port_group_members_table').DataTable().draw();
+})
+
+$('#port_group_information_float_panel #port_group_members_tab').on('click', 'button[name=add_port_group_member_btn]', function() {
+  var data = {
+    id: null,
+    port: {
+      port_group_id: null,
+      port_id: null,
+    }
+  };
+  $('#port_group_information_float_panel #port_group_members_tab #port_group_members_table').DataTable().row.add(data).draw();
+  $('#port_group_information_float_panel #port_group_members_tab #port_group_members_table').DataTable().draw();
+});
+
+$('#port_group_information_float_panel #port_group_members_tab #port_group_members_table').on('click', 'button[name=delete_port_group_member_btn]', function() {
+  var tr = $(this).closest('tr');
+  var deletedMemberPortID = tr.find('select[name=port_group_member_port_id]').val();
+  if ((deletedMemberPortID != null) && (deletedMemberPortID != undefined) && (deletedMemberPortID != '') && (deletedMemberPortID != 0)) {
+    $('#port_group_information_float_panel #port_group_members_tab div[name=deleted_port_group_members]').append(createHiddenElement('deleted', deletedMemberPortID));
+  }
+  $('#port_group_information_float_panel #port_group_members_tab #port_group_members_table').DataTable().row(tr).remove().draw();
+});
+
+$('#port_group_information_panel').on('click', 'button[name=cancel_port_group_btn]', function() {
+  $('#port_group_information_float_panel').fadeOut(50, function() {
+    $('#page_cover').fadeOut(50);
+  });
+});
+
+$('#port_group_information_panel').on('click', 'button[name=update_port_group_btn]', function() {
+  if (!confirm('Are you sure to register/update the port group?')) {
+    return;
+  }
+
+  var deletedMemberIDMap = {};
+  var inputDeletedMembers = $('#port_group_information_float_panel #port_group_members_tab div[name=deleted_port_group_members]').find('input[name=deleted]');
+  for (var i = 0; i < inputDeletedMembers.length; i = i + 1) {
+    var inputDeletedMember = inputDeletedMembers[i];
+    var deletedMemberID = parseInt($(inputDeletedMember).val());
+    deletedMemberIDMap[deletedMemberID] = deletedMemberID;
+  }
+
+  var portGroupID = $('#port_group_information_panel').find('input[name=id]').val();
+  if ((portGroupID == null) || (portGroupID == undefined) || (portGroupID == '')) {
+    portGroupID = 0;
+  }
+  var portGroupName = $('#port_group_information_panel').find('input[name=name]').val();
+  var portGroupDescription = $('#port_group_information_panel').find('input[name=description]').val();
+
+  var portGroup = {
+    id: parseInt(portGroupID),
+    name: portGroupName,
+    description: portGroupDescription,
+    port_group_port_associations: []
+  };
+  if (portGroupID == 0) {
+    delete(portGroup['id']);
+  }
+
+  $('#port_group_information_float_panel #port_group_members_tab #port_group_members_table').DataTable().rows().every(function(){
+    var memberPortTr = $(this.node());
+    var memberPortID = memberPortTr.find('select[name=port_group_member_port_id]').val();
+
+    var portGroupPortAssociation = {
+      port_id: parseInt(memberPortID),
+    };
+
+    portGroup.port_group_port_associations.push(portGroupPortAssociation);
+  });
+
+  for (deletedMemberID in deletedMemberIDMap) {
+    var portGroupPortAssociation = {
+      port_group_id: parseInt(portGroup.id),
+      port_id: parseInt(deletedMemberID),
+      to_be_deleted: true
+    };
+    portGroup.port_group_port_associations.push(portGroupPortAssociation);
+  }
+
+  if (portGroup.id == undefined) {
+    postResource('port_groups', portGroup, '', function(result, xhr) {
+      showProcessResult(result, xhr, 201, "The port group information has been registered successfully.");
+      postProcessUpdatePortGroup(result, xhr);
+    });
+  } else {
+    putResource('port_groups', portGroup.id, portGroup, '', function(result, xhr) {
+      showProcessResult(result, xhr, 200, "The port group information has been updated successfully.");
+      postProcessUpdatePortGroup(result, xhr);
+    });
+  }
+});
+
+function postProcessUpdatePortGroup(result, xhr) {
+  var portGroupID = result.id;
+
+  getResource('port_groups', portGroupID, 'preloads=port_group_port_associations.port.node', function(portGroup) {
+    repaintPortGroupInformation(portGroup, false);
+    if ((storedCallbackPortGroupInformationUpdated != null) && (storedCallbackPortGroupInformationUpdated != undefined)) {
+      storedCallbackPortGroupInformationUpdated();
+    }
+  });
+}
+
+function deletePortGroupInformation(portGroupID, callbackPortGroupInformationDeleted) {
+  if (!confirm('Are you sure to delete the port group?')) {
+    return;
+  }
+
+  deleteResource('port_groups', portGroupID, '', function(result, xhr) {
+    showProcessResult(result, xhr, 204, "The port group information has been deleted successfully.");
+    callbackPortGroupInformationDeleted();
+  });
+}

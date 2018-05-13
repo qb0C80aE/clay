@@ -1,0 +1,302 @@
+{{ .ModelStore.Single "ephemeral_templates/headerpart.tmpl/generation" "ui_menu=design" }}
+{{ .ModelStore.Single "ephemeral_templates/node_information.tmpl/generation" "" }}
+{{ .ModelStore.Single "ephemeral_templates/vlan_information.tmpl/generation" "" }}
+
+<div class="context-menu" id="context-menu">
+	<ul>
+	</ul>
+</div>
+
+<div id="main_panel">
+
+	<div class="container-fluid">
+	  <div class="row">
+	    <ul class="nav nav-tabs">
+	      <li class="active"><a href="#layer1_tab" data-toggle="tab">Nodes and Links</a></li>
+				<li><a href="#layer2_tab" data-toggle="tab">VLANs</a></li>
+				<li><a href="#layer3_tab" data-toggle="tab">Subnets</a></li>
+	    </ul>
+	  </div>
+	</div>
+
+	<br>
+
+	<div class="tab-content clearfix">
+
+		<div class="tab-pane active" id="layer1_tab">
+		</div>
+
+		<div class="tab-pane" id="layer2_tab">
+		</div>
+
+		<div class="tab-pane" id="layer3_tab">
+		</div>
+
+	</div>
+</div>
+
+<script language="javascript">
+$(function() {
+
+	{{ .ModelStore.Single "ephemeral_templates/functions.tmpl/generation" "" }}
+	{{ .ModelStore.Single "ephemeral_templates/functions_node_information.tmpl/generation" "" }}
+	{{ .ModelStore.Single "ephemeral_templates/functions_vlan_information.tmpl/generation" "" }}
+
+	var diagramProperties = {
+		layer1: {
+			distance: function(force) {
+				force.jaccardLinkLengths(70, 0.2);
+			}
+		},
+		layer2: {
+			distance: function(force) {
+				force.jaccardLinkLengths(150, 0.2);
+			}
+		},
+		layer3: {
+			distance: function(force) {
+				force.jaccardLinkLengths(150, 0.2);
+			}
+		}
+	}
+
+	var diagramNodeIDTypeMap = {
+		1: 'node',
+		2: 'vlan',
+		3: 'subnet'
+	};
+
+	var metaIndexMap = {
+		diagram_node_id: 1,
+		mac_address: 2,
+		ipv4_address: 3
+	};
+
+	var menuItems = {
+		diagram: [
+			{ label: 'Add node', action: 'add_node' },
+			{ label: 'Initialize diagram layout', action: 'initialize_diagram_layout' },
+		],
+		node: [
+			{ label: 'Edit node', action: 'edit_node' },
+			{ label: 'Delete node', action: 'delete_node' }
+		],
+		vlan: [
+			{ label: 'Edit VLAN', action: 'edit_vlan' },
+		],
+		subnet: [
+			{ label: 'Edit subnet', action: 'edit_subnet' },
+			{ label: 'Delete subnet', action: 'delete_subnet' }
+		],
+	};
+
+	function parseDiagramNodeID(diagramNodeID) {
+		var values = diagramNodeID.split('_');
+		var result = {
+			node_id: parseInt(values[0]),
+			layer: parseInt(values[1]),
+			type: parseInt(values[2])
+		};
+		return result;
+	}
+
+	function updateNodeLocation(e) {
+		var node = e.target.__data__;
+		var diagramNodeID = node.meta[metaIndexMap.diagram_node_id].value;
+		var x = node.x;
+		var y = node.y;
+		var diagramNode = {
+			diagram_node_id: diagramNodeID,
+			x: x,
+			y: y
+		};
+		putResource('diagram_nodes', diagramNodeID, diagramNode, '', function(){}, function(){});
+	}
+
+	function getContextOfTarget(target, targetValue) {
+		if (target.nodeName == 'svg') {
+			return false;
+		}
+		if (target.className.baseVal.split(' ').indexOf(targetValue) > -1) {
+			var keys = parseDiagramNodeID(target.__data__.meta[metaIndexMap.diagram_node_id].value);
+			var type = diagramNodeIDTypeMap[keys.type];
+			return { type: type, meta: target.__data__ };
+		}
+		return getContextOfTarget(target.parentNode, targetValue);
+	}
+
+	function createContextMenu(context) {
+		for (var idx in menuItems[context.type]) {
+			item = menuItems[context.type][idx];
+
+			if (item.label == null) {
+				var liElement = $('<li>').prop('class', 'divider');
+			} else {
+				var liElement = $('<li>').data('action', item.action).append(
+							$('<span>').prop('class', 'item glyphicon')
+						).append(item.label);
+
+				if (context.meta != null) {
+					for(var key in context.meta) {
+						liElement.data(key, context.meta[key]);
+					}
+				}
+				if (item.type != null) {
+					liElement.prop('id', item.type)
+				}
+			}
+			$('.context-menu ul').append(liElement);
+		}
+	}
+
+	function updateContextMenu() {
+		$("#diagram").ready(function() {
+			d3.select('#diagram').on('contextmenu', function(data) {
+				if($('.node-reg-panel').is(':visible')) return;
+
+				var menuElement = $('.context-menu');
+				$('.context-menu ul').empty();
+
+				d3.event.preventDefault();
+				var x = d3.event.pageX;
+				var y = d3.event.pageY;
+				var context = getContextOfTarget(d3.event.target, 'node') || { type: 'diagram', meta: null }
+				createContextMenu(context);
+
+				menuElement.css({left: x, top: y - 40});
+				menuElement.fadeIn(50);
+			});
+		});
+	}
+
+	function restoreNodeLocation(diagramInstance) {
+		$('#diagram').ready(function() {
+			loopSleep(100, 200, function(i){
+				n = d3.select('#diagram').selectAll('.node');
+				ns = n[0];
+				if (ns.length > 0) {
+					getResources('diagram_nodes', '', function(diagramNodesResult) {
+						var diagramNodeMap = buildResouceMapFromResourceArray(diagramNodesResult, 'diagram_node_id');
+						for (var i = 0; i < ns.length; i ++) {
+							ns[i].onmouseup = updateNodeLocation;
+
+							var diagramNode = diagramNodeMap[ns[i].__data__.meta[metaIndexMap.diagram_node_id].value];
+							if (diagramNode != null) {
+								ns[i].__data__.x = diagramNode.x;
+								ns[i].__data__.y = diagramNode.y;
+							}
+						}
+						diagramInstance.cola.start();
+					});
+					return false;
+				}
+			});
+			return true;
+		});
+	}
+
+	function repaintDiagram() {
+		var href = '#layer1_tab';
+		$('#main_panel a[data-toggle="tab"]').each(function(i) {
+        if ($(this).parent().attr("class") == 'active') {
+            href = $(this).attr('href');
+        }
+    });
+
+		var targetTabPaneID = '#' + href.split('#')[1];
+		var targetDiagramType = href.split('#')[1].split('_')[0];
+		var targetTabPane = $(targetTabPaneID);
+
+		$('#layer1_tab').children().remove();
+		$('#layer2_tab').children().remove();
+		$('#layer3_tab').children().remove();
+		targetTabPane.append($('<div>').prop('id', 'diagram'));
+		var diagramInstance = new Diagram('#diagram', '/diagrams/' + targetDiagramType, {
+			pop: /^([^\s-]+)-/,
+			distance: diagramProperties[targetDiagramType].distance,
+			width: $(window).width(),
+			height: ($(window).height() - 180)
+		});
+		diagramInstance.init('interface', 'node_extra_information', 'diagram_node_id', 'mac_address', 'ipv4_address');
+		diagramInstance.max_ticks = 1;
+
+		restoreNodeLocation(diagramInstance);
+		updateContextMenu();
+	}
+
+	function initializeDiagramLayout() {
+		var href = '#layer1_tab';
+		$('#main_panel a[data-toggle="tab"]').each(function(i) {
+        if ($(this).parent().attr("class") == 'active') {
+            href = $(this).attr('href');
+        }
+    });
+
+		var targetDiagramLayer = href.split('#')[1].split('_')[0].split('layer')[1];
+
+		deleteResource('diagram_nodes', '', 'layer=' + targetDiagramLayer, function(result, xhr) {
+			repaintDiagram();
+		});
+	}
+
+	function onLoad() {
+		repaintDiagram();
+	}
+
+	$('#main_panel a[data-toggle=tab]').on('shown.bs.tab', function(e) {
+		repaintDiagram();
+	})
+
+	$('body').on('click', function(event) {
+		$('#context-menu').fadeOut(150);
+	});
+
+	$('#context-menu').on('click', function(event) {
+		switch($(event.target).data('action')) {
+		case 'initialize_diagram_layout':
+			initializeDiagramLayout();
+			break;
+		case 'add_node':
+			$('#page-cover').fadeIn(50);
+			showNodeInformation(null, repaintDiagram);
+			break;
+		case 'edit_node':
+			$('#page-cover').fadeIn(50);
+			var keys = parseDiagramNodeID($(event.target).data('meta')[metaIndexMap.diagram_node_id].value);
+			var nodeID = keys.node_id;
+			showNodeInformation(nodeID, repaintDiagram);
+			break;
+		case 'delete_node':
+			var keys = parseDiagramNodeID($(event.target).data('meta')[metaIndexMap.diagram_node_id].value);
+			var nodeID = keys.node_id;
+			deleteNodeInformation(nodeID, repaintDiagram);
+			break;
+		case 'edit_vlan':
+			$('#page-cover').fadeIn(50);
+			var keys = parseDiagramNodeID($(event.target).data('meta')[metaIndexMap.diagram_node_id].value);
+			var vlanID = keys.node_id;
+			showVlanInformation(vlanID, repaintDiagram);
+			break;
+		case 'edit_subnet':
+			$('#page-cover').fadeIn(50);
+			var keys = parseDiagramNodeID($(event.target).data('meta')[metaIndexMap.diagram_node_id].value);
+			var subnetID = keys.node_id;
+			getResource('subnets', subnetID, '', function(subnet) {
+				var vlanID = subnet.vlan_id;
+				showVlanInformation(vlanID, repaintDiagram);
+			});
+			break;
+		case 'delete_subnet':
+			$('#page-cover').fadeIn(50);
+			var keys = parseDiagramNodeID($(event.target).data('meta')[metaIndexMap.diagram_node_id].value);
+			var subnetID = keys.node_id;
+			deleteSubnetInformation(subnetID, repaintDiagram);
+			break;
+		}
+	});
+
+	onLoad();
+
+});
+</script>
+{{ .ModelStore.Single "ephemeral_templates/footerpart.tmpl/generation" "" }}

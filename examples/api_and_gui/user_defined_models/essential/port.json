@@ -35,7 +35,7 @@
       "type_name": "int"
     },
     {
-      "name": "MACAddress",
+      "name": "MacAddress",
       "tag": "json:\"mac_address\" yaml:\"mac_address\" validate:\"omitempty,mac\"",
       "type_name": "string"
     },
@@ -60,6 +60,11 @@
       "tag": "json:\"port_group_port_associations\" yaml:\"port_group_port_associations\" gorm:\"ForeignKey:PortID\" validate:\"omitempty,dive\"",
       "type_name": "PortGroupPortAssociation",
       "is_slice": true
+    },
+    {
+      "name": "Vlans",
+      "tag": "json:\"vlans\" yaml:\"vlans\"",
+      "type_name": "string"
     },
     {
       "name": "VlanPortAssociations",

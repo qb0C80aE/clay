@@ -1,0 +1,89 @@
+{
+  "type_name": "Layer3Interface",
+  "resource_name": "layer3_interfaces",
+  "to_be_migrated": false,
+  "is_controller_enabled": true,
+  "is_design_access_disabled": true,
+  "fields": [
+    {
+      "name": "ID",
+      "tag": "json:\"id\" yaml:\"id\"",
+      "type_name": "int"
+    },
+    {
+      "name": "Name",
+      "tag": "json:\"name\" yaml:\"name\"",
+      "type_name": "string"
+    },
+    {
+      "name": "NodeID",
+      "tag": "json:\"node_id\" yaml:\"node_id\"",
+      "type_name": "int"
+    },
+    {
+      "name": "Node",
+      "tag": "json:\"node\" yaml:\"node\" gorm:\"ForeignKey:NodeID\"",
+      "type_name": "Node"
+    },
+    {
+      "name": "Number",
+      "tag": "json:\"number\" yaml:\"number\"",
+      "type_name": "int"
+    },
+    {
+      "name": "MACAddress",
+      "tag": "json:\"mac_address\" yaml:\"mac_address\"",
+      "type_name": "string"
+    },
+    {
+      "name": "Ipv4AddressID",
+      "tag": "json:\"ipv4_address_id\" yaml:\"ipv4_address_id\"",
+      "type_name": "int"
+    },
+    {
+      "name": "Ipv4Address",
+      "tag": "json:\"ipv4_address\" yaml:\"ipv4_address\"",
+      "type_name": "string"
+    },
+    {
+      "name": "Ipv4Prefix",
+      "tag": "json:\"ipv4_prefix\" yaml:\"ipv4_prefix\"",
+      "type_name": "int"
+    },
+    {
+      "name": "VlanID",
+      "tag": "json:\"vlan_id\" yaml:\"vlan_id\"",
+      "type_name": "int"
+    },
+    {
+      "name": "Vlan",
+      "tag": "json:\"vlan\" yaml:\"vlan\" gorm:\"ForeignKey:VlanID\"",
+      "type_name": "Vlan"
+    },
+    {
+      "name": "SubnetID",
+      "tag": "json:\"subnet_id\" yaml:\"subnet_id\"",
+      "type_name": "int"
+    },
+    {
+      "name": "Subnet",
+      "tag": "json:\"subnet\" yaml:\"subnet\" gorm:\"ForeignKey:SubnetID\"",
+      "type_name": "Subnet"
+    }
+  ],
+  "sql_after_migration": [
+    "drop view if exists layer3_interfaces;",
+    "create view if not exists layer3_interfaces as",
+    "  select ports.id id,",
+    "    ports.name name,",
+    "    ports.node_id node_id,",
+    "    ports.number number,",
+    "    ports.mac_address mac_address,",
+    "    port_ipv4_addresses.id ipv4_address_id,",
+    "    port_ipv4_addresses.address ipv4_address,",
+    "    port_ipv4_addresses.prefix ipv4_prefix",
+    "  from ports",
+    "    inner join port_ipv4_addresses",
+    "      on ports.id = port_ipv4_addresses.port_id;"
+  ]
+}

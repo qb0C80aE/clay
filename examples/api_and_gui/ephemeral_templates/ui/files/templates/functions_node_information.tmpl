@@ -1,0 +1,585 @@
+{{/* <script> */}}
+
+var storedCallbackNodeInformationUpdated = null;
+
+function compactVlans(vlanPortAssociations) {
+  var result = [];
+	if (vlanPortAssociations.length > 0) {
+    vlanPortAssociations.sort(function(a, b) {
+        if( a.vlan_id < b.vlan_id ) return -1;
+        if( a.vlan_id > b.vlan_id ) return 1;
+        return 0;
+    });
+
+		var begin = -1;
+		var previous = -1;
+
+		for (var i = 0; i < vlanPortAssociations.length; i = i + 1) {
+      var vlan = vlanPortAssociations[i].vlan_id;
+			if (begin == -1) {
+				begin = vlan;
+			}
+
+			if ((previous != -1) && ((previous + 1) != vlan)) {
+				if (begin == previous) {
+					result.push('' + begin);
+				} else {
+          result.push('' + begin + '-' + previous);
+				}
+				begin = vlan;
+			}
+			previous = vlan;
+		}
+		if (begin == previous) {
+			result.push('' + begin);
+		} else {
+			result.push('' + begin + '-' + previous);
+		}
+	}
+  return result.join(',');
+}
+
+function extendVlans(vlansString) {
+	var result = [];
+	var resultMap = {};
+
+  var vlans = vlansString.split(',');
+
+	for (var i = 0; i < vlans.length; i = i + 1) {
+    var vlan = vlans[i];
+		if (vlan.trim().length == 0) {
+			continue;
+		}
+
+		var elems = vlan.split('-');
+
+		if (isNaN(elems[0])) {
+      return null;
+		}
+
+    var begin = parseInt(elems[0]);
+		var end = begin;
+		if (elems.length == 2) {
+      if (isNaN(elems[1])) {
+        return null;
+      }
+      end = parseInt(elems[1]);
+		}
+
+		if (begin > end) {
+      return null;
+		}
+		if ((begin < 1) || (4095 < begin) || (4095 < end)) {
+      return null;
+		}
+		for (var j = begin; j <= end; j = j + 1) {
+			if (!resultMap[j]) {
+				resultMap[j] = true;
+				result.push(j);
+			}
+		}
+	}
+
+	return result.join(',');
+}
+
+function showNodeInformation(nodeID, callbackNodeInformationUpdated) {
+
+  storedCallbackNodeInformationUpdated = callbackNodeInformationUpdated;
+
+  if (nodeID == null) {
+    var node = {
+      name: '',
+      description: '',
+      ports: [],
+      node_type_id: 1,
+      virtual: false,
+      routes: []
+    };
+    repaintNodeInformation(node, true);
+  } else {
+    getResource('nodes', nodeID, 'preloads=node_type,routes.output_port,routes.gateway_port_ipv4_address.port.node,ports.link.destination_port.node,ports.ipv4_addresses,ports.vlan_port_associations', function(node) {
+      repaintNodeInformation(node, true);
+    });
+  }
+}
+
+function repaintNodeInformation(node, initializeTabSelection) {
+  $('#node_information_float_panel #ports_tab div[name=deleted_ports]').children().remove();
+  $('#node_information_float_panel #ports_tab div[name=deleted_ipv4_addresses]').children().remove();
+  $('#node_information_float_panel #routes_tab div[name=deleted_routes]').children().remove();
+
+  var nodeVirtualMap = {
+    false: 'physical',
+    true: 'virtual'
+  };
+
+  var node_information_table_virtual = $('#node_information_float_panel #node_information_tab #node_information_table select[name=virtual]');
+  node_information_table_virtual.children().remove();
+  for (key in nodeVirtualMap) {
+    node_information_table_virtual.append($('<option>').val(key).text(nodeVirtualMap[key]));
+  }
+
+  getResources('node_types', '', function(nodeTypesResult) {
+    var node_information_node_type_id = $('#node_information_float_panel #node_information_tab #node_information_table').find('select[name=node_type_id]');
+    node_information_node_type_id.children().remove();
+    for (var i = 0; i < nodeTypesResult.length; i = i + 1) {
+      node_information_node_type_id.append($('<option>').val(nodeTypesResult[i].id).text(nodeTypesResult[i].name));
+    }
+
+    var node_information_table = $('#node_information_float_panel #node_information_tab #node_information_table');
+
+    node_information_table.find('input[name=id]').val(node.id);
+    node_information_table.find('input[name=name]').val(node.name);
+    node_information_table.find('input[name=description]').val(node.description);
+    node_information_table.find('select[name=node_type_id]').val(node.node_type_id);
+    node_information_table.find('select[name=virtual]').val(convertBooleanToString(node.virtual));
+    node_information_table.find('select[name=tagged]').val(convertBooleanToString(node.tagged));
+
+    if (initializeTabSelection) {
+      $('#node_information_float_panel a[href="#node_information_tab"]').tab('show');
+    }
+    $('#node_information_float_panel').fadeIn(50);
+
+    $('#node_information_float_panel #ports_tab #ports_table').DataTable({
+      sDom: '<"row"<"col-sm-5"l><"col-sm-6 right"f>>tip',
+      order: [[1, 'asc']],
+      scrollX: true,
+      paginate: true,
+      destroy: true,
+      data: node.ports,
+      columns: [
+        {title: '', sortable: false, render: function (data, type, full, meta) {
+            return createButtonElement('delete_port_btn', 'btn btn-default', 'glyphicon glyphicon-minus', '').outerHTML +
+              createHiddenElement('id', full.id).outerHTML +
+              createFormElement('deleted_ipv4_addresses').outerHTML;
+          }
+        },
+        {title: 'Port No.', data: 'number', defaultContent: '', sortable: true, orderDataType: "dom-text-numeric", render: function (data, type, full, meta) {
+            if ((data == 0) || (data == null) || (data == undefined)) {
+              data = 1;
+            }
+            return createTextElement('number', 'in-table port-number', '', '1', data).outerHTML;
+          }
+        },
+        {title: 'Name', data: 'name', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+            return createTextElement('name', 'in-table', '', 'eth0', data).outerHTML;
+          }
+        },
+        {title: 'VLAN', data: 'vlan_port_associations', defaultContent: '', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+            return createTextElement('vlans', 'in-table', '', '100,200-300', compactVlans(data)).outerHTML;
+          }
+        },
+        {title: 'Tagged', data: 'tagged', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+            var options = [
+              {id: false, name: 'Untagged'},
+              {id: true, name: 'Tagged'}
+            ];
+            return createSelectElement('tagged', 'in-table', '', options, convertBooleanToString(data)).outerHTML;
+          }
+        },
+        {title: 'MAC Address', data: 'mac_address', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+            return createTextElement('mac_address', 'in-table mac-address', '', '00:00:00:00:00:00', data).outerHTML;
+          }
+        },
+        {title: 'IPv4 Addresses', data: 'ipv4_addresses', defaultContent: '', sortable: false, render: function (data, type, full, meta) {
+            return createIPv4TableElement(data, true, true, false).outerHTML;
+          }
+        },
+        {title: 'Destination Port', data: 'link', defaultContent: '', type: 'int', sortable: true, orderDataType: 'dom-numeric', render: function (data, type, full, meta) {
+            var options = [];
+            var value = null;
+            if ((data != null) && (data != undefined)) {
+              var name = data.destination_port.node.name + '.' + data.destination_port.name;
+              options = [{id: data.destination_port_id, name: name}];
+              value = data.destination_port_id;
+            }
+            return createHiddenElement('previous_destination_port_id', value).outerHTML + createSelectElement('destination_port_id', 'in-table', '', options, value).outerHTML;
+          }
+        },
+        {title: 'Description', data: 'description', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+            return createTextElement('description', 'in-table', '', 'description', data).outerHTML;
+          }
+        }
+      ],
+      drawCallback: function(settings) {
+        $('#node_information_float_panel #ports_tab #ports_table select[name=tagged]').select2({
+          width: '128px'
+        });
+        $('#node_information_float_panel #ports_tab #ports_table select[name=destination_port_id]').select2({
+          allowClear: true,
+          minimumInputLength: 1,
+          ajax: {
+            url:'/ui/select2',
+            dataType: 'json',
+            delay: 50,
+            data: function(params) {
+              return { 'resource_name': 'port_select2', 'terms_order': 'node_name,name', 'terms': params.term, 'limit': 10 };
+            }
+          },
+          width: '384px',
+          placeholder: 'None',
+        });
+      }
+    });
+
+    $('#node_information_float_panel #routes_tab #routes_table').DataTable({
+      sDom: '<"row"<"col-sm-5"l><"col-sm-6 right"f>>tip',
+      order: [[1, "asc"]],
+      scrollX: true,
+      paginate: true,
+      destroy: true,
+      data: node.routes,
+      columns: [
+        {title: '', sortable: false, render: function (data, type, full, meta) {
+            return createButtonElement('delete_route_btn', 'btn btn-default', 'glyphicon glyphicon-minus', '').outerHTML;
+          }
+        },
+        {title: 'Destination Network', defaultContent: '', type: 'string', sortable: true, render: function (data, type, full, meta) {
+            return createIPv4TableElement([full], false, false, false).outerHTML +
+              createHiddenElement('id', full.id).outerHTML;
+          }
+        },
+        {title: 'Output Port', data: 'output_port_id', defaultContent: '', type: 'int', sortable: true, orderDataType: 'dom-numeric', render: function (data, type, full, meta) {
+            var outputPortOptions = [{}].concat(node.ports);
+            return createSelectElement('output_port_id', 'in-table', '', outputPortOptions, data).outerHTML;
+          }
+        },
+        {title: 'Gateway Addrees', data: 'gateway_port_ipv4_address_id', defaultContent: '', type: 'int', sortable: true, orderDataType: 'dom-numeric', render: function (data, type, full, meta) {
+            var options = [];
+            var value = null;
+            if (full.gateway_port_ipv4_address != null) {
+              var name = full.gateway_port_ipv4_address.address + ' (' + full.gateway_port_ipv4_address.port.node.name + '.' + full.gateway_port_ipv4_address.port.name + ')';
+              options = [{id: full.gateway_port_ipv4_address.id, name: name}];
+              value = full.gateway_port_ipv4_address.id;
+            }
+            return createSelectElement('gateway_port_ipv4_address_id', 'in-table', '', options, value).outerHTML;
+          }
+        }
+      ],
+      drawCallback: function(settings) {
+        $('#node_information_float_panel #routes_tab #routes_table select[name=output_port_id]').select2({
+          allowClear: true,
+          placeholder: 'None',
+          width: '196px'
+        });
+        $('#node_information_float_panel #routes_tab #routes_table select[name=gateway_port_ipv4_address_id]').select2({
+          allowClear: true,
+          minimumInputLength: 1,
+          ajax: {
+            url:'/ui/select2',
+            dataType: 'json',
+            delay: 50,
+            data: function(params) {
+              return { 'resource_name': 'port_ipv4_address_select2', 'terms_order': 'node_name,port_name', 'terms': params.term, 'limit': 10 };
+            }
+          },
+          width: '384px',
+          placeholder: 'None',
+        });
+      }
+    });
+
+    $('#page_cover').fadeIn(50);
+
+  });
+}
+
+function deleteNodeInformation(nodeID, callbackNodeInformationDeleted) {
+  if (!confirm('Are you sure to delete the node?')) {
+    return;
+  }
+
+  deleteResource('nodes', nodeID, '', function(result, xhr) {
+    showProcessResult(result, xhr, 204, "The node information has been deleted successfully.");
+    callbackNodeInformationDeleted();
+  });
+}
+
+$('#node_information_float_panel a[data-toggle=tab]').on('shown.bs.tab', function(e) {
+  $('#node_information_float_panel #ports_tab #ports_table').DataTable().draw();
+  $('#node_information_float_panel #routes_tab #routes_table').DataTable().draw();
+})
+
+$('#node_information_float_panel #ports_tab').on('click', 'button[name=add_port_btn]', function() {
+  var data = {
+    id: null,
+    number: 0,
+    name: '',
+    description: '',
+    mac_address: '',
+    vlan_port_associations: [],
+    ipv4_addresses: []
+  };
+  $('#node_information_float_panel #ports_tab #ports_table').DataTable().row.add(data).draw();
+  $('#node_information_float_panel #ports_tab #ports_table').DataTable().draw();
+});
+
+$('#node_information_float_panel #ports_tab #ports_table').on('click', 'button[name=delete_port_btn]', function() {
+  var tr = $(this).closest('tr');
+  var deletedPortID = tr.find('input[name=id]').val();
+  if ((deletedPortID != null) && (deletedPortID != undefined) && (deletedPortID != '') && (deletedPortID != 0)) {
+    $('#node_information_float_panel #ports_tab div[name=deleted_ports]').append(createHiddenElement('deleted', deletedPortID));
+  }
+  $('#node_information_float_panel #ports_tab #ports_table').DataTable().row(tr).remove().draw();
+  $('#node_information_float_panel #ports_tab #ports_table').DataTable().draw();
+});
+
+$('#node_information_float_panel #ports_tab #ports_table').on('click', 'button[name=add_ipv4_address_btn]', function() {
+  var tr = $(this).closest('tr');
+  tr.before(createIPv4TrElement(null, true));
+});
+
+$('#node_information_float_panel #ports_tab #ports_table').on('click', 'button[name=delete_ipv4_address_btn]', function() {
+  var tr = $(this).closest('tr');
+  var ipv4AddressesTable = tr.closest('table');
+  var portTr = ipv4AddressesTable.closest('tr');
+  var deletedIPv4AddressID = tr.find('input[name=id]').val();
+  if ((deletedIPv4AddressID != null) && (deletedIPv4AddressID != undefined) && (deletedIPv4AddressID != '') && (deletedIPv4AddressID != 0)) {
+    portTr.find('form[name=deleted_ipv4_addresses]').append(createHiddenElement('deleted', deletedIPv4AddressID));
+  }
+  tr.remove();
+});
+
+$('#node_information_float_panel #routes_tab').on('click', 'button[name=add_route_btn]', function() {
+  var data = {
+    id: null,
+    address: '',
+    prefix: 0,
+    output_port_id: 0,
+    gateway_port_ipv4_address_id: 0
+  };
+  $('#node_information_float_panel #routes_tab #routes_table').DataTable().row.add(data).draw();
+  $('#node_information_float_panel #routes_tab #routes_table').DataTable().draw();
+});
+
+$('#node_information_float_panel #routes_tab #routes_table').on('click', 'button[name=delete_route_btn]', function() {
+  var tr = $(this).closest('tr');
+  var deletedRouteID = tr.find('input[name=id]').val();
+  if ((deletedRouteID != null) && (deletedRouteID != undefined) && (deletedRouteID != '') && (deletedRouteID != 0)) {
+    $('#node_information_float_panel #routes_tab div[name=deleted_routes]').append(createHiddenElement('deleted', deletedRouteID));
+  }
+  $('#node_information_float_panel #routes_tab #routes_table').DataTable().row(tr).remove().draw();
+  $('#node_information_float_panel #routes_tab #routes_table').DataTable().draw();
+});
+
+$('#node_information_panel').on('click', 'button[name=cancel_node_btn]', function() {
+  $('#node_information_float_panel').fadeOut(50, function() {
+    $('#page_cover').fadeOut(50);
+  });
+});
+
+$('#node_information_panel').on('click', 'button[name=update_node_btn]', function() {
+  if (!confirm('Are you sure to register/update the node?')) {
+    return;
+  }
+
+  var deletedPortIDMap = {};
+  var inputDeletedPorts = $('#node_information_float_panel #ports_tab div[name=deleted_ports]').find('input[name=deleted]');
+  for (var i = 0; i < inputDeletedPorts.length; i = i + 1) {
+    var inputDeletedPort = inputDeletedPorts[i];
+    var deletedPortID = parseInt($(inputDeletedPort).val());
+    deletedPortIDMap[deletedPortID] = deletedPortID;
+  }
+
+  var deletedRouteIDMap = {};
+  var inputDeletedRoutes = $('#node_information_float_panel #routes_tab div[name=deleted_routes]').find('input[name=deleted]');
+  for (var i = 0; i < inputDeletedRoutes.length; i = i + 1) {
+    var inputDeletedRoute = inputDeletedRoutes[i];
+    var deletedRouteID = parseInt($(inputDeletedRoute).val());
+    deletedRouteIDMap[deletedRouteID] = deletedRouteID;
+  }
+
+  var nodeID = $('#node_information_panel').find('input[name=id]').val();
+  if ((nodeID == null) || (nodeID == undefined) || (nodeID == '')) {
+    nodeID = 0;
+  }
+  var nodeName = $('#node_information_panel').find('input[name=name]').val();
+  var nodeDescription = $('#node_information_panel').find('input[name=description]').val();
+  var nodeTypeID = $('#node_information_panel').find('select[name=node_type_id]').val();
+  var nodeVirtual = $('#node_information_panel').find('select[name=virtual]').val();
+
+  var node = {
+    id: parseInt(nodeID),
+    name: nodeName,
+    description: nodeDescription,
+    node_type_id: parseInt(nodeTypeID),
+    virtual: convertStringToBoolean(nodeVirtual),
+    ports: [],
+    routes: []
+  };
+  if (nodeID == 0) {
+    delete(node['id']);
+  }
+
+  $('#node_information_float_panel #ports_tab #ports_table').DataTable().rows().every(function(){
+    var portTr = $(this.node());
+    var portID = portTr.find('input[name=id]').val();
+    if ((portID == "") || (portID == null) || (portID == undefined)) {
+      portID = 0;
+    }
+
+    var portNumber = portTr.find('input[name=number]').val();
+    var portName = portTr.find('input[name=name]').val();
+    var portDescription = portTr.find('input[name=description]').val();
+    var portMacAddress = portTr.find('input[name=mac_address]').val();
+    var portVlans = portTr.find('input[name=vlans]').val();
+    var portTagged = portTr.find('select[name=tagged]').val();
+    var portDestinationPortID = portTr.find('select[name=destination_port_id]').val();
+    if ((portDestinationPortID == "") || (portDestinationPortID == null) || (portDestinationPortID == undefined)) {
+      portDestinationPortID = 0;
+    }
+    var portPreviousDestinationPortID = portTr.find('input[name=previous_destination_port_id]').val();
+    if ((portPreviousDestinationPortID == "") || (portPreviousDestinationPortID == null) || (portPreviousDestinationPortID == undefined)) {
+      portPreviousDestinationPortID = 0;
+    }
+    var portIPv4Addresses = [];
+
+    var portIPv4AddressesTable = portTr.find('.ipv4-addresses');
+    var portIPv4AddressTrs = $(portIPv4AddressesTable).find('tr');
+    for (var i = 0; i < portIPv4AddressTrs.length - 1; i = i + 1) {
+      var portIPv4AddressTr = portIPv4AddressTrs[i];
+      var portIPv4AddressID = $(portIPv4AddressTr).find('input[name=id]').val();
+      var portIPv4AddressAddress = $(portIPv4AddressTr).find('input[name=address]').val();
+      var portIPv4AddressPrefix = $(portIPv4AddressTr).find('input[name=prefix]').val();
+
+      var portIPv4Address = {
+        id: parseInt(portIPv4AddressID),
+        address: portIPv4AddressAddress,
+        prefix: parseInt(portIPv4AddressPrefix)
+      };
+
+      portIPv4Addresses.push(portIPv4Address);
+    }
+
+    var deletedPortIPv4AddressIDMap = {};
+    var formDeletedPortIPv4Addresses = portTr.find('form[name=deleted_ipv4_addresses]');
+    var inputDeletedPortIPv4Addresses = formDeletedPortIPv4Addresses.find('input[name=deleted]');
+    for (var i = 0; i < inputDeletedPortIPv4Addresses.length; i = i + 1) {
+      var inputDeletedPortIPv4Address = inputDeletedPortIPv4Addresses[i];
+      var deletedPortIPv4AddressID = parseInt($(inputDeletedPortIPv4Address).val());
+      deletedPortIPv4AddressIDMap[deletedPortIPv4AddressID] = deletedPortIPv4AddressID;
+    }
+
+    for (portIPv4AddressID in deletedPortIPv4AddressIDMap) {
+      var portIPv4Address = {
+        id: parseInt(portIPv4AddressID),
+        address: '0.0.0.0',
+        prefix: 1,
+        to_be_deleted: true
+      };
+
+      portIPv4Addresses.push(portIPv4Address);
+    }
+
+    var iface = {
+      id: parseInt(portID),
+      node_id: node.id,
+      number: parseInt(portNumber),
+      name: portName,
+      description: portDescription,
+      mac_address: portMacAddress,
+      ipv4_addresses: portIPv4Addresses,
+      vlans: extendVlans(portVlans),
+      tagged: convertStringToBoolean(portTagged),
+      link: {
+        source_port_id: parseInt(portID),
+        destination_port_id: parseInt(portDestinationPortID)
+      }
+    };
+    if (nodeID == 0) {
+      delete(iface['node_id']);
+    }
+
+    if (portPreviousDestinationPortID != 0) {
+      if (iface.link.destination_port_id == 0) {
+        iface.link.to_be_deleted = true;
+      }
+    } else {
+      if (iface.link.destination_port_id == 0) {
+        delete(iface['link']);
+      }
+    }
+
+    node.ports.push(iface);
+  });
+
+  for (portID in deletedPortIDMap) {
+    var iface = {
+      id: parseInt(portID),
+      number: 0,
+      name: '',
+      description: '',
+      mac_address: '',
+      ipv4_addresses: [],
+      vlans: '',
+      tagged: false,
+      to_be_deleted: true
+    };
+
+    node.ports.push(iface);
+  }
+
+  $('#node_information_float_panel #routes_tab #routes_table').DataTable().rows().every(function(){
+    var routeTr = $(this.node());
+    var routeID = routeTr.find('input[name=id]').val();
+    var routeOutputPortID = routeTr.find('select[name=output_port_id]').val();
+    var routeGatewayPortIpv4AddressID = routeTr.find('select[name=gateway_port_ipv4_address_id]').val();
+
+    var routeIPv4AddressesTable = routeTr.find('.ipv4-addresses');
+    var routeIPv4AddressTr = $(routeIPv4AddressesTable).find('tr')[0];
+    var routeIPv4AddressAddress = $(routeIPv4AddressTr).find('input[name=address]').val();
+    var routeIPv4AddressPrefix = $(routeIPv4AddressTr).find('input[name=prefix]').val();
+
+    var route = {
+      id: parseInt(routeID),
+      node_id: node.id,
+      address: routeIPv4AddressAddress,
+      prefix: parseInt(routeIPv4AddressPrefix),
+      output_port_id: parseInt(routeOutputPortID),
+      gateway_port_ipv4_address_id: parseInt(routeGatewayPortIpv4AddressID)
+    };
+    if (nodeID == 0) {
+      delete(route['node_id']);
+    }
+
+    node.routes.push(route);
+  });
+
+  for (routeID in deletedRouteIDMap) {
+    var route = {
+      id: parseInt(routeID),
+      address: '0.0.0.0',
+      prefix: 1,
+      output_port_id: 0,
+      gateway_port_ipv4_address_id: 0,
+      to_be_deleted: true
+    };
+
+    node.routes.push(route);
+  }
+
+  if (node.id == undefined) {
+    postResource('nodes', node, '', function(result, xhr) {
+      showProcessResult(result, xhr, 201, "The node information has been registered successfully.");
+      postProcessUpdateNode(result, xhr);
+    });
+  } else {
+    putResource('nodes', node.id, node, '', function(result, xhr) {
+      showProcessResult(result, xhr, 200, "The node information has been updated successfully.");
+      postProcessUpdateNode(result, xhr);
+    });
+  }
+
+});
+
+function postProcessUpdateNode(result, xhr) {
+  var nodeID = result.id;
+
+  getResource('nodes', nodeID, 'preloads=node_type,routes.output_port,routes.gateway_port_ipv4_address.port.node,ports.link.destination_port.node,ports.ipv4_addresses,ports.vlan_port_associations', function(node) {
+    repaintNodeInformation(node, false);
+    if ((storedCallbackNodeInformationUpdated != null) && (storedCallbackNodeInformationUpdated != undefined)) {
+      storedCallbackNodeInformationUpdated();
+    }
+  });
+}

@@ -1,0 +1,111 @@
+<div class="panel-float" id="execution_information_float_panel">
+
+	<div class="panel panel-default" id="execution_information_panel">
+		<div class="panel-heading">
+			<h1 class="panel-title" name="execution_information_panel_title">
+				<span style="display: table-cell; vertical-align: middle; text-align: left; width=90%">
+					<span class="glyphicon glyphicon-info-sign"></span> Execution Information
+				</span>
+				<span class="input-group-btn">
+				</span>
+			</h1>
+		</div>
+		<div class="panel-body">
+
+			<div class="container-fluid">
+			  <div class="row">
+			    <ul class="nav nav-tabs">
+			      <li class="active"><a href="#execution_information_tab" data-toggle="tab">Information</a></li>
+						<li><a href="#execution_logs_tab" data-toggle="tab">Logs</a></li>
+			    </ul>
+			  </div>
+			</div>
+
+			<div class="tab-content clearfix">
+
+				<br>
+
+				<div class="tab-pane active" id="execution_information_tab">
+
+					<table class="table" id="execution_information_table">
+						<tr>
+							<td width="15%">Name</td>
+							<td width="85%">
+								<input name="name" type="text" placeholder="name" class="form-control">
+							</td>
+						</tr>
+						<tr>
+							<td width="15%">Description</td>
+							<td width="85%">
+								<input name="description" type="text" placeholder="description" class="form-control">
+							</td>
+						</tr>
+						<tr>
+							<td width="15%">CommandLine</td>
+							<td width="85%">
+								<input name="command_line" type="text" placeholder="ls -la" class="form-control">
+							</td>
+						</tr>
+						<tr>
+							<td width="15%">WorkingDirectory</td>
+							<td width="85%">
+								<input name="working_directory" type="text" placeholder="/tmp" class="form-control">
+							</td>
+						</tr>
+						<tr>
+							<td width="15%">Status</td>
+							<td width="85%">
+								<input name="status" type="text" placeholder="" class="form-control" readonly>
+							</td>
+						</tr>
+						<tr>
+							<td width="15%">ExitCode</td>
+							<td width="85%">
+								<input name="exit_code" type="text" placeholder="" class="form-control" readonly>
+							</td>
+						</tr>
+						<tr>
+							<td width="15%">Killed</td>
+							<td width="85%">
+								<input name="killed" type="text" placeholder="" class="form-control" readonly>
+							</td>
+						</tr>
+						<tr>
+							<td width="15%">Started at</td>
+							<td width="85%">
+								<input name="started_at" type="text" placeholder="" class="form-control" readonly>
+							</td>
+						</tr>
+						<tr>
+							<td width="15%">Finished at</td>
+							<td width="85%">
+								<input name="finished_at" type="text" placeholder="" class="form-control" readonly>
+							</td>
+						</tr>
+					</table>
+
+				</div>
+
+				<div class="tab-pane" id="execution_logs_tab">
+					<table class="table" id="execution_logs_table">
+						<tr>
+							<td width="100%">
+								Stdout<br>
+								<textarea name="std_out" class="form-control" rows="15"></textarea>
+							</td>
+						</tr>
+						<tr>
+							<td width="100%">
+								Stderr<br>
+								<textarea name="std_err" class="form-control" rows="15"></textarea>
+							</td>
+						</tr>
+					</table>
+				</div>
+
+			</div>
+
+		</div>
+	</div>
+
+</div>

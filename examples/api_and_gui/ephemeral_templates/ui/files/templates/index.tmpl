@@ -1,0 +1,41 @@
+{{ .ModelStore.Single "ephemeral_templates/headerpart.tmpl/generation" "ui_menu=home" }}
+<div class="col-sm-6">
+	<div class="panel panel-default panel-custom" id="information_panel">
+		<div class="panel-heading">
+			<h1 class="panel-title">
+				<span class="glyphicon glyphicon-info-sign"></span> Information
+			</h1>
+		</div>
+		<div class="panel-body">
+			Clay {{ .ProgramInformation.GetVersion }}
+			<br>
+			<br>
+			<table class="table .table-condensed">
+				<tr>
+					<td width="25%">BuildTime</td>
+					<td width="75%">{{ .ProgramInformation.GetBuildTime }}</td>
+				</tr>
+				<tr>
+					<td>Branch</td>
+					<td>{{ .ProgramInformation.GetBranch }}</td>
+				</tr>
+				<tr>
+					<td>Commit</td>
+					<td>{{ .ProgramInformation.GetCommitHash }}</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</div>
+<script language="javascript">
+	(function($) {
+
+		function onLoad() {
+			$('#information_panel').fadeIn(150);
+		}
+
+		onLoad();
+
+	})(jQuery);
+</script>
+{{/* .ModelStore.Single "ephemeral_templates/footerpart.tmpl/generation" "" */}}

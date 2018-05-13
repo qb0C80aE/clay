@@ -1,0 +1,44 @@
+{{- $core := .Core -}}
+{{- $layer1Interfaces := .ModelStore.Multi "diagram_layer1_interfaces" "preloads=node,destination_node" -}}
+{{- $nodes := .ModelStore.Multi "nodes" "preloads=ports,node_type" -}}
+{{- $lastNodeIndex := $core.Sub $nodes.Total 1 -}}
+{{- $interfaceMap := $core.Map -}}
+{
+  "links": [
+  {{ range $i, $layer1Interface := $layer1Interfaces.Records }}
+    {{ if ne $layer1Interface.DestinationID "" }}
+      {{- $interfaceProcessed := $core.Exists $interfaceMap $layer1Interface.ID -}}
+      {{- if eq $interfaceProcessed false -}}
+        {{- $interfaceProcessedLen := len $interfaceMap }}
+    {{ if ne $interfaceProcessedLen 0 }},{{ end }}{
+      "source": "{{ $layer1Interface.Node.Name }}",
+      "target": "{{ $layer1Interface.DestinationNode.Name }}",
+      "meta": {
+        "interface": {
+          "source": "[{{ $layer1Interface.Number }}]{{ $layer1Interface.Name }}",
+          "target": "[{{ $layer1Interface.DestinationNumber }}]{{ $layer1Interface.DestinationName }}"
+        },
+        "mac_address": null,
+        "ipv4_address": null
+      }
+    }
+        {{- $interfaceMap := $core.Put $interfaceMap $layer1Interface.ID true -}}
+        {{- $interfaceMap := $core.Put $interfaceMap $layer1Interface.DestinationID true -}}
+      {{ end }}
+    {{ end }}
+  {{ end }}
+  ],
+  "nodes": [
+  {{ range $i, $node := $nodes.Records }}
+    {{- $diagramNodeKey := printf "%d_1_1" $node.ID }}
+    {
+      "name": "{{ $node.Name }}",
+      "icon": "/ui/files/images/diagram/{{ $node.NodeType.Name }}_{{ $node.Virtual }}.png",
+      "meta": {
+        "node_extra_information": "-",
+        "diagram_node_id": "{{ $diagramNodeKey }}"
+      }
+    }{{ if ne $i $lastNodeIndex }},{{end}}
+  {{ end }}
+  ]
+}

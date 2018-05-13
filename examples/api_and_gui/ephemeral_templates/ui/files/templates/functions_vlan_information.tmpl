@@ -1,0 +1,179 @@
+{{/* <script> */}}
+
+var storedCallbackVlanInformationUpdated = null;
+
+function showVlanInformation(vlanID, callbackVlanInformationUpdated) {
+  storedCallbackVlanInformationUpdated = callbackVlanInformationUpdated;
+
+  getResource('vlans', vlanID, 'preloads=subnets', function(vlan) {
+    repaintVlanInformation(vlan, true);
+  });
+}
+
+function repaintVlanInformation(vlan, initializeTabSelection) {
+  $('#vlan_information_float_panel #subnets_tab div[name=deleted_subnets]').children().remove();
+
+  var vlan_information_table = $('#vlan_information_float_panel #vlan_information_tab #vlan_information_table');
+
+  vlan_information_table.find('input[name=id]').val(vlan.id);
+  vlan_information_table.find('input[name=name]').val(vlan.name);
+  vlan_information_table.find('input[name=description]').val(vlan.description);
+
+  if (initializeTabSelection) {
+    $('#vlan_information_float_panel a[href="#vlan_information_tab"]').tab('show');
+  }
+  $('#vlan_information_float_panel').fadeIn(50);
+
+  $('#vlan_information_float_panel #subnets_tab #subnets_table').DataTable({
+    sDom: '<"row"<"col-sm-5"l><"col-sm-6 right"f>>tip',
+    order: [[1, 'asc']],
+    scrollX: true,
+    paginate: true,
+    destroy: true,
+    data: vlan.subnets,
+    columns: [
+      {title: '', sortable: false, render: function (data, type, full, meta) {
+          return createButtonElement('delete_subnet_btn', 'btn btn-default', 'glyphicon glyphicon-minus', '').outerHTML +
+            createHiddenElement('id', full.id).outerHTML;
+        }
+      },
+      {title: 'Name', data: 'name', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+          return createTextElement('name', 'in-table', '', '', data).outerHTML;
+        }
+      },
+      {title: 'Address', defaultContent: '', sortable: false, render: function (data, type, full, meta) {
+          return createIPv4TableElement([full], false, false, false).outerHTML;
+        }
+      },
+      {title: 'Description', data: 'description', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+          return createTextElement('description', 'in-table', '', '', data).outerHTML;
+        }
+      }
+    ]
+  });
+
+  $('#page_cover').fadeIn(50);
+}
+
+function deleteSubnetInformation(subnetID, callbackSubnetInformationDeleted) {
+  if (!confirm('Are you sure to delete the subnet?')) {
+    return;
+  }
+
+  deleteResource('subnets', subnetID, '', function(result, xhr) {
+    showProcessResult(result, xhr, 204, "The subnet information has been deleted successfully.");
+    callbackSubnetInformationDeleted();
+  });
+}
+
+$('#vlan_information_float_panel a[data-toggle=tab]').on('shown.bs.tab', function(e) {
+  $('#vlan_information_float_panel #subnets_tab #subnets_table').DataTable().draw();
+})
+
+$('#vlan_information_float_panel #subnets_tab').on('click', 'button[name=add_subnet_btn]', function() {
+  var data = {
+    id: null,
+    name: '',
+    description: '',
+    address: '',
+    prefix: 0
+  };
+  $('#vlan_information_float_panel #subnets_tab #subnets_table').DataTable().row.add(data).draw();
+  $('#vlan_information_float_panel #subnets_tab #subnets_table').DataTable().draw();
+});
+
+$('#vlan_information_float_panel #subnets_tab #subnets_table').on('click', 'button[name=delete_subnet_btn]', function() {
+  var tr = $(this).closest('tr');
+  var deletedSubnetID = tr.find('input[name=id]').val();
+  if ((deletedSubnetID != null) && (deletedSubnetID != undefined) && (deletedSubnetID != '') && (deletedSubnetID != 0)) {
+    $('#vlan_information_float_panel #subnets_tab div[name=deleted_subnets]').append(createHiddenElement('deleted', deletedSubnetID));
+  }
+  $('#vlan_information_float_panel #subnets_tab #subnets_table').DataTable().row(tr).remove().draw();
+});
+
+$('#vlan_information_panel').on('click', 'button[name=cancel_vlan_btn]', function() {
+  $('#vlan_information_float_panel').fadeOut(50, function() {
+    $('#page_cover').fadeOut(50);
+  });
+});
+
+$('#vlan_information_panel').on('click', 'button[name=update_vlan_btn]', function() {
+  if (!confirm('Are you sure to register/update the vlan?')) {
+    return;
+  }
+
+  var deletedSubnetIDMap = {};
+  var inputDeletedSubnets = $('#vlan_information_float_panel #subnets_tab div[name=deleted_subnets]').find('input[name=deleted]');
+  for (var i = 0; i < inputDeletedSubnets.length; i = i + 1) {
+    var inputDeletedSubnet = inputDeletedSubnets[i];
+    var deletedSubnetID = parseInt($(inputDeletedSubnet).val());
+    deletedSubnetIDMap[deletedSubnetID] = deletedSubnetID;
+  }
+
+  var vlanID = $('#vlan_information_panel').find('input[name=id]').val();
+  var vlanName = $('#vlan_information_panel').find('input[name=name]').val();
+  var vlanDescription = $('#vlan_information_panel').find('input[name=description]').val();
+
+  var vlan = {
+    id: parseInt(vlanID),
+    name: vlanName,
+    description: vlanDescription,
+    subnets: []
+  };
+
+  $('#vlan_information_float_panel #subnets_tab #subnets_table').DataTable().rows().every(function(){
+    var subnetTr = $(this.node());
+    var subnetID = subnetTr.find('input[name=id]').val();
+    var subnetName = subnetTr.find('input[name=name]').val();
+    var subnetDescription = subnetTr.find('input[name=description]').val();
+
+    var subnetAddressesTable = subnetTr.find('.ipv4-addresses');
+    var subnetAddressTrs = $(subnetAddressesTable).find('tr');
+    var subnetAddressTr = subnetAddressTrs[0];
+    var subnetAddressID = $(subnetAddressTr).find('input[name=id]').val();
+    var subnetAddressAddress = $(subnetAddressTr).find('input[name=address]').val();
+    var subnetAddressPrefix = $(subnetAddressTr).find('input[name=prefix]').val();
+
+    var subnet = {
+      id: parseInt(subnetID),
+      name: subnetName,
+      description: subnetDescription,
+      vlan_id: parseInt(vlanID),
+      address: subnetAddressAddress,
+      prefix: parseInt(subnetAddressPrefix)
+    };
+
+    vlan.subnets.push(subnet);
+  });
+
+  for (subnetID in deletedSubnetIDMap) {
+    var subnet = {
+      id: parseInt(subnetID),
+      name: '',
+      description: '',
+      vlan_id: 0,
+      address: '',
+      prefix: 0,
+      to_be_deleted: true
+    };
+
+    vlan.subnets.push(subnet);
+  }
+
+  putResource('vlans', vlan.id, vlan, '', function(result, xhr) {
+    showProcessResult(result, xhr, 200, "The vlan information has been updated successfully.");
+    postProcessUpdateVlan(result, xhr);
+  });
+
+});
+
+function postProcessUpdateVlan(result, xhr) {
+  var vlanID = result.id;
+
+  getResource('vlans', vlanID, 'preloads=subnets', function(vlan) {
+    repaintVlanInformation(vlan, false);
+    if ((storedCallbackVlanInformationUpdated != null) && (storedCallbackVlanInformationUpdated != undefined)) {
+      storedCallbackVlanInformationUpdated();
+    }
+  });
+}

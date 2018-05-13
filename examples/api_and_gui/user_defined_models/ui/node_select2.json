@@ -1,0 +1,32 @@
+{
+  "type_name": "NodeSelect2",
+  "resource_name": "node_select2",
+  "to_be_migrated": false,
+  "is_controller_enabled": true,
+  "is_design_access_disabled": true,
+  "fields": [
+    {
+      "name": "ID",
+      "tag": "json:\"id\" yaml:\"id\" clay:\"primary_key\"",
+      "type_name": "int"
+    },
+    {
+      "name": "Text",
+      "tag": "json:\"text\" yaml:\"text\"",
+      "type_name": "string"
+    },
+    {
+      "name": "Name",
+      "tag": "json:\"name\" yaml:\"name\"",
+      "type_name": "string"
+    }
+  ],
+  "sql_after_migration": [
+    "drop view if exists node_select2;",
+    "create view if not exists node_select2 as",
+    "  select nodes.id id,",
+    "    nodes.name text,",
+    "    nodes.name name",
+    "  from nodes;"
+  ]
+}

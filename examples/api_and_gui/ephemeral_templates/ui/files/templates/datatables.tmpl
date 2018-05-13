@@ -1,0 +1,78 @@
+{{- $parameterMap := .Core.Map -}}
+
+{{- $columns := .Query.Get "columns" -}}
+{{- $columnList := .Core.Split $columns "," -}}
+
+{{- $columnIndexString := .Query.Get "order[0][column]" -}}
+{{- $columnIndex := .Core.Int $columnIndexString -}}
+{{- $column := index $columnList $columnIndex -}}
+
+{{- $order := .Query.Get "order[0][dir]" -}}
+{{- if eq $order "asc" -}}
+  {{- $sortParameter := printf "&sort=%s" $column -}}
+  {{- $parameterMap := .Core.Put $parameterMap "sort" $sortParameter -}}
+{{- else -}}
+  {{- $sortParameter := printf "&sort=-%s" $column -}}
+  {{- $parameterMap := .Core.Put $parameterMap "sort" $sortParameter -}}
+{{- end -}}
+
+{{- $limit := .Query.Get "length" -}}
+{{- $limitParameter := printf "&limit=%s" $limit -}}
+{{- $parameterMap := .Core.Put $parameterMap "limit" $limitParameter -}}
+
+{{- $start := .Query.Get "start" -}}
+
+{{- $limitInt := .Core.Int $limit -}}
+{{- $startInt := .Core.Int $start -}}
+{{- $tempInt := .Core.Div $startInt $limitInt -}}
+{{- $pageInt := .Core.Add $tempInt 1 -}}
+{{- $pageParameter := printf "&page=%d" $pageInt -}}
+{{- $parameterMap := .Core.Put $parameterMap "page" $pageParameter -}}
+
+{{- $search := .Query.Get "search[value]" -}}
+{{- $searchLen := len $search -}}
+{{- if ne $searchLen 0 -}}
+  {{- $searchParameter := printf "&q[%s]=%%25%s%%25" $column $search -}}
+  {{- $parameterMap := .Core.Put $parameterMap "search" $searchParameter -}}
+{{- else -}}
+  {{- $parameterMap := .Core.Put $parameterMap "search" "" -}}
+{{- end -}}
+
+{{- $resourceName := .Query.Get "resource_name" -}}
+
+{{- $preloads := .Query.Get "resource_preloads" -}}
+{{- $preloadsLen := len $preloads -}}
+{{- if ne $preloadsLen 0 -}}
+  {{- $preloadsParameter := printf "&preloads=%s" $preloads -}}
+  {{- $parameterMap := .Core.Put $parameterMap "preloads" $preloadsParameter -}}
+{{- else -}}
+  {{- $parameterMap := .Core.Put $parameterMap "preloads" "" -}}
+{{- end -}}
+
+{{- $fields := .Query.Get "resource_fields" -}}
+{{- $fieldsLen := len $fields -}}
+{{- if ne $fieldsLen 0 -}}
+  {{- $fieldsParameter := printf "&fields=%s" $fields -}}
+  {{- $parameterMap := .Core.Put $parameterMap "fields" $fieldsParameter -}}
+{{- else -}}
+  {{- $parameterMap := .Core.Put $parameterMap "fields" "" -}}
+{{- end -}}
+
+{{- $preloadsParameter := .Core.Get $parameterMap "preloads" -}}
+{{- $fieldsParameter := .Core.Get $parameterMap "fields" -}}
+{{- $sortParameter := .Core.Get $parameterMap "sort" -}}
+{{- $limitParameter := .Core.Get $parameterMap "limit" -}}
+{{- $pageParameter := .Core.Get $parameterMap "page" -}}
+{{- $searchParameter := .Core.Get $parameterMap "search" -}}
+
+{{- $query := printf "%s%s%s%s%s%s" $preloadsParameter $fieldsParameter $sortParameter $limitParameter $pageParameter $searchParameter -}}
+
+{{- $data := .ModelStore.Multi $resourceName $query -}}
+
+{{- $dataRecordsJSON := .Core.JSON $data.Records "  " -}}
+
+{
+  "recordsTotal": {{ $data.Total }},
+  "recordsFiltered": {{ $data.CountBeforePagination }},
+  "data": {{ $dataRecordsJSON }}
+}

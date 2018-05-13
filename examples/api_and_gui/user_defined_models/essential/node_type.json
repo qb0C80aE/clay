@@ -1,0 +1,33 @@
+{
+  "type_name": "NodeType",
+  "resource_name": "node_types",
+  "to_be_migrated": true,
+  "is_controller_enabled": true,
+  "fields": [
+    {
+      "name": "ID",
+      "tag": "json:\"id\" yaml:\"id\" gorm:\"primary_key;auto_increment\"",
+      "type_name": "int"
+    },
+    {
+      "name": "Name",
+      "tag": "json:\"name\" yaml:\"name\" gorm:\"not null;unique\"",
+      "type_name": "string"
+    },
+    {
+      "name": "Description",
+      "tag": "json:\"description\" yaml:\"description\"",
+      "type_name": "string"
+    }
+  ],
+  "sql_after_migration": [
+    "insert or ignore into node_types(id, name, description) values(1, 'L2Switch', 'Layer2 Switch');",
+    "insert or ignore into node_types(id, name, description) values(2, 'L3Switch', 'Layer2 Switch');",
+    "insert or ignore into node_types(id, name, description) values(3, 'Firewall', 'Firewall');",
+    "insert or ignore into node_types(id, name, description) values(4, 'Router', 'Router');",
+    "insert or ignore into node_types(id, name, description) values(5, 'LoadBalancer', 'LoadBalancer');",
+    "insert or ignore into node_types(id, name, description) values(6, 'Server', 'Server');",
+    "insert or ignore into node_types(id, name, description) values(7, 'Servers', 'Servers');",
+    "insert or ignore into node_types(id, name, description) values(8, 'Network', 'Network');"
+  ]
+}

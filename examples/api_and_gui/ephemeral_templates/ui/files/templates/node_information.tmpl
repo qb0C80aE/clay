@@ -1,0 +1,96 @@
+<div class="panel-float" id="node_information_float_panel">
+
+	<div class="panel panel-default" id="node_information_panel">
+		<div class="panel-heading">
+			<h1 class="panel-title">
+				<span style="display: table-cell; vertical-align: middle; text-align: left; width=90%">
+					<span class="glyphicon glyphicon-info-sign"></span> Node Information
+				</span>
+				<span class="input-group-btn">
+					<button class="btn btn-default" name="update_node_btn" type="button">
+						<span class="glyphicon glyphicon-ok"></span>
+					</button>
+					<button class="btn btn-default" name="cancel_node_btn" type="button">
+						<span class="glyphicon glyphicon-remove"></span>
+					</button>
+				</span>
+			</h1>
+		</div>
+		<div class="panel-body">
+
+			<div class="container-fluid">
+			  <div class="row">
+			    <ul class="nav nav-tabs">
+			      <li class="active"><a href="#node_information_tab" data-toggle="tab">Information</a></li>
+						<li><a href="#ports_tab" data-toggle="tab">Ports</a></li>
+						<li><a href="#routes_tab" data-toggle="tab">Routes</a></li>
+			    </ul>
+			  </div>
+			</div>
+
+			<div class="tab-content clearfix">
+
+				<br>
+
+				<div class="tab-pane active" id="node_information_tab">
+
+					<table class="table" id="node_information_table">
+						<tr>
+							<td width="15%">Name</td>
+							<td width="85%">
+								<input name="id" type="hidden">
+								<input name="name" type="text" placeholder="name like L2SW001" class="form-control">
+							</td>
+						</tr>
+						<tr>
+							<td width="15%">Node Type</td>
+							<td width="85%">
+								<select name="node_type_id" class="form-control"></select>
+							</td>
+						</tr>
+						<tr>
+							<td width="15%">Virtual</td>
+							<td width="85%">
+								<select name="virtual" class="form-control"></select>
+							</td>
+						</tr>
+						<tr>
+							<td width="15%">Description</td>
+							<td width="85%">
+								<input name="description" type="text" placeholder="description" class="form-control">
+							</td>
+						</tr>
+					</table>
+
+				</div>
+
+				<div class="tab-pane" id="ports_tab">
+					<div class="pull-right">
+						<button name="add_port_btn" type="button" class="btn btn-default">
+							<span class="glyphicon glyphicon-plus"></span>
+						</button>
+					</div>
+					<div class="hidden" name="deleted_ports">
+					</div>
+					<table id="ports_table" class="table table-striped table-bordered">
+					</table>
+				</div>
+
+				<div class="tab-pane" id="routes_tab">
+					<div class="pull-right">
+						<button name="add_route_btn" type="button" class="btn btn-default">
+							<span class="glyphicon glyphicon-plus"></span>
+						</button>
+					</div>
+					<div class="hidden" name="deleted_routes">
+					</div>
+					<table id="routes_table" class="table table-striped table-bordered">
+					</table>
+				</div>
+
+			</div>
+
+		</div>
+	</div>
+
+</div>

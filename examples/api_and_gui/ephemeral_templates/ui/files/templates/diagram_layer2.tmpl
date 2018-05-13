@@ -1,0 +1,65 @@
+{{- $core := .Core -}}
+{{- $layer2Interfaces := .ModelStore.Multi "diagram_layer2_interfaces" "preloads=node.node_type,vlan" -}}
+{{- $diagramNodeMap := $core.Map -}}
+{{- $interfaceMap := $core.Map -}}
+{
+  "nodes": [
+  {{ range $i, $layer2Interface := $layer2Interfaces.Records }}
+    {{ $diagramNodeKey := printf "%d_2_2" $layer2Interface.VlanID }}
+    {{ $diagramNodeCount := len $diagramNodeMap }}
+    {{ if ne $layer2Interface.VlanID 0 }}
+      {{ $vlanExists := $core.Exists $diagramNodeMap $diagramNodeKey }}
+      {{ if ne $vlanExists true }}
+    {{ if ne $diagramNodeCount 0 }},{{ end }}{
+      "name": "{{ $layer2Interface.Vlan.Name }}",
+      "icon": "/ui/files/images/diagram/Segment.png",
+      "meta": {
+        "node_extra_information": "{{ printf "(VLAN %04d)" $layer2Interface.VlanID }}",
+        "diagram_node_id": "{{ $diagramNodeKey }}"
+      }
+    }
+        {{ $diagramNodeMap := $core.Put $diagramNodeMap $diagramNodeKey true }}
+      {{ end}}
+    {{ end }}
+
+    {{ $diagramNodeKey := printf "%d_2_1" $layer2Interface.Node.ID }}
+    {{ $diagramNodeCount := len $diagramNodeMap }}
+    {{ $nodeExists := $core.Exists $diagramNodeMap $diagramNodeKey }}
+    {{ if ne $nodeExists true }}
+    {{ if ne $diagramNodeCount 0 }},{{ end }}{
+      "name": "{{ $layer2Interface.Node.Name }}",
+      "icon": "/ui/files/images/diagram/{{ $layer2Interface.Node.NodeType.Name }}_{{ $layer2Interface.Node.Virtual }}.png",
+      "meta": {
+        "node_extra_information": "-",
+        "diagram_node_id": "{{ $diagramNodeKey }}"
+      }
+    }
+      {{ $diagramNodeMap := $core.Put $diagramNodeMap $diagramNodeKey true }}
+    {{ end}}
+  {{ end }}
+  ],
+  "links": [
+  {{ range $i, $layer2Interface := $layer2Interfaces.Records }}
+    {{ $interfaceCount := len $interfaceMap }}
+    {{ if eq $layer2Interface.IsConnected true }}
+      {{ if ne $interfaceCount 0 }},{{ end }}{
+        "source": "{{ $layer2Interface.Node.Name }}",
+        "target": "{{ $layer2Interface.Vlan.Name }}",
+        "meta": {
+          "interface": {
+            "source": "{{ $layer2Interface.Name }}",
+            "target": ""
+          },
+          {{ $macAddressLen := len $layer2Interface.MacAddress }}
+          "mac_address": {
+            "source": "{{ if eq $macAddressLen 0 }}-{{ else }}{{ $layer2Interface.MacAddress }}{{ end }}",
+            "target": ""
+          },
+          "ipv4_address": null
+        }
+    }
+        {{ $interfaceMap := $core.Put $interfaceMap true true }}
+      {{ end}}
+    {{ end }}
+  ]
+}

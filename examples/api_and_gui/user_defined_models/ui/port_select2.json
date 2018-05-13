@@ -1,0 +1,49 @@
+{
+  "type_name": "PortSelect2",
+  "resource_name": "port_select2",
+  "to_be_migrated": false,
+  "is_controller_enabled": true,
+  "is_design_access_disabled": true,
+  "fields": [
+    {
+      "name": "ID",
+      "tag": "json:\"id\" yaml:\"id\" clay:\"primary_key\"",
+      "type_name": "int"
+    },
+    {
+      "name": "Text",
+      "tag": "json:\"text\" yaml:\"text\"",
+      "type_name": "string"
+    },
+    {
+      "name": "Name",
+      "tag": "json:\"name\" yaml:\"name\"",
+      "type_name": "string"
+    },
+    {
+      "name": "NodeName",
+      "tag": "json:\"node_name\" yaml:\"node_name\"",
+      "type_name": "string"
+    }
+  ],
+  "sql_after_migration": [
+    "drop view if exists port_select2;",
+    "create view if not exists port_select2 as",
+    "  select ports.id id,",
+    "    case",
+    "      when destination_ports.id is null then nodes.name||'.'||ports.name",
+    "      else nodes.name||'.'||ports.name||' (-> '||destination_nodes.name||'.'||destination_ports.name||')'",
+    "    end as text,",
+    "    ports.name name,",
+    "    nodes.name node_name",
+    "  from ports",
+    "    inner join nodes",
+    "      on ports.node_id = nodes.id",
+    "    left outer join links",
+    "      on ports.id = links.source_port_id",
+    "    left outer join ports destination_ports",
+    "      on links.destination_port_id = destination_ports.id",
+    "    left outer join nodes destination_nodes",
+    "      on destination_ports.node_id = destination_nodes.id;"
+  ]
+}

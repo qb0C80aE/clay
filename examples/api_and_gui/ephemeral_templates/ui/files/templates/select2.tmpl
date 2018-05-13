@@ -1,0 +1,41 @@
+{{- $parameterMap := .Core.Map -}}
+
+{{- $resourceName := .Query.Get "resource_name" -}}
+
+{{- $termsOrder := .Query.Get "terms_order" -}}
+{{- $termsElementList := .Core.Split $termsOrder "," -}}
+
+{{- $terms := .Query.Get "terms" -}}
+{{- $parameterList := .Core.Split $terms "." -}}
+{{- $parameterListLen := len $parameterList -}}
+
+{{- if eq $parameterListLen 1 -}}
+  {{- $firstName := index $termsElementList 0 }}
+  {{- $firstTerm := index $parameterList 0 }}
+  {{- $searchParameter := printf "&q[%s]=%%25%s%%25" $firstName $firstTerm -}}
+  {{- $parameterMap := .Core.Put $parameterMap "search" $searchParameter -}}
+{{- else -}}
+  {{- $firstName := index $termsElementList 0 }}
+  {{- $secondName := index $termsElementList 1 }}
+  {{- $firstTerm := index $parameterList 0 }}
+  {{- $secondTerm := index $parameterList 1 }}
+  {{- $searchParameter := printf "&q[%s]=%s&q[%s]=%%25%s%%25" $firstName $firstTerm $secondName $secondTerm -}}
+  {{- $parameterMap := .Core.Put $parameterMap "search" $searchParameter -}}
+{{- end -}}
+
+{{- $limit := .Query.Get "length" -}}
+{{- $limitParameter := printf "&limit=%s" $limit -}}
+{{- $parameterMap := .Core.Put $parameterMap "limit" $limitParameter -}}
+
+{{- $limitParameter := .Core.Get $parameterMap "limit" -}}
+{{- $searchParameter := .Core.Get $parameterMap "search" -}}
+
+{{- $query := printf "%s%s" $limitParameter $searchParameter -}}
+
+{{- $data := .ModelStore.Multi $resourceName $query -}}
+
+{{- $dataJSON := .Core.JSON $data.Records " " -}}
+
+{
+  "results": {{ $dataJSON }}
+}

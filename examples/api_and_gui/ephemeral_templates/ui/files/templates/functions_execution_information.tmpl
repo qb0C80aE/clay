@@ -1,0 +1,198 @@
+{{/* <script> */}}
+
+var storedCallbackExecutionInformationUpdated = null;
+
+function showExecutionInformation(executionName, callbackExecutionInformationUpdated) {
+  storedCallbackExecutionInformationUpdated = callbackExecutionInformationUpdated;
+
+  if (executionName == null) {
+    var execution = {
+      name: '',
+      description: '',
+      command_line: '',
+      working_directory: '',
+      status: '',
+      exit_code: ''
+    };
+    repaintExecutionInformation(execution, true);
+  } else {
+    getResource('commands', executionName, '', function(execution) {
+      repaintExecutionInformation(execution, true);
+    });
+  }
+}
+
+function repaintExecutionInformation(execution, initializeTabSelection) {
+  var execution_information_table = $('#execution_information_float_panel #execution_information_tab #execution_information_table');
+
+  var buttonElements = [];
+  if (execution.status == 'running') {
+    execution_information_table.find('input[name=name]').prop('readonly', true);
+    execution_information_table.find('input[name=description]').prop('readonly', true);
+    execution_information_table.find('input[name=command_line]').prop('readonly', true);
+    execution_information_table.find('input[name=working_directory]').prop('readonly', true);
+    buttonElements.push({name: 'stop_execution_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-stop', text: ''});
+    buttonElements.push({name: 'refresh_execution_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-refresh', text: ''});
+  } else {
+    if (execution.name == '') {
+      execution_information_table.find('input[name=name]').prop('readonly', false);
+      execution_information_table.find('input[name=description]').prop('readonly', false);
+      execution_information_table.find('input[name=command_line]').prop('readonly', false);
+      execution_information_table.find('input[name=working_directory]').prop('readonly', false);
+      buttonElements.push({name: 'update_execution_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-ok', text: ''});
+    } else {
+      execution_information_table.find('input[name=name]').prop('readonly', true);
+      execution_information_table.find('input[name=description]').prop('readonly', true);
+      execution_information_table.find('input[name=command_line]').prop('readonly', true);
+      execution_information_table.find('input[name=working_directory]').prop('readonly', true);
+      buttonElements.push({name: 'run_execution_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-play', text: ''});
+      buttonElements.push({name: 'refresh_execution_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-refresh', text: ''});
+    }
+  }
+  buttonElements.push({name: 'cancel_execution_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-remove', text: ''});
+  $('#execution_information_panel').find('h1[name=execution_information_panel_title]').children().last().remove();
+  $('#execution_information_panel').find('h1[name=execution_information_panel_title]').append(createButtonGroupElement(buttonElements));
+
+  execution_information_table.find('input[name=name]').val(execution.name);
+  execution_information_table.find('input[name=description]').val(execution.description);
+  execution_information_table.find('input[name=command_line]').val(execution.command_line);
+  execution_information_table.find('input[name=working_directory]').val(execution.working_directory);
+  execution_information_table.find('input[name=status]').val(execution.status);
+  execution_information_table.find('input[name=exit_code]').val(execution.exit_code);
+  execution_information_table.find('input[name=killed]').val(execution.killed);
+  execution_information_table.find('input[name=started_at]').val(execution.started_at);
+  execution_information_table.find('input[name=finished_at]').val(execution.finished_at);
+
+  var execution_logs_table = $('#execution_information_float_panel #execution_logs_tab #execution_logs_table');
+  execution_logs_table.find('textarea[name=std_out]').val(execution.std_out);
+  execution_logs_table.find('textarea[name=std_err]').val(execution.std_err);
+
+  if (initializeTabSelection) {
+    $('#execution_information_float_panel a[href="#execution_information_tab"]').tab('show');
+  }
+  $('#execution_information_float_panel').fadeIn(50);
+
+  $('#page_cover').fadeIn(50);
+}
+
+$('#execution_information_float_panel a[data-toggle=tab]').on('shown.bs.tab', function(e) {
+  var executionName = $('#execution_information_panel').find('input[name=name]').val();
+  if ((executionName == null) || (executionName == undefined) || (executionName == '')) {
+    return;
+  }
+
+  getResource('commands', executionName, '', function(execution) {
+    repaintExecutionInformation(execution, false);
+  });
+})
+
+$('#execution_information_panel').on('click', 'button[name=run_execution_btn]', function() {
+  var executionName = $('#execution_information_panel').find('input[name=name]').val();
+  if ((executionName == null) || (executionName == undefined) || (executionName == '')) {
+    alert('Register execution first.');
+    return;
+  }
+
+});
+
+$('#execution_information_panel').on('click', 'button[name=cancel_execution_btn]', function() {
+  $('#execution_information_float_panel').fadeOut(50, function() {
+    $('#page_cover').fadeOut(50);
+  });
+});
+
+$('#execution_information_panel').on('click', 'button[name=refresh_execution_btn]', function() {
+  var execution_information_table = $('#execution_information_float_panel #execution_information_tab #execution_information_table');
+  var executionName = execution_information_table.find('input[name=name]').val();
+  getResource('commands', executionName, '', function(execution) {
+    repaintExecutionInformation(execution, false);
+  });
+});
+
+$('#execution_information_panel').on('click', 'button[name=run_execution_btn]', function() {
+  var execution_information_table = $('#execution_information_float_panel #execution_information_tab #execution_information_table');
+  var executionName = execution_information_table.find('input[name=name]').val();
+  runExecution(executionName, function() {
+    getResource('commands', executionName, '', function(execution) {
+      repaintExecutionInformation(execution, false);
+    });
+  });
+});
+
+$('#execution_information_panel').on('click', 'button[name=stop_execution_btn]', function() {
+  var execution_information_table = $('#execution_information_float_panel #execution_information_tab #execution_information_table');
+  var executionName = execution_information_table.find('input[name=name]').val();
+  stopExecution(executionName, function() {
+    getResource('commands', executionName, '', function(execution) {
+      repaintExecutionInformation(execution, false);
+    });
+  });
+});
+
+$('#execution_information_panel').on('click', 'button[name=update_execution_btn]', function() {
+  if (!confirm('Are you sure to register the execution?')) {
+    return;
+  }
+
+  var executionName = $('#execution_information_panel').find('input[name=name]').val();
+  var executionDescription = $('#execution_information_panel').find('input[name=description]').val();
+  var executionCommandLine = $('#execution_information_panel').find('input[name=command_line]').val();
+  var executionWorkingDirectory = $('#execution_information_panel').find('input[name=working_directory]').val();
+
+  var execution = {
+    name: executionName,
+    description: executionDescription,
+    command_line: executionCommandLine,
+    working_directory: executionWorkingDirectory
+  };
+
+  postResource('commands', execution, '', function(result, xhr) {
+    showProcessResult(result, xhr, 201, "The execution information has been registered successfully.");
+    postProcessUpdateExecution(result, xhr);
+  });
+
+});
+
+function postProcessUpdateExecution(result, xhr) {
+  var executionName = result.name;
+
+  getResource('commands', executionName, '', function(execution) {
+    repaintExecutionInformation(execution, false);
+    if ((storedCallbackExecutionInformationUpdated != null) && (storedCallbackExecutionInformationUpdated != undefined)) {
+      storedCallbackExecutionInformationUpdated();
+    }
+  });
+}
+
+function deleteExecutionInformation(executionName, callbackExecutionInformationDeleted) {
+  if (!confirm('Are you sure to delete the template?')) {
+    return;
+  }
+
+  deleteResource('commands', executionName, '', function(result, xhr) {
+    showProcessResult(result, xhr, 204, "The execution information has been deleted successfully.");
+    callbackExecutionInformationDeleted();
+  });
+}
+
+function runExecution(executionName, callbackExecutionStarted) {
+  if (!confirm('Are you sure to execute?')) {
+    return;
+  }
+
+  postResource('commands/' + executionName + '/execution', {}, '', function(result, xhr) {
+    showProcessResult(result, xhr, 201, "The execution has started successfully.");
+    callbackExecutionStarted();
+  });
+}
+
+function stopExecution(executionName, callbackExecutionCancelled) {
+  if (!confirm('Are you sure to stop?')) {
+    return;
+  }
+
+  deleteResource('commands/' + executionName, 'execution', '', function(result, xhr) {
+    showProcessResult(result, xhr, 204, "The execution has been stopped successfully.");
+    callbackExecutionCancelled();
+  });
+}

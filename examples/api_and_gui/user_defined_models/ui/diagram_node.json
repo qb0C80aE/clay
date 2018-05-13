@@ -1,0 +1,23 @@
+{
+  "type_name": "DiagramNode",
+  "resource_name": "diagram_nodes",
+  "to_be_migrated": true,
+  "is_controller_enabled": true,
+  "fields": [
+    {
+      "name": "DiagramNodeID",
+      "tag": "json:\"diagram_node_id\" yaml:\"diagram_node_id\" gorm:\"primary_key\"",
+      "type_name": "string"
+    },
+    {
+      "name": "X",
+      "tag": "json:\"x\" yaml:\"x\" gorm:\"not null\" validate:\"required\"",
+      "type_name": "float"
+    },
+    {
+      "name": "Y",
+      "tag": "json:\"y\" yaml:\"y\" gorm:\"not null\" validate:\"required\"",
+      "type_name": "float"
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+{{ .ModelStore.Single "ephemeral_templates/headerpart.tmpl/generation" "ui_menu=design" }}
+<div class="col-sm-8">
+	<div class="panel panel-default panel-custom" id="design_file_panel">
+		<div class="panel-heading">
+			<h1 class="panel-title">
+				<span class="glyphicon glyphicon-import"></span> Import/Export Design
+			</h1>
+		</div>
+		<div class="panel-body">
+			<div class="row">
+				<div class="col-xs-2">
+					<span class="glyphicon glyphicon-file"></span> Design File
+				</div>
+				<div class="col-xs-10">
+					<input id="design_file" type="file" name="design_file" class="form-control">
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-12">
+					&nbsp;
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xs-2">
+				</div>
+				<div class="col-xs-10">
+					<button class="btn btn-default" id="import_file_btn" type="button">
+						<span class="glyphicon glyphicon-import"></span> Import
+					</button>
+					<button class="btn btn-default" id="export_file_btn" type="button">
+						<span class="glyphicon glyphicon-export"></span> Export
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script language="javascript">
+	(function($) {
+
+		{{ .ModelStore.Single "ephemeral_templates/functions.tmpl/generation" "" }}
+
+		var designData = null;
+
+		function onLoad() {
+			$('#design_file_panel').fadeIn(150);
+		}
+
+		function importDesignFile(result, successCode, successMessage, ignoreSuccess) {
+			if (designData == null) {
+				alert('Select design file first.');
+				return;
+			}
+
+			if (!confirm('Are you sure to import?')) {
+				return;
+			}
+
+			var result = putResource('designs', 'present', designData, '', function(result, xhr) {
+				showProcessResult(result, xhr, 200, "The design file has been imported successfully.");
+			});
+		}
+
+		document.getElementById('design_file').addEventListener('change', function(evt) {
+			var file = evt.target.files;
+			var reader = new FileReader();
+			reader.readAsText(file[0]);
+			reader.onload = function(ev) {
+				try {
+					designData = $.parseJSON(reader.result);
+				}
+				catch (e) {
+					designData = null;
+					$('html,body').animate({
+						scrollTop: 0
+					}, 'slow');
+					$('#error_message').text('The selected file is not a JSON file');
+					$('#alert_error').fadeIn(500).delay(2000).fadeOut(1000);
+				}
+			}
+		}, false);
+
+		function exportDesignFile() {
+			if (!confirm('Are you sure to export?')) {
+				return;
+			}
+
+			getResource('designs', 'present', '', function(result) {
+				var design = JSON.stringify(result, null, '    ');
+
+				var content = design;
+				var link = document.createElement('a');
+				link.href = window.URL.createObjectURL(new Blob([content]));
+				link.download = 'design.json';
+				link.click();
+			});
+		}
+
+		$('#import_file_btn').on('click', function() {
+			importDesignFile();
+		});
+
+		$('#export_file_btn').on('click', function() {
+			exportDesignFile();
+		});
+
+		onLoad();
+
+	})(jQuery);
+</script>
+{{ .ModelStore.Single "ephemeral_templates/footerpart.tmpl/generation" "" }}
