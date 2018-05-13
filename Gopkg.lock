@@ -69,6 +69,12 @@
   revision = "d14ea06fba99483203c19d92cfcd13ebe73135f4"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/jessevdk/go-assets"
+  packages = ["."]
+  revision = "4f4301a06e153ff90e17793577ab6bf79f8dc5c5"
+
+[[projects]]
   name = "github.com/jinzhu/gorm"
   packages = [
     ".",
@@ -299,6 +305,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a31749e15b657b00982250c68b763504694635583e3fcf6a9c8800c191cd1f75"
+  inputs-digest = "9e630323c3b7efb2fc287b9bd1ffbc2693cd76c6e2bc3ffbabc83b95f6b6c4cb"
   solver-name = "gps-cdcl"
   solver-version = 1

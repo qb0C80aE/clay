@@ -31,6 +31,7 @@ type EnvironmentalVariableSet struct {
 	clayPort           string
 	clayDBMode         string
 	clayDBFilePath     string
+	clayAssetMode      string
 }
 
 func getEnvironmentalVariable(name string, defaultValue string) string {
@@ -48,6 +49,7 @@ var defaultEnvironmentVariableSet = EnvironmentalVariableSet{
 	clayPort:           "8080",
 	clayDBMode:         "file",
 	clayDBFilePath:     "./clay.db",
+	clayAssetMode:      "external",
 }
 
 var currentEnvironmentalVariableSet = EnvironmentalVariableSet{
@@ -56,6 +58,7 @@ var currentEnvironmentalVariableSet = EnvironmentalVariableSet{
 	clayPort:           getEnvironmentalVariable("CLAY_PORT", defaultEnvironmentVariableSet.clayPort),
 	clayDBMode:         getEnvironmentalVariable("CLAY_DB_MODE", defaultEnvironmentVariableSet.clayDBMode),
 	clayDBFilePath:     getEnvironmentalVariable("CLAY_DB_FILE_PATH", defaultEnvironmentVariableSet.clayDBFilePath),
+	clayAssetMode:      getEnvironmentalVariable("CLAY_ASSET_MODE", defaultEnvironmentVariableSet.clayAssetMode),
 }
 
 // GetDefaultEnvironmentalVariableSet returns default environmental variable set
@@ -101,4 +104,9 @@ func (receiver *EnvironmentalVariableSet) GetClayDBMode() string {
 // GetClayDBFilePath returns CLAY_DB_FILE_PATH
 func (receiver *EnvironmentalVariableSet) GetClayDBFilePath() string {
 	return receiver.clayDBFilePath
+}
+
+// GetClayAssetMode returns CLAY_ASSET_MODE
+func (receiver *EnvironmentalVariableSet) GetClayAssetMode() string {
+	return receiver.clayAssetMode
 }
