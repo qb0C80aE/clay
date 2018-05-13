@@ -2,7 +2,6 @@ package runtime
 
 import (
 	"os"
-	"strconv"
 
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -17,21 +16,12 @@ type clayRuntime struct {
 }
 
 func (clayRuntime *clayRuntime) Run() {
-	host := "localhost"
-	port := "8080"
+	environmentalVariableSet := extension.GetCurrentEnvironmentalVariableSet()
 
-	if h := os.Getenv("CLAY_HOST"); h != "" {
-		host = h
-	}
+	host := environmentalVariableSet.GetClayHost()
+	port := environmentalVariableSet.GetClayPortInt()
 
-	if p := os.Getenv("CLAY_PORT"); p != "" {
-		if _, err := strconv.Atoi(p); err == nil {
-			port = p
-		}
-	}
-
-	dbMode := os.Getenv("CLAY_DB_MODE")
-	db, err := dbpkg.Connect(dbMode)
+	db, err := dbpkg.Connect(environmentalVariableSet.GetClayDBMode())
 	if err != nil {
 		logging.Logger().Critical(err.Error())
 		os.Exit(1)
@@ -56,7 +46,7 @@ func (clayRuntime *clayRuntime) Run() {
 		os.Exit(1)
 	}
 
-	if err := server.Run(fmt.Sprintf("%s:%s", host, port)); err != nil {
+	if err := server.Run(fmt.Sprintf("%s:%d", host, port)); err != nil {
 		logging.Logger().Criticalf("failed to start: %s", err)
 		os.Exit(1)
 	}
