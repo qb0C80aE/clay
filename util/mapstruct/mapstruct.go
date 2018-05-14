@@ -9,8 +9,19 @@ import (
 	"sort"
 )
 
+var utility = &Utility{}
+
+// Utility handles map struct operation
+type Utility struct {
+}
+
+// GetUtility returns the instance of utility
+func GetUtility() *Utility {
+	return utility
+}
+
 // MapToStruct maps the map instance into the struct instance using JSON marshal logic
-func MapToStruct(m interface{}, val interface{}) error {
+func (receiver *Utility) MapToStruct(m interface{}, val interface{}) error {
 	tmp, err := json.Marshal(m)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
@@ -26,7 +37,7 @@ func MapToStruct(m interface{}, val interface{}) error {
 
 // SliceToInterfaceSlice creates a []interface{} from a slice of concrete type
 // It doesn't modify the raw type of elements like strpping pointer or something
-func SliceToInterfaceSlice(slice interface{}) ([]interface{}, error) {
+func (receiver *Utility) SliceToInterfaceSlice(slice interface{}) ([]interface{}, error) {
 	v := reflect.ValueOf(slice)
 
 	if v.Kind() != reflect.Slice && v.Kind() != reflect.Array {
@@ -63,7 +74,7 @@ func SliceToInterfaceSlice(slice interface{}) ([]interface{}, error) {
 
 // StructSliceToInterfaceMap creates a map[interface{}]interface{} from a slice of a struct with key defined in the struct
 // It doesn't modify the raw type of elements like strpping pointer or something
-func StructSliceToInterfaceMap(structSlice interface{}, keyFieldName string) (map[interface{}]interface{}, error) {
+func (receiver *Utility) StructSliceToInterfaceMap(structSlice interface{}, keyFieldName string) (map[interface{}]interface{}, error) {
 	structSliceValue := reflect.ValueOf(structSlice)
 
 	if structSliceValue.Kind() != reflect.Slice && structSliceValue.Kind() != reflect.Array {
@@ -106,7 +117,7 @@ func StructSliceToInterfaceMap(structSlice interface{}, keyFieldName string) (ma
 
 // StructSliceToInterfaceSliceMap creates a map[interface{}][]interface{} from a slice of a struct with key defined in the struct
 // It doesn't modify the raw type of elements like strpping pointer or something
-func StructSliceToInterfaceSliceMap(structSlice interface{}, keyFieldName string) (map[interface{}][]interface{}, error) {
+func (receiver *Utility) StructSliceToInterfaceSliceMap(structSlice interface{}, keyFieldName string) (map[interface{}][]interface{}, error) {
 	structSliceValue := reflect.ValueOf(structSlice)
 
 	if structSliceValue.Kind() != reflect.Slice && structSliceValue.Kind() != reflect.Array {
@@ -155,7 +166,7 @@ func StructSliceToInterfaceSliceMap(structSlice interface{}, keyFieldName string
 
 // StructSliceToFieldValueInterfaceSlice creates a []interface{} from a slice of a struct with field defined in the struct
 // It doesn't modify the raw type of elements like strpping pointer or something
-func StructSliceToFieldValueInterfaceSlice(structSlice interface{}, fieldName string) ([]interface{}, error) {
+func (receiver *Utility) StructSliceToFieldValueInterfaceSlice(structSlice interface{}, fieldName string) ([]interface{}, error) {
 	structSliceValue := reflect.ValueOf(structSlice)
 
 	if structSliceValue.Kind() != reflect.Slice && structSliceValue.Kind() != reflect.Array {
@@ -197,7 +208,7 @@ func StructSliceToFieldValueInterfaceSlice(structSlice interface{}, fieldName st
 
 // MapToKeySlice creates a []interface{} from keys of map
 // It doesn't modify the raw type of elements like strpping pointer or something
-func MapToKeySlice(mapInterface interface{}) ([]interface{}, error) {
+func (receiver *Utility) MapToKeySlice(mapInterface interface{}) ([]interface{}, error) {
 	mapInterfaceValue := reflect.ValueOf(mapInterface)
 
 	if mapInterfaceValue.Kind() != reflect.Map {
@@ -233,7 +244,7 @@ func MapToKeySlice(mapInterface interface{}) ([]interface{}, error) {
 // It doesn't modify the raw type of elements like strpping pointer or something
 // The elements in the given slice must be the same type of digit primitive or string
 // The order must be "asc" or "desc"
-func SortSlice(slice interface{}, order string) ([]interface{}, error) {
+func (receiver *Utility) SortSlice(slice interface{}, order string) ([]interface{}, error) {
 	sliceValue := reflect.ValueOf(slice)
 
 	if sliceValue.Kind() != reflect.Slice && sliceValue.Kind() != reflect.Array {
@@ -348,7 +359,7 @@ func SortSlice(slice interface{}, order string) ([]interface{}, error) {
 
 // RemapToStruct remaps map or struct elements into another one
 // It can be used, for example, map -> container, map -> model, container <-> model
-func RemapToStruct(in interface{}, out interface{}) error {
+func (receiver *Utility) RemapToStruct(in interface{}, out interface{}) error {
 	byteArray, err := json.Marshal(in)
 	if err != nil {
 		logging.Logger().Debug(err.Error())

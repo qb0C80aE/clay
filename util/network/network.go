@@ -7,17 +7,19 @@ import (
 	"net"
 )
 
-// Ipv4Address is the struct represents IPv4 what is easy to use in calculation
-type Ipv4Address struct {
-	v4address uint32
-	mask      uint32
-	prefix    uint
-	network   uint32
-	host      uint32
+var utility = &Utility{}
+
+// Utility handles network operation
+type Utility struct {
+}
+
+// GetUtility returns the instance of utility
+func GetUtility() *Utility {
+	return utility
 }
 
 // ParseCIDR parses CIDR string and generate Ipv4Address instance based on that
-func ParseCIDR(cidr string) (*Ipv4Address, error) {
+func (receiver *Utility) ParseCIDR(cidr string) (*Ipv4Address, error) {
 	ip, ipNet, err := net.ParseCIDR(cidr)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
@@ -32,6 +34,15 @@ func ParseCIDR(cidr string) (*Ipv4Address, error) {
 	result.network = (result.v4address & result.mask) >> uint32(32-prefix)
 	result.host = (result.v4address & ^result.mask)
 	return result, nil
+}
+
+// Ipv4Address is the struct represents IPv4 what is easy to use in calculation
+type Ipv4Address struct {
+	v4address uint32
+	mask      uint32
+	prefix    uint
+	network   uint32
+	host      uint32
 }
 
 func (receiver *Ipv4Address) clone() *Ipv4Address {

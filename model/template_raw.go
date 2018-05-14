@@ -5,7 +5,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
-	"github.com/qb0C80aE/clay/util/mapstruct"
+	mapstructutilpkg "github.com/qb0C80aE/clay/util/mapstruct"
 	"net/url"
 )
 
@@ -42,7 +42,7 @@ func (receiver *TemplateRaw) GetSingle(model extension.Model, db *gorm.DB, param
 		return nil, err
 	}
 
-	if err := mapstruct.RemapToStruct(container, templateModelAsContainer); err != nil {
+	if err := mapstructutilpkg.GetUtility().RemapToStruct(container, templateModelAsContainer); err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
 	}

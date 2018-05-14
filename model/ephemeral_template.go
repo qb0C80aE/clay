@@ -7,7 +7,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
-	"github.com/qb0C80aE/clay/util/mapstruct"
+	mapstructutilpkg "github.com/qb0C80aE/clay/util/mapstruct"
 	"net/url"
 	"sort"
 	"sync"
@@ -78,7 +78,7 @@ func (receiver *EphemeralTemplate) GetMulti(_ extension.Model, db *gorm.DB, _ gi
 // Create corresponds HTTP POST message and handles a request for multi resource to create a new information
 func (receiver *EphemeralTemplate) Create(_ extension.Model, _ *gorm.DB, _ gin.Params, _ url.Values, inputContainer interface{}) (interface{}, error) {
 	ephemeralTemplate := NewEphemeralTemplate()
-	if err := mapstruct.RemapToStruct(inputContainer, ephemeralTemplate); err != nil {
+	if err := mapstructutilpkg.GetUtility().RemapToStruct(inputContainer, ephemeralTemplate); err != nil {
 		return nil, err
 	}
 
@@ -106,7 +106,7 @@ func (receiver *EphemeralTemplate) Update(model extension.Model, _ *gorm.DB, par
 	name := parameters.ByName(modelKey.KeyParameter)
 
 	ephemeralTemplate := NewEphemeralTemplate()
-	if err := mapstruct.RemapToStruct(inputContainer, ephemeralTemplate); err != nil {
+	if err := mapstructutilpkg.GetUtility().RemapToStruct(inputContainer, ephemeralTemplate); err != nil {
 		logging.Logger().Debug(err)
 		return nil, err
 	}

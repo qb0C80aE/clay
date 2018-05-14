@@ -7,7 +7,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
-	"github.com/qb0C80aE/clay/util/mapstruct"
+	mapstructutilpkg "github.com/qb0C80aE/clay/util/mapstruct"
 	"net/url"
 	"sort"
 	"sync"
@@ -80,7 +80,7 @@ func (receiver *URLAliasDefinition) Create(_ extension.Model, _ *gorm.DB, _ gin.
 	defer nameURLAliasDefinitionMapMutex.Unlock()
 
 	urlAliasDefinition := NewURLAliasDefinition()
-	if err := mapstruct.RemapToStruct(inputContainer, urlAliasDefinition); err != nil {
+	if err := mapstructutilpkg.GetUtility().RemapToStruct(inputContainer, urlAliasDefinition); err != nil {
 		return nil, err
 	}
 

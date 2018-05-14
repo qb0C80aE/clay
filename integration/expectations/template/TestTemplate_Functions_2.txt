@@ -304,6 +304,9 @@ map1[7]: <no value>
 map keys
 keys of map1: [1 2 3 4 6]
 
+map values
+values of map1: [B C D E G]
+
 --- model store ---
 multi
 test1
@@ -329,14 +332,6 @@ total, paginaiton
 hash
 hash[testParameter11]={1 1 <nil> testParameter11 testParameter11desc int 1 false <nil>}
 hash[testParameter12]={2 1 <nil> testParameter12 testParameter12desc string TestParameter12 false <nil>}
-
---- slicemap ---
-slicemap
-slicemap[testParameter1][0]={1 1 <nil> testParameter11 testParameter11desc int 1 false <nil>}
-slicemap[testParameter2][0]={2 1 <nil> testParameter12 testParameter12desc string TestParameter12 false <nil>}
-slicemap[testParameter1X][0]={3 1 <nil> testParameter1X testParameter1Xdesc int 100 false <nil>}
-slicemap[testParameter1X][1]={4 2 <nil> testParameter1X testParameter1Xdesc int 200 false <nil>}
-slicemap[testParameter1X][2]={5 3 <nil> testParameter1X testParameter1Xdesc int 300 false <nil>}
 
 --- sequence ---
 sequence

@@ -1,14 +1,28 @@
 package conversion
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/qb0C80aE/clay/logging"
+	"gopkg.in/yaml.v2"
+	"reflect"
 	"strconv"
 )
 
-// ToIntInterface converts interface{} into interface{} what has a int value
-func ToIntInterface(value interface{}) (interface{}, error) {
+var utility = &Utility{}
+
+// Utility handles conversion operation
+type Utility struct {
+}
+
+// GetUtility returns the instance of utility
+func GetUtility() *Utility {
+	return utility
+}
+
+// Int converts interface{} into interface{} what has a int value
+func (receiver *Utility) Int(value interface{}) (interface{}, error) {
 	switch value.(type) {
 	case int:
 		return int(value.(int)), nil
@@ -34,6 +48,13 @@ func ToIntInterface(value interface{}) (interface{}, error) {
 		return int(value.(float32)), nil
 	case float64:
 		return int(value.(float64)), nil
+	case []byte:
+		val, err := strconv.ParseInt(string(value.([]byte)), 10, 32)
+		if err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
+		return int(val), nil
 	case string:
 		val, err := strconv.ParseInt(value.(string), 10, 32)
 		if err != nil {
@@ -47,8 +68,8 @@ func ToIntInterface(value interface{}) (interface{}, error) {
 	}
 }
 
-// ToInt8Interface converts interface{} into interface{} what has a int8 value
-func ToInt8Interface(value interface{}) (interface{}, error) {
+// Int8 converts interface{} into interface{} what has a int8 value
+func (receiver *Utility) Int8(value interface{}) (interface{}, error) {
 	switch value.(type) {
 	case int:
 		return int8(value.(int)), nil
@@ -74,6 +95,13 @@ func ToInt8Interface(value interface{}) (interface{}, error) {
 		return int8(value.(float32)), nil
 	case float64:
 		return int8(value.(float64)), nil
+	case []byte:
+		val, err := strconv.ParseInt(string(value.([]byte)), 10, 32)
+		if err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
+		return int8(val), nil
 	case string:
 		val, err := strconv.ParseInt(value.(string), 10, 32)
 		if err != nil {
@@ -87,8 +115,8 @@ func ToInt8Interface(value interface{}) (interface{}, error) {
 	}
 }
 
-// ToInt16Interface converts interface{} into interface{} what has a int16 value
-func ToInt16Interface(value interface{}) (interface{}, error) {
+// Int16 converts interface{} into interface{} what has a int16 value
+func (receiver *Utility) Int16(value interface{}) (interface{}, error) {
 	switch value.(type) {
 	case int:
 		return int16(value.(int)), nil
@@ -114,6 +142,13 @@ func ToInt16Interface(value interface{}) (interface{}, error) {
 		return int16(value.(float32)), nil
 	case float64:
 		return int16(value.(float64)), nil
+	case []byte:
+		val, err := strconv.ParseInt(string(value.([]byte)), 10, 32)
+		if err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
+		return int16(val), nil
 	case string:
 		val, err := strconv.ParseInt(value.(string), 10, 32)
 		if err != nil {
@@ -127,8 +162,8 @@ func ToInt16Interface(value interface{}) (interface{}, error) {
 	}
 }
 
-// ToInt32Interface converts interface{} into interface{} what has a int32 value
-func ToInt32Interface(value interface{}) (interface{}, error) {
+// Int32 converts interface{} into interface{} what has a int32 value
+func (receiver *Utility) Int32(value interface{}) (interface{}, error) {
 	switch value.(type) {
 	case int:
 		return int32(value.(int)), nil
@@ -154,6 +189,13 @@ func ToInt32Interface(value interface{}) (interface{}, error) {
 		return int32(value.(float32)), nil
 	case float64:
 		return int32(value.(float64)), nil
+	case []byte:
+		val, err := strconv.ParseInt(string(value.([]byte)), 10, 32)
+		if err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
+		return int32(val), nil
 	case string:
 		val, err := strconv.ParseInt(value.(string), 10, 32)
 		if err != nil {
@@ -167,8 +209,8 @@ func ToInt32Interface(value interface{}) (interface{}, error) {
 	}
 }
 
-// ToInt64Interface converts interface{} into interface{} what has a int64 value
-func ToInt64Interface(value interface{}) (interface{}, error) {
+// Int64 converts interface{} into interface{} what has a int64 value
+func (receiver *Utility) Int64(value interface{}) (interface{}, error) {
 	switch value.(type) {
 	case int:
 		return int64(value.(int)), nil
@@ -194,6 +236,13 @@ func ToInt64Interface(value interface{}) (interface{}, error) {
 		return int64(value.(float32)), nil
 	case float64:
 		return int64(value.(float64)), nil
+	case []byte:
+		val, err := strconv.ParseInt(string(value.([]byte)), 10, 64)
+		if err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
+		return int64(val), nil
 	case string:
 		val, err := strconv.ParseInt(value.(string), 10, 64)
 		if err != nil {
@@ -207,8 +256,8 @@ func ToInt64Interface(value interface{}) (interface{}, error) {
 	}
 }
 
-// ToUintInterface converts interface{} into interface{} what has a uint value
-func ToUintInterface(value interface{}) (interface{}, error) {
+// Uint converts interface{} into interface{} what has a uint value
+func (receiver *Utility) Uint(value interface{}) (interface{}, error) {
 	switch value.(type) {
 	case int:
 		return uint(value.(int)), nil
@@ -234,6 +283,13 @@ func ToUintInterface(value interface{}) (interface{}, error) {
 		return uint(value.(float32)), nil
 	case float64:
 		return uint(value.(float64)), nil
+	case []byte:
+		val, err := strconv.ParseUint(string(value.([]byte)), 10, 32)
+		if err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
+		return uint(val), nil
 	case string:
 		val, err := strconv.ParseUint(value.(string), 10, 32)
 		if err != nil {
@@ -247,8 +303,8 @@ func ToUintInterface(value interface{}) (interface{}, error) {
 	}
 }
 
-// ToUint8Interface converts interface{} into interface{} what has a uint8 value
-func ToUint8Interface(value interface{}) (interface{}, error) {
+// Uint8 converts interface{} into interface{} what has a uint8 value
+func (receiver *Utility) Uint8(value interface{}) (interface{}, error) {
 	switch value.(type) {
 	case int:
 		return uint8(value.(int)), nil
@@ -274,6 +330,13 @@ func ToUint8Interface(value interface{}) (interface{}, error) {
 		return uint8(value.(float32)), nil
 	case float64:
 		return uint8(value.(float64)), nil
+	case []byte:
+		val, err := strconv.ParseUint(string(value.([]byte)), 10, 32)
+		if err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
+		return uint8(val), nil
 	case string:
 		val, err := strconv.ParseUint(value.(string), 10, 32)
 		if err != nil {
@@ -287,8 +350,8 @@ func ToUint8Interface(value interface{}) (interface{}, error) {
 	}
 }
 
-// ToUint16Interface converts interface{} into interface{} what has a uint16 value
-func ToUint16Interface(value interface{}) (interface{}, error) {
+// Uint16 converts interface{} into interface{} what has a uint16 value
+func (receiver *Utility) Uint16(value interface{}) (interface{}, error) {
 	switch value.(type) {
 	case int:
 		return uint16(value.(int)), nil
@@ -314,6 +377,13 @@ func ToUint16Interface(value interface{}) (interface{}, error) {
 		return uint16(value.(float32)), nil
 	case float64:
 		return uint16(value.(float64)), nil
+	case []byte:
+		val, err := strconv.ParseUint(string(value.([]byte)), 10, 32)
+		if err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
+		return uint16(val), nil
 	case string:
 		val, err := strconv.ParseUint(value.(string), 10, 32)
 		if err != nil {
@@ -327,8 +397,8 @@ func ToUint16Interface(value interface{}) (interface{}, error) {
 	}
 }
 
-// ToUint32Interface converts interface{} into interface{} what has a uint32 value
-func ToUint32Interface(value interface{}) (interface{}, error) {
+// Uint32 converts interface{} into interface{} what has a uint32 value
+func (receiver *Utility) Uint32(value interface{}) (interface{}, error) {
 	switch value.(type) {
 	case int:
 		return uint32(value.(int)), nil
@@ -354,6 +424,13 @@ func ToUint32Interface(value interface{}) (interface{}, error) {
 		return uint32(value.(float32)), nil
 	case float64:
 		return uint32(value.(float64)), nil
+	case []byte:
+		val, err := strconv.ParseUint(string(value.([]byte)), 10, 32)
+		if err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
+		return uint32(val), nil
 	case string:
 		val, err := strconv.ParseUint(value.(string), 10, 32)
 		if err != nil {
@@ -367,8 +444,8 @@ func ToUint32Interface(value interface{}) (interface{}, error) {
 	}
 }
 
-// ToUint64Interface converts interface{} into interface{} what has a uint64 value
-func ToUint64Interface(value interface{}) (interface{}, error) {
+// Uint64 converts interface{} into interface{} what has a uint64 value
+func (receiver *Utility) Uint64(value interface{}) (interface{}, error) {
 	switch value.(type) {
 	case int:
 		return uint64(value.(int)), nil
@@ -394,6 +471,13 @@ func ToUint64Interface(value interface{}) (interface{}, error) {
 		return uint64(value.(float32)), nil
 	case float64:
 		return uint64(value.(float64)), nil
+	case []byte:
+		val, err := strconv.ParseUint(string(value.([]byte)), 10, 64)
+		if err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
+		return uint64(val), nil
 	case string:
 		val, err := strconv.ParseUint(value.(string), 10, 64)
 		if err != nil {
@@ -407,8 +491,8 @@ func ToUint64Interface(value interface{}) (interface{}, error) {
 	}
 }
 
-// ToFloat32Interface converts interface{} into interface{} what has a float32 value
-func ToFloat32Interface(value interface{}) (interface{}, error) {
+// Float32 converts interface{} into interface{} what has a float32 value
+func (receiver *Utility) Float32(value interface{}) (interface{}, error) {
 	switch value.(type) {
 	case int:
 		return float32(value.(int)), nil
@@ -434,6 +518,13 @@ func ToFloat32Interface(value interface{}) (interface{}, error) {
 		return float32(value.(float32)), nil
 	case float64:
 		return float32(value.(float64)), nil
+	case []byte:
+		val, err := strconv.ParseFloat(string(value.([]byte)), 32)
+		if err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
+		return float32(val), nil
 	case string:
 		val, err := strconv.ParseFloat(value.(string), 32)
 		if err != nil {
@@ -447,8 +538,8 @@ func ToFloat32Interface(value interface{}) (interface{}, error) {
 	}
 }
 
-// ToFloat64Interface converts interface{} into interface{} what has a float64 value
-func ToFloat64Interface(value interface{}) (interface{}, error) {
+// Float64 converts interface{} into interface{} what has a float64 value
+func (receiver *Utility) Float64(value interface{}) (interface{}, error) {
 	switch value.(type) {
 	case int:
 		return float64(value.(int)), nil
@@ -474,6 +565,13 @@ func ToFloat64Interface(value interface{}) (interface{}, error) {
 		return float64(value.(float32)), nil
 	case float64:
 		return float64(value.(float64)), nil
+	case []byte:
+		val, err := strconv.ParseFloat(string(value.([]byte)), 64)
+		if err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
+		return float64(val), nil
 	case string:
 		val, err := strconv.ParseFloat(value.(string), 64)
 		if err != nil {
@@ -487,8 +585,8 @@ func ToFloat64Interface(value interface{}) (interface{}, error) {
 	}
 }
 
-// ToStringInterface converts interface{} into interface{} what has a string value
-func ToStringInterface(value interface{}) interface{} {
+// String converts interface{} into interface{} what has a string value
+func (receiver *Utility) String(value interface{}) interface{} {
 	switch value.(type) {
 	case int:
 		return strconv.FormatInt(int64(value.(int)), 10)
@@ -516,14 +614,23 @@ func ToStringInterface(value interface{}) interface{} {
 		return strconv.FormatFloat(float64(value.(float64)), 'E', -1, 64)
 	case bool:
 		return strconv.FormatBool(value.(bool))
+	case []byte:
+		return string(value.([]byte))
 	default:
 		return fmt.Sprintf("%v", value)
 	}
 }
 
-// ToBooleanInterface converts interface{} into interface{} what has a boolean value
-func ToBooleanInterface(value interface{}) (interface{}, error) {
+// Boolean converts interface{} into interface{} what has a boolean value
+func (receiver *Utility) Boolean(value interface{}) (interface{}, error) {
 	switch value.(type) {
+	case []byte:
+		val, err := strconv.ParseBool(string(value.([]byte)))
+		if err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
+		return val, nil
 	case string:
 		val, err := strconv.ParseBool(value.(string))
 		if err != nil {
@@ -535,4 +642,60 @@ func ToBooleanInterface(value interface{}) (interface{}, error) {
 		logging.Logger().Debug("value is not boolean-string")
 		return nil, errors.New("value is not boolean-string")
 	}
+}
+
+func (receiver *Utility) convertToStringKeyMap(dataInterface interface{}) interface{} {
+	reflectValue := reflect.ValueOf(dataInterface)
+	for (reflectValue.Kind() == reflect.Ptr) || (reflectValue.Kind() == reflect.Interface) {
+		reflectValue = reflectValue.Elem()
+	}
+
+	switch reflectValue.Kind() {
+	case reflect.Map:
+		result := map[string]interface{}{}
+		mapKeys := reflectValue.MapKeys()
+
+		for _, key := range mapKeys {
+			itemValue := reflectValue.MapIndex(key)
+			itemInterface := itemValue.Interface()
+			item := receiver.convertToStringKeyMap(itemInterface)
+			result[fmt.Sprintf("%v", key)] = item
+		}
+
+		return result
+	default:
+		return dataInterface
+	}
+}
+
+// JSONMarshal generates JSON text from given object
+func (receiver *Utility) JSONMarshal(dataInterface interface{}, indentInterface interface{}) (interface{}, error) {
+	indent := indentInterface.(string)
+
+	switch len(indent) {
+	case 0:
+		result, err := json.Marshal(receiver.convertToStringKeyMap(dataInterface))
+		if err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
+		return string(result), nil
+	default:
+		result, err := json.MarshalIndent(receiver.convertToStringKeyMap(dataInterface), "", indent)
+		if err != nil {
+			logging.Logger().Debug(err.Error())
+			return nil, err
+		}
+		return string(result), nil
+	}
+}
+
+// YAMLMarshal generates YAML text from given object
+func (receiver *Utility) YAMLMarshal(dataInterface interface{}) (interface{}, error) {
+	result, err := yaml.Marshal(receiver.convertToStringKeyMap(dataInterface))
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+	return string(result), nil
 }

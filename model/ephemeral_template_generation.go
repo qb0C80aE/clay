@@ -7,6 +7,11 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
+	collectionutilpkg "github.com/qb0C80aE/clay/util/collection"
+	conversionutilpkg "github.com/qb0C80aE/clay/util/conversion"
+	mapstructutilpkg "github.com/qb0C80aE/clay/util/mapstruct"
+	networkutilpkg "github.com/qb0C80aE/clay/util/network"
+	stringutilpkg "github.com/qb0C80aE/clay/util/string"
 	"net/url"
 	tplpkg "text/template"
 )
@@ -61,8 +66,11 @@ func (receiver *EphemeralTemplateGeneration) GetSingle(model extension.Model, db
 		ModelStore: &modelStore{
 			db: db,
 		},
-		Core:               &coreUtil{},
-		Network:            &networkUtil{},
+		Collection:         collectionutilpkg.GetUtility(),
+		Conversion:         conversionutilpkg.GetUtility(),
+		MapStruct:          mapstructutilpkg.GetUtility(),
+		Network:            networkutilpkg.GetUtility(),
+		String:             stringutilpkg.GetUtility(),
 		Parameter:          map[interface{}]interface{}{},
 		Query:              urlValues,
 		ProgramInformation: extension.GetRegisteredProgramInformation(),
