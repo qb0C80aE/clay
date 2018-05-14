@@ -2,18 +2,17 @@ package model
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	dbpkg "github.com/qb0C80aE/clay/db"
 	"github.com/qb0C80aE/clay/extension"
-	"github.com/qb0C80aE/clay/helper"
 	"github.com/qb0C80aE/clay/logging"
 	collectionutilpkg "github.com/qb0C80aE/clay/util/collection"
 	conversionutilpkg "github.com/qb0C80aE/clay/util/conversion"
 	loggingutilpkg "github.com/qb0C80aE/clay/util/logging"
 	mapstructutilpkg "github.com/qb0C80aE/clay/util/mapstruct"
+	modelstorepkg "github.com/qb0C80aE/clay/util/modelstore"
 	networkutilpkg "github.com/qb0C80aE/clay/util/network"
 	stringutilpkg "github.com/qb0C80aE/clay/util/string"
 	"net/url"
@@ -26,7 +25,7 @@ import (
 var parameterRegexp = regexp.MustCompile("p\\[(.+)\\]")
 
 type templateParameter struct {
-	ModelStore         *modelStore
+	ModelStore         *modelstorepkg.ModelStore
 	Collection         *collectionutilpkg.Utility
 	Conversion         *conversionutilpkg.Utility
 	MapStruct          *mapstructutilpkg.Utility
@@ -36,10 +35,6 @@ type templateParameter struct {
 	Query              url.Values
 	ProgramInformation extension.ProgramInformation
 	Logging            *loggingutilpkg.Utility
-}
-
-type modelStore struct {
-	db *gorm.DB
 }
 
 // TemplateGeneration is the model class what represents template generation
@@ -198,9 +193,7 @@ func (receiver *TemplateGeneration) GenerateTemplate(db *gorm.DB, parameters gin
 	}
 
 	templateParameter := &templateParameter{
-		ModelStore: &modelStore{
-			db: db,
-		},
+		ModelStore:         modelstorepkg.NewModelStore(db),
 		Collection:         collectionutilpkg.GetUtility(),
 		Conversion:         conversionutilpkg.GetUtility(),
 		MapStruct:          mapstructutilpkg.GetUtility(),
@@ -227,218 +220,6 @@ func (receiver *TemplateGeneration) GenerateTemplate(db *gorm.DB, parameters gin
 // parameters must be given as p[...]=...
 func (receiver *TemplateGeneration) GetSingle(_ extension.Model, db *gorm.DB, parameters gin.Params, urlValues url.Values, _ string) (interface{}, error) {
 	return receiver.GenerateTemplate(db, parameters, urlValues)
-}
-
-func (receiver *modelStore) Single(pathInterface interface{}, queryInterface interface{}) (interface{}, error) {
-	path := pathInterface.(string)
-
-	controller, err := extension.GetAssociatedControllerWithPath(path)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-
-	singleURL, err := controller.GetResourceSingleURL()
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-
-	parameters, err := extension.CreateParametersFromPathAntRoute(path, singleURL)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-
-	urlValues, err := url.ParseQuery(queryInterface.(string))
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-
-	model := controller.GetModel()
-
-	parameter, err := dbpkg.NewParameter(urlValues)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-
-	// single resets db conditions like preloads, so you should use this method in GetSingle or GetMulti only,
-	// and note that all conditions go away after this method.
-	db := receiver.db.New()
-	db, err = parameter.Paginate(db)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-	db = parameter.SetPreloads(db)
-	db = parameter.FilterFields(db)
-	fields := helper.ParseFields(parameter.DefaultQuery(urlValues, "fields", "*"))
-	queryFields := helper.QueryFields(model, fields)
-
-	result, err := model.GetSingle(model, db, parameters, urlValues, queryFields)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-	return result, nil
-}
-
-func (receiver *modelStore) Multi(pathInterface interface{}, queryInterface interface{}) (interface{}, error) {
-	path := pathInterface.(string)
-
-	controller, err := extension.GetAssociatedControllerWithPath(path)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-
-	multiURL, err := controller.GetResourceMultiURL()
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-
-	parameters, err := extension.CreateParametersFromPathAntRoute(path, multiURL)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-
-	urlValues, err := url.ParseQuery(queryInterface.(string))
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-
-	model := controller.GetModel()
-
-	parameter, err := dbpkg.NewParameter(urlValues)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-
-	// multi resets db conditions like preloads, so you should use this method in GetSingle or GetMulti only,
-	// and note that all conditions go away after this method.
-	db := receiver.db.New()
-	db, err = parameter.Paginate(db)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-	db = parameter.SetPreloads(db)
-	db = parameter.SortRecords(db)
-	db = parameter.FilterFields(db)
-	fields := helper.ParseFields(parameter.DefaultQuery(urlValues, "fields", "*"))
-	queryFields := helper.QueryFields(model, fields)
-	result, err := model.GetMulti(model, db, parameters, urlValues, queryFields)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-
-	// reset all conditions in order to get the total number of records
-	db = db.New()
-	total, err := model.GetCount(model, db)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-
-	// reset conditions except for limit and offset in order to get the record count before limitation
-	db = db.New()
-	db = parameter.SetPreloads(db)
-	db = parameter.SortRecords(db)
-	db = parameter.FilterFields(db)
-	countBeforePagination, err := model.GetCount(model, db)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-
-	type multiResult struct {
-		Records               interface{}
-		Total                 interface{}
-		CountBeforePagination interface{}
-	}
-
-	multiResultObject := &multiResult{
-		Records: result,
-		Total:   total,
-		CountBeforePagination: countBeforePagination,
-	}
-
-	return multiResultObject, nil
-}
-
-func (receiver *modelStore) First(pathInterface interface{}, queryInterface interface{}) (interface{}, error) {
-	path := pathInterface.(string)
-
-	controller, err := extension.GetAssociatedControllerWithPath(path)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-
-	multiURL, err := controller.GetResourceMultiURL()
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-
-	parameters, err := extension.CreateParametersFromPathAntRoute(path, multiURL)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-
-	urlValues, err := url.ParseQuery(queryInterface.(string))
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-
-	model := controller.GetModel()
-
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-
-	parameter, err := dbpkg.NewParameter(urlValues)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-
-	// first resets db conditions like preloads, so you should use this method in GetSingle or GetMulti only,
-	// and note that all conditions go away after this method.
-	db := receiver.db.New()
-	db, err = parameter.Paginate(db)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-	db = parameter.SetPreloads(db)
-	db = parameter.SortRecords(db)
-	db = parameter.FilterFields(db)
-	fields := helper.ParseFields(parameter.DefaultQuery(urlValues, "fields", "*"))
-	queryFields := helper.QueryFields(model, fields)
-	result, err := model.GetMulti(model, db, parameters, urlValues, queryFields)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-
-	resultValue := reflect.ValueOf(result)
-	if resultValue.Len() == 0 {
-		logging.Logger().Debug("no record selected")
-		return nil, errors.New("no record selected")
-	}
-
-	return resultValue.Index(0).Interface(), nil
 }
 
 func init() {
