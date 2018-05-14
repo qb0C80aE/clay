@@ -9,6 +9,7 @@ import (
 	"github.com/qb0C80aE/clay/logging"
 	collectionutilpkg "github.com/qb0C80aE/clay/util/collection"
 	conversionutilpkg "github.com/qb0C80aE/clay/util/conversion"
+	loggingutilpkg "github.com/qb0C80aE/clay/util/logging"
 	mapstructutilpkg "github.com/qb0C80aE/clay/util/mapstruct"
 	networkutilpkg "github.com/qb0C80aE/clay/util/network"
 	stringutilpkg "github.com/qb0C80aE/clay/util/string"
@@ -74,6 +75,7 @@ func (receiver *EphemeralTemplateGeneration) GetSingle(model extension.Model, db
 		Parameter:          map[interface{}]interface{}{},
 		Query:              urlValues,
 		ProgramInformation: extension.GetRegisteredProgramInformation(),
+		Logging:            loggingutilpkg.GetUtility(),
 	}
 
 	var doc bytes.Buffer

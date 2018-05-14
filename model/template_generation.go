@@ -12,6 +12,7 @@ import (
 	"github.com/qb0C80aE/clay/logging"
 	collectionutilpkg "github.com/qb0C80aE/clay/util/collection"
 	conversionutilpkg "github.com/qb0C80aE/clay/util/conversion"
+	loggingutilpkg "github.com/qb0C80aE/clay/util/logging"
 	mapstructutilpkg "github.com/qb0C80aE/clay/util/mapstruct"
 	networkutilpkg "github.com/qb0C80aE/clay/util/network"
 	stringutilpkg "github.com/qb0C80aE/clay/util/string"
@@ -34,6 +35,7 @@ type templateParameter struct {
 	Parameter          map[interface{}]interface{}
 	Query              url.Values
 	ProgramInformation extension.ProgramInformation
+	Logging            *loggingutilpkg.Utility
 }
 
 type modelStore struct {
@@ -207,6 +209,7 @@ func (receiver *TemplateGeneration) GenerateTemplate(db *gorm.DB, parameters gin
 		Parameter:          templateParameterMap,
 		Query:              urlValues,
 		ProgramInformation: extension.GetRegisteredProgramInformation(),
+		Logging:            loggingutilpkg.GetUtility(),
 	}
 
 	var doc bytes.Buffer
