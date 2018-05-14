@@ -6,7 +6,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
-	"github.com/qb0C80aE/clay/util/mapstruct"
+	mapstructutilpkg "github.com/qb0C80aE/clay/util/mapstruct"
 	"net/url"
 	"reflect"
 	"regexp"
@@ -322,7 +322,7 @@ func (receiver *Base) LoadToDesign(model extension.Model, db *gorm.DB, data inte
 
 	design := data.(*Design)
 	if value, exists := design.Content[resourceName]; exists {
-		if err := mapstruct.MapToStruct(value.([]interface{}), slicePointer.Interface()); err != nil {
+		if err := mapstructutilpkg.GetUtility().MapToStruct(value.([]interface{}), slicePointer.Interface()); err != nil {
 			logging.Logger().Debug(err.Error())
 			return err
 		}

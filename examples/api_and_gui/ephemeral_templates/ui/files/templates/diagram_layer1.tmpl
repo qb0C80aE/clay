@@ -1,13 +1,12 @@
-{{- $core := .Core -}}
 {{- $layer1Interfaces := .ModelStore.Multi "diagram_layer1_interfaces" "preloads=node,destination_node" -}}
 {{- $nodes := .ModelStore.Multi "nodes" "preloads=ports,node_type" -}}
-{{- $lastNodeIndex := $core.Sub $nodes.Total 1 -}}
-{{- $interfaceMap := $core.Map -}}
+{{- $lastNodeIndex := sub $nodes.Total 1 -}}
+{{- $interfaceMap := .Collection.Map -}}
 {
   "links": [
   {{ range $i, $layer1Interface := $layer1Interfaces.Records }}
     {{ if ne $layer1Interface.DestinationID "" }}
-      {{- $interfaceProcessed := $core.Exists $interfaceMap $layer1Interface.ID -}}
+      {{- $interfaceProcessed := $interfaceMap.Exists $layer1Interface.ID -}}
       {{- if eq $interfaceProcessed false -}}
         {{- $interfaceProcessedLen := len $interfaceMap }}
     {{ if ne $interfaceProcessedLen 0 }},{{ end }}{
@@ -22,8 +21,8 @@
         "ipv4_address": null
       }
     }
-        {{- $interfaceMap := $core.Put $interfaceMap $layer1Interface.ID true -}}
-        {{- $interfaceMap := $core.Put $interfaceMap $layer1Interface.DestinationID true -}}
+        {{- $interfaceMap := $interfaceMap.Put $layer1Interface.ID true -}}
+        {{- $interfaceMap := $interfaceMap.Put $layer1Interface.DestinationID true -}}
       {{ end }}
     {{ end }}
   {{ end }}

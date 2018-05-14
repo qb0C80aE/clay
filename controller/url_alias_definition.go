@@ -7,7 +7,7 @@ import (
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
 	"github.com/qb0C80aE/clay/model"
-	"github.com/qb0C80aE/clay/util/mapstruct"
+	mapstructutilpkg "github.com/qb0C80aE/clay/util/mapstruct"
 	"github.com/qb0C80aE/clay/version"
 	"net/http"
 	"net/url"
@@ -82,7 +82,7 @@ func (receiver *urlAliasDefinitionController) Create(c *gin.Context) {
 	}
 
 	newURLAliasDefinition := &model.URLAliasDefinition{}
-	if err := mapstruct.RemapToStruct(container, newURLAliasDefinition); err != nil {
+	if err := mapstructutilpkg.GetUtility().RemapToStruct(container, newURLAliasDefinition); err != nil {
 		logging.Logger().Debug(err.Error())
 		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
 		return

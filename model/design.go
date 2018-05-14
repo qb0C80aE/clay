@@ -6,7 +6,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
-	"github.com/qb0C80aE/clay/util/mapstruct"
+	mapstructutilpkg "github.com/qb0C80aE/clay/util/mapstruct"
 	"net/url"
 	"reflect"
 	"time"
@@ -86,7 +86,7 @@ func (receiver *Design) Update(_ extension.Model, db *gorm.DB, _ gin.Params, _ u
 	}
 
 	design := NewDesign()
-	if err := mapstruct.RemapToStruct(inputContainer, design); err != nil {
+	if err := mapstructutilpkg.GetUtility().RemapToStruct(inputContainer, design); err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
 	}

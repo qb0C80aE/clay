@@ -2,7 +2,6 @@ package model
 
 import (
 	"bytes"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -11,15 +10,16 @@ import (
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/helper"
 	"github.com/qb0C80aE/clay/logging"
-	"github.com/qb0C80aE/clay/util/conversion"
-	"github.com/qb0C80aE/clay/util/mapstruct"
-	"github.com/qb0C80aE/clay/util/network"
-	"gopkg.in/yaml.v2"
+	collectionutilpkg "github.com/qb0C80aE/clay/util/collection"
+	conversionutilpkg "github.com/qb0C80aE/clay/util/conversion"
+	loggingutilpkg "github.com/qb0C80aE/clay/util/logging"
+	mapstructutilpkg "github.com/qb0C80aE/clay/util/mapstruct"
+	networkutilpkg "github.com/qb0C80aE/clay/util/network"
+	stringutilpkg "github.com/qb0C80aE/clay/util/string"
 	"net/url"
 	"reflect"
 	"regexp"
 	"strconv"
-	"strings"
 	tplpkg "text/template"
 )
 
@@ -27,21 +27,19 @@ var parameterRegexp = regexp.MustCompile("p\\[(.+)\\]")
 
 type templateParameter struct {
 	ModelStore         *modelStore
-	Core               *coreUtil
-	Network            *networkUtil
+	Collection         *collectionutilpkg.Utility
+	Conversion         *conversionutilpkg.Utility
+	MapStruct          *mapstructutilpkg.Utility
+	Network            *networkutilpkg.Utility
+	String             *stringutilpkg.Utility
 	Parameter          map[interface{}]interface{}
 	Query              url.Values
 	ProgramInformation extension.ProgramInformation
+	Logging            *loggingutilpkg.Utility
 }
 
 type modelStore struct {
 	db *gorm.DB
-}
-
-type coreUtil struct {
-}
-
-type networkUtil struct {
 }
 
 // TemplateGeneration is the model class what represents template generation
@@ -101,7 +99,7 @@ func (receiver *TemplateGeneration) GenerateTemplate(db *gorm.DB, parameters gin
 		return nil, err
 	}
 
-	if err := mapstruct.RemapToStruct(container, templateModelAsContainer); err != nil {
+	if err := mapstructutilpkg.GetUtility().RemapToStruct(container, templateModelAsContainer); err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
@@ -111,11 +109,11 @@ func (receiver *TemplateGeneration) GenerateTemplate(db *gorm.DB, parameters gin
 		templateArgumentMap[templateArgument.Name] = templateArgument
 		switch templateArgument.Type {
 		case TemplateArgumentTypeInt:
-			templateParameterMap[templateArgument.Name], err = conversion.ToInt64Interface(templateArgument.DefaultValue)
+			templateParameterMap[templateArgument.Name], err = conversionutilpkg.GetUtility().Int64(templateArgument.DefaultValue)
 		case TemplateArgumentTypeFloat:
-			templateParameterMap[templateArgument.Name], err = conversion.ToFloat64Interface(templateArgument.DefaultValue)
+			templateParameterMap[templateArgument.Name], err = conversionutilpkg.GetUtility().Float64(templateArgument.DefaultValue)
 		case TemplateArgumentTypeBool:
-			templateParameterMap[templateArgument.Name], err = conversion.ToBooleanInterface(templateArgument.DefaultValue)
+			templateParameterMap[templateArgument.Name], err = conversionutilpkg.GetUtility().Boolean(templateArgument.DefaultValue)
 		case TemplateArgumentTypeString:
 			templateParameterMap[templateArgument.Name] = templateArgument.DefaultValue
 		default:
@@ -203,11 +201,15 @@ func (receiver *TemplateGeneration) GenerateTemplate(db *gorm.DB, parameters gin
 		ModelStore: &modelStore{
 			db: db,
 		},
-		Core:               &coreUtil{},
-		Network:            &networkUtil{},
+		Collection:         collectionutilpkg.GetUtility(),
+		Conversion:         conversionutilpkg.GetUtility(),
+		MapStruct:          mapstructutilpkg.GetUtility(),
+		Network:            networkutilpkg.GetUtility(),
+		String:             stringutilpkg.GetUtility(),
 		Parameter:          templateParameterMap,
 		Query:              urlValues,
 		ProgramInformation: extension.GetRegisteredProgramInformation(),
+		Logging:            loggingutilpkg.GetUtility(),
 	}
 
 	var doc bytes.Buffer
@@ -225,224 +227,6 @@ func (receiver *TemplateGeneration) GenerateTemplate(db *gorm.DB, parameters gin
 // parameters must be given as p[...]=...
 func (receiver *TemplateGeneration) GetSingle(_ extension.Model, db *gorm.DB, parameters gin.Params, urlValues url.Values, _ string) (interface{}, error) {
 	return receiver.GenerateTemplate(db, parameters, urlValues)
-}
-
-func (receiver *coreUtil) Add(a, b int) int {
-	return a + b
-}
-
-func (receiver *coreUtil) Sub(a, b int) int {
-	return a - b
-}
-
-func (receiver *coreUtil) Mul(a, b int) int {
-	return a * b
-}
-
-func (receiver *coreUtil) Div(a, b int) int {
-	return a / b
-}
-
-func (receiver *coreUtil) Mod(a, b int) int {
-	return a % b
-}
-
-func (receiver *coreUtil) Int(value interface{}) (interface{}, error) {
-	return conversion.ToIntInterface(value)
-}
-
-func (receiver *coreUtil) Int8(value interface{}) (interface{}, error) {
-	return conversion.ToInt8Interface(value)
-}
-
-func (receiver *coreUtil) Int16(value interface{}) (interface{}, error) {
-	return conversion.ToInt16Interface(value)
-}
-
-func (receiver *coreUtil) Int32(value interface{}) (interface{}, error) {
-	return conversion.ToInt32Interface(value)
-}
-
-func (receiver *coreUtil) Int64(value interface{}) (interface{}, error) {
-	return conversion.ToInt64Interface(value)
-}
-
-func (receiver *coreUtil) Uint(value interface{}) (interface{}, error) {
-	return conversion.ToUintInterface(value)
-}
-
-func (receiver *coreUtil) Uint8(value interface{}) (interface{}, error) {
-	return conversion.ToUint8Interface(value)
-}
-
-func (receiver *coreUtil) Uint16(value interface{}) (interface{}, error) {
-	return conversion.ToUint16Interface(value)
-}
-
-func (receiver *coreUtil) Uint32(value interface{}) (interface{}, error) {
-	return conversion.ToUint32Interface(value)
-}
-
-func (receiver *coreUtil) Uint64(value interface{}) (interface{}, error) {
-	return conversion.ToUint64Interface(value)
-}
-
-func (receiver *coreUtil) Float32(value interface{}) (interface{}, error) {
-	return conversion.ToFloat32Interface(value)
-}
-
-func (receiver *coreUtil) Float64(value interface{}) (interface{}, error) {
-	return conversion.ToFloat64Interface(value)
-}
-
-func (receiver *coreUtil) String(value interface{}) interface{} {
-	return conversion.ToStringInterface(value)
-}
-
-func (receiver *coreUtil) Boolean(value interface{}) (interface{}, error) {
-	return conversion.ToBooleanInterface(value)
-}
-
-func (receiver *coreUtil) Split(value interface{}, separator string) interface{} {
-	data := fmt.Sprintf("%v", value)
-	return strings.Split(data, separator)
-}
-
-func (receiver *coreUtil) Join(slice interface{}, separator string) (interface{}, error) {
-	interfaceSlice, err := mapstruct.SliceToInterfaceSlice(slice)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-	stringSlice := make([]string, len(interfaceSlice))
-
-	for index, item := range interfaceSlice {
-		stringSlice[index] = fmt.Sprintf("%v", item)
-	}
-
-	return strings.Join(stringSlice, separator), nil
-}
-
-func (receiver *coreUtil) Slice(items ...interface{}) interface{} {
-	slice := []interface{}{}
-	return append(slice, items...)
-}
-
-func (receiver *coreUtil) SubSlice(sliceInterface interface{}, begin int, end int) (interface{}, error) {
-	slice, err := mapstruct.SliceToInterfaceSlice(sliceInterface)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-	if begin < 0 {
-		if end < 0 {
-			return slice[:], nil
-		}
-		return slice[:end], nil
-	}
-	if end < 0 {
-		return slice[begin:], nil
-	}
-	return slice[begin:end], nil
-}
-
-func (receiver *coreUtil) Append(sliceInterface interface{}, item ...interface{}) (interface{}, error) {
-	slice, err := mapstruct.SliceToInterfaceSlice(sliceInterface)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-	return append(slice, item...), nil
-}
-
-func (receiver *coreUtil) Concatenate(sliceInterface1 interface{}, sliceInterface2 interface{}) (interface{}, error) {
-	slice1, err := mapstruct.SliceToInterfaceSlice(sliceInterface1)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-	slice2, err := mapstruct.SliceToInterfaceSlice(sliceInterface2)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-	return append(slice1, slice2...), nil
-}
-
-func (receiver *coreUtil) FieldSlice(slice interface{}, fieldName string) ([]interface{}, error) {
-	return mapstruct.StructSliceToFieldValueInterfaceSlice(slice, fieldName)
-}
-
-func (receiver *coreUtil) Sort(slice interface{}, order string) ([]interface{}, error) {
-	return mapstruct.SortSlice(slice, order)
-}
-
-func (receiver *coreUtil) Map(pairs ...interface{}) (map[interface{}]interface{}, error) {
-	if len(pairs)%2 == 1 {
-		logging.Logger().Debug("numebr of arguments must be even")
-		return nil, fmt.Errorf("numebr of arguments must be even")
-	}
-	m := make(map[interface{}]interface{}, len(pairs)/2)
-	for i := 0; i < len(pairs); i += 2 {
-		m[pairs[i]] = pairs[i+1]
-	}
-	return m, nil
-}
-
-func (receiver *coreUtil) Exists(target map[interface{}]interface{}, key interface{}) bool {
-	_, exists := target[key]
-	return exists
-}
-
-func (receiver *coreUtil) Put(target map[interface{}]interface{}, key interface{}, value interface{}) map[interface{}]interface{} {
-	target[key] = value
-	return target
-}
-
-func (receiver *coreUtil) Get(target map[interface{}]interface{}, key interface{}) interface{} {
-	return target[key]
-}
-
-func (receiver *coreUtil) Delete(target map[interface{}]interface{}, key interface{}) map[interface{}]interface{} {
-	delete(target, key)
-	return target
-}
-
-func (receiver *coreUtil) Merge(source, destination map[interface{}]interface{}) map[interface{}]interface{} {
-	for key, value := range source {
-		destination[key] = value
-	}
-	return destination
-}
-
-func (receiver *coreUtil) Keys(target map[interface{}]interface{}) ([]interface{}, error) {
-	return mapstruct.MapToKeySlice(target)
-}
-
-func (receiver *coreUtil) Hash(slice interface{}, keyField string) (map[interface{}]interface{}, error) {
-	return mapstruct.StructSliceToInterfaceMap(slice, keyField)
-}
-
-func (receiver *coreUtil) SliceMap(slice interface{}, keyField string) (map[interface{}]interface{}, error) {
-	sliceMap, err := mapstruct.StructSliceToInterfaceSliceMap(slice, keyField)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-	result := make(map[interface{}]interface{}, len(sliceMap))
-	for key, value := range sliceMap {
-		result[key] = value
-	}
-	return result, nil
-}
-
-func (receiver *coreUtil) Sequence(begin, end int) interface{} {
-	count := end - begin + 1
-	result := make([]int, count)
-	for i, j := 0, begin; i < count; i, j = i+1, j+1 {
-		result[i] = j
-	}
-	return result
 }
 
 func (receiver *modelStore) Single(pathInterface interface{}, queryInterface interface{}) (interface{}, error) {
@@ -657,64 +441,15 @@ func (receiver *modelStore) First(pathInterface interface{}, queryInterface inte
 	return resultValue.Index(0).Interface(), nil
 }
 
-func (receiver *coreUtil) convertToStringKeyMap(dataInterface interface{}) interface{} {
-	reflectValue := reflect.ValueOf(dataInterface)
-	for (reflectValue.Kind() == reflect.Ptr) || (reflectValue.Kind() == reflect.Interface) {
-		reflectValue = reflectValue.Elem()
-	}
-
-	switch reflectValue.Kind() {
-	case reflect.Map:
-		result := map[string]interface{}{}
-		mapKeys := reflectValue.MapKeys()
-
-		for _, key := range mapKeys {
-			itemValue := reflectValue.MapIndex(key)
-			itemInterface := itemValue.Interface()
-			item := receiver.convertToStringKeyMap(itemInterface)
-			result[fmt.Sprintf("%v", key)] = item
-		}
-
-		return result
-	default:
-		return dataInterface
-	}
-}
-
-func (receiver *coreUtil) JSON(dataInterface interface{}, indentInterface interface{}) (interface{}, error) {
-	indent := indentInterface.(string)
-
-	switch len(indent) {
-	case 0:
-		result, err := json.Marshal(receiver.convertToStringKeyMap(dataInterface))
-		if err != nil {
-			logging.Logger().Debug(err.Error())
-			return nil, err
-		}
-		return string(result), nil
-	default:
-		result, err := json.MarshalIndent(receiver.convertToStringKeyMap(dataInterface), "", indent)
-		if err != nil {
-			logging.Logger().Debug(err.Error())
-			return nil, err
-		}
-		return string(result), nil
-	}
-}
-
-func (receiver *coreUtil) YAML(dataInterface interface{}) (interface{}, error) {
-	result, err := yaml.Marshal(receiver.convertToStringKeyMap(dataInterface))
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return nil, err
-	}
-	return string(result), nil
-}
-
-func (receiver *networkUtil) ParseCIDR(cidr string) (*network.Ipv4Address, error) {
-	return network.ParseCIDR(cidr)
-}
-
 func init() {
 	extension.RegisterModel(NewTemplateGeneration())
+
+	funcMap := tplpkg.FuncMap{
+		"add": func(a, b int) int { return a + b },
+		"sub": func(a, b int) int { return a - b },
+		"mul": func(a, b int) int { return a * b },
+		"div": func(a, b int) int { return a / b },
+		"mod": func(a, b int) int { return a % b },
+	}
+	extension.RegisterTemplateFuncMap(funcMap)
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
-	"github.com/qb0C80aE/clay/util/mapstruct"
+	mapstructutilpkg "github.com/qb0C80aE/clay/util/mapstruct"
 	"net/url"
 	"reflect"
 	"sort"
@@ -105,7 +105,7 @@ func (receiver *UserDefinedModelDefinition) Create(model extension.Model, db *go
 	defer typeNameUserDefinedModelDefinitionMapMutex.Unlock()
 
 	userDefinedModelDefinition := NewUserDefinedModelDefinition()
-	if err := mapstruct.RemapToStruct(inputContainer, userDefinedModelDefinition); err != nil {
+	if err := mapstructutilpkg.GetUtility().RemapToStruct(inputContainer, userDefinedModelDefinition); err != nil {
 		return nil, err
 	}
 

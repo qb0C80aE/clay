@@ -634,40 +634,40 @@ i = 100
 {{- $i := 100 }}
 
 i = i + 2
-{{- $i := .Core.Add $i 2 }}
+{{- $i := add $i 2 }}
 {{ $i }}
 
 i = i - 4
-{{- $i := .Core.Sub $i 4 }}
+{{- $i := sub $i 4 }}
 {{ $i }}
 
 i = i * 6
-{{- $i := .Core.Mul $i 6 }}
+{{- $i := mul $i 6 }}
 {{ $i }}
 
 i = i / 2
-{{- $i := .Core.Div $i 2 }}
+{{- $i := div $i 2 }}
 {{ $i }}
 
 i = i mod 5
-{{- $i := .Core.Mod $i 5 }}
+{{- $i := mod $i 5 }}
 {{ $i }}
 
 --- conversion ---
-{{- $vint := .Core.Int "100" }}
-{{- $vint8 := .Core.Int8 "101" }}
-{{- $vint16 := .Core.Int16 "102" }}
-{{- $vint32 := .Core.Int32 "103" }}
-{{- $vint64 := .Core.Int64 "104" }}
-{{- $vuint := .Core.Uint "200" }}
-{{- $vuint8 := .Core.Uint8 "201" }}
-{{- $vuint16 := .Core.Uint16 "202" }}
-{{- $vuint32 := .Core.Uint32 "203" }}
-{{- $vuint64 := .Core.Uint64 "204" }}
-{{- $vfloat32 := .Core.Float32 "300.1" }}
-{{- $vfloat64 := .Core.Float64 "300.2" }}
-{{- $vboolean := .Core.Boolean "false" }}
-{{- $vmap := .Core.Map "key" "value" }}
+{{- $vint := .Conversion.Int "100" }}
+{{- $vint8 := .Conversion.Int8 "101" }}
+{{- $vint16 := .Conversion.Int16 "102" }}
+{{- $vint32 := .Conversion.Int32 "103" }}
+{{- $vint64 := .Conversion.Int64 "104" }}
+{{- $vuint := .Conversion.Uint "200" }}
+{{- $vuint8 := .Conversion.Uint8 "201" }}
+{{- $vuint16 := .Conversion.Uint16 "202" }}
+{{- $vuint32 := .Conversion.Uint32 "203" }}
+{{- $vuint64 := .Conversion.Uint64 "204" }}
+{{- $vfloat32 := .Conversion.Float32 "300.1" }}
+{{- $vfloat64 := .Conversion.Float64 "300.2" }}
+{{- $vboolean := .Conversion.Boolean "false" }}
+{{- $vmap := .Collection.Map "key" "value" }}
 {{ $vint }}
 {{ $vint8 }}
 {{ $vint16 }}
@@ -682,20 +682,20 @@ i = i mod 5
 {{ $vfloat64 }}
 {{ $vboolean }}
 {{ $vmap }}
-{{- $sint := .Core.String $vint }}
-{{- $sint8 := .Core.String $vint8 }}
-{{- $sint16 := .Core.String $vint16 }}
-{{- $sint32 := .Core.String $vint32 }}
-{{- $sint64 := .Core.String $vint64 }}
-{{- $suint := .Core.String $vuint }}
-{{- $suint8 := .Core.String $vuint8 }}
-{{- $suint16 := .Core.String $vuint16 }}
-{{- $suint32 := .Core.String $vuint32 }}
-{{- $suint64 := .Core.String $vuint64 }}
-{{- $sfloat32:= .Core.String $vfloat32 }}
-{{- $sfloat64 := .Core.String $vfloat64 }}
-{{- $sboolean := .Core.String $vboolean }}
-{{- $sobject := .Core.String $vmap }}
+{{- $sint := .Conversion.String $vint }}
+{{- $sint8 := .Conversion.String $vint8 }}
+{{- $sint16 := .Conversion.String $vint16 }}
+{{- $sint32 := .Conversion.String $vint32 }}
+{{- $sint64 := .Conversion.String $vint64 }}
+{{- $suint := .Conversion.String $vuint }}
+{{- $suint8 := .Conversion.String $vuint8 }}
+{{- $suint16 := .Conversion.String $vuint16 }}
+{{- $suint32 := .Conversion.String $vuint32 }}
+{{- $suint64 := .Conversion.String $vuint64 }}
+{{- $sfloat32:= .Conversion.String $vfloat32 }}
+{{- $sfloat64 := .Conversion.String $vfloat64 }}
+{{- $sboolean := .Conversion.String $vboolean }}
+{{- $sobject := .Conversion.String $vmap }}
 {{ $sint }}
 {{ $sint8 }}
 {{ $sint16 }}
@@ -710,400 +710,405 @@ i = i mod 5
 {{ $sfloat64 }}
 {{ $sboolean }}
 {{ $sobject }}
-{{ .Core.Int $vint }}
-{{ .Core.Int $vint8 }}
-{{ .Core.Int $vint16 }}
-{{ .Core.Int $vint32 }}
-{{ .Core.Int $vint64 }}
-{{ .Core.Int $vuint }}
-{{ .Core.Int $vuint8 }}
-{{ .Core.Int $vuint16 }}
-{{ .Core.Int $vuint32 }}
-{{ .Core.Int $vuint64 }}
-{{ .Core.Int $vfloat32 }}
-{{ .Core.Int $vfloat64 }}
-{{ .Core.Int8 $vint }}
-{{ .Core.Int8 $vint8 }}
-{{ .Core.Int8 $vint16 }}
-{{ .Core.Int8 $vint32 }}
-{{ .Core.Int8 $vint64 }}
-{{ .Core.Int8 $vuint }}
-{{ .Core.Int8 $vuint8 }}
-{{ .Core.Int8 $vuint16 }}
-{{ .Core.Int8 $vuint32 }}
-{{ .Core.Int8 $vuint64 }}
-{{ .Core.Int8 $vfloat32 }}
-{{ .Core.Int8 $vfloat64 }}
-{{ .Core.Int16 $vint }}
-{{ .Core.Int16 $vint8 }}
-{{ .Core.Int16 $vint16 }}
-{{ .Core.Int16 $vint32 }}
-{{ .Core.Int16 $vint64 }}
-{{ .Core.Int16 $vuint }}
-{{ .Core.Int16 $vuint8 }}
-{{ .Core.Int16 $vuint16 }}
-{{ .Core.Int16 $vuint32 }}
-{{ .Core.Int16 $vuint64 }}
-{{ .Core.Int16 $vfloat32 }}
-{{ .Core.Int16 $vfloat64 }}
-{{ .Core.Int32 $vint }}
-{{ .Core.Int32 $vint8 }}
-{{ .Core.Int32 $vint16 }}
-{{ .Core.Int32 $vint32 }}
-{{ .Core.Int32 $vint64 }}
-{{ .Core.Int32 $vuint }}
-{{ .Core.Int32 $vuint8 }}
-{{ .Core.Int32 $vuint16 }}
-{{ .Core.Int32 $vuint32 }}
-{{ .Core.Int32 $vuint64 }}
-{{ .Core.Int32 $vfloat32 }}
-{{ .Core.Int32 $vfloat64 }}
-{{ .Core.Int64 $vint }}
-{{ .Core.Int64 $vint8 }}
-{{ .Core.Int64 $vint16 }}
-{{ .Core.Int64 $vint32 }}
-{{ .Core.Int64 $vint64 }}
-{{ .Core.Int64 $vuint }}
-{{ .Core.Int64 $vuint8 }}
-{{ .Core.Int64 $vuint16 }}
-{{ .Core.Int64 $vuint32 }}
-{{ .Core.Int64 $vuint64 }}
-{{ .Core.Int64 $vfloat32 }}
-{{ .Core.Int64 $vfloat64 }}
-{{ .Core.Uint $vint }}
-{{ .Core.Uint $vint8 }}
-{{ .Core.Uint $vint16 }}
-{{ .Core.Uint $vint32 }}
-{{ .Core.Uint $vint64 }}
-{{ .Core.Uint $vuint }}
-{{ .Core.Uint $vuint8 }}
-{{ .Core.Uint $vuint16 }}
-{{ .Core.Uint $vuint32 }}
-{{ .Core.Uint $vuint64 }}
-{{ .Core.Uint $vfloat32 }}
-{{ .Core.Uint $vfloat64 }}
-{{ .Core.Uint8 $vint }}
-{{ .Core.Uint8 $vint8 }}
-{{ .Core.Uint8 $vint16 }}
-{{ .Core.Uint8 $vint32 }}
-{{ .Core.Uint8 $vint64 }}
-{{ .Core.Uint8 $vuint }}
-{{ .Core.Uint8 $vuint8 }}
-{{ .Core.Uint8 $vuint16 }}
-{{ .Core.Uint8 $vuint32 }}
-{{ .Core.Uint8 $vuint64 }}
-{{ .Core.Uint8 $vfloat32 }}
-{{ .Core.Uint8 $vfloat64 }}
-{{ .Core.Uint16 $vint }}
-{{ .Core.Uint16 $vint8 }}
-{{ .Core.Uint16 $vint16 }}
-{{ .Core.Uint16 $vint32 }}
-{{ .Core.Uint16 $vint64 }}
-{{ .Core.Uint16 $vuint }}
-{{ .Core.Uint16 $vuint8 }}
-{{ .Core.Uint16 $vuint16 }}
-{{ .Core.Uint16 $vuint32 }}
-{{ .Core.Uint16 $vuint64 }}
-{{ .Core.Uint16 $vfloat32 }}
-{{ .Core.Uint16 $vfloat64 }}
-{{ .Core.Uint32 $vint }}
-{{ .Core.Uint32 $vint8 }}
-{{ .Core.Uint32 $vint16 }}
-{{ .Core.Uint32 $vint32 }}
-{{ .Core.Uint32 $vint64 }}
-{{ .Core.Uint32 $vuint }}
-{{ .Core.Uint32 $vuint8 }}
-{{ .Core.Uint32 $vuint16 }}
-{{ .Core.Uint32 $vuint32 }}
-{{ .Core.Uint32 $vuint64 }}
-{{ .Core.Uint32 $vfloat32 }}
-{{ .Core.Uint32 $vfloat64 }}
-{{ .Core.Uint64 $vint }}
-{{ .Core.Uint64 $vint8 }}
-{{ .Core.Uint64 $vint16 }}
-{{ .Core.Uint64 $vint32 }}
-{{ .Core.Uint64 $vint64 }}
-{{ .Core.Uint64 $vuint }}
-{{ .Core.Uint64 $vuint8 }}
-{{ .Core.Uint64 $vuint16 }}
-{{ .Core.Uint64 $vuint32 }}
-{{ .Core.Uint64 $vuint64 }}
-{{ .Core.Uint64 $vfloat32 }}
-{{ .Core.Uint64 $vfloat64 }}
-{{ .Core.Float32 $vint }}
-{{ .Core.Float32 $vint8 }}
-{{ .Core.Float32 $vint16 }}
-{{ .Core.Float32 $vint32 }}
-{{ .Core.Float32 $vint64 }}
-{{ .Core.Float32 $vuint }}
-{{ .Core.Float32 $vuint8 }}
-{{ .Core.Float32 $vuint16 }}
-{{ .Core.Float32 $vuint32 }}
-{{ .Core.Float32 $vuint64 }}
-{{ .Core.Float32 $vfloat32 }}
-{{ .Core.Float32 $vfloat64 }}
-{{ .Core.Float64 $vint }}
-{{ .Core.Float64 $vint8 }}
-{{ .Core.Float64 $vint16 }}
-{{ .Core.Float64 $vint32 }}
-{{ .Core.Float64 $vint64 }}
-{{ .Core.Float64 $vuint }}
-{{ .Core.Float64 $vuint8 }}
-{{ .Core.Float64 $vuint16 }}
-{{ .Core.Float64 $vuint32 }}
-{{ .Core.Float64 $vuint64 }}
-{{ .Core.Float64 $vfloat32 }}
-{{ .Core.Float64 $vfloat64 }}
+{{ .Conversion.Int $vint }}
+{{ .Conversion.Int $vint8 }}
+{{ .Conversion.Int $vint16 }}
+{{ .Conversion.Int $vint32 }}
+{{ .Conversion.Int $vint64 }}
+{{ .Conversion.Int $vuint }}
+{{ .Conversion.Int $vuint8 }}
+{{ .Conversion.Int $vuint16 }}
+{{ .Conversion.Int $vuint32 }}
+{{ .Conversion.Int $vuint64 }}
+{{ .Conversion.Int $vfloat32 }}
+{{ .Conversion.Int $vfloat64 }}
+{{ .Conversion.Int8 $vint }}
+{{ .Conversion.Int8 $vint8 }}
+{{ .Conversion.Int8 $vint16 }}
+{{ .Conversion.Int8 $vint32 }}
+{{ .Conversion.Int8 $vint64 }}
+{{ .Conversion.Int8 $vuint }}
+{{ .Conversion.Int8 $vuint8 }}
+{{ .Conversion.Int8 $vuint16 }}
+{{ .Conversion.Int8 $vuint32 }}
+{{ .Conversion.Int8 $vuint64 }}
+{{ .Conversion.Int8 $vfloat32 }}
+{{ .Conversion.Int8 $vfloat64 }}
+{{ .Conversion.Int16 $vint }}
+{{ .Conversion.Int16 $vint8 }}
+{{ .Conversion.Int16 $vint16 }}
+{{ .Conversion.Int16 $vint32 }}
+{{ .Conversion.Int16 $vint64 }}
+{{ .Conversion.Int16 $vuint }}
+{{ .Conversion.Int16 $vuint8 }}
+{{ .Conversion.Int16 $vuint16 }}
+{{ .Conversion.Int16 $vuint32 }}
+{{ .Conversion.Int16 $vuint64 }}
+{{ .Conversion.Int16 $vfloat32 }}
+{{ .Conversion.Int16 $vfloat64 }}
+{{ .Conversion.Int32 $vint }}
+{{ .Conversion.Int32 $vint8 }}
+{{ .Conversion.Int32 $vint16 }}
+{{ .Conversion.Int32 $vint32 }}
+{{ .Conversion.Int32 $vint64 }}
+{{ .Conversion.Int32 $vuint }}
+{{ .Conversion.Int32 $vuint8 }}
+{{ .Conversion.Int32 $vuint16 }}
+{{ .Conversion.Int32 $vuint32 }}
+{{ .Conversion.Int32 $vuint64 }}
+{{ .Conversion.Int32 $vfloat32 }}
+{{ .Conversion.Int32 $vfloat64 }}
+{{ .Conversion.Int64 $vint }}
+{{ .Conversion.Int64 $vint8 }}
+{{ .Conversion.Int64 $vint16 }}
+{{ .Conversion.Int64 $vint32 }}
+{{ .Conversion.Int64 $vint64 }}
+{{ .Conversion.Int64 $vuint }}
+{{ .Conversion.Int64 $vuint8 }}
+{{ .Conversion.Int64 $vuint16 }}
+{{ .Conversion.Int64 $vuint32 }}
+{{ .Conversion.Int64 $vuint64 }}
+{{ .Conversion.Int64 $vfloat32 }}
+{{ .Conversion.Int64 $vfloat64 }}
+{{ .Conversion.Uint $vint }}
+{{ .Conversion.Uint $vint8 }}
+{{ .Conversion.Uint $vint16 }}
+{{ .Conversion.Uint $vint32 }}
+{{ .Conversion.Uint $vint64 }}
+{{ .Conversion.Uint $vuint }}
+{{ .Conversion.Uint $vuint8 }}
+{{ .Conversion.Uint $vuint16 }}
+{{ .Conversion.Uint $vuint32 }}
+{{ .Conversion.Uint $vuint64 }}
+{{ .Conversion.Uint $vfloat32 }}
+{{ .Conversion.Uint $vfloat64 }}
+{{ .Conversion.Uint8 $vint }}
+{{ .Conversion.Uint8 $vint8 }}
+{{ .Conversion.Uint8 $vint16 }}
+{{ .Conversion.Uint8 $vint32 }}
+{{ .Conversion.Uint8 $vint64 }}
+{{ .Conversion.Uint8 $vuint }}
+{{ .Conversion.Uint8 $vuint8 }}
+{{ .Conversion.Uint8 $vuint16 }}
+{{ .Conversion.Uint8 $vuint32 }}
+{{ .Conversion.Uint8 $vuint64 }}
+{{ .Conversion.Uint8 $vfloat32 }}
+{{ .Conversion.Uint8 $vfloat64 }}
+{{ .Conversion.Uint16 $vint }}
+{{ .Conversion.Uint16 $vint8 }}
+{{ .Conversion.Uint16 $vint16 }}
+{{ .Conversion.Uint16 $vint32 }}
+{{ .Conversion.Uint16 $vint64 }}
+{{ .Conversion.Uint16 $vuint }}
+{{ .Conversion.Uint16 $vuint8 }}
+{{ .Conversion.Uint16 $vuint16 }}
+{{ .Conversion.Uint16 $vuint32 }}
+{{ .Conversion.Uint16 $vuint64 }}
+{{ .Conversion.Uint16 $vfloat32 }}
+{{ .Conversion.Uint16 $vfloat64 }}
+{{ .Conversion.Uint32 $vint }}
+{{ .Conversion.Uint32 $vint8 }}
+{{ .Conversion.Uint32 $vint16 }}
+{{ .Conversion.Uint32 $vint32 }}
+{{ .Conversion.Uint32 $vint64 }}
+{{ .Conversion.Uint32 $vuint }}
+{{ .Conversion.Uint32 $vuint8 }}
+{{ .Conversion.Uint32 $vuint16 }}
+{{ .Conversion.Uint32 $vuint32 }}
+{{ .Conversion.Uint32 $vuint64 }}
+{{ .Conversion.Uint32 $vfloat32 }}
+{{ .Conversion.Uint32 $vfloat64 }}
+{{ .Conversion.Uint64 $vint }}
+{{ .Conversion.Uint64 $vint8 }}
+{{ .Conversion.Uint64 $vint16 }}
+{{ .Conversion.Uint64 $vint32 }}
+{{ .Conversion.Uint64 $vint64 }}
+{{ .Conversion.Uint64 $vuint }}
+{{ .Conversion.Uint64 $vuint8 }}
+{{ .Conversion.Uint64 $vuint16 }}
+{{ .Conversion.Uint64 $vuint32 }}
+{{ .Conversion.Uint64 $vuint64 }}
+{{ .Conversion.Uint64 $vfloat32 }}
+{{ .Conversion.Uint64 $vfloat64 }}
+{{ .Conversion.Float32 $vint }}
+{{ .Conversion.Float32 $vint8 }}
+{{ .Conversion.Float32 $vint16 }}
+{{ .Conversion.Float32 $vint32 }}
+{{ .Conversion.Float32 $vint64 }}
+{{ .Conversion.Float32 $vuint }}
+{{ .Conversion.Float32 $vuint8 }}
+{{ .Conversion.Float32 $vuint16 }}
+{{ .Conversion.Float32 $vuint32 }}
+{{ .Conversion.Float32 $vuint64 }}
+{{ .Conversion.Float32 $vfloat32 }}
+{{ .Conversion.Float32 $vfloat64 }}
+{{ .Conversion.Float64 $vint }}
+{{ .Conversion.Float64 $vint8 }}
+{{ .Conversion.Float64 $vint16 }}
+{{ .Conversion.Float64 $vint32 }}
+{{ .Conversion.Float64 $vint64 }}
+{{ .Conversion.Float64 $vuint }}
+{{ .Conversion.Float64 $vuint8 }}
+{{ .Conversion.Float64 $vuint16 }}
+{{ .Conversion.Float64 $vuint32 }}
+{{ .Conversion.Float64 $vuint64 }}
+{{ .Conversion.Float64 $vfloat32 }}
+{{ .Conversion.Float64 $vfloat64 }}
 
 --- string ---
 join
-{{- $data := .Core.Slice 1 99.99 "a" false }}
-{{- $sj := .Core.Join $data "," }}
-join string: {{ $sj}}
+{{- $data := .Collection.Slice 1 99.99 "a" false }}
+{{- $sj := .String.Join $data "," }}
+join string: {{ $sj }}
 
 split
-{{- $ss := .Core.Split $sj "," }}
+{{- $ss := .String.Split $sj "," }}
 split slice: {{ $ss }}
 
 --- slice ---
 slice init
-{{- $slice1 := .Core.Slice }}
+{{- $slice1 := .Collection.Slice }}
 slice1: {{ $slice1 }}
 
 slice init
-{{- $slice2 := .Core.Slice 1 2 3 4 5 }}
+{{- $slice2 := .Collection.Slice 1 2 3 4 5 }}
 slice2: {{ $slice2 }}
 
 slice init
-{{- $slice3 := .Core.Slice 3 4 5 6 7 }}
+{{- $slice3 := .Collection.Slice 3 4 5 6 7 }}
 slice3: {{ $slice3 }}
 
 subslice
-{{- $subslice := .Core.SubSlice $slice3 -1 3 }}
+{{- $subslice := .Collection.SubSlice $slice3 -1 3 }}
 {{ $subslice }}
 
 subslice
-{{ .Core.SubSlice $slice3 1 -1 }}
+{{ .Collection.SubSlice $slice3 1 -1 }}
 
 subslice
-{{ .Core.SubSlice $slice3 -1 -1 }}
+{{ .Collection.SubSlice $slice3 -1 -1 }}
 
 subslice
-{{ .Core.SubSlice $slice3 1 3 }}
+{{ .Collection.SubSlice $slice3 1 3 }}
 
 append
-{{- $slice3 := .Core.Append $slice3 8 9 10 }}
+{{- $slice3 := .Collection.Append $slice3 8 9 10 }}
 {{ $slice3 }}
 
 concatenate
-{{ .Core.Concatenate $slice2 $slice3 }}
+{{ .Collection.Concatenate $slice2 $slice3 }}
 
 fieldslice
 {{- $tpp := .ModelStore.Multi "template_arguments" "" }}
-{{- $idfields := .Core.FieldSlice $tpp.Records "ID" }}
-{{- $namefields := .Core.FieldSlice $tpp.Records "Name" }}
-{{- $idfields := .Core.Sort $idfields "asc" }}
-{{- $namefields := .Core.Sort $namefields "asc" }}
+{{- $idfields := .Collection.FieldSlice $tpp.Records "ID" }}
+{{- $namefields := .Collection.FieldSlice $tpp.Records "Name" }}
+{{- $idfields := .Collection.Sort $idfields "asc" }}
+{{- $namefields := .Collection.Sort $namefields "asc" }}
 {{ $idfields }}
 {{ $namefields }}
 
 sort
-{{- $sliceint := .Core.Slice }}
-{{- $v1 := .Core.Int 3 }}
-{{- $v2 := .Core.Int 1 }}
-{{- $v3 := .Core.Int -5 }}
-{{- $v4 := .Core.Int 2 }}
-{{- $v5 := .Core.Int 4 }}
-{{- $sliceint := .Core.Append $sliceint $v1 $v2 $v3 $v4 $v5 }}
-{{- $sliceint := .Core.Sort $sliceint "asc" }}
+{{- $sliceint := .Collection.Slice }}
+{{- $v1 := .Conversion.Int 3 }}
+{{- $v2 := .Conversion.Int 1 }}
+{{- $v3 := .Conversion.Int -5 }}
+{{- $v4 := .Conversion.Int 2 }}
+{{- $v5 := .Conversion.Int 4 }}
+{{- $sliceint := .Collection.Append $sliceint $v1 $v2 $v3 $v4 $v5 }}
+{{- $sliceint := .Collection.Sort $sliceint "asc" }}
 sliceint asc: {{ $sliceint }}
-{{- $sliceint := .Core.Sort $sliceint "desc" }}
+{{- $sliceint := .Collection.Sort $sliceint "desc" }}
 sliceint desc: {{ $sliceint }}
-{{- $sliceint8 := .Core.Slice }}
-{{- $v1 := .Core.Int8 3 }}
-{{- $v2 := .Core.Int8 1 }}
-{{- $v3 := .Core.Int8 -5 }}
-{{- $v4 := .Core.Int8 2 }}
-{{- $v5 := .Core.Int8 4 }}
-{{- $sliceint8 := .Core.Append $sliceint8 $v1 $v2 $v3 $v4 $v5 }}
-{{- $sliceint8 := .Core.Sort $sliceint8 "asc" }}
+{{- $sliceint8 := .Collection.Slice }}
+{{- $v1 := .Conversion.Int8 3 }}
+{{- $v2 := .Conversion.Int8 1 }}
+{{- $v3 := .Conversion.Int8 -5 }}
+{{- $v4 := .Conversion.Int8 2 }}
+{{- $v5 := .Conversion.Int8 4 }}
+{{- $sliceint8 := .Collection.Append $sliceint8 $v1 $v2 $v3 $v4 $v5 }}
+{{- $sliceint8 := .Collection.Sort $sliceint8 "asc" }}
 sliceint8 asc: {{ $sliceint8}}
-{{- $sliceint8 := .Core.Sort $sliceint8 "desc" }}
+{{- $sliceint8 := .Collection.Sort $sliceint8 "desc" }}
 sliceint8 desc: {{ $sliceint8}}
-{{- $sliceint16 := .Core.Slice }}
-{{- $v1 := .Core.Int16 3 }}
-{{- $v2 := .Core.Int16 1 }}
-{{- $v3 := .Core.Int16 -5 }}
-{{- $v4 := .Core.Int16 2 }}
-{{- $v5 := .Core.Int16 4 }}
-{{- $sliceint16 := .Core.Append $sliceint16 $v1 $v2 $v3 $v4 $v5 }}
-{{- $sliceint16 := .Core.Sort $sliceint16 "asc" }}
+{{- $sliceint16 := .Collection.Slice }}
+{{- $v1 := .Conversion.Int16 3 }}
+{{- $v2 := .Conversion.Int16 1 }}
+{{- $v3 := .Conversion.Int16 -5 }}
+{{- $v4 := .Conversion.Int16 2 }}
+{{- $v5 := .Conversion.Int16 4 }}
+{{- $sliceint16 := .Collection.Append $sliceint16 $v1 $v2 $v3 $v4 $v5 }}
+{{- $sliceint16 := .Collection.Sort $sliceint16 "asc" }}
 sliceint16 asc: {{ $sliceint16 }}
-{{- $sliceint16 := .Core.Sort $sliceint16 "desc" }}
+{{- $sliceint16 := .Collection.Sort $sliceint16 "desc" }}
 sliceint16 desc: {{ $sliceint16 }}
-{{- $sliceint32 := .Core.Slice }}
-{{- $v1 := .Core.Int32 3 }}
-{{- $v2 := .Core.Int32 1 }}
-{{- $v3 := .Core.Int32 -5 }}
-{{- $v4 := .Core.Int32 2 }}
-{{- $v5 := .Core.Int32 4 }}
-{{- $sliceint32 := .Core.Append $sliceint32 $v1 $v2 $v3 $v4 $v5 }}
-{{- $sliceint32 := .Core.Sort $sliceint32 "asc" }}
+{{- $sliceint32 := .Collection.Slice }}
+{{- $v1 := .Conversion.Int32 3 }}
+{{- $v2 := .Conversion.Int32 1 }}
+{{- $v3 := .Conversion.Int32 -5 }}
+{{- $v4 := .Conversion.Int32 2 }}
+{{- $v5 := .Conversion.Int32 4 }}
+{{- $sliceint32 := .Collection.Append $sliceint32 $v1 $v2 $v3 $v4 $v5 }}
+{{- $sliceint32 := .Collection.Sort $sliceint32 "asc" }}
 sliceint32 asc: {{ $sliceint32 }}
-{{- $sliceint32 := .Core.Sort $sliceint32 "desc" }}
+{{- $sliceint32 := .Collection.Sort $sliceint32 "desc" }}
 sliceint32 desc: {{ $sliceint32 }}
-{{- $sliceint64 := .Core.Slice }}
-{{- $v1 := .Core.Int64 3 }}
-{{- $v2 := .Core.Int64 1 }}
-{{- $v3 := .Core.Int64 -5 }}
-{{- $v4 := .Core.Int64 2 }}
-{{- $v5 := .Core.Int64 4 }}
-{{- $sliceint64 := .Core.Append $sliceint64 $v1 $v2 $v3 $v4 $v5 }}
-{{- $sliceint64 := .Core.Sort $sliceint64 "asc" }}
+{{- $sliceint64 := .Collection.Slice }}
+{{- $v1 := .Conversion.Int64 3 }}
+{{- $v2 := .Conversion.Int64 1 }}
+{{- $v3 := .Conversion.Int64 -5 }}
+{{- $v4 := .Conversion.Int64 2 }}
+{{- $v5 := .Conversion.Int64 4 }}
+{{- $sliceint64 := .Collection.Append $sliceint64 $v1 $v2 $v3 $v4 $v5 }}
+{{- $sliceint64 := .Collection.Sort $sliceint64 "asc" }}
 sliceint64 asc: {{ $sliceint64 }}
-{{- $sliceint64 := .Core.Sort $sliceint64 "desc" }}
+{{- $sliceint64 := .Collection.Sort $sliceint64 "desc" }}
 sliceint64 desc: {{ $sliceint64 }}
-{{- $sliceuint := .Core.Slice }}
-{{- $v1 := .Core.Uint 3 }}
-{{- $v2 := .Core.Uint 1 }}
-{{- $v3 := .Core.Uint 5 }}
-{{- $v4 := .Core.Uint 2 }}
-{{- $v5 := .Core.Uint 4 }}
-{{- $sliceuint := .Core.Append $sliceuint $v1 $v2 $v3 $v4 $v5 }}
-{{- $sliceuint := .Core.Sort $sliceuint "asc" }}
+{{- $sliceuint := .Collection.Slice }}
+{{- $v1 := .Conversion.Uint 3 }}
+{{- $v2 := .Conversion.Uint 1 }}
+{{- $v3 := .Conversion.Uint 5 }}
+{{- $v4 := .Conversion.Uint 2 }}
+{{- $v5 := .Conversion.Uint 4 }}
+{{- $sliceuint := .Collection.Append $sliceuint $v1 $v2 $v3 $v4 $v5 }}
+{{- $sliceuint := .Collection.Sort $sliceuint "asc" }}
 sliceuint asc: {{ $sliceuint }}
-{{- $sliceuint := .Core.Sort $sliceuint "desc" }}
+{{- $sliceuint := .Collection.Sort $sliceuint "desc" }}
 sliceuint desc: {{ $sliceuint }}
-{{- $sliceuint8 := .Core.Slice }}
-{{- $v1 := .Core.Uint8 3 }}
-{{- $v2 := .Core.Uint8 1 }}
-{{- $v3 := .Core.Uint8 5 }}
-{{- $v4 := .Core.Uint8 2 }}
-{{- $v5 := .Core.Uint8 4 }}
-{{- $sliceuint8 := .Core.Append $sliceuint8 $v1 $v2 $v3 $v4 $v5 }}
-{{- $sliceuint8 := .Core.Sort $sliceuint8 "asc" }}
+{{- $sliceuint8 := .Collection.Slice }}
+{{- $v1 := .Conversion.Uint8 3 }}
+{{- $v2 := .Conversion.Uint8 1 }}
+{{- $v3 := .Conversion.Uint8 5 }}
+{{- $v4 := .Conversion.Uint8 2 }}
+{{- $v5 := .Conversion.Uint8 4 }}
+{{- $sliceuint8 := .Collection.Append $sliceuint8 $v1 $v2 $v3 $v4 $v5 }}
+{{- $sliceuint8 := .Collection.Sort $sliceuint8 "asc" }}
 sliceuint8 asc: {{ $sliceuint8}}
-{{- $sliceuint8 := .Core.Sort $sliceuint8 "desc" }}
+{{- $sliceuint8 := .Collection.Sort $sliceuint8 "desc" }}
 sliceuint8 desc: {{ $sliceuint8}}
-{{- $sliceuint16 := .Core.Slice }}
-{{- $v1 := .Core.Uint16 3 }}
-{{- $v2 := .Core.Uint16 1 }}
-{{- $v3 := .Core.Uint16 5 }}
-{{- $v4 := .Core.Uint16 2 }}
-{{- $v5 := .Core.Uint16 4 }}
-{{- $sliceuint16 := .Core.Append $sliceuint16 $v1 $v2 $v3 $v4 $v5 }}
-{{- $sliceuint16 := .Core.Sort $sliceuint16 "asc" }}
+{{- $sliceuint16 := .Collection.Slice }}
+{{- $v1 := .Conversion.Uint16 3 }}
+{{- $v2 := .Conversion.Uint16 1 }}
+{{- $v3 := .Conversion.Uint16 5 }}
+{{- $v4 := .Conversion.Uint16 2 }}
+{{- $v5 := .Conversion.Uint16 4 }}
+{{- $sliceuint16 := .Collection.Append $sliceuint16 $v1 $v2 $v3 $v4 $v5 }}
+{{- $sliceuint16 := .Collection.Sort $sliceuint16 "asc" }}
 sliceuint16 asc: {{ $sliceuint16 }}
-{{- $sliceuint16 := .Core.Sort $sliceuint16 "desc" }}
+{{- $sliceuint16 := .Collection.Sort $sliceuint16 "desc" }}
 sliceuint16 desc: {{ $sliceuint16 }}
-{{- $sliceuint32 := .Core.Slice }}
-{{- $v1 := .Core.Uint32 3 }}
-{{- $v2 := .Core.Uint32 1 }}
-{{- $v3 := .Core.Uint32 5 }}
-{{- $v4 := .Core.Uint32 2 }}
-{{- $v5 := .Core.Uint32 4 }}
-{{- $sliceuint32 := .Core.Append $sliceuint32 $v1 $v2 $v3 $v4 $v5 }}
-{{- $sliceuint32 := .Core.Sort $sliceuint32 "asc" }}
+{{- $sliceuint32 := .Collection.Slice }}
+{{- $v1 := .Conversion.Uint32 3 }}
+{{- $v2 := .Conversion.Uint32 1 }}
+{{- $v3 := .Conversion.Uint32 5 }}
+{{- $v4 := .Conversion.Uint32 2 }}
+{{- $v5 := .Conversion.Uint32 4 }}
+{{- $sliceuint32 := .Collection.Append $sliceuint32 $v1 $v2 $v3 $v4 $v5 }}
+{{- $sliceuint32 := .Collection.Sort $sliceuint32 "asc" }}
 sliceuint32 asc: {{ $sliceuint32 }}
-{{- $sliceuint32 := .Core.Sort $sliceuint32 "desc" }}
+{{- $sliceuint32 := .Collection.Sort $sliceuint32 "desc" }}
 sliceuint32 desc: {{ $sliceuint32 }}
-{{- $sliceuint64 := .Core.Slice }}
-{{- $v1 := .Core.Uint64 3 }}
-{{- $v2 := .Core.Uint64 1 }}
-{{- $v3 := .Core.Uint64 5 }}
-{{- $v4 := .Core.Uint64 2 }}
-{{- $v5 := .Core.Uint64 4 }}
-{{- $sliceuint64 := .Core.Append $sliceuint64 $v1 $v2 $v3 $v4 $v5 }}
-{{- $sliceuint64 := .Core.Sort $sliceuint64 "asc" }}
+{{- $sliceuint64 := .Collection.Slice }}
+{{- $v1 := .Conversion.Uint64 3 }}
+{{- $v2 := .Conversion.Uint64 1 }}
+{{- $v3 := .Conversion.Uint64 5 }}
+{{- $v4 := .Conversion.Uint64 2 }}
+{{- $v5 := .Conversion.Uint64 4 }}
+{{- $sliceuint64 := .Collection.Append $sliceuint64 $v1 $v2 $v3 $v4 $v5 }}
+{{- $sliceuint64 := .Collection.Sort $sliceuint64 "asc" }}
 sliceuint64 asc: {{ $sliceuint64 }}
-{{- $sliceuint64 := .Core.Sort $sliceuint64 "desc" }}
+{{- $sliceuint64 := .Collection.Sort $sliceuint64 "desc" }}
 sliceuint64 desc: {{ $sliceuint64 }}
-{{- $slicefloat64 := .Core.Slice }}
-{{- $v1 := .Core.Float32 3.3 }}
-{{- $v2 := .Core.Float32 1 }}
-{{- $v3 := .Core.Float32 -5.1 }}
-{{- $v4 := .Core.Float32 2.2 }}
-{{- $v5 := .Core.Float32 4 }}
-{{- $slicefloat64 := .Core.Append $slicefloat64 $v1 $v2 $v3 $v4 $v5 }}
-{{- $slicefloat64 := .Core.Sort $slicefloat64 "asc" }}
+{{- $slicefloat64 := .Collection.Slice }}
+{{- $v1 := .Conversion.Float32 3.3 }}
+{{- $v2 := .Conversion.Float32 1 }}
+{{- $v3 := .Conversion.Float32 -5.1 }}
+{{- $v4 := .Conversion.Float32 2.2 }}
+{{- $v5 := .Conversion.Float32 4 }}
+{{- $slicefloat64 := .Collection.Append $slicefloat64 $v1 $v2 $v3 $v4 $v5 }}
+{{- $slicefloat64 := .Collection.Sort $slicefloat64 "asc" }}
 slicefloat32 asc: {{ $slicefloat64 }}
-{{- $slicefloat64 := .Core.Sort $slicefloat64 "desc" }}
+{{- $slicefloat64 := .Collection.Sort $slicefloat64 "desc" }}
 slicefloat32 desc: {{ $slicefloat64 }}
-{{- $slicefloat64 := .Core.Slice }}
-{{- $v1 := .Core.Float64 3.3 }}
-{{- $v2 := .Core.Float64 1 }}
-{{- $v3 := .Core.Float64 -5.1 }}
-{{- $v4 := .Core.Float64 2.2 }}
-{{- $v5 := .Core.Float64 4 }}
-{{- $slicefloat64 := .Core.Append $slicefloat64 $v1 $v2 $v3 $v4 $v5 }}
-{{- $slicefloat64 := .Core.Sort $slicefloat64 "asc" }}
+{{- $slicefloat64 := .Collection.Slice }}
+{{- $v1 := .Conversion.Float64 3.3 }}
+{{- $v2 := .Conversion.Float64 1 }}
+{{- $v3 := .Conversion.Float64 -5.1 }}
+{{- $v4 := .Conversion.Float64 2.2 }}
+{{- $v5 := .Conversion.Float64 4 }}
+{{- $slicefloat64 := .Collection.Append $slicefloat64 $v1 $v2 $v3 $v4 $v5 }}
+{{- $slicefloat64 := .Collection.Sort $slicefloat64 "asc" }}
 slicefloat64 asc: {{ $slicefloat64 }}
-{{- $slicefloat64 := .Core.Sort $slicefloat64 "desc" }}
+{{- $slicefloat64 := .Collection.Sort $slicefloat64 "desc" }}
 slicefloat64 desc: {{ $slicefloat64 }}
-{{- $slicestring := .Core.Slice }}
+{{- $slicestring := .Collection.Slice }}
 {{- $v1 := "3.3" }}
 {{- $v2 := "ABC" }}
 {{- $v3 := "-5.1" }}
 {{- $v4 := "012" }}
 {{- $v5 := "def" }}
-{{- $slicestring := .Core.Append $slicestring $v1 $v2 $v3 $v4 $v5 }}
-{{- $slicestring := .Core.Sort $slicestring "asc" }}
+{{- $slicestring := .Collection.Append $slicestring $v1 $v2 $v3 $v4 $v5 }}
+{{- $slicestring := .Collection.Sort $slicestring "asc" }}
 slicestring asc: {{ $slicestring}}
-{{- $slicestring := .Core.Sort $slicestring "desc" }}
+{{- $slicestring := .Collection.Sort $slicestring "desc" }}
 slicestring desc: {{ $slicestring}}
 
 --- map ---
 map
-{{- $map1 := .Core.Map }}
+{{- $map1 := .Collection.Map }}
 map1: {{ $map1 }}
 
 map init get
-{{- $map2 := .Core.Map 1 "A" 2 "B" }}
-map2[1]: {{ .Core.Get $map2 1 }}
-map2[2]: {{ .Core.Get $map2 2 }}
+{{- $map2 := .Collection.Map 1 "A" 2 "B" }}
+map2[1]: {{ $map2.Get 1 }}
+map2[2]: {{ $map2.Get 2 }}
 
 map init get
-{{- $map3 := .Core.Map 1 "C" 3 "D" }}
-map3[1]: {{ .Core.Get $map3 1 }}
-map3[3]: {{ .Core.Get $map3 3 }}
+{{- $map3 := .Collection.Map 1 "C" 3 "D" }}
+map3[1]: {{ $map3.Get 1 }}
+map3[3]: {{ $map3.Get 3 }}
 
 map exists
-{{ .Core.Exists $map2 0 }}
-{{- $e := .Core.Exists $map2 1 }}
+{{ $map2.Exists 0 }}
+{{- $e := $map2.Exists 1 }}
 {{ if eq $e true }}TRUE!!{{ else }}FALSE!!{{ end }}
 
 map put
-{{- $null := .Core.Put $map1 4 "E" }}
-{{- $null := .Core.Put $map1 5 "F" }}
-{{- $null := .Core.Put $map1 6 "G" }}
-map1[4]: {{ .Core.Get $map1 4 }}
-map1[5]: {{ .Core.Get $map1 5 }}
-map1[6]: {{ .Core.Get $map1 6 }}
+{{- $null := $map1.Put 4 "E" }}
+{{- $null := $map1.Put 5 "F" }}
+{{- $null := $map1.Put 6 "G" }}
+map1[4]: {{ $map1.Get 4 }}
+map1[5]: {{ $map1.Get 5 }}
+map1[6]: {{ $map1.Get 6 }}
 
 map delete
-{{- $null := .Core.Delete $map1 5 }}
-map1[3]: {{ .Core.Get $map1 3 }}
-map1[4]: {{ .Core.Get $map1 4 }}
-map1[5]: {{ .Core.Get $map1 5 }}
-map1[6]: {{ .Core.Get $map1 6 }}
-map1[7]: {{ .Core.Get $map1 7 }}
+{{- $null := $map1.Delete 5 }}
+map1[3]: {{ $map1.Get 3 }}
+map1[4]: {{ $map1.Get 4 }}
+map1[5]: {{ $map1.Get 5 }}
+map1[6]: {{ $map1.Get 6 }}
+map1[7]: {{ $map1.Get 7 }}
 
 map merge
-{{- $null :=  .Core.Merge $map2 $map1 }}
-{{- $null :=  .Core.Merge $map3 $map1 }}
-map1[0]: {{ .Core.Get $map1 0 }}
-map1[1]: {{ .Core.Get $map1 1 }}
-map1[2]: {{ .Core.Get $map1 2 }}
-map1[3]: {{ .Core.Get $map1 3 }}
-map1[4]: {{ .Core.Get $map1 4 }}
-map1[5]: {{ .Core.Get $map1 5 }}
-map1[6]: {{ .Core.Get $map1 6 }}
-map1[7]: {{ .Core.Get $map1 7 }}
+{{- $null :=  $map1.Merge $map2 }}
+{{- $null :=  $map1.Merge $map3 }}
+map1[0]: {{ $map1.Get 0 }}
+map1[1]: {{ $map1.Get 1 }}
+map1[2]: {{ $map1.Get 2 }}
+map1[3]: {{ $map1.Get 3 }}
+map1[4]: {{ $map1.Get 4 }}
+map1[5]: {{ $map1.Get 5 }}
+map1[6]: {{ $map1.Get 6 }}
+map1[7]: {{ $map1.Get 7 }}
 
 map keys
-{{- $keys := .Core.Keys $map1 }}
-{{- $keys := .Core.Sort $keys "asc" }}
+{{- $keys := $map1.Keys }}
+{{- $keys := .Collection.Sort $keys "asc" }}
 keys of map1: {{ $keys }}
+
+map values
+{{- $values := $map1.Values }}
+{{- $values := .Collection.Sort $values "asc" }}
+values of map1: {{ $values }}
 
 --- model store ---
 multi
@@ -1140,30 +1145,13 @@ total, paginaiton
 
 --- hash ---
 hash
-{{- $h := .Core.Hash $s.TemplateArguments "Name" }}
-hash[testParameter11]={{ .Core.Get $h "testParameter11" }}
-hash[testParameter12]={{ .Core.Get $h "testParameter12" }}
-
---- slicemap ---
-slicemap
-{{- $p := .ModelStore.Multi "template_arguments" "" }}
-{{- $z := .Core.SliceMap $p.Records "Name" }}
-{{- $z1 := .Core.Get $z "testParameter11" }}
-{{- $z2 := .Core.Get $z "testParameter12" }}
-{{- $z3 := .Core.Get $z "testParameter1X" }}
-{{- range $i, $v := $z1 }}
-slicemap[testParameter1][{{ $i }}]={{ $v }}
-{{- end }}
-{{- range $i, $v := $z2 }}
-slicemap[testParameter2][{{ $i }}]={{ $v }}
-{{- end }}
-{{- range $i, $v := $z3 }}
-slicemap[testParameter1X][{{ $i }}]={{ $v }}
-{{- end }}
+{{- $h := .Collection.Hash $s.TemplateArguments "Name" }}
+hash[testParameter11]={{ $h.Get "testParameter11" }}
+hash[testParameter12]={{ $h.Get "testParameter12" }}
 
 --- sequence ---
 sequence
-{{- $s := .Core.Sequence 1 10 }}
+{{- $s := .Collection.Sequence 1 10 }}
 {{- range $i, $v := $s }}
 sequence[{{ $i }}]={{ $v }}
 {{- end }}
@@ -1192,14 +1180,14 @@ sequence[{{ $i }}]={{ $v }}
 
 --- json, yaml ---
 {{- $x := .ModelStore.Multi "templates" "preloads=template_arguments&fields=id,name" }}
-{{- $x2 := .Core.Map }}
-{{- $x2 := .Core.Put $x2 "title" "test" }}
-{{- $x2 := .Core.Put $x2 "abc" 100 }}
-{{- $x3 := .Core.Put $x2 "records" $x.Records }}
+{{- $x2 := .Collection.Map }}
+{{- $x2 := $x2.Put "title" "test" }}
+{{- $x2 := $x2.Put "abc" 100 }}
+{{- $x3 := $x2.Put "records" $x.Records }}
 json
-{{ .Core.JSON $x2 "	" }}
+{{ .Conversion.JSONMarshal $x2 "	" }}
 yaml
-{{ .Core.YAML $x2 }}
+{{ .Conversion.YAMLMarshal $x2 }}
 `,
 		Description: "test1desc",
 	}

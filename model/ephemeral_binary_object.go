@@ -7,7 +7,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
-	"github.com/qb0C80aE/clay/util/mapstruct"
+	mapstructutilpkg "github.com/qb0C80aE/clay/util/mapstruct"
 	"net/url"
 	"sort"
 	"sync"
@@ -91,7 +91,7 @@ func (receiver *EphemeralBinaryObject) GetMulti(_ extension.Model, db *gorm.DB, 
 func (receiver *EphemeralBinaryObject) Create(_ extension.Model, _ *gorm.DB, _ gin.Params, _ url.Values, inputContainer interface{}) (interface{}, error) {
 	ephemeralBinaryObject := NewEphemeralBinaryObject()
 
-	if err := mapstruct.RemapToStruct(inputContainer, ephemeralBinaryObject); err != nil {
+	if err := mapstructutilpkg.GetUtility().RemapToStruct(inputContainer, ephemeralBinaryObject); err != nil {
 		return nil, err
 	}
 
@@ -125,7 +125,7 @@ func (receiver *EphemeralBinaryObject) Update(model extension.Model, _ *gorm.DB,
 	name := parameters.ByName(modelKey.KeyParameter)
 
 	ephemeralBinaryObject := NewEphemeralBinaryObject()
-	if err := mapstruct.RemapToStruct(inputContainer, ephemeralBinaryObject); err != nil {
+	if err := mapstructutilpkg.GetUtility().RemapToStruct(inputContainer, ephemeralBinaryObject); err != nil {
 		logging.Logger().Debug(err)
 		return nil, err
 	}
