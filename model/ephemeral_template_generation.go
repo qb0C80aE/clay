@@ -11,6 +11,7 @@ import (
 	conversionutilpkg "github.com/qb0C80aE/clay/util/conversion"
 	loggingutilpkg "github.com/qb0C80aE/clay/util/logging"
 	mapstructutilpkg "github.com/qb0C80aE/clay/util/mapstruct"
+	modelstorepkg "github.com/qb0C80aE/clay/util/modelstore"
 	networkutilpkg "github.com/qb0C80aE/clay/util/network"
 	stringutilpkg "github.com/qb0C80aE/clay/util/string"
 	"net/url"
@@ -64,9 +65,7 @@ func (receiver *EphemeralTemplateGeneration) GetSingle(model extension.Model, db
 	}
 
 	templateParameter := &templateParameter{
-		ModelStore: &modelStore{
-			db: db,
-		},
+		ModelStore:         modelstorepkg.NewModelStore(db),
 		Collection:         collectionutilpkg.GetUtility(),
 		Conversion:         conversionutilpkg.GetUtility(),
 		MapStruct:          mapstructutilpkg.GetUtility(),
