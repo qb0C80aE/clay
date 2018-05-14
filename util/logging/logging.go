@@ -113,7 +113,6 @@ func (receiver *Utility) Panic(log interface{}) error {
 	}
 
 	panic(message)
-	return nil
 }
 
 // Panicf throws panic with formatted message
@@ -125,5 +124,4 @@ func (receiver *Utility) Panicf(log interface{}, parameters []interface{}) error
 
 	message = fmt.Sprintf(message, parameters...)
 	panic(message)
-	return nil
 }
