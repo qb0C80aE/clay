@@ -1,13 +1,12 @@
-{{- $core := .Core -}}
 {{- $layer3Interfaces := .ModelStore.Multi "diagram_layer3_interfaces" "preloads=node.node_type,subnet" -}}
-{{- $diagramNodeMap := $core.Map -}}
-{{- $interfaceMap := $core.Map -}}
+{{- $diagramNodeMap := .Collection.Map -}}
+{{- $interfaceMap := .Collection.Map -}}
 {
   "nodes": [
   {{ range $i, $layer3Interface := $layer3Interfaces.Records }}
     {{ $diagramNodeKey := printf "%d_3_3" $layer3Interface.SubnetID }}
     {{ $diagramNodeCount := len $diagramNodeMap }}
-    {{ $subnetExists := $core.Exists $diagramNodeMap $diagramNodeKey }}
+    {{ $subnetExists := $diagramNodeMap.Exists $diagramNodeKey }}
     {{ if ne $subnetExists true }}
       {{ if ne $diagramNodeCount 0 }},{{ end }}{
       "name": "{{ printf "%s/%d" $layer3Interface.Subnet.Address $layer3Interface.Subnet.Prefix }}",
@@ -17,12 +16,12 @@
         "diagram_node_id": "{{ $diagramNodeKey }}"
       }
     }
-      {{ $diagramNodeMap := $core.Put $diagramNodeMap $diagramNodeKey true }}
+      {{ $diagramNodeMap := $diagramNodeMap.Put $diagramNodeKey true }}
     {{ end}}
 
     {{ $diagramNodeKey := printf "%d_3_1" $layer3Interface.Node.ID }}
     {{ $diagramNodeCount := len $diagramNodeMap }}
-    {{ $nodeExists := $core.Exists $diagramNodeMap $diagramNodeKey }}
+    {{ $nodeExists := $diagramNodeMap.Exists $diagramNodeKey }}
     {{ if ne $nodeExists true }}
     {{ if ne $diagramNodeCount 0 }},{{ end }}{
       "name": "{{ $layer3Interface.Node.Name }}",
@@ -32,7 +31,7 @@
         "diagram_node_id": "{{ $diagramNodeKey }}"
       }
     }
-      {{ $diagramNodeMap := $core.Put $diagramNodeMap $diagramNodeKey true }}
+      {{ $diagramNodeMap := $diagramNodeMap.Put $diagramNodeKey true }}
     {{ end}}
   {{ end }}
   ],
@@ -56,7 +55,7 @@
           }
         }
     }
-        {{ $interfaceMap := $core.Put $interfaceMap true true }}
+        {{ $interfaceMap := $interfaceMap.Put true true }}
       {{ end}}
     {{ end }}
   ]

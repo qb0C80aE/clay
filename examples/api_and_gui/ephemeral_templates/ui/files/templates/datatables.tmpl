@@ -1,41 +1,41 @@
-{{- $parameterMap := .Core.Map -}}
+{{- $parameterMap := .Collection.Map -}}
 
 {{- $columns := .Query.Get "columns" -}}
-{{- $columnList := .Core.Split $columns "," -}}
+{{- $columnList := .String.Split $columns "," -}}
 
 {{- $columnIndexString := .Query.Get "order[0][column]" -}}
-{{- $columnIndex := .Core.Int $columnIndexString -}}
+{{- $columnIndex := .Conversion.Int $columnIndexString -}}
 {{- $column := index $columnList $columnIndex -}}
 
 {{- $order := .Query.Get "order[0][dir]" -}}
 {{- if eq $order "asc" -}}
   {{- $sortParameter := printf "&sort=%s" $column -}}
-  {{- $parameterMap := .Core.Put $parameterMap "sort" $sortParameter -}}
+  {{- $parameterMap := $parameterMap.Put "sort" $sortParameter -}}
 {{- else -}}
   {{- $sortParameter := printf "&sort=-%s" $column -}}
-  {{- $parameterMap := .Core.Put $parameterMap "sort" $sortParameter -}}
+  {{- $parameterMap := $parameterMap.Put "sort" $sortParameter -}}
 {{- end -}}
 
 {{- $limit := .Query.Get "length" -}}
 {{- $limitParameter := printf "&limit=%s" $limit -}}
-{{- $parameterMap := .Core.Put $parameterMap "limit" $limitParameter -}}
+{{- $parameterMap := $parameterMap.Put "limit" $limitParameter -}}
 
 {{- $start := .Query.Get "start" -}}
 
-{{- $limitInt := .Core.Int $limit -}}
-{{- $startInt := .Core.Int $start -}}
-{{- $tempInt := .Core.Div $startInt $limitInt -}}
-{{- $pageInt := .Core.Add $tempInt 1 -}}
+{{- $limitInt := .Conversion.Int $limit -}}
+{{- $startInt := .Conversion.Int $start -}}
+{{- $tempInt := div $startInt $limitInt -}}
+{{- $pageInt := add $tempInt 1 -}}
 {{- $pageParameter := printf "&page=%d" $pageInt -}}
-{{- $parameterMap := .Core.Put $parameterMap "page" $pageParameter -}}
+{{- $parameterMap := $parameterMap.Put "page" $pageParameter -}}
 
 {{- $search := .Query.Get "search[value]" -}}
 {{- $searchLen := len $search -}}
 {{- if ne $searchLen 0 -}}
   {{- $searchParameter := printf "&q[%s]=%%25%s%%25" $column $search -}}
-  {{- $parameterMap := .Core.Put $parameterMap "search" $searchParameter -}}
+  {{- $parameterMap := $parameterMap.Put "search" $searchParameter -}}
 {{- else -}}
-  {{- $parameterMap := .Core.Put $parameterMap "search" "" -}}
+  {{- $parameterMap := $parameterMap.Put "search" "" -}}
 {{- end -}}
 
 {{- $resourceName := .Query.Get "resource_name" -}}
@@ -44,32 +44,32 @@
 {{- $preloadsLen := len $preloads -}}
 {{- if ne $preloadsLen 0 -}}
   {{- $preloadsParameter := printf "&preloads=%s" $preloads -}}
-  {{- $parameterMap := .Core.Put $parameterMap "preloads" $preloadsParameter -}}
+  {{- $parameterMap := $parameterMap.Put "preloads" $preloadsParameter -}}
 {{- else -}}
-  {{- $parameterMap := .Core.Put $parameterMap "preloads" "" -}}
+  {{- $parameterMap := $parameterMap.Put "preloads" "" -}}
 {{- end -}}
 
 {{- $fields := .Query.Get "resource_fields" -}}
 {{- $fieldsLen := len $fields -}}
 {{- if ne $fieldsLen 0 -}}
   {{- $fieldsParameter := printf "&fields=%s" $fields -}}
-  {{- $parameterMap := .Core.Put $parameterMap "fields" $fieldsParameter -}}
+  {{- $parameterMap := $parameterMap.Put "fields" $fieldsParameter -}}
 {{- else -}}
-  {{- $parameterMap := .Core.Put $parameterMap "fields" "" -}}
+  {{- $parameterMap := $parameterMap.Put "fields" "" -}}
 {{- end -}}
 
-{{- $preloadsParameter := .Core.Get $parameterMap "preloads" -}}
-{{- $fieldsParameter := .Core.Get $parameterMap "fields" -}}
-{{- $sortParameter := .Core.Get $parameterMap "sort" -}}
-{{- $limitParameter := .Core.Get $parameterMap "limit" -}}
-{{- $pageParameter := .Core.Get $parameterMap "page" -}}
-{{- $searchParameter := .Core.Get $parameterMap "search" -}}
+{{- $preloadsParameter := $parameterMap.Get "preloads" -}}
+{{- $fieldsParameter := $parameterMap.Get "fields" -}}
+{{- $sortParameter := $parameterMap.Get "sort" -}}
+{{- $limitParameter := $parameterMap.Get "limit" -}}
+{{- $pageParameter := $parameterMap.Get "page" -}}
+{{- $searchParameter := $parameterMap.Get "search" -}}
 
 {{- $query := printf "%s%s%s%s%s%s" $preloadsParameter $fieldsParameter $sortParameter $limitParameter $pageParameter $searchParameter -}}
 
 {{- $data := .ModelStore.Multi $resourceName $query -}}
 
-{{- $dataRecordsJSON := .Core.JSON $data.Records "  " -}}
+{{- $dataRecordsJSON := .Conversion.JSONMarshal $data.Records "  " -}}
 
 {
   "recordsTotal": {{ $data.Total }},

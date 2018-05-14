@@ -1,14 +1,13 @@
-{{- $core := .Core -}}
 {{- $layer2Interfaces := .ModelStore.Multi "diagram_layer2_interfaces" "preloads=node.node_type,vlan" -}}
-{{- $diagramNodeMap := $core.Map -}}
-{{- $interfaceMap := $core.Map -}}
+{{- $diagramNodeMap := .Collection.Map -}}
+{{- $interfaceMap := .Collection.Map -}}
 {
   "nodes": [
   {{ range $i, $layer2Interface := $layer2Interfaces.Records }}
     {{ $diagramNodeKey := printf "%d_2_2" $layer2Interface.VlanID }}
     {{ $diagramNodeCount := len $diagramNodeMap }}
     {{ if ne $layer2Interface.VlanID 0 }}
-      {{ $vlanExists := $core.Exists $diagramNodeMap $diagramNodeKey }}
+      {{ $vlanExists := $diagramNodeMap.Exists $diagramNodeKey }}
       {{ if ne $vlanExists true }}
     {{ if ne $diagramNodeCount 0 }},{{ end }}{
       "name": "{{ $layer2Interface.Vlan.Name }}",
@@ -18,13 +17,13 @@
         "diagram_node_id": "{{ $diagramNodeKey }}"
       }
     }
-        {{ $diagramNodeMap := $core.Put $diagramNodeMap $diagramNodeKey true }}
+        {{ $diagramNodeMap := $diagramNodeMap.Put $diagramNodeKey true }}
       {{ end}}
     {{ end }}
 
     {{ $diagramNodeKey := printf "%d_2_1" $layer2Interface.Node.ID }}
     {{ $diagramNodeCount := len $diagramNodeMap }}
-    {{ $nodeExists := $core.Exists $diagramNodeMap $diagramNodeKey }}
+    {{ $nodeExists := $diagramNodeMap.Exists $diagramNodeKey }}
     {{ if ne $nodeExists true }}
     {{ if ne $diagramNodeCount 0 }},{{ end }}{
       "name": "{{ $layer2Interface.Node.Name }}",
@@ -34,7 +33,7 @@
         "diagram_node_id": "{{ $diagramNodeKey }}"
       }
     }
-      {{ $diagramNodeMap := $core.Put $diagramNodeMap $diagramNodeKey true }}
+      {{ $diagramNodeMap := $diagramNodeMap.Put $diagramNodeKey true }}
     {{ end}}
   {{ end }}
   ],
@@ -58,7 +57,7 @@
           "ipv4_address": null
         }
     }
-        {{ $interfaceMap := $core.Put $interfaceMap true true }}
+        {{ $interfaceMap := $interfaceMap.Put true true }}
       {{ end}}
     {{ end }}
   ]
