@@ -235,6 +235,8 @@ var job = Job{
 	RoleCd: 1,
 }
 
+var targetTag = "json"
+
 func TestFieldToMap_Wildcard(t *testing.T) {
 	user := User{
 		ID:      1,
@@ -246,7 +248,7 @@ func TestFieldToMap_Wildcard(t *testing.T) {
 	fields := map[string]interface{}{
 		"*": nil,
 	}
-	result, err := FieldToMap(user, fields)
+	result, err := FieldToMap(user, fields, targetTag)
 
 	if err != nil {
 		t.Fatalf("FieldToMap return an error. detail: %#v", err.Error())
@@ -278,7 +280,7 @@ func TestFieldToMap_OmitEmpty(t *testing.T) {
 	fields := map[string]interface{}{
 		"*": nil,
 	}
-	result, err := FieldToMap(user, fields)
+	result, err := FieldToMap(user, fields, targetTag)
 
 	if err != nil {
 		t.Fatalf("FieldToMap return an error. detail: %#v", err.Error())
@@ -310,7 +312,7 @@ func TestFieldToMap_OmitEmptyWithField(t *testing.T) {
 		"name": nil,
 		"jobs": nil,
 	}
-	result, err := FieldToMap(user, fields)
+	result, err := FieldToMap(user, fields, targetTag)
 
 	if err != nil {
 		t.Fatalf("FieldToMap return an error. detail: %#v", err.Error())
@@ -342,7 +344,7 @@ func TestFieldToMap_OmitEmptyAllTypes(t *testing.T) {
 	fields := map[string]interface{}{
 		"*": nil,
 	}
-	result, err := FieldToMap(company, fields)
+	result, err := FieldToMap(company, fields, targetTag)
 
 	if err != nil {
 		t.Fatalf("FieldToMap return an error. detail: %#v", err.Error())
@@ -367,7 +369,7 @@ func TestFieldToMap_SpecifyField(t *testing.T) {
 		"id":   nil,
 		"name": nil,
 	}
-	result, err := FieldToMap(user, fields)
+	result, err := FieldToMap(user, fields, targetTag)
 
 	if err != nil {
 		t.Fatalf("FieldToMap return an error. detail: %#v", err.Error())
@@ -400,7 +402,7 @@ func TestFieldToMap_NestedField(t *testing.T) {
 		},
 		"name": nil,
 	}
-	result, err := FieldToMap(user, fields)
+	result, err := FieldToMap(user, fields, targetTag)
 
 	if err != nil {
 		t.Fatalf("FieldToMap return an error. detail: %#v", err.Error())
