@@ -93,6 +93,7 @@ func (receiver *urlAliasDefinitionController) Create(c *gin.Context) {
 	newController.name = newURLAliasDefinition.Name
 	newController.from = strings.Trim(newURLAliasDefinition.From, "/")
 	newController.to = strings.Trim(newURLAliasDefinition.To, "/")
+	newController.methods = newURLAliasDefinition.Methods
 
 	if _, err := url.ParseQuery(newURLAliasDefinition.Query); err != nil {
 		logging.Logger().Debug(err.Error())

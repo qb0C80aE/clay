@@ -29,7 +29,7 @@ type clayConfig struct {
 	EphemeralTemplates     []*clayConfigEphemeralTemplate     `json:"ephemeral_templates"`
 	EphemeralBinaryObjects []*clayConfigEphemeralBinaryObject `json:"ephemeral_binary_objects"`
 	EphemeralScripts       []*clayConfigEphemeralScript       `json:"ephemeral_scripts"`
-	URLAliases             []*clayConfigURLAlias              `json:"url_aliases"`
+	URLAliases             []*model.URLAliasDefinition        `json:"url_aliases"`
 }
 
 type clayConfigGeneral struct {
@@ -56,13 +56,6 @@ type clayConfigEphemeralBinaryObject struct {
 type clayConfigEphemeralScript struct {
 	Name     string `json:"name"`
 	FileName string `json:"file_name"`
-}
-
-type clayConfigURLAlias struct {
-	Name  string `json:"name"`
-	From  string `json:"from"`
-	To    string `json:"to"`
-	Query string `json:"query"`
 }
 
 func (receiver *clayRuntimeInitializer) readFile(filePath string) ([]byte, error) {
@@ -393,13 +386,7 @@ func (receiver *clayRuntimeInitializer) loadEphemeralScripts(config *clayConfig,
 
 func (receiver *clayRuntimeInitializer) loadURLAliases(config *clayConfig, host string, port int) error {
 	for _, urlAliasDefinition := range config.URLAliases {
-		urlAliasDefinitionModel := model.NewURLAliasDefinition()
-		urlAliasDefinitionModel.Name = urlAliasDefinition.Name
-		urlAliasDefinitionModel.From = urlAliasDefinition.From
-		urlAliasDefinitionModel.To = urlAliasDefinition.To
-		urlAliasDefinitionModel.Query = urlAliasDefinition.Query
-
-		jsonData, err := json.Marshal(urlAliasDefinitionModel)
+		jsonData, err := json.Marshal(urlAliasDefinition)
 		if err != nil {
 			logging.Logger().Critical(err.Error())
 			return err
@@ -424,6 +411,7 @@ func (receiver *clayRuntimeInitializer) loadURLAliases(config *clayConfig, host 
 		}
 
 		if response.StatusCode != http.StatusCreated {
+			logging.Logger().Critical(fmt.Errorf("invalid url alias definition of %s", urlAliasDefinition.Name))
 			logging.Logger().Critical(fmt.Errorf("status code was %d", response.StatusCode))
 			logging.Logger().Critical(string(responseBody))
 			return fmt.Errorf("status code was %d", response.StatusCode)
