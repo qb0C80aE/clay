@@ -28,6 +28,7 @@ type clayConfig struct {
 	UserDefinedModels      []*clayConfigUserDefinedModel      `json:"user_defined_models"`
 	EphemeralTemplates     []*clayConfigEphemeralTemplate     `json:"ephemeral_templates"`
 	EphemeralBinaryObjects []*clayConfigEphemeralBinaryObject `json:"ephemeral_binary_objects"`
+	EphemeralScripts       []*clayConfigEphemeralScript       `json:"ephemeral_scripts"`
 	URLAliases             []*clayConfigURLAlias              `json:"url_aliases"`
 }
 
@@ -35,6 +36,7 @@ type clayConfigGeneral struct {
 	UserDefinedModelsDirectory      string `json:"user_defined_models_directory"`
 	EphemeralTemplatesDirectory     string `json:"ephemeral_templates_directory"`
 	EphemeralBinaryObjectsDirectory string `json:"ephemeral_binary_objects_directory"`
+	EphemeralScriptsDirectory       string `json:"ephemeral_scripts_directory"`
 }
 
 type clayConfigUserDefinedModel struct {
@@ -47,6 +49,11 @@ type clayConfigEphemeralTemplate struct {
 }
 
 type clayConfigEphemeralBinaryObject struct {
+	Name     string `json:"name"`
+	FileName string `json:"file_name"`
+}
+
+type clayConfigEphemeralScript struct {
 	Name     string `json:"name"`
 	FileName string `json:"file_name"`
 }
@@ -183,6 +190,11 @@ func (receiver *clayRuntimeInitializer) initialize() {
 		os.Exit(1)
 	}
 
+	if err := receiver.loadEphemeralScripts(config, host, port); err != nil {
+		logging.Logger().Critical(err.Error())
+		os.Exit(1)
+	}
+
 	if err := receiver.loadURLAliases(config, host, port); err != nil {
 		logging.Logger().Critical(err.Error())
 		os.Exit(1)
@@ -309,6 +321,52 @@ func (receiver *clayRuntimeInitializer) loadEphemeralBinaryObjects(config *clayC
 		url := fmt.Sprintf("http://%s:%d/ephemeral_binary_objects", host, port)
 		request, err := http.NewRequest("POST", url, &bytesBuffer)
 		request.Header.Set("Content-Type", multipartWriter.FormDataContentType())
+
+		client := &http.Client{}
+		response, err := client.Do(request)
+		if err != nil {
+			logging.Logger().Critical(err.Error())
+			return err
+		}
+		defer response.Body.Close()
+
+		responseBody, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			logging.Logger().Critical(err.Error())
+			return err
+		}
+
+		if response.StatusCode != http.StatusCreated {
+			logging.Logger().Critical(fmt.Errorf("status code was %d", response.StatusCode))
+			logging.Logger().Critical(string(responseBody))
+			return fmt.Errorf("status code was %d", response.StatusCode)
+		}
+	}
+	return nil
+}
+
+func (receiver *clayRuntimeInitializer) loadEphemeralScripts(config *clayConfig, host string, port int) error {
+	for _, ephemeralScript := range config.EphemeralScripts {
+		filePath := filepath.Join(config.General.EphemeralScriptsDirectory, ephemeralScript.FileName)
+		data, err := receiver.readFile(filePath)
+		if err != nil {
+			logging.Logger().Critical(err.Error())
+			return err
+		}
+
+		ephemeralScriptModel := model.NewEphemeralScript()
+		ephemeralScriptModel.Name = ephemeralScript.Name
+		ephemeralScriptModel.ScriptContent = string(data)
+
+		jsonData, err := json.Marshal(ephemeralScriptModel)
+		if err != nil {
+			logging.Logger().Critical(err.Error())
+			return err
+		}
+
+		url := fmt.Sprintf("http://%s:%d/ephemeral_scripts", host, port)
+		request, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
+		request.Header.Set("Content-Type", "application/json")
 
 		client := &http.Client{}
 		response, err := client.Do(request)
