@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"strings"
+
 	dbpkg "github.com/qb0C80aE/clay/db"
 	"github.com/qb0C80aE/clay/helper"
 
@@ -8,17 +10,19 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"net/url"
+	"reflect"
+	"strconv"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
 	"github.com/qb0C80aE/clay/version"
 	validatorpkg "gopkg.in/go-playground/validator.v9"
-	"io/ioutil"
-	"net/http"
-	"net/url"
-	"reflect"
-	"strconv"
+	"regexp"
 )
 
 // BaseController is the base class that all controller classes inherit
@@ -31,6 +35,40 @@ type BaseController struct {
 }
 
 var validator = validatorpkg.New()
+
+var intTypeString = reflect.TypeOf(int(0)).String()
+var int8TypeString = reflect.TypeOf(int8(0)).String()
+var int16TypeString = reflect.TypeOf(int16(0)).String()
+var int32TypeString = reflect.TypeOf(int32(0)).String()
+var int64TypeString = reflect.TypeOf(int64(0)).String()
+var uintTypeString = reflect.TypeOf(uint(0)).String()
+var uint8TypeString = reflect.TypeOf(uint8(0)).String()
+var uint16TypeString = reflect.TypeOf(uint16(0)).String()
+var uint32TypeString = reflect.TypeOf(uint32(0)).String()
+var uint64TypeString = reflect.TypeOf(uint64(0)).String()
+var float32TypeString = reflect.TypeOf(float32(0)).String()
+var float64TypeString = reflect.TypeOf(float64(0)).String()
+var booleanTypeString = reflect.TypeOf(true).String()
+var stringTypeString = reflect.TypeOf("").String()
+var bytesTypeString = reflect.TypeOf([]byte{}).String()
+var stringInterfaceMapTypeString = reflect.TypeOf(map[string]interface{}{}).String()
+
+var formKeyHashRegExp, _ = regexp.Compile("^([a-zA-Z_][a-zA-Z0-9_]*)\\[([a-zA-Z_][a-zA-Z0-9_]*)\\]$")
+
+func getMapingTagValue(structField *reflect.StructField, tagName string) string {
+	tag := structField.Name
+	tagValueList := strings.Split(structField.Tag.Get(tagName), ",")
+	for _, tagValue := range tagValueList {
+		switch tagValue {
+		case "omitempty":
+			continue
+		default:
+			tag = tagValue
+			break
+		}
+	}
+	return tag
+}
 
 // CreateController creates a new instance of actual controller with BaseController
 func CreateController(actualController extension.Controller, model extension.Model) extension.Controller {
@@ -133,26 +171,121 @@ func (receiver *BaseController) Bind(c *gin.Context, resourceName string) (inter
 			return nil, err
 		}
 
-		if err := c.Bind(container); err != nil {
-			logging.Logger().Debug(err.Error())
-			return nil, err
+		vs := reflect.ValueOf(container)
+		for vs.Kind() == reflect.Ptr {
+			vs = vs.Elem()
 		}
-
-		if err := executeValidation(c, resourceName, container, c.Request.URL.Query().Get("key_parameter")); err != nil {
-			return nil, err
+		if !vs.IsValid() {
+			logging.Logger().Debug("invalid model")
+			return nil, errors.New("invalid model")
 		}
+		if !vs.CanInterface() {
+			logging.Logger().Debug("invalid model")
+			return nil, errors.New("invalid model")
+		}
+		value := vs.Interface()
+		t := reflect.TypeOf(value)
 
+		// bind once except for form fields which are unable to bind
+		// in order to do that, ignore error
+		c.Bind(container)
+
+		// bind the multipart form manually
 		if c.Request.ParseMultipartForm(1024*1024) == nil {
+
+			// form fields binding process (in case of Map)
+			for formKey := range c.Request.Form {
+				formValue := c.Request.Form.Get(formKey)
+				submatchList := formKeyHashRegExp.FindStringSubmatch(formKey)
+
+				if len(submatchList) == 3 {
+					formMainKey := submatchList[1]
+					formSubKey := submatchList[2]
+					for i := 0; i < t.NumField(); i++ {
+						field := t.Field(i)
+						formTag := getMapingTagValue(&field, "form")
+
+						if formTag == formMainKey {
+							switch field.Type.String() {
+							case stringInterfaceMapTypeString:
+								if vs.FieldByName(field.Name).IsNil() {
+									vs.FieldByName(field.Name).Set(reflect.ValueOf(map[string]interface{}{}))
+								}
+								vs.FieldByName(field.Name).SetMapIndex(reflect.ValueOf(formSubKey), reflect.ValueOf(formValue))
+								break
+							default:
+								logging.Logger().Debug("invalid field definition, the field must be map[string]interface{}")
+								return nil, errors.New("invalid field definition, the field must be map[string]interface{}")
+							}
+						}
+					}
+				} else {
+					for i := 0; i < t.NumField(); i++ {
+						field := t.Field(i)
+						formTag := getMapingTagValue(&field, "form")
+
+						if formTag == formKey {
+							switch field.Type.String() {
+							case intTypeString, int8TypeString, int16TypeString, int32TypeString, int64TypeString:
+								intValue, err := strconv.ParseInt(formValue, 10, 64)
+								if err != nil {
+									logging.Logger().Debug(err.Error())
+									return nil, err
+								}
+								vs.FieldByName(field.Name).SetInt(intValue)
+								break
+							case uintTypeString, uint8TypeString, uint16TypeString, uint32TypeString, uint64TypeString:
+								uintValue, err := strconv.ParseUint(formValue, 10, 64)
+								if err != nil {
+									logging.Logger().Debug(err.Error())
+									return nil, err
+								}
+								vs.FieldByName(field.Name).SetUint(uintValue)
+								break
+							case float32TypeString, float64TypeString:
+								floatValue, err := strconv.ParseFloat(formValue, 64)
+								if err != nil {
+									logging.Logger().Debug(err.Error())
+									return nil, err
+								}
+								vs.FieldByName(field.Name).SetFloat(floatValue)
+								break
+							case booleanTypeString:
+								booleanValue, err := strconv.ParseBool(formValue)
+								if err != nil {
+									logging.Logger().Debug(err.Error())
+									return nil, err
+								}
+								vs.FieldByName(field.Name).SetBool(booleanValue)
+								break
+							case stringTypeString:
+								vs.FieldByName(field.Name).SetString(formValue)
+								break
+							case bytesTypeString:
+								vs.FieldByName(field.Name).SetBytes([]byte(formValue))
+								break
+							default:
+								logging.Logger().Debug("invalid field definition, the field must be string or slice of bytes")
+								return nil, errors.New("invalid field definition, the field must be string or slice of bytes")
+							}
+						}
+					}
+				}
+			}
+
+			// uploaded files binding process
 			files := c.Request.MultipartForm.File
-			for name := range files {
+			for formKey := range files {
 				buffer := &bytes.Buffer{}
-				file, _, err := c.Request.FormFile(name)
+				file, _, err := c.Request.FormFile(formKey)
 				if err != nil {
 					logging.Logger().Debug(err.Error())
 					return nil, err
 				}
+				defer file.Close()
 
 				data, err := ioutil.ReadAll(file)
+
 				if err != nil {
 					logging.Logger().Debug(err.Error())
 					return nil, err
@@ -164,41 +297,56 @@ func (receiver *BaseController) Bind(c *gin.Context, resourceName string) (inter
 					return nil, err
 				}
 
-				vs := reflect.ValueOf(container)
-				for vs.Kind() == reflect.Ptr {
-					vs = vs.Elem()
-				}
-				if !vs.IsValid() {
-					logging.Logger().Debug("invalid model")
-					return nil, errors.New("invalid model")
-				}
-				if !vs.CanInterface() {
-					logging.Logger().Debug("invalid model")
-					return nil, errors.New("invalid model")
-				}
-				value := vs.Interface()
+				submatchList := formKeyHashRegExp.FindStringSubmatch(formKey)
+				if len(submatchList) == 3 {
+					formMainKey := submatchList[1]
+					formSubKey := submatchList[2]
 
-				t := reflect.TypeOf(value)
-				for i := 0; i < t.NumField(); i++ {
-					field := t.Field(i)
-					jsonTag := field.Tag.Get("json")
-					formTag := field.Tag.Get("form")
-					if jsonTag == name || formTag == name {
-						if field.Type.Kind() == reflect.String {
-							vs.FieldByName(field.Name).SetString(buffer.String())
-							break
-						} else if field.Type.Kind() == reflect.Slice {
-							vs.FieldByName(field.Name).SetBytes(buffer.Bytes())
-							break
-						} else {
-							logging.Logger().Debug("invalid field definition, the field must be string or slice of bytes")
-							return nil, errors.New("invalid field definition, the field must be string or slice of bytes")
+					for i := 0; i < t.NumField(); i++ {
+						field := t.Field(i)
+						formTag := getMapingTagValue(&field, "form")
+
+						if formTag == formMainKey {
+							switch field.Type.String() {
+							case stringInterfaceMapTypeString:
+								if vs.FieldByName(field.Name).IsNil() {
+									vs.FieldByName(field.Name).Set(reflect.ValueOf(map[string]interface{}{}))
+								}
+								vs.FieldByName(field.Name).SetMapIndex(reflect.ValueOf(formSubKey), reflect.ValueOf(buffer.Bytes()))
+								break
+							default:
+								logging.Logger().Debug("invalid field definition, the field must be map[string]interface{}")
+								return nil, errors.New("invalid field definition, the field must be map[string]interface{}")
+							}
+						}
+					}
+				} else {
+					for i := 0; i < t.NumField(); i++ {
+						field := t.Field(i)
+						formTag := getMapingTagValue(&field, "form")
+
+						if formTag == formKey {
+							switch field.Type.String() {
+							case stringTypeString:
+								vs.FieldByName(field.Name).SetString(buffer.String())
+								break
+							case bytesTypeString:
+								vs.FieldByName(field.Name).SetBytes(buffer.Bytes())
+								break
+							default:
+								logging.Logger().Debug("invalid field definition, the field must be string or slice of bytes")
+								return nil, errors.New("invalid field definition, the field must be string or slice of bytes")
+							}
 						}
 					}
 				}
-
 			}
 		}
+
+		if err := executeValidation(c, resourceName, container, c.Request.URL.Query().Get("key_parameter")); err != nil {
+			return nil, err
+		}
+
 		return container, nil
 	}
 

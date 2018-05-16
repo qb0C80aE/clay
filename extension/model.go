@@ -104,10 +104,9 @@ func InspectActualElementType(object interface{}) reflect.Type {
 
 	switch objectType.Kind() {
 	case reflect.Array, reflect.Slice:
-		temporarySlice := reflect.MakeSlice(objectType, 1, 1)
-		objectType = reflect.TypeOf(temporarySlice.Index(0).Interface())
+		objectType = objectType.Elem()
 
-		for (objectType.Kind() == reflect.Ptr) || (objectType.Kind() == reflect.Interface) {
+		for objectType.Kind() == reflect.Ptr {
 			objectType = objectType.Elem()
 		}
 	}
