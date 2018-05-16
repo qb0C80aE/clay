@@ -16,7 +16,8 @@
 			  <div class="row">
 			    <ul class="nav nav-tabs">
 			      <li class="active"><a href="#execution_information_tab" data-toggle="tab">Information</a></li>
-						<li><a href="#execution_logs_tab" data-toggle="tab">Logs</a></li>
+						<li><a href="#execution_script_tab" data-toggle="tab">Script</a></li>
+						<li><a href="#execution_data_tab" data-toggle="tab">Input Data</a></li>
 			    </ul>
 			  </div>
 			</div>
@@ -41,33 +42,21 @@
 							</td>
 						</tr>
 						<tr>
-							<td width="15%">CommandLine</td>
-							<td width="85%">
-								<input name="command_line" type="text" placeholder="ls -la" class="form-control">
-							</td>
-						</tr>
-						<tr>
-							<td width="15%">WorkingDirectory</td>
-							<td width="85%">
-								<input name="working_directory" type="text" placeholder="/tmp" class="form-control">
-							</td>
-						</tr>
-						<tr>
 							<td width="15%">Status</td>
 							<td width="85%">
 								<input name="status" type="text" placeholder="" class="form-control" readonly>
 							</td>
 						</tr>
 						<tr>
-							<td width="15%">ExitCode</td>
+							<td width="15%">ReturnValue</td>
 							<td width="85%">
-								<input name="exit_code" type="text" placeholder="" class="form-control" readonly>
+								<input name="return_value" type="text" placeholder="" class="form-control" readonly>
 							</td>
 						</tr>
 						<tr>
-							<td width="15%">Killed</td>
+							<td width="15%">Error</td>
 							<td width="85%">
-								<input name="killed" type="text" placeholder="" class="form-control" readonly>
+								<input name="error" type="text" placeholder="" class="form-control" readonly>
 							</td>
 						</tr>
 						<tr>
@@ -86,20 +75,17 @@
 
 				</div>
 
-				<div class="tab-pane" id="execution_logs_tab">
-					<table class="table" id="execution_logs_table">
-						<tr>
-							<td width="100%">
-								Stdout<br>
-								<textarea name="std_out" class="form-control" rows="15"></textarea>
-							</td>
-						</tr>
-						<tr>
-							<td width="100%">
-								Stderr<br>
-								<textarea name="std_err" class="form-control" rows="15"></textarea>
-							</td>
-						</tr>
+				<div class="tab-pane" id="execution_script_tab">
+					<textarea name="script_content" class="form-control" rows="15"></textarea>
+				</div>
+
+				<div class="tab-pane" id="execution_data_tab">
+					<div class="pull-right">
+						<button name="execution_add_data_btn" type="button" class="btn btn-default">
+							<span class="glyphicon glyphicon-plus"></span>
+						</button>
+					</div>
+					<table id="execution_data_table" class="table table-striped table-bordered">
 					</table>
 				</div>
 

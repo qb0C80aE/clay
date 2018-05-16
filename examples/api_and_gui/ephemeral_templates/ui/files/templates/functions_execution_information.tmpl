@@ -9,81 +9,105 @@ function showExecutionInformation(executionName, callbackExecutionInformationUpd
     var execution = {
       name: '',
       description: '',
-      command_line: '',
-      working_directory: '',
       status: '',
-      exit_code: ''
+      return_value: '',
+      error: '',
+      started_at: '',
+      finished_at: ''
     };
-    repaintExecutionInformation(execution, true);
+    repaintExecutionInformation(execution, [], true);
   } else {
-    getResource('commands', executionName, '', function(execution) {
-      repaintExecutionInformation(execution, true);
+    getResource('ephemeral_scripts', executionName, '', function(execution) {
+      repaintExecutionInformation(execution, [], true);
     });
   }
 }
 
-function repaintExecutionInformation(execution, initializeTabSelection) {
+function getInputDataList() {
+  var inputDataList = [];
+  $('#execution_information_panel #execution_data_tab #execution_data_table').DataTable().rows().every(function(){
+    var dataTr = $(this.node());
+    var dataFieldName = dataTr.find('input[name=field_name]').val();
+    var dataFieldValue = dataTr.find('input[name=field_value]').val();
+
+    var inputData = {
+      field_name: dataFieldName,
+      field_value: dataFieldValue
+    };
+
+    inputDataList.push(inputData);
+  });
+
+  return inputDataList;
+}
+
+function repaintExecutionInformation(execution, inputDataList, initializeTabSelection) {
   var execution_information_table = $('#execution_information_float_panel #execution_information_tab #execution_information_table');
 
   var buttonElements = [];
-  if (execution.status == 'running') {
-    execution_information_table.find('input[name=name]').prop('readonly', true);
-    execution_information_table.find('input[name=description]').prop('readonly', true);
-    execution_information_table.find('input[name=command_line]').prop('readonly', true);
-    execution_information_table.find('input[name=working_directory]').prop('readonly', true);
-    buttonElements.push({name: 'stop_execution_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-stop', text: ''});
-    buttonElements.push({name: 'refresh_execution_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-refresh', text: ''});
+  if (execution.name == '') {
+    buttonElements.push({name: 'update_execution_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-ok', text: ''});
   } else {
-    if (execution.name == '') {
-      execution_information_table.find('input[name=name]').prop('readonly', false);
-      execution_information_table.find('input[name=description]').prop('readonly', false);
-      execution_information_table.find('input[name=command_line]').prop('readonly', false);
-      execution_information_table.find('input[name=working_directory]').prop('readonly', false);
-      buttonElements.push({name: 'update_execution_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-ok', text: ''});
+    buttonElements.push({name: 'update_execution_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-ok', text: ''});
+    if (execution.status == 'running') {
+      buttonElements.push({name: 'stop_execution_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-stop', text: ''});
     } else {
-      execution_information_table.find('input[name=name]').prop('readonly', true);
-      execution_information_table.find('input[name=description]').prop('readonly', true);
-      execution_information_table.find('input[name=command_line]').prop('readonly', true);
-      execution_information_table.find('input[name=working_directory]').prop('readonly', true);
       buttonElements.push({name: 'run_execution_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-play', text: ''});
-      buttonElements.push({name: 'refresh_execution_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-refresh', text: ''});
     }
+    buttonElements.push({name: 'refresh_execution_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-refresh', text: ''});
   }
+
   buttonElements.push({name: 'cancel_execution_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-remove', text: ''});
   $('#execution_information_panel').find('h1[name=execution_information_panel_title]').children().last().remove();
   $('#execution_information_panel').find('h1[name=execution_information_panel_title]').append(createButtonGroupElement(buttonElements));
 
   execution_information_table.find('input[name=name]').val(execution.name);
   execution_information_table.find('input[name=description]').val(execution.description);
-  execution_information_table.find('input[name=command_line]').val(execution.command_line);
-  execution_information_table.find('input[name=working_directory]').val(execution.working_directory);
   execution_information_table.find('input[name=status]').val(execution.status);
-  execution_information_table.find('input[name=exit_code]').val(execution.exit_code);
-  execution_information_table.find('input[name=killed]').val(execution.killed);
+  execution_information_table.find('input[name=return_value]').val(execution.return_value);
+  execution_information_table.find('input[name=error]').val(execution.error);
   execution_information_table.find('input[name=started_at]').val(execution.started_at);
   execution_information_table.find('input[name=finished_at]').val(execution.finished_at);
 
-  var execution_logs_table = $('#execution_information_float_panel #execution_logs_tab #execution_logs_table');
-  execution_logs_table.find('textarea[name=std_out]').val(execution.std_out);
-  execution_logs_table.find('textarea[name=std_err]').val(execution.std_err);
+  $('#execution_information_float_panel #execution_script_tab').find('textarea[name=script_content]').val(execution.script_content);
 
   if (initializeTabSelection) {
     $('#execution_information_float_panel a[href="#execution_information_tab"]').tab('show');
   }
   $('#execution_information_float_panel').fadeIn(50);
 
+  $('#execution_information_float_panel #execution_data_tab #execution_data_table').DataTable({
+    sDom: '<"row"<"col-sm-5"l><"col-sm-6 right"f>>tip',
+    order: [[1, 'asc']],
+    scrollX: true,
+    paginate: true,
+    destroy: true,
+    data: inputDataList,
+    columns: [
+      {title: '', sortable: false, render: function (data, type, full, meta) {
+          return createButtonElement('execution_delete_data_btn', 'btn btn-default', 'glyphicon glyphicon-minus', '').outerHTML;
+        }
+      },
+      {title: 'FieldName', data: 'field_name', defaultContent: '', sortable: false, render: function (data, type, full, meta) {
+          return createTextElement('field_name', 'in-table', '', '', data).outerHTML;
+        }
+      },
+      {title: 'FieldValue', data: 'field_value', defaultContent: '', sortable: false, render: function (data, type, full, meta) {
+          return createTextElement('field_value', 'in-table', '', '', data).outerHTML;
+        }
+      }
+    ]
+  });
+
   $('#page_cover').fadeIn(50);
 }
 
 $('#execution_information_float_panel a[data-toggle=tab]').on('shown.bs.tab', function(e) {
+  var inputDataList = getInputDataList();
   var executionName = $('#execution_information_panel').find('input[name=name]').val();
-  if ((executionName == null) || (executionName == undefined) || (executionName == '')) {
-    return;
-  }
-
-  getResource('commands', executionName, '', function(execution) {
-    repaintExecutionInformation(execution, false);
-  });
+  getResource('ephemeral_scripts', executionName, '', function(execution) {
+    repaintExecutionInformation(execution, inputDataList, false);
+  }, function(execution) {});
 })
 
 $('#execution_information_panel').on('click', 'button[name=run_execution_btn]', function() {
@@ -102,29 +126,32 @@ $('#execution_information_panel').on('click', 'button[name=cancel_execution_btn]
 });
 
 $('#execution_information_panel').on('click', 'button[name=refresh_execution_btn]', function() {
+  var inputDataList = getInputDataList();
   var execution_information_table = $('#execution_information_float_panel #execution_information_tab #execution_information_table');
   var executionName = execution_information_table.find('input[name=name]').val();
-  getResource('commands', executionName, '', function(execution) {
-    repaintExecutionInformation(execution, false);
+  getResource('ephemeral_scripts', executionName, '', function(execution) {
+    repaintExecutionInformation(execution, inputDataList, false);
   });
 });
 
 $('#execution_information_panel').on('click', 'button[name=run_execution_btn]', function() {
+  var inputDataList = getInputDataList();
   var execution_information_table = $('#execution_information_float_panel #execution_information_tab #execution_information_table');
   var executionName = execution_information_table.find('input[name=name]').val();
   runExecution(executionName, function() {
-    getResource('commands', executionName, '', function(execution) {
-      repaintExecutionInformation(execution, false);
+    getResource('ephemeral_scripts', executionName, '', function(execution) {
+      repaintExecutionInformation(execution, inputDataList, false);
     });
   });
 });
 
 $('#execution_information_panel').on('click', 'button[name=stop_execution_btn]', function() {
+  var inputDataList = getInputDataList();
   var execution_information_table = $('#execution_information_float_panel #execution_information_tab #execution_information_table');
   var executionName = execution_information_table.find('input[name=name]').val();
   stopExecution(executionName, function() {
-    getResource('commands', executionName, '', function(execution) {
-      repaintExecutionInformation(execution, false);
+    getResource('ephemeral_scripts', executionName, '', function(execution) {
+      repaintExecutionInformation(execution, inputDataList, false);
     });
   });
 });
@@ -136,18 +163,16 @@ $('#execution_information_panel').on('click', 'button[name=update_execution_btn]
 
   var executionName = $('#execution_information_panel').find('input[name=name]').val();
   var executionDescription = $('#execution_information_panel').find('input[name=description]').val();
-  var executionCommandLine = $('#execution_information_panel').find('input[name=command_line]').val();
-  var executionWorkingDirectory = $('#execution_information_panel').find('input[name=working_directory]').val();
+  var executionScriptContent = $('#execution_information_panel').find('textarea[name=script_content]').val();
 
   var execution = {
     name: executionName,
     description: executionDescription,
-    command_line: executionCommandLine,
-    working_directory: executionWorkingDirectory
+    script_content: executionScriptContent
   };
 
-  postResource('commands', execution, '', function(result, xhr) {
-    showProcessResult(result, xhr, 201, "The execution information has been registered successfully.");
+  putResource('ephemeral_scripts', executionName, execution, '', function(result, xhr) {
+    showProcessResult(result, xhr, 200, "The execution information has been registered successfully.");
     postProcessUpdateExecution(result, xhr);
   });
 
@@ -155,9 +180,10 @@ $('#execution_information_panel').on('click', 'button[name=update_execution_btn]
 
 function postProcessUpdateExecution(result, xhr) {
   var executionName = result.name;
+  var inputDataList = getInputDataList();
 
-  getResource('commands', executionName, '', function(execution) {
-    repaintExecutionInformation(execution, false);
+  getResource('ephemeral_scripts', executionName, '', function(execution) {
+    repaintExecutionInformation(execution, inputDataList, false);
     if ((storedCallbackExecutionInformationUpdated != null) && (storedCallbackExecutionInformationUpdated != undefined)) {
       storedCallbackExecutionInformationUpdated();
     }
@@ -165,11 +191,11 @@ function postProcessUpdateExecution(result, xhr) {
 }
 
 function deleteExecutionInformation(executionName, callbackExecutionInformationDeleted) {
-  if (!confirm('Are you sure to delete the template?')) {
+  if (!confirm('Are you sure to delete the execution?')) {
     return;
   }
 
-  deleteResource('commands', executionName, '', function(result, xhr) {
+  deleteResource('ephemeral_scripts', executionName, '', function(result, xhr) {
     showProcessResult(result, xhr, 204, "The execution information has been deleted successfully.");
     callbackExecutionInformationDeleted();
   });
@@ -180,7 +206,16 @@ function runExecution(executionName, callbackExecutionStarted) {
     return;
   }
 
-  postResource('commands/' + executionName + '/execution', {}, '', function(result, xhr) {
+  var data = {};
+  $('#execution_information_panel #execution_data_tab #execution_data_table').DataTable().rows().every(function(){
+    var dataTr = $(this.node());
+    var dataFieldName = dataTr.find('input[name=field_name]').val();
+    var dataFieldValue = dataTr.find('input[name=field_value]').val();
+
+    data[dataFieldName] = dataFieldValue;
+  });
+
+  postResource('ephemeral_scripts/' + executionName + '/execution', {data: data}, '', function(result, xhr) {
     showProcessResult(result, xhr, 201, "The execution has started successfully.");
     callbackExecutionStarted();
   });
@@ -191,8 +226,34 @@ function stopExecution(executionName, callbackExecutionCancelled) {
     return;
   }
 
-  deleteResource('commands/' + executionName, 'execution', '', function(result, xhr) {
+  deleteResource('ephemeral_scripts/' + executionName, 'execution', '', function(result, xhr) {
     showProcessResult(result, xhr, 204, "The execution has been stopped successfully.");
     callbackExecutionCancelled();
   });
 }
+
+function stopExecution(executionName, callbackExecutionCancelled) {
+  if (!confirm('Are you sure to stop?')) {
+    return;
+  }
+
+  deleteResource('ephemeral_scripts/' + executionName, 'execution', '', function(result, xhr) {
+    showProcessResult(result, xhr, 204, "The execution has been stopped successfully.");
+    callbackExecutionCancelled();
+  });
+}
+
+$('#execution_information_panel #execution_data_tab').on('click', 'button[name=execution_add_data_btn]', function() {
+  var data = {
+    field_name: '',
+    field_data: ''
+  };
+
+  $('#execution_information_panel #execution_data_tab #execution_data_table').DataTable().row.add(data).draw();
+  $('#execution_information_panel #execution_data_tab #execution_data_table').DataTable().draw();
+});
+
+$('#execution_information_panel #execution_data_tab #execution_data_table').on('click', 'button[name=execution_delete_data_btn]', function() {
+  var tr = $(this).closest('tr');
+  $('#execution_information_panel #execution_data_tab #execution_data_table').DataTable().row(tr).remove().draw();
+});

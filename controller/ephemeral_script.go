@@ -8,15 +8,15 @@ import (
 	"github.com/qb0C80aE/clay/model"
 )
 
-type commandController struct {
+type ephemeralScriptController struct {
 	BaseController
 }
 
-func newCommandController() *commandController {
-	return CreateController(&commandController{}, model.NewCommand()).(*commandController)
+func newEphemeralScriptController() *ephemeralScriptController {
+	return CreateController(&ephemeralScriptController{}, model.NewEphemeralScript()).(*ephemeralScriptController)
 }
 
-func (receiver *commandController) GetResourceSingleURL() (string, error) {
+func (receiver *ephemeralScriptController) GetResourceSingleURL() (string, error) {
 	modelKey, err := receiver.model.GetModelKey(receiver.model, "")
 	if err != nil {
 		logging.Logger().Debug(err.Error())
@@ -32,7 +32,7 @@ func (receiver *commandController) GetResourceSingleURL() (string, error) {
 	return fmt.Sprintf("%s/:%s", resourceName, modelKey.KeyParameter), nil
 }
 
-func (receiver *commandController) GetRouteMap() map[int]map[int]gin.HandlerFunc {
+func (receiver *ephemeralScriptController) GetRouteMap() map[int]map[int]gin.HandlerFunc {
 	routeMap := map[int]map[int]gin.HandlerFunc{
 		extension.MethodGet: {
 			extension.URLSingle: receiver.GetSingle,
@@ -40,6 +40,9 @@ func (receiver *commandController) GetRouteMap() map[int]map[int]gin.HandlerFunc
 		},
 		extension.MethodPost: {
 			extension.URLMulti: receiver.Create,
+		},
+		extension.MethodPut: {
+			extension.URLSingle: receiver.Update,
 		},
 		extension.MethodDelete: {
 			extension.URLSingle: receiver.Delete,
@@ -49,5 +52,5 @@ func (receiver *commandController) GetRouteMap() map[int]map[int]gin.HandlerFunc
 }
 
 func init() {
-	extension.RegisterController(newCommandController())
+	extension.RegisterController(newEphemeralScriptController())
 }

@@ -2,7 +2,8 @@
   "general": {
     "user_defined_models_directory": "examples/api_and_gui/user_defined_models",
     "ephemeral_templates_directory": "examples/api_and_gui/ephemeral_templates",
-    "ephemeral_binary_objects_directory": "examples/api_and_gui/ephemeral_binary_objects"
+    "ephemeral_binary_objects_directory": "examples/api_and_gui/ephemeral_binary_objects",
+    "ephemeral_scripts_directory": "examples/api_and_gui/ephemeral_scripts"
   },
   "user_defined_models": [
     {
@@ -311,6 +312,12 @@
     {
       "name": "Server_true.png",
       "file_name": "ui/files/images/diagram/Server_true.png"
+    }
+  ],
+  "ephemeral_scripts": [
+    {
+      "name": "output_design_yaml_file",
+      "file_name": "output_design_yaml_file.js"
     }
   ],
   "url_aliases": [

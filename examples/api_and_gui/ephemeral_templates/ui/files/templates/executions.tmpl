@@ -37,7 +37,7 @@ $(function() {
 		$('#main_panel #executions_panel').fadeIn(150, function() {
 			$('#main_panel #executions_panel #executions_table').DataTable({
 				ajax: {
-					url: '/ui/datatables?resource_name=commands&columns=null,name,description,working_directory,command_line,status,exit_code'
+					url: '/ui/datatables?resource_name=ephemeral_scripts&columns=null,name,description,status,return_value,error,started_at,finished_at'
 				},
 				serverSide: true,
 				order: [[1, 'asc']],
@@ -50,11 +50,6 @@ $(function() {
 								{name: 'show_execution_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-info-sign', text: ''},
 								{name: 'delete_execution_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-minus', text: ''}
 							];
-							if (full.status == 'running') {
-								buttonElements.push({name: 'stop_execution_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-stop', text: ''});
-							} else {
-								buttonElements.push({name: 'run_execution_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-play', text: ''});
-							}
 							return createButtonGroupElement(buttonElements).outerHTML;
 						}
 					},
@@ -66,19 +61,15 @@ $(function() {
 							return createReadOnlyTextElement('description', 'in-table', '', '', data).outerHTML;
 						}
 					},
-					{title: 'CommandLine', data: 'command_line', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
-							return createReadOnlyTextElement('command_line', 'in-table', '', '', data).outerHTML;
-						}
-					},
 					{title: 'Status', data: 'status', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
 							return createReadOnlyTextElement('status', 'in-table', '', '', data).outerHTML;
 						}
 					},
-					{title: 'ExitCode', data: 'exit_code', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+					{title: 'ReturnValue', data: 'return_value', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
 							return createReadOnlyTextElement('exit_code', 'in-table', '', '', data).outerHTML;
 						}
 					},
-					{title: 'Killed', data: 'killed', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+					{title: 'Error', data: 'error', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
 							return createReadOnlyTextElement('killed', 'in-table', '', '', data).outerHTML;
 						}
 					},
@@ -101,12 +92,6 @@ $(function() {
 
 	$('#main_panel #executions_panel button[name=refresh_execution_btn]').on('click', function() {
 		onLoad();
-	});
-
-	$('#main_panel #executions_panel #executions_table').on('click', 'button[name=run_execution_btn]', function() {
-		var tr = $(this).closest('tr');
-		var executionName = tr.find('input[name=name]').val();
-		runExecution(executionName, onLoad);
 	});
 
 	$('#main_panel #executions_panel #executions_table').on('click', 'button[name=stop_execution_btn]', function() {

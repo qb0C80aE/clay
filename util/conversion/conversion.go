@@ -644,6 +644,17 @@ func (receiver *Utility) Boolean(value interface{}) (interface{}, error) {
 	}
 }
 
+// Bytes converts string interface{} into interface{} what has []byte value
+func (receiver *Utility) Bytes(value interface{}) (interface{}, error) {
+	switch value.(type) {
+	case string:
+		return []byte(value.(string)), nil
+	default:
+		logging.Logger().Debug("value is not string")
+		return nil, errors.New("value is not string")
+	}
+}
+
 func (receiver *Utility) convertToStringKeyMap(dataInterface interface{}) interface{} {
 	reflectValue := reflect.ValueOf(dataInterface)
 	for (reflectValue.Kind() == reflect.Ptr) || (reflectValue.Kind() == reflect.Interface) {
