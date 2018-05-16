@@ -220,8 +220,8 @@ func SetupController(relativePath string, controllerList []Controller) error {
 	return nil
 }
 
-// CreateParametersFromPathAntRoute creates parameters from actual access url path (like /test/1/generation) and routing url (like /test/:id/generation)
-func CreateParametersFromPathAntRoute(path, route string) (gin.Params, error) {
+// CreateParametersFromPathAndRoute creates parameters from actual access url path (like /test/1/generation) and routing url (like /test/:id/generation)
+func CreateParametersFromPathAndRoute(path, route string) (gin.Params, error) {
 	pathElements := strings.Split(strings.Trim(path, "/"), "/")
 	routeElements := strings.Split(strings.Trim(route, "/"), "/")
 

@@ -37,7 +37,7 @@ func (receiver *ModelStore) Single(pathInterface interface{}, queryInterface int
 		return nil, err
 	}
 
-	parameters, err := extension.CreateParametersFromPathAntRoute(path, singleURL)
+	parameters, err := extension.CreateParametersFromPathAndRoute(path, singleURL)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
@@ -94,7 +94,7 @@ func (receiver *ModelStore) Multi(pathInterface interface{}, queryInterface inte
 		return nil, err
 	}
 
-	parameters, err := extension.CreateParametersFromPathAntRoute(path, multiURL)
+	parameters, err := extension.CreateParametersFromPathAndRoute(path, multiURL)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
@@ -183,7 +183,7 @@ func (receiver *ModelStore) First(pathInterface interface{}, queryInterface inte
 		return nil, err
 	}
 
-	parameters, err := extension.CreateParametersFromPathAntRoute(path, multiURL)
+	parameters, err := extension.CreateParametersFromPathAndRoute(path, multiURL)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
