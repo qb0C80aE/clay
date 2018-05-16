@@ -411,6 +411,7 @@ func (receiver *clayRuntimeInitializer) loadURLAliases(config *clayConfig, host 
 		}
 
 		if response.StatusCode != http.StatusCreated {
+			logging.Logger().Critical(fmt.Errorf("invalid url alias definition of %s", urlAliasDefinition.Name))
 			logging.Logger().Critical(fmt.Errorf("status code was %d", response.StatusCode))
 			logging.Logger().Critical(string(responseBody))
 			return fmt.Errorf("status code was %d", response.StatusCode)
