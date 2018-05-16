@@ -316,7 +316,7 @@
   ],
   "ephemeral_scripts": [
     {
-      "name": "output_design_yaml_file",
+      "name": "output_design_yaml_file.js",
       "file_name": "output_design_yaml_file.js"
     }
   ],
@@ -325,265 +325,541 @@
       "name": "custom.css",
       "from": "/ui/files/css/custom.css",
       "to": "/ephemeral_templates/custom.css/raw",
-      "query": "content_type=text/css%3b%20charset=utf-8"
+      "query": "content_type=text/css%3b%20charset=utf-8",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "datatables.min.css",
       "from": "/ui/files/css/datatables.min.css",
       "to": "/ephemeral_templates/datatables.min.css/raw",
-      "query": "content_type=text/css%3b%20charset=utf-8"
+      "query": "content_type=text/css%3b%20charset=utf-8",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "select2.min.css",
       "from": "/ui/files/css/select2.min.css",
       "to": "/ephemeral_templates/select2.min.css/raw",
-      "query": "content_type=text/css%3b%20charset=utf-8"
+      "query": "content_type=text/css%3b%20charset=utf-8",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "cola.3.1.3.min.js",
       "from": "/ui/files/js/cola.3.1.3.min.js",
       "to": "/ephemeral_templates/cola.3.1.3.min.js/raw",
-      "query": "content_type=application/javascript%3b%20charset=utf-8"
+      "query": "content_type=application/javascript%3b%20charset=utf-8",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "d3.js",
       "from": "/ui/files/js/d3.js",
       "to": "/ephemeral_templates/d3.js/raw",
-      "query": "content_type=application/javascript%3b%20charset=utf-8"
+      "query": "content_type=application/javascript%3b%20charset=utf-8",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "datatables.min.js",
       "from": "/ui/files/js/datatables.min.js",
       "to": "/ephemeral_templates/datatables.min.js/raw",
-      "query": "content_type=application/javascript%3b%20charset=utf-8"
+      "query": "content_type=application/javascript%3b%20charset=utf-8",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "holder.min.js",
       "from": "/ui/files/js/holder.min.js",
       "to": "/ephemeral_templates/holder.min.js/raw",
-      "query": "content_type=application/javascript%3b%20charset=utf-8"
+      "query": "content_type=application/javascript%3b%20charset=utf-8",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "inet-henge.js",
       "from": "/ui/files/js/inet-henge.js",
       "to": "/ephemeral_templates/inet-henge.js/raw",
-      "query": "content_type=application/javascript%3b%20charset=utf-8"
+      "query": "content_type=application/javascript%3b%20charset=utf-8",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "meta.js",
       "from": "/ui/files/js/meta.js",
       "to": "/ephemeral_templates/meta.js/raw",
-      "query": "content_type=application/javascript%3b%20charset=utf-8"
+      "query": "content_type=application/javascript%3b%20charset=utf-8",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "scripts.js",
       "from": "/ui/files/js/scripts.js",
       "to": "/ephemeral_templates/scripts.js/raw",
-      "query": "content_type=application/javascript%3b%20charset=utf-8"
+      "query": "content_type=application/javascript%3b%20charset=utf-8",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "select2.min.js",
       "from": "/ui/files/js/select2.min.js",
       "to": "/ephemeral_templates/select2.min.js/raw",
-      "query": "content_type=application/javascript%3b%20charset=utf-8"
+      "query": "content_type=application/javascript%3b%20charset=utf-8",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "spin.min.js",
       "from": "/ui/files/js/spin.min.js",
       "to": "/ephemeral_templates/spin.min.js/raw",
-      "query": "content_type=application/javascript%3b%20charset=utf-8"
+      "query": "content_type=application/javascript%3b%20charset=utf-8",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "glyphicons-halflings-regular.eot",
       "from": "/ui/files/css/Bootstrap-3.3.7/fonts/glyphicons-halflings-regular.eot",
       "to": "/ephemeral_binary_objects/glyphicons-halflings-regular.eot/raw",
-      "query": "content_type=application/vnd.ms-fontobject"
+      "query": "content_type=application/vnd.ms-fontobject",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "glyphicons-halflings-regular.svg",
       "from": "/ui/files/css/Bootstrap-3.3.7/fonts/glyphicons-halflings-regular.svg",
       "to": "/ephemeral_binary_objects/glyphicons-halflings-regular.svg/raw",
-      "query": "content_type=image/svg+xml"
+      "query": "content_type=image/svg+xml",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "glyphicons-halflings-regular.ttf",
       "from": "/ui/files/css/Bootstrap-3.3.7/fonts/glyphicons-halflings-regular.ttf",
       "to": "/ephemeral_binary_objects/glyphicons-halflings-regular.ttf/raw",
-      "query": "content_type=application/octet-stream"
+      "query": "content_type=application/octet-stream",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "glyphicons-halflings-regular.woff",
       "from": "/ui/files/css/Bootstrap-3.3.7/fonts/glyphicons-halflings-regular.woff",
       "to": "/ephemeral_binary_objects/glyphicons-halflings-regular.woff/raw",
-      "query": "content_type=application/x-font-woff"
+      "query": "content_type=application/x-font-woff",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "glyphicons-halflings-regular.woff2",
       "from": "/ui/files/css/Bootstrap-3.3.7/fonts/glyphicons-halflings-regular.woff2",
       "to": "/ephemeral_binary_objects/glyphicons-halflings-regular.woff2/raw",
-      "query": "content_type=application/octet-stream"
+      "query": "content_type=application/octet-stream",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "Firewall_false.png",
       "from": "/ui/files/images/diagram/Firewall_false.png",
       "to": "/ephemeral_binary_objects/Firewall_false.png/raw",
-      "query": "content_type=image/png"
+      "query": "content_type=image/png",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "Firewall_true.png",
       "from": "/ui/files/images/diagram/Firewall_true.png",
       "to": "/ephemeral_binary_objects/Firewall_true.png/raw",
-      "query": "content_type=image/png"
+      "query": "content_type=image/png",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "L2Switch_false.png",
       "from": "/ui/files/images/diagram/L2Switch_false.png",
       "to": "/ephemeral_binary_objects/L2Switch_false.png/raw",
-      "query": "content_type=image/png"
+      "query": "content_type=image/png",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "L2Switch_true.png",
       "from": "/ui/files/images/diagram/L2Switch_true.png",
       "to": "/ephemeral_binary_objects/L2Switch_true.png/raw",
-      "query": "content_type=image/png"
+      "query": "content_type=image/png",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "L3Switch_false.png",
       "from": "/ui/files/images/diagram/L3Switch_false.png",
       "to": "/ephemeral_binary_objects/L3Switch_false.png/raw",
-      "query": "content_type=image/png"
+      "query": "content_type=image/png",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "L3Switch_true.png",
       "from": "/ui/files/images/diagram/L3Switch_true.png",
       "to": "/ephemeral_binary_objects/L3Switch_true.png/raw",
-      "query": "content_type=image/png"
+      "query": "content_type=image/png",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "LoadBalancer_false.png",
       "from": "/ui/files/images/diagram/LoadBalancer_false.png",
       "to": "/ephemeral_binary_objects/LoadBalancer_false.png/raw",
-      "query": "content_type=image/png"
+      "query": "content_type=image/png",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "LoadBalancer_true.png",
       "from": "/ui/files/images/diagram/LoadBalancer_true.png",
       "to": "/ephemeral_binary_objects/LoadBalancer_true.png/raw",
-      "query": "content_type=image/png"
+      "query": "content_type=image/png",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "Network_true.png",
       "from": "/ui/files/images/diagram/Network_true.png",
       "to": "/ephemeral_binary_objects/Network.png/raw",
-      "query": "content_type=image/png"
+      "query": "content_type=image/png",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "Network_false.png",
       "from": "/ui/files/images/diagram/Network_false.png",
       "to": "/ephemeral_binary_objects/Network.png/raw",
-      "query": "content_type=image/png"
+      "query": "content_type=image/png",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "Router_false.png",
       "from": "/ui/files/images/diagram/Router_false.png",
       "to": "/ephemeral_binary_objects/Router_false.png/raw",
-      "query": "content_type=image/png"
+      "query": "content_type=image/png",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "Router_true.png",
       "from": "/ui/files/images/diagram/Router_true.png",
       "to": "/ephemeral_binary_objects/Router_true.png/raw",
-      "query": "content_type=image/png"
+      "query": "content_type=image/png",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "Segment.png",
       "from": "/ui/files/images/diagram/Segment.png",
       "to": "/ephemeral_binary_objects/Segment.png/raw",
-      "query": "content_type=image/png"
+      "query": "content_type=image/png",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "Server_false.png",
       "from": "/ui/files/images/diagram/Server_false.png",
       "to": "/ephemeral_binary_objects/Server_false.png/raw",
-      "query": "content_type=image/png"
+      "query": "content_type=image/png",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "Servers_false.png",
       "from": "/ui/files/images/diagram/Servers_false.png",
       "to": "/ephemeral_binary_objects/Servers_false.png/raw",
-      "query": "content_type=image/png"
+      "query": "content_type=image/png",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "Servers_true.png",
       "from": "/ui/files/images/diagram/Servers_true.png",
       "to": "/ephemeral_binary_objects/Servers_true.png/raw",
-      "query": "content_type=image/png"
+      "query": "content_type=image/png",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "Server_true.png",
       "from": "/ui/files/images/diagram/Server_true.png",
       "to": "/ephemeral_binary_objects/Server_true.png/raw",
-      "query": "content_type=image/png"
+      "query": "content_type=image/png",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "ui",
       "from": "/ui",
       "to": "/ephemeral_templates/index.tmpl/generation",
-      "query": "content_type=text/html%3b%20charset=utf-8"
+      "query": "content_type=text/html%3b%20charset=utf-8",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "resources",
       "from": "/ui/resources",
       "to": "/ephemeral_templates/resources.tmpl/generation",
-      "query": "content_type=text/html%3b%20charset=utf-8"
+      "query": "content_type=text/html%3b%20charset=utf-8",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "diagrams",
       "from": "/ui/diagrams",
       "to": "/ephemeral_templates/diagrams.tmpl/generation",
-      "query": "content_type=text/html%3b%20charset=utf-8"
+      "query": "content_type=text/html%3b%20charset=utf-8",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "designs",
       "from": "/ui/designs",
       "to": "/ephemeral_templates/designs.tmpl/generation",
-      "query": "content_type=text/html%3b%20charset=utf-8"
+      "query": "content_type=text/html%3b%20charset=utf-8",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "executions",
       "from": "/ui/executions",
       "to": "/ephemeral_templates/executions.tmpl/generation",
-      "query": "content_type=text/html%3b%20charset=utf-8"
+      "query": "content_type=text/html%3b%20charset=utf-8",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "datatables",
       "from": "/ui/datatables",
       "to": "/ephemeral_templates/datatables.tmpl/generation",
-      "query": "content_type=application/json"
+      "query": "content_type=application/json",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "select2",
       "from": "/ui/select2",
       "to": "/ephemeral_templates/select2.tmpl/generation",
-      "query": "content_type=application/json"
+      "query": "content_type=application/json",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "diagram_layer1",
       "from": "/diagrams/layer1",
       "to": "/ephemeral_templates/diagram_layer1.tmpl/generation",
-      "query": "content_type=application/json"
+      "query": "content_type=application/json",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "diagram_layer2",
       "from": "/diagrams/layer2",
       "to": "/ephemeral_templates/diagram_layer2.tmpl/generation",
-      "query": "content_type=application/json"
+      "query": "content_type=application/json",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
     },
     {
       "name": "diagram_layer3",
       "from": "/diagrams/layer3",
       "to": "/ephemeral_templates/diagram_layer3.tmpl/generation",
-      "query": "content_type=application/json"
+      "query": "content_type=application/json",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single"
+        }
+      ]
+    },
+    {
+      "name": "output_design_yaml_file",
+      "from": "/process/output_design_yaml_file",
+      "to": "/ephemeral_scripts/output_design_yaml_file.js/execution",
+      "query": "content_type=application/json",
+      "methods": [
+        {
+          "method": "POST",
+          "target_url_type": "single"
+        }
+      ]
     }
   ]
 }
