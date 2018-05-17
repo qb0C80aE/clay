@@ -655,7 +655,9 @@ func (receiver *Utility) Bytes(value interface{}) (interface{}, error) {
 	}
 }
 
-func (receiver *Utility) convertToStringKeyMap(dataInterface interface{}) interface{} {
+// ConvertToStringKeyMap converts non-string key map like map[interface{}]interface{} to map [string]...
+// It can be used to marshal map to json(that cannot be marshal if the key of map is interface{})
+func (receiver *Utility) ConvertToStringKeyMap(dataInterface interface{}) interface{} {
 	reflectValue := reflect.ValueOf(dataInterface)
 	for (reflectValue.Kind() == reflect.Ptr) || (reflectValue.Kind() == reflect.Interface) {
 		reflectValue = reflectValue.Elem()
@@ -669,11 +671,19 @@ func (receiver *Utility) convertToStringKeyMap(dataInterface interface{}) interf
 		for _, key := range mapKeys {
 			itemValue := reflectValue.MapIndex(key)
 			itemInterface := itemValue.Interface()
-			item := receiver.convertToStringKeyMap(itemInterface)
+			item := receiver.ConvertToStringKeyMap(itemInterface)
 			result[fmt.Sprintf("%v", key)] = item
 		}
 
 		return result
+	case reflect.Slice, reflect.Array:
+		for i := 0; i < reflectValue.Len(); i++ {
+			itemValue := reflectValue.Index(i)
+			newItem := receiver.ConvertToStringKeyMap(itemValue.Interface())
+			itemValue.Set(reflect.ValueOf(newItem))
+		}
+
+		return dataInterface
 	default:
 		return dataInterface
 	}
@@ -685,14 +695,14 @@ func (receiver *Utility) JSONMarshal(dataInterface interface{}, indentInterface 
 
 	switch len(indent) {
 	case 0:
-		result, err := json.Marshal(receiver.convertToStringKeyMap(dataInterface))
+		result, err := json.Marshal(receiver.ConvertToStringKeyMap(dataInterface))
 		if err != nil {
 			logging.Logger().Debug(err.Error())
 			return nil, err
 		}
 		return string(result), nil
 	default:
-		result, err := json.MarshalIndent(receiver.convertToStringKeyMap(dataInterface), "", indent)
+		result, err := json.MarshalIndent(receiver.ConvertToStringKeyMap(dataInterface), "", indent)
 		if err != nil {
 			logging.Logger().Debug(err.Error())
 			return nil, err
@@ -703,7 +713,7 @@ func (receiver *Utility) JSONMarshal(dataInterface interface{}, indentInterface 
 
 // YAMLMarshal generates YAML text from given object
 func (receiver *Utility) YAMLMarshal(dataInterface interface{}) (interface{}, error) {
-	result, err := yaml.Marshal(receiver.convertToStringKeyMap(dataInterface))
+	result, err := yaml.Marshal(receiver.ConvertToStringKeyMap(dataInterface))
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err

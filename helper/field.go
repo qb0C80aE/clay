@@ -147,7 +147,14 @@ func isEmptyValue(v reflect.Value) bool {
 }
 
 // FieldToMap generates a map from the model in argument
-func FieldToMap(model interface{}, fields map[string]interface{}) (map[string]interface{}, error) {
+func FieldToMap(model interface{}, fields map[string]interface{}, targetTag string) (map[string]interface{}, error) {
+	switch targetTag {
+	case "yaml":
+		// use as it is
+	default:
+		targetTag = "json"
+	}
+
 	u := make(map[string]interface{})
 	vs := reflect.ValueOf(model)
 
@@ -171,20 +178,20 @@ func FieldToMap(model interface{}, fields map[string]interface{}) (map[string]in
 		}
 	}
 
-	var jsonKey string
+	var fieldTagKey string
 	var omitEmpty bool
 
 	ts := vs.Type()
 	for i := 0; i < ts.NumField(); i++ {
 		field := ts.Field(i)
-		jsonTag := field.Tag.Get("json")
+		jsonTag := field.Tag.Get(targetTag)
 		omitEmpty = false
 
 		if jsonTag == "" {
-			jsonKey = field.Name
+			fieldTagKey = field.Name
 		} else {
 			ss := strings.Split(jsonTag, ",")
-			jsonKey = ss[0]
+			fieldTagKey = ss[0]
 
 			if len(ss) > 1 && ss[1] == "omitempty" {
 				omitEmpty = true
@@ -193,31 +200,31 @@ func FieldToMap(model interface{}, fields map[string]interface{}) (map[string]in
 
 		if contains(fields, "*") {
 			if !omitEmpty || !isEmptyValue(vs.Field(i)) {
-				u[jsonKey] = vs.Field(i).Interface()
+				u[fieldTagKey] = vs.Field(i).Interface()
 			}
 
 			continue
 		}
 
-		if contains(fields, jsonKey) {
-			v := fields[jsonKey]
+		if contains(fields, fieldTagKey) {
+			v := fields[fieldTagKey]
 
 			if vs.Field(i).Kind() == reflect.Ptr {
 				if !vs.Field(i).IsNil() {
 					if v == nil {
-						u[jsonKey] = vs.Field(i).Elem().Interface()
+						u[fieldTagKey] = vs.Field(i).Elem().Interface()
 					} else {
-						k, err := FieldToMap(vs.Field(i).Elem().Interface(), v.(map[string]interface{}))
+						k, err := FieldToMap(vs.Field(i).Elem().Interface(), v.(map[string]interface{}), targetTag)
 
 						if err != nil {
 							return nil, err
 						}
 
-						u[jsonKey] = k
+						u[fieldTagKey] = k
 					}
 				} else {
 					if v == nil {
-						u[jsonKey] = nil
+						u[fieldTagKey] = nil
 					} else {
 						return nil, errors.New("Invalid Parameter. The structure is null")
 					}
@@ -232,7 +239,7 @@ func FieldToMap(model interface{}, fields map[string]interface{}) (map[string]in
 					} else {
 
 						if s.Index(i).Kind() == reflect.Ptr {
-							k, err := FieldToMap(s.Index(i).Elem().Interface(), v.(map[string]interface{}))
+							k, err := FieldToMap(s.Index(i).Elem().Interface(), v.(map[string]interface{}), targetTag)
 
 							if err != nil {
 								return nil, err
@@ -240,7 +247,7 @@ func FieldToMap(model interface{}, fields map[string]interface{}) (map[string]in
 
 							fieldMap = append(fieldMap, k)
 						} else {
-							k, err := FieldToMap(s.Index(i).Interface(), v.(map[string]interface{}))
+							k, err := FieldToMap(s.Index(i).Interface(), v.(map[string]interface{}), targetTag)
 
 							if err != nil {
 								return nil, err
@@ -251,18 +258,18 @@ func FieldToMap(model interface{}, fields map[string]interface{}) (map[string]in
 					}
 				}
 
-				u[jsonKey] = fieldMap
+				u[fieldTagKey] = fieldMap
 			} else {
 				if v == nil {
-					u[jsonKey] = vs.Field(i).Interface()
+					u[fieldTagKey] = vs.Field(i).Interface()
 				} else {
-					k, err := FieldToMap(vs.Field(i).Interface(), v.(map[string]interface{}))
+					k, err := FieldToMap(vs.Field(i).Interface(), v.(map[string]interface{}), targetTag)
 
 					if err != nil {
 						return nil, err
 					}
 
-					u[jsonKey] = k
+					u[fieldTagKey] = k
 				}
 			}
 		}

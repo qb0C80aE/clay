@@ -16,13 +16,17 @@ import (
 	"reflect"
 	"strconv"
 
+	"regexp"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
+	"github.com/qb0C80aE/clay/util/conversion"
+	"github.com/qb0C80aE/clay/util/mapstruct"
 	"github.com/qb0C80aE/clay/version"
 	validatorpkg "gopkg.in/go-playground/validator.v9"
-	"regexp"
+	"gopkg.in/yaml.v2"
 )
 
 // BaseController is the base class that all controller classes inherit
@@ -135,25 +139,56 @@ func executeValidation(c *gin.Context, resourceName string, inputContainer inter
 	return nil
 }
 
+func (receiver *BaseController) determineResponseType(c *gin.Context) string {
+	acceptList := strings.Split(c.Request.Header.Get("Accept"), ",")
+
+	if len(acceptList) == 0 {
+		return "application/json"
+	}
+
+	result := strings.Trim(acceptList[0], " ")
+	switch result {
+	case "application/x-yaml", "text/yaml":
+		return result
+	default:
+		return "application/json"
+	}
+}
+
 // Bind binds input data to a container instance
 func (receiver *BaseController) Bind(c *gin.Context, resourceName string) (interface{}, error) {
 	preloadedBody := c.MustGet("PreloadedBody").([]byte)
 
 	switch c.ContentType() {
-	case "application/json":
+	case "application/json", "application/x-yaml", "text/yaml":
 		inputMap := map[string]interface{}{}
-		if err := json.Unmarshal(preloadedBody, &inputMap); err != nil {
-			logging.Logger().Debug(err.Error())
-			return nil, err
+		var data interface{}
+		switch c.ContentType() {
+		case "application/json":
+			if err := json.Unmarshal(preloadedBody, &inputMap); err != nil {
+				logging.Logger().Debug(err.Error())
+				return nil, err
+			}
+			data = inputMap
+		case "application/x-yaml", "text/yaml":
+			if err := yaml.Unmarshal(preloadedBody, &inputMap); err != nil {
+				logging.Logger().Debug(err.Error())
+				return nil, err
+			}
+			// yaml.Unmarshal builds map[interface{}]interface{} what cannot be used in json.Marshal
+			// so convert it to string-keyed map
+			data = conversion.GetUtility().ConvertToStringKeyMap(inputMap)
 		}
 
-		container, err := extension.CreateInputContainerByResourceName(resourceName, inputMap)
+		container, err := extension.CreateInputContainerByResourceName(resourceName, data)
 		if err != nil {
 			logging.Logger().Debug(err.Error())
 			return nil, err
 		}
 
-		if err := c.Bind(container); err != nil {
+		// remap inputMap to container
+		// instead of c.Bind (c.Bind does not bind yaml correctly)
+		if err := mapstruct.GetUtility().MapToStruct(data, container); err != nil {
 			logging.Logger().Debug(err.Error())
 			return nil, err
 		}
@@ -385,33 +420,47 @@ func (receiver *BaseController) GetResourceMultiURL() (string, error) {
 	return fmt.Sprintf("%s", resourceName), nil
 }
 
+func (receiver *BaseController) outputDataWithType(c *gin.Context, code int, obj interface{}) {
+	switch receiver.determineResponseType(c) {
+	case "application/x-yaml", "text/yaml":
+		c.YAML(code, obj)
+	default:
+		// default is json
+		if _, ok := c.GetQuery("pretty"); ok {
+			c.IndentedJSON(code, obj)
+		} else {
+			c.JSON(code, obj)
+		}
+	}
+}
+
 // OutputError handles an error output
 func (receiver *BaseController) OutputError(c *gin.Context, code int, err error) {
-	c.JSON(code, gin.H{"error": err.Error()})
+	receiver.outputDataWithType(c, code, gin.H{"error": err.Error()})
 }
 
 // OutputGetSingle corresponds HTTP GET message and handles the output of a single result from logic classes
 func (receiver *BaseController) OutputGetSingle(c *gin.Context, code int, result interface{}, fields map[string]interface{}) {
 	_, allFieldExists := fields["*"]
 	if (fields == nil) || ((len(fields) == 1) && allFieldExists) {
-		if _, ok := c.GetQuery("pretty"); ok {
-			c.IndentedJSON(code, result)
-		} else {
-			c.JSON(code, result)
-		}
+		receiver.outputDataWithType(c, code, result)
 	} else {
-		fieldMap, err := helper.FieldToMap(result, fields)
+		targetTag := ""
+		switch receiver.determineResponseType(c) {
+		case "application/x-yaml", "text/yaml":
+			targetTag = "yaml"
+		default:
+			targetTag = "json"
+		}
+
+		fieldMap, err := helper.FieldToMap(result, fields, targetTag)
 		if err != nil {
 			logging.Logger().Debug(err.Error())
 			receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
 			return
 		}
 
-		if _, ok := c.GetQuery("pretty"); ok {
-			c.IndentedJSON(code, fieldMap)
-		} else {
-			c.JSON(code, fieldMap)
-		}
+		receiver.outputDataWithType(c, code, fieldMap)
 	}
 }
 
@@ -421,12 +470,16 @@ func (receiver *BaseController) OutputGetMulti(c *gin.Context, code int, result 
 	c.Header("Count-Before-Pagination", strconv.Itoa(countBeforePagination))
 	_, allFieldExists := fields["*"]
 	if (fields == nil) || ((len(fields) == 1) && allFieldExists) {
-		if _, ok := c.GetQuery("pretty"); ok {
-			c.IndentedJSON(code, result)
-		} else {
-			c.JSON(code, result)
-		}
+		receiver.outputDataWithType(c, code, result)
 	} else {
+		targetTag := ""
+		switch receiver.determineResponseType(c) {
+		case "application/x-yaml", "text/yaml":
+			targetTag = "yaml"
+		default:
+			targetTag = "json"
+		}
+
 		v := reflect.ValueOf(result)
 
 		if v.Kind() != reflect.Slice && v.Kind() != reflect.Array {
@@ -450,7 +503,7 @@ func (receiver *BaseController) OutputGetMulti(c *gin.Context, code int, result 
 					return
 				}
 
-				fieldMap, err := helper.FieldToMap(item.Interface(), fields)
+				fieldMap, err := helper.FieldToMap(item.Interface(), fields, targetTag)
 
 				if err != nil {
 					logging.Logger().Debug(err.Error())
@@ -476,7 +529,7 @@ func (receiver *BaseController) OutputGetMulti(c *gin.Context, code int, result 
 					return
 				}
 
-				fieldMap, err := helper.FieldToMap(item.Interface(), fields)
+				fieldMap, err := helper.FieldToMap(item.Interface(), fields, targetTag)
 
 				if err != nil {
 					logging.Logger().Debug(err.Error())
@@ -487,11 +540,7 @@ func (receiver *BaseController) OutputGetMulti(c *gin.Context, code int, result 
 				fieldMaps = append(fieldMaps, fieldMap)
 			}
 
-			if _, ok := c.GetQuery("pretty"); ok {
-				c.IndentedJSON(code, fieldMaps)
-			} else {
-				c.JSON(code, fieldMaps)
-			}
+			receiver.outputDataWithType(c, code, fieldMaps)
 		}
 	}
 }
