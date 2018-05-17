@@ -81,7 +81,7 @@ func (receiver *URLAliasDefinition) Create(_ extension.Model, _ *gorm.DB, _ gin.
 	defer nameURLAliasDefinitionMapMutex.Unlock()
 
 	urlAliasDefinition := NewURLAliasDefinition()
-	if err := mapstructutilpkg.GetUtility().RemapToStruct(inputContainer, urlAliasDefinition); err != nil {
+	if err := mapstructutilpkg.GetUtility().MapToStruct(inputContainer, urlAliasDefinition); err != nil {
 		return nil, err
 	}
 

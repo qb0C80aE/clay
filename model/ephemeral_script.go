@@ -91,7 +91,7 @@ func (receiver *EphemeralScript) GetMulti(_ extension.Model, db *gorm.DB, _ gin.
 // Create corresponds HTTP POST message and handles a request for multi resource to create a new information
 func (receiver *EphemeralScript) Create(_ extension.Model, db *gorm.DB, _ gin.Params, _ url.Values, inputContainer interface{}) (interface{}, error) {
 	ephemeralScript := NewEphemeralScript()
-	if err := mapstructutilpkg.GetUtility().RemapToStruct(inputContainer, ephemeralScript); err != nil {
+	if err := mapstructutilpkg.GetUtility().MapToStruct(inputContainer, ephemeralScript); err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
@@ -134,7 +134,7 @@ func (receiver *EphemeralScript) Update(model extension.Model, _ *gorm.DB, param
 
 	if !exists {
 		ephemeralScript = NewEphemeralScript()
-		if err := mapstructutilpkg.GetUtility().RemapToStruct(inputContainer, ephemeralScript); err != nil {
+		if err := mapstructutilpkg.GetUtility().MapToStruct(inputContainer, ephemeralScript); err != nil {
 			logging.Logger().Debug(err.Error())
 			return nil, err
 		}
@@ -153,7 +153,7 @@ func (receiver *EphemeralScript) Update(model extension.Model, _ *gorm.DB, param
 		}
 
 		newEephemeralScript := NewEphemeralScript()
-		if err := mapstructutilpkg.GetUtility().RemapToStruct(inputContainer, newEephemeralScript); err != nil {
+		if err := mapstructutilpkg.GetUtility().MapToStruct(inputContainer, newEephemeralScript); err != nil {
 			logging.Logger().Debug(err.Error())
 			return nil, err
 		}

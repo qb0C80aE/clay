@@ -42,7 +42,7 @@ func (receiver *TemplateRaw) GetSingle(model extension.Model, db *gorm.DB, param
 		return nil, err
 	}
 
-	if err := mapstructutilpkg.GetUtility().RemapToStruct(container, templateModelAsContainer); err != nil {
+	if err := mapstructutilpkg.GetUtility().MapToStruct(container, templateModelAsContainer); err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
 	}

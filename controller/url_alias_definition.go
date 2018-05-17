@@ -82,7 +82,7 @@ func (receiver *urlAliasDefinitionController) Create(c *gin.Context) {
 	}
 
 	newURLAliasDefinition := &model.URLAliasDefinition{}
-	if err := mapstructutilpkg.GetUtility().RemapToStruct(container, newURLAliasDefinition); err != nil {
+	if err := mapstructutilpkg.GetUtility().MapToStruct(container, newURLAliasDefinition); err != nil {
 		logging.Logger().Debug(err.Error())
 		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
 		return

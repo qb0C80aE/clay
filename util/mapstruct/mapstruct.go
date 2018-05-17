@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/qb0C80aE/clay/logging"
 	"reflect"
 	"sort"
+
+	"github.com/qb0C80aE/clay/logging"
 )
 
 var utility = &Utility{}
@@ -21,17 +22,19 @@ func GetUtility() *Utility {
 }
 
 // MapToStruct maps the map instance into the struct instance using JSON marshal logic
-func (receiver *Utility) MapToStruct(m interface{}, val interface{}) error {
-	tmp, err := json.Marshal(m)
+// It can be used, for example, map -> container, map -> model, container <-> model
+func (receiver *Utility) MapToStruct(in interface{}, out interface{}) error {
+	byteArray, err := json.Marshal(in)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		return err
 	}
-	err = json.Unmarshal(tmp, val)
-	if err != nil {
+
+	if err := json.Unmarshal(byteArray, out); err != nil {
 		logging.Logger().Debug(err.Error())
 		return err
 	}
+
 	return nil
 }
 
@@ -355,21 +358,4 @@ func (receiver *Utility) SortSlice(slice interface{}, order string) ([]interface
 		}
 	})
 	return result, nil
-}
-
-// RemapToStruct remaps map or struct elements into another one
-// It can be used, for example, map -> container, map -> model, container <-> model
-func (receiver *Utility) RemapToStruct(in interface{}, out interface{}) error {
-	byteArray, err := json.Marshal(in)
-	if err != nil {
-		logging.Logger().Debug(err.Error())
-		return err
-	}
-
-	if err := json.Unmarshal(byteArray, out); err != nil {
-		logging.Logger().Debug(err.Error())
-		return err
-	}
-
-	return nil
 }

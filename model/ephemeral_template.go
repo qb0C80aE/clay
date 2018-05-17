@@ -78,7 +78,7 @@ func (receiver *EphemeralTemplate) GetMulti(_ extension.Model, db *gorm.DB, _ gi
 // Create corresponds HTTP POST message and handles a request for multi resource to create a new information
 func (receiver *EphemeralTemplate) Create(_ extension.Model, _ *gorm.DB, _ gin.Params, _ url.Values, inputContainer interface{}) (interface{}, error) {
 	ephemeralTemplate := NewEphemeralTemplate()
-	if err := mapstructutilpkg.GetUtility().RemapToStruct(inputContainer, ephemeralTemplate); err != nil {
+	if err := mapstructutilpkg.GetUtility().MapToStruct(inputContainer, ephemeralTemplate); err != nil {
 		return nil, err
 	}
 
@@ -106,7 +106,7 @@ func (receiver *EphemeralTemplate) Update(model extension.Model, _ *gorm.DB, par
 	name := parameters.ByName(modelKey.KeyParameter)
 
 	ephemeralTemplate := NewEphemeralTemplate()
-	if err := mapstructutilpkg.GetUtility().RemapToStruct(inputContainer, ephemeralTemplate); err != nil {
+	if err := mapstructutilpkg.GetUtility().MapToStruct(inputContainer, ephemeralTemplate); err != nil {
 		logging.Logger().Debug(err)
 		return nil, err
 	}

@@ -105,7 +105,7 @@ func (receiver *UserDefinedModelDefinition) Create(model extension.Model, db *go
 	defer typeNameUserDefinedModelDefinitionMapMutex.Unlock()
 
 	userDefinedModelDefinition := NewUserDefinedModelDefinition()
-	if err := mapstructutilpkg.GetUtility().RemapToStruct(inputContainer, userDefinedModelDefinition); err != nil {
+	if err := mapstructutilpkg.GetUtility().MapToStruct(inputContainer, userDefinedModelDefinition); err != nil {
 		return nil, err
 	}
 
