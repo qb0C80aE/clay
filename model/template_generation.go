@@ -94,7 +94,7 @@ func (receiver *TemplateGeneration) GenerateTemplate(db *gorm.DB, parameters gin
 		return nil, err
 	}
 
-	if err := mapstructutilpkg.GetUtility().RemapToStruct(container, templateModelAsContainer); err != nil {
+	if err := mapstructutilpkg.GetUtility().MapToStruct(container, templateModelAsContainer); err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
 	}

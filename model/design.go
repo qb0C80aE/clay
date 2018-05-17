@@ -86,7 +86,7 @@ func (receiver *Design) Update(_ extension.Model, db *gorm.DB, _ gin.Params, _ u
 	}
 
 	design := NewDesign()
-	if err := mapstructutilpkg.GetUtility().RemapToStruct(inputContainer, design); err != nil {
+	if err := mapstructutilpkg.GetUtility().MapToStruct(inputContainer, design); err != nil {
 		logging.Logger().Debug(err.Error())
 		return nil, err
 	}
