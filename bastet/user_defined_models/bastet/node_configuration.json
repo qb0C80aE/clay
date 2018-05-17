@@ -1,0 +1,33 @@
+{
+  "type_name": "NodeConfiguration",
+  "resource_name": "node_configurations",
+  "to_be_migrated": true,
+  "is_controller_enabled": true,
+  "fields": [
+    {
+      "name": "ID",
+      "tag": "json:\"id\" yaml:\"id\" gorm:\"primary_key;auto_increment\"",
+      "type_name": "int"
+    },
+    {
+      "name": "NodeID",
+      "tag": "json:\"node_id\" yaml:\"node_id\" gorm:\"unique_index:node_id_port_name\" sql:\"type:integer references nodes(id)\"",
+      "type_name": "int"
+    },
+    {
+      "name": "Node",
+      "tag": "json:\"node\" yaml:\"node\" gorm:\"ForeignKey:NodeID\" validate:\"omitempty,dive\"",
+      "type_name": "Node"
+    },
+    {
+      "name": "Description",
+      "tag": "json:\"description\" yaml:\"description\"",
+      "type_name": "string"
+    },
+    {
+      "name": "ImageName",
+      "tag": "json:\"image_name\" yaml:\"image_name\" gorm:\"not null\"",
+      "type_name": "string"
+    },
+  ]
+}

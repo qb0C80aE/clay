@@ -1,0 +1,29 @@
+{
+  "type_name": "TestScenario",
+  "resource_name": "test_scenarios",
+  "to_be_migrated": true,
+  "is_controller_enabled": true,
+  "fields": [
+    {
+      "name": "ID",
+      "tag": "json:\"id\" yaml:\"id\" gorm:\"primary_key;auto_increment\"",
+      "type_name": "int"
+    },
+    {
+      "name": "Name",
+      "tag": "json:\"name\" yaml:\"name\" gorm:\"not null;unique\"",
+      "type_name": "string"
+    },
+    {
+      "name": "Description",
+      "tag": "json:\"description\" yaml:\"description\"",
+      "type_name": "string"
+    },
+    {
+      "name": "TestScenarioTestStepAssociations",
+      "tag": "json:\"test_scenario_test_step_associations\" yaml:\"test_scenario_test_step_associations\" gorm:\"ForeignKey:TestScenarioID\" validate:\"omitempty,dive\"",
+      "type_name": "TestScenarioTestStepAssociation",
+      "is_slice": true
+    }
+  ]
+}

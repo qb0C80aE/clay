@@ -1,0 +1,52 @@
+{
+    "type_name": "TestStep",
+    "resource_name": "test_steps",
+    "to_be_migrated": true,
+    "is_controller_enabled": true,
+    "fields": [
+      {
+        "name": "ID",
+        "tag": "json:\"id\" yaml:\"id\" gorm:\"primary_key;auto_increment\"",
+        "type_name": "int"
+      },
+      {
+        "name": "Name",
+        "tag": "json:\"name\" yaml:\"name\" gorm:\"not null;unique\"",
+        "type_name": "string"
+      },
+      {
+        "name": "Description",
+        "tag": "json:\"description\" yaml:\"description\"",
+        "type_name": "string"
+      },
+      {
+        "name": "TemplateID",
+        "tag": "json:\"template_id\" yaml:\"template_id\" gorm:\"unique_index:template_id_name\" sql:\"type:integer references templates(id)\"",
+        "type_name": "int"
+      },
+      {
+        "name": "Template",
+        "tag": "json:\"template\" yaml:\"template\" gorm:\"ForeignKey:TemplateID\" validate:\"omitempty,dive\"",
+        "type_name": "Template"
+      },
+      {
+        "name": "ToBeDeleted",
+        "tag": "json:\"to_be_deleted,omitempty\" yaml:\"to_be_deleted,omitempty\" sql:\"-\"",
+        "type_name": "bool"
+      }
+    ],
+    "sql_after_migration": [
+      "create trigger if not exists DeleteTemplateBeforeTestStepDeletion before delete on test_steps",
+  		"  begin",
+  		"    delete from templates where id = old.template_id;",
+  		"  end;",
+  		"create trigger if not exists DeleteTemplateBeforeTestStepUpdate before update of template_id on test_steps",
+  		"  begin",
+  		"    delete from templates where id = old.template_id and old.template_id <> new.template_id;",
+  		"  end;",
+  		"create trigger if not exists DeleteTestStepBeforeTemplateDeletion before delete on templates",
+  		"  begin",
+  		"    delete from test_steps where template_id = old.id;",
+  		"  end;"
+    ]
+  }

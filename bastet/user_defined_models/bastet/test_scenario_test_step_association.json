@@ -1,0 +1,46 @@
+{
+  "type_name": "TestScenarioTestStepAssociation",
+  "resource_name": "test_scenario_test_step_associations",
+  "to_be_migrated": true,
+  "is_controller_enabled": true,
+  "is_many_to_many_association": true,
+  "fields": [
+    {
+      "name": "TestScenarioID",
+      "tag": "json:\"test_step_group_id\" yaml:\"test_step_group_id\" gorm:\"primary_key\" sql:\"type:integer references test_step_groups(id)\" clay:\"many_to_many_left_resource_name=test_step_groups\"",
+      "type_name": "int"
+    },
+    {
+      "name": "TestScenario",
+      "tag": "json:\"test_step_group\" yaml:\"test_step_group\" gorm:\"ForeignKey:TestScenarioID\" validate:\"omitempty,dive\"",
+      "type_name": "TestScenario"
+    },
+    {
+      "name": "TestStepID",
+      "tag": "json:\"test_step_id\" yaml:\"test_step_id\" gorm:\"primary_key\" sql:\"type:integer references test_steps(id)\" clay:\"many_to_many_right_resource_name=test_steps\"",
+      "type_name": "int"
+    },
+    {
+      "name": "TestStep",
+      "tag": "json:\"test_step\" yaml:\"test_step\" gorm:\"ForeignKey:TestStepID\" validate:\"omitempty,dive\"",
+      "type_name": "TestStep"
+    },
+    {
+      "name": "ToBeDeleted",
+      "tag": "json:\"to_be_deleted,omitempty\" yaml:\"to_be_deleted,omitempty\" sql:\"-\"",
+      "type_name": "bool"
+    }
+  ],
+  "sql_after_migration": [
+    "drop trigger if exists DeleteTestScenarioTestStepAssociationBeforeTestScenarioDeletion;",
+    "create trigger if not exists DeleteTestScenarioTestStepAssociationBeforeTestScenarioDeletion before delete on test_step_groups",
+    "  begin",
+    "    delete from test_scenario_test_step_associations where test_step_group_id = old.id;",
+    "  end;",
+    "drop trigger if exists DeleteTestScenarioTestStepAssociationBeforeTestStepDeletion;",
+    "create trigger if not exists DeleteTestScenarioTestStepAssociationBeforeTestStepDeletion before delete on test_steps",
+    "  begin",
+    "    delete from test_scenario_test_step_associations where test_step_id = old.id;",
+    "  end;"
+  ]
+}
