@@ -139,6 +139,22 @@ func executeValidation(c *gin.Context, resourceName string, inputContainer inter
 	return nil
 }
 
+func (receiver *BaseController) determineResponseType(c *gin.Context) string {
+	acceptList := strings.Split(c.Request.Header.Get("Accept"), ",")
+
+	if len(acceptList) == 0 {
+		return "application/json"
+	}
+
+	result := strings.Trim(acceptList[0], " ")
+	switch result {
+	case "application/x-yaml", "text/yaml":
+		return result
+	default:
+		return "application/json"
+	}
+}
+
 // Bind binds input data to a container instance
 func (receiver *BaseController) Bind(c *gin.Context, resourceName string) (interface{}, error) {
 	preloadedBody := c.MustGet("PreloadedBody").([]byte)
@@ -405,8 +421,8 @@ func (receiver *BaseController) GetResourceMultiURL() (string, error) {
 }
 
 func (receiver *BaseController) outputDataWithType(c *gin.Context, code int, obj interface{}) {
-	switch c.Request.URL.Query().Get("output_type") {
-	case "yaml":
+	switch receiver.determineResponseType(c) {
+	case "application/x-yaml", "text/yaml":
 		c.YAML(code, obj)
 	default:
 		// default is json
@@ -429,7 +445,14 @@ func (receiver *BaseController) OutputGetSingle(c *gin.Context, code int, result
 	if (fields == nil) || ((len(fields) == 1) && allFieldExists) {
 		receiver.outputDataWithType(c, code, result)
 	} else {
-		targetTag := c.Request.URL.Query().Get("output_type")
+		targetTag := ""
+		switch receiver.determineResponseType(c) {
+		case "application/x-yaml", "text/yaml":
+			targetTag = "yaml"
+		default:
+			targetTag = "json"
+		}
+
 		fieldMap, err := helper.FieldToMap(result, fields, targetTag)
 		if err != nil {
 			logging.Logger().Debug(err.Error())
@@ -449,7 +472,13 @@ func (receiver *BaseController) OutputGetMulti(c *gin.Context, code int, result 
 	if (fields == nil) || ((len(fields) == 1) && allFieldExists) {
 		receiver.outputDataWithType(c, code, result)
 	} else {
-		targetTag := c.Request.URL.Query().Get("output_type")
+		targetTag := ""
+		switch receiver.determineResponseType(c) {
+		case "application/x-yaml", "text/yaml":
+			targetTag = "yaml"
+		default:
+			targetTag = "json"
+		}
 
 		v := reflect.ValueOf(result)
 
