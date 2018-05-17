@@ -9,6 +9,8 @@ type URLAliasMethodURLTypeDefinition struct {
 	Base
 	Method        string `json:"method" yaml:"method" validate:"required,oneof=GET POST PUT DELETE PATCH OPTIONS"`
 	TargetURLType string `json:"target_url_type" yaml:"target_url_type" validate:"required,oneof=single multi"`
+	Accept        string `json:"accept" yaml:"accept"`
+	AcceptCharset string `json:"accept_charset" yaml:"accept_charset"`
 }
 
 // NewURLAliasMethodURLTypeDefinition creates a template raw model instance

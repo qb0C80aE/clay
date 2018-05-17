@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
@@ -36,21 +37,7 @@ func (receiver *templateGenerationController) GetRouteMap() map[int]map[int]gin.
 }
 
 func (receiver *templateGenerationController) OutputGetSingle(c *gin.Context, code int, result interface{}, _ map[string]interface{}) {
-	OutputTextWithContentType(c, code, result)
-}
-
-// OutputTextWithContentType outputs the result text in the given type
-func OutputTextWithContentType(c *gin.Context, code int, result interface{}) {
-	text := result.(string)
-
-	contentType := c.Request.URL.Query().Get("content_type")
-
-	switch contentType {
-	case "":
-		c.String(code, text)
-	default:
-		c.Data(code, contentType, []byte(text))
-	}
+	receiver.outputTextWithContentType(c, code, result)
 }
 
 func init() {

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
@@ -42,7 +43,7 @@ func (receiver *ephemeralScriptRawController) GetRouteMap() map[int]map[int]gin.
 }
 
 func (receiver *ephemeralScriptRawController) OutputGetSingle(c *gin.Context, code int, result interface{}, fields map[string]interface{}) {
-	OutputTextWithContentType(c, code, result)
+	receiver.BaseController.outputTextWithContentType(c, code, result)
 }
 
 func init() {

@@ -2,13 +2,14 @@ package extension
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/qb0C80aE/clay/logging"
 	"net/http"
 	"net/url"
 	"os"
 	"regexp"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	"github.com/qb0C80aE/clay/logging"
 )
 
 type regExpControllerPair struct {
@@ -28,8 +29,34 @@ const (
 	MethodDelete  = 4
 	MethodPatch   = 5
 	MethodOptions = 6
-	URLSingle     = 1
-	URLMulti      = 2
+)
+
+// URLSomething means URL type
+const (
+	URLSingle = 1
+	URLMulti  = 2
+)
+
+// AcceptSomething contains the expression of string in Accept header
+const (
+	AcceptJSON     = "application/json"
+	AcceptXYAML    = "application/x-yaml"
+	AcceptTextYAML = "text/yaml"
+	AcceptAll      = "*/*"
+)
+
+// AcceptCharsetSomething contains the expressin of string in Accept-Charset header
+const (
+	AcceptCharsetUTF8 = "utf-8"
+)
+
+// ContentTypeSomething contains the expression of string in Content-Type header
+const (
+	ContentTypeJSON              = "application/json"
+	ContentTypeXYAML             = "application/x-yaml"
+	ContentTypeTextYAML          = "text/yaml"
+	ContentTypeMultipartFormData = "multipart/form-data"
+	ContentTypeOctetStream       = "application/octet-stream"
 )
 
 var methodStringMap = map[int]string{
@@ -39,6 +66,15 @@ var methodStringMap = map[int]string{
 	MethodDelete:  http.MethodDelete,
 	MethodPatch:   http.MethodPatch,
 	MethodOptions: http.MethodOptions,
+}
+
+var methodIntMap = map[string]int{
+	http.MethodGet:     MethodGet,
+	http.MethodPost:    MethodPost,
+	http.MethodPut:     MethodPut,
+	http.MethodDelete:  MethodDelete,
+	http.MethodPatch:   MethodPatch,
+	http.MethodOptions: MethodOptions,
 }
 
 // Controller is the interface what is mapped into specific urls and handles the requests from HTTP clients
@@ -90,6 +126,11 @@ type OutputHandler interface {
 // LookUpMethodName returns the HTTP method name string corresponded to the argument
 func LookUpMethodName(method int) string {
 	return methodStringMap[method]
+}
+
+// LookUpMethodInt returns the HTTP method int value corresponded to the argument
+func LookUpMethodInt(method string) int {
+	return methodIntMap[method]
 }
 
 // RegisterController registers a controller used in the router
