@@ -41,16 +41,21 @@ func merge(m1, m2 map[string]interface{}) map[string]interface{} {
 }
 
 // QueryFields builds a query field string based on arguments
-func QueryFields(model interface{}, fields map[string]interface{}, targetTag string) string {
+// It requires a container which has actual fields, not a model which might not have actual fields
+func QueryFields(container interface{}, fields map[string]interface{}, targetTag string) (string, error) {
+	if _, ok := container.(extension.Model); ok {
+		return "", errors.New("given data is not a model, not a container")
+	}
+
 	var targetFieldKey string
 
-	vs := reflect.ValueOf(model)
+	vs := reflect.ValueOf(container)
 
 	for vs.Kind() == reflect.Ptr {
 		vs = vs.Elem()
 	}
 	if !vs.IsValid() {
-		return "*"
+		return "", errors.New("given data is not valid")
 	}
 
 	assocs := make(map[string]AssociationType)
@@ -85,7 +90,7 @@ func QueryFields(model interface{}, fields map[string]interface{}, targetTag str
 
 	for k := range fields {
 		if k == "*" {
-			return "*"
+			return "*", nil
 		}
 
 		if _, ok := assocs[k]; !ok {
@@ -102,7 +107,7 @@ func QueryFields(model interface{}, fields map[string]interface{}, targetTag str
 		}
 	}
 
-	return strings.Join(result, ",")
+	return strings.Join(result, ","), nil
 }
 
 // ParseFields parses the argument and generate a map based on that

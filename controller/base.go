@@ -652,7 +652,12 @@ func (receiver *BaseController) GetSingle(c *gin.Context) {
 
 	db = parameter.SetPreloads(db)
 	fields := helper.ParseFields(c.DefaultQuery("fields", "*"))
-	queryFields := helper.QueryFields(resultForQueryFields, fields, receiver.determineResponseMappingTagFromAccept(c))
+	queryFields, err := helper.QueryFields(resultForQueryFields, fields, receiver.determineResponseMappingTagFromAccept(c))
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		receiver.outputHandler.OutputError(c, http.StatusNotFound, err)
+		return
+	}
 
 	result, err := receiver.model.GetSingle(receiver.model, db, c.Params, c.Request.URL.Query(), queryFields)
 	if err != nil {
@@ -711,7 +716,12 @@ func (receiver *BaseController) GetMulti(c *gin.Context) {
 	db = parameter.SortRecords(db)
 	db = parameter.FilterFields(db)
 	fields := helper.ParseFields(c.DefaultQuery("fields", "*"))
-	queryFields := helper.QueryFields(elementOfResultForQueryFields, fields, receiver.determineResponseMappingTagFromAccept(c))
+	queryFields, err := helper.QueryFields(elementOfResultForQueryFields, fields, receiver.determineResponseMappingTagFromAccept(c))
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		receiver.outputHandler.OutputError(c, http.StatusNotFound, err)
+		return
+	}
 
 	result, err := receiver.model.GetMulti(receiver.model, db, c.Params, c.Request.URL.Query(), queryFields)
 	if err != nil {
