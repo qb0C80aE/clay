@@ -2,7 +2,8 @@
   "general": {
     "user_defined_models_directory": "./examples/api_only",
     "ephemeral_templates_directory": "./examples/api_only",
-    "ephemeral_binary_objects_directory": "./examples/api_only"
+    "ephemeral_binary_objects_directory": "./examples/api_only",
+    "ephemeral_scripts_directory": "examples/api_and_gui/ephemeral_scripts"
   },
   "user_defined_models": [
     {
@@ -42,12 +43,8 @@
       "file_name": "vlan_port_association.json"
     }
   ],
-  "ephemeral_templates": [
-  ],
-  "ephemeral_binary_objects": [
-  ],
-  "ephemeral_templates": [
-  ],
-  "url_aliases": [
-  ]
+  "ephemeral_templates": [],
+  "ephemeral_binary_objects": [],
+  "ephemeral_scripts": [],
+  "url_aliases": []
 }
