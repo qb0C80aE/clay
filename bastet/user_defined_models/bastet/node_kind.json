@@ -1,6 +1,6 @@
 {
-  "type_name": "NodeConfiguration",
-  "resource_name": "node_configurations",
+  "type_name": "NodeKind",
+  "resource_name": "node_kinds",
   "to_be_migrated": true,
   "is_controller_enabled": true,
   "fields": [
@@ -51,14 +51,14 @@
     },
   ],
   "sql_after_migration": [
-		"create trigger if not exists DeleteTemplateBeforeNodeConfigurationDeletion before delete on node_configurations",
+		"create trigger if not exists DeleteTemplateBeforeNodeKindDeletion before delete on node_kinds",
 		"  begin",
 		"    delete from templates where id = old.initialization_template_id;",
 		"    delete from templates where id = old.configuration_template_id;",
 		"  end;",
-		"create trigger if not exists DeleteNodeConfigurationBeforeTemplateDeletion before delete on templates",
+		"create trigger if not exists DeleteNodeKindBeforeTemplateDeletion before delete on templates",
 		"  begin",
-		"    delete from node_configurations where initialization_template_id = old.id or configuration_template_id = old.id;",
+		"    delete from node_kinds where initialization_template_id = old.id or configuration_template_id = old.id;",
 		"  end;"
   ]
 }

@@ -48,6 +48,26 @@
       "type_name": "NodeType"
     },
     {
+      "name": "NodeKindID",
+      "tag": "json:\"node_kind_id\" yaml:\"node_kind_id\" gorm:\"not null\" sql:\"type:integer references node_kinds(id)\"",
+      "type_name": "int"
+    },
+    {
+      "name": "NodeKind",
+      "tag": "json:\"node_kind\" yaml:\"node_kind\" gorm:\"ForeignKey:NodeKindID\" validate:\"omitempty,dive\"",
+      "type_name": "NodeKind"
+    },
+    {
+      "name": "NodeConfigurationID",
+      "tag": "json:\"node_configuration_id\" yaml:\"node_configuration_id\" gorm:\"not null\" sql:\"type:integer references node_configurations(id)\"",
+      "type_name": "int"
+    },
+    {
+      "name": "NodeConfiguration",
+      "tag": "json:\"node_configuration\" yaml:\"node_configuration\" gorm:\"ForeignKey:NodeConfigurationID\" validate:\"omitempty,dive\"",
+      "type_name": "NodeConfiguration"
+    },
+    {
       "name": "Virtual",
       "tag": "json:\"virtual\" yaml:\"virtual\"",
       "type_name": "bool"
