@@ -1,0 +1,274 @@
+{{/* <script> */}}
+
+var storedCallbackTestScenarioInformationUpdated = null;
+
+function showTestScenarioInformation(testScenarioID, callbackTestScenarioInformationUpdated) {
+  storedCallbackTestScenarioInformationUpdated = callbackTestScenarioInformationUpdated;
+
+  if (testScenarioID == null) {
+    var testScenario = {
+      name: '',
+      description: '',
+      test_scenario_parameters: [],
+      test_scenario_test_step_associations: []
+    };
+    repaintTestScenarioInformation(testScenario);
+  } else {
+    getResource('test_scenarios', testScenarioID, 'preloads=test_scenario_parameters,test_scenario_test_step_associations.test_step', function(testScenario) {
+      repaintTestScenarioInformation(testScenario);
+    });
+  }
+}
+
+function repaintTestScenarioInformation(testScenario) {
+  $('#test_scenario_information_float_panel div[name=deleted_test_scenario_parameters]').children().remove();
+
+  var test_scenario_information_table = $('#test_scenario_information_float_panel #test_scenario_information_table');
+
+  test_scenario_information_table.find('input[name=id]').val(testScenario.id);
+  test_scenario_information_table.find('input[name=name]').val(testScenario.name);
+  test_scenario_information_table.find('input[name=description]').val(testScenario.description);
+
+  $('#test_scenario_information_float_panel').fadeIn(50);
+
+  $('#test_scenario_information_float_panel #test_scenario_steps_table').DataTable({
+    sDom: '<"row"<"col-sm-5"l><"col-sm-6 right"f>>tip',
+    order: [[1, 'asc']],
+    scrollX: true,
+    destroy: true,
+    paging:   true,
+    ordering: true,
+    info:     false,
+    searching: false,
+    data: testScenario.test_scenario_test_step_associations,
+    columns: [
+      {title: '', sortable: false, render: function (data, type, full, meta) {
+          return createButtonElement('delete_test_scenario_step_btn', 'btn btn-default', 'glyphicon glyphicon-minus', '').outerHTML;
+        }
+      },
+      {title: 'No.', defaultContent: '', sortable: true, orderDataType: "dom-text-numeric", render: function (data, type, full, meta) {
+          return createTextElement('number', 'in-table test-step-number', '', '1', full.number).outerHTML;
+        }
+      },
+      {title: 'Test Step', defaultContent: '', sortable: false, render: function (data, type, full, meta) {
+          var options = [];
+          if (full.test_step_id != 0) {
+            var option = {
+              id: full.test_step_id,
+              name: full.test_step.name + ' (' + full.test_step.description + ')'
+            };
+            options.push(option);
+          }
+          return createSelectElement('test_step_id', 'in-table', '', options, full.test_step_id).outerHTML;
+        }
+      },
+    ],
+    drawCallback: function(settings) {
+      $('#test_scenario_information_float_panel #test_scenario_steps_table select[name=test_step_id]').select2({
+        allowClear: true,
+        minimumInputLength: 1,
+        ajax: {
+          url:'/ui/select2',
+          dataType: 'json',
+          delay: 50,
+          data: function(params) {
+            return { 'resource_name': 'test_step_select2', 'terms_order': 'name', 'terms': params.term, 'limit': 10 };
+          }
+        },
+        width: '800px',
+        placeholder: 'None',
+      });
+    }
+  });
+
+  $('#test_scenario_information_float_panel #test_scenario_parameters_table').DataTable({
+    sDom: '<"row"<"col-sm-5"l><"col-sm-6 right"f>>tip',
+    order: [[1, 'asc']],
+    scrollX: true,
+    destroy: true,
+    paging:   true,
+    ordering: true,
+    info:     false,
+    searching: false,
+    data: testScenario.test_scenario_parameters,
+    columns: [
+      {title: '', sortable: false, render: function (data, type, full, meta) {
+          return createButtonElement('delete_test_scenario_parameter_btn', 'btn btn-default', 'glyphicon glyphicon-minus', '').outerHTML +
+            createHiddenElement('id', full.id).outerHTML;
+        }
+      },
+      {title: 'Step No.', data: 'test_step_number', defaultContent: '', sortable: true, orderDataType: "dom-text-numeric", render: function (data, type, full, meta) {
+          if (data == 0) {
+            data = '';
+          }
+          return createTextElement('test_step_number', 'in-table test-step-number', '', '', data).outerHTML;
+        }
+      },
+      {title: 'Name', data: 'name', defaultContent: '', sortable: false, render: function (data, type, full, meta) {
+          return createTextElement('name', 'in-table', '', 'parameter name', data).outerHTML;
+        }
+      },
+      {title: 'Value', data: 'value', defaultContent: '', sortable: false, render: function (data, type, full, meta) {
+          return createTextElement('value', 'in-table', '', 'description', data).outerHTML;
+        }
+      }
+    ],
+    drawCallback: function(settings) {
+
+    }
+  });
+
+  $('#page_cover').fadeIn(50);
+}
+
+$('#test_scenario_information_float_panel').on('click', 'button[name=add_test_scenario_step_btn]', function() {
+  var data = {
+    number: 1,
+    test_step_id: 0
+  };
+  $('#test_scenario_information_float_panel #test_scenario_steps_table').DataTable().row.add(data).draw();
+  $('#test_scenario_information_float_panel #test_scenario_steps_table').DataTable().draw();
+});
+
+$('#test_scenario_information_float_panel #test_scenario_steps_table').on('click', 'button[name=delete_test_scenario_step_btn]', function() {
+  var tr = $(this).closest('tr');
+  $('#test_scenario_information_float_panel #test_scenario_steps_table').DataTable().row(tr).remove().draw();
+});
+
+$('#test_scenario_information_float_panel').on('click', 'button[name=add_test_scenario_parameter_btn]', function() {
+  var data = {
+    id: 0
+  };
+  $('#test_scenario_information_float_panel #test_scenario_parameters_table').DataTable().row.add(data).draw();
+  $('#test_scenario_information_float_panel #test_scenario_parameters_table').DataTable().draw();
+});
+
+$('#test_scenario_information_float_panel #test_scenario_parameters_table').on('click', 'button[name=delete_test_scenario_parameter_btn]', function() {
+  var tr = $(this).closest('tr');
+  var deletedTestScenarioParameterID = tr.find('input[name=id]').val();
+  if ((deletedTestScenarioParameterID != null) && (deletedTestScenarioParameterID != undefined) && (deletedTestScenarioParameterID != '') && (deletedTestScenarioParameterID != 0)) {
+    $('#test_scenario_information_float_panel div[name=deleted_test_scenario_parameters]').append(createHiddenElement('deleted', deletedTestScenarioParameterID));
+  }
+  $('#test_scenario_information_float_panel #test_scenario_parameters_table').DataTable().row(tr).remove().draw();
+});
+
+$('#test_scenario_information_panel').on('click', 'button[name=cancel_test_scenario_btn]', function() {
+  $('#test_scenario_information_float_panel').fadeOut(50, function() {
+    $('#page_cover').fadeOut(50);
+  });
+});
+
+$('#test_scenario_information_panel').on('click', 'button[name=update_test_scenario_btn]', function() {
+  if (!confirm('Are you sure to register/update the test scenario?')) {
+    return;
+  }
+
+  var deletedTestScenarioParameterIDMap = {};
+  var inputDeletedTestScenarioParameters = $('#test_scenario_information_float_panel div[name=deleted_test_scenario_parameters]').find('input[name=deleted]');
+  for (var i = 0; i < inputDeletedTestScenarioParameters.length; i = i + 1) {
+    var inputDeletedTestScenarioParameter = inputDeletedTestScenarioParameters[i];
+    var deletedTestScenarioParameterID = parseInt($(inputDeletedTestScenarioParameter).val());
+    deletedTestScenarioParameterIDMap[deletedTestScenarioParameterID] = deletedTestScenarioParameterID;
+  }
+
+  var testScenarioID = $('#test_scenario_information_panel').find('input[name=id]').val();
+  if ((testScenarioID == null) || (testScenarioID == undefined) || (testScenarioID == '')) {
+    testScenarioID = 0;
+  }
+
+  var testScenarioName = $('#test_scenario_information_panel').find('input[name=name]').val();
+  var testScenarioDescription = $('#test_scenario_information_panel').find('input[name=description]').val();
+
+  var testScenario = {
+    id: parseInt(testScenarioID),
+    name: testScenarioName,
+    description: testScenarioDescription,
+    test_scenario_parameters: [],
+    test_scenario_test_step_associations: []
+  };
+  if (testScenarioID == 0) {
+    delete(testScenario['id']);
+  }
+
+  $('#test_scenario_information_float_panel #test_scenario_steps_table').DataTable().rows().every(function(){
+    var testScenarioStepTr = $(this.node());
+    var testScenarioStepID = testScenarioStepTr.find('select[name=test_step_id]').val();
+    var testScenarioStepNumber = testScenarioStepTr.find('input[name=number]').val();
+
+    var testScenarioTestStepAssociation = {
+      test_scenario_id: parseInt(testScenarioID),
+      test_step_id: parseInt(testScenarioStepID),
+      number: parseInt(testScenarioStepNumber)
+    };
+    if (testScenarioID == 0) {
+      delete(testScenarioTestStepAssociation['test_scenario_id']);
+    }
+
+    testScenario.test_scenario_test_step_associations.push(testScenarioTestStepAssociation);
+  });
+
+  $('#test_scenario_information_float_panel #test_scenario_parameters_table').DataTable().rows().every(function(){
+    var testScenarioParameterTr = $(this.node());
+    var testScenarioParameterID = testScenarioParameterTr.find('input[name=id]').val();
+    var testScenarioParameterTestStepNumber = testScenarioParameterTr.find('input[name=test_step_number]').val();
+    var testScenarioParameterName = testScenarioParameterTr.find('input[name=name]').val();
+    var testScenarioParameterValue = testScenarioParameterTr.find('input[name=value]').val();
+
+    var testScenarioParameter = {
+      id: parseInt(testScenarioParameterID),
+      test_scenario_id: parseInt(testScenarioID),
+      test_step_number: parseInt(testScenarioParameterTestStepNumber),
+      name: testScenarioParameterName,
+      value: testScenarioParameterValue
+    };
+    if (testScenarioID == 0) {
+      delete(testScenarioParameter['test_scenario_id']);
+    }
+
+    testScenario.test_scenario_parameters.push(testScenarioParameter);
+  });
+
+  for (testScenarioParameterID in deletedTestScenarioParameterIDMap) {
+    var testScenarioParameter = {
+      id: parseInt(testScenarioParameterID),
+      to_be_deleted: true
+    };
+
+    testScenario.test_scenario_parameters.push(testScenarioParameter);
+  }
+
+  if (testScenario.id == undefined) {
+    postResource('test_scenarios', testScenario, '', function(result, xhr) {
+      showProcessResult(result, xhr, 201, "The test scenario information has been registered successfully.");
+      postProcessUpdateTestScenario(result, xhr);
+    });
+  } else {
+    putResource('test_scenarios', testScenario.id, testScenario, '', function(result, xhr) {
+      showProcessResult(result, xhr, 200, "The test scenario information has been updated successfully.");
+      postProcessUpdateTestScenario(result, xhr);
+    });
+  }
+
+});
+
+function postProcessUpdateTestScenario(result, xhr) {
+  var testScenarioID = result.id;
+
+  getResource('test_scenarios', testScenarioID, 'preloads=test_scenario_parameters,test_scenario_test_step_associations.test_step', function(testScenario) {
+    repaintTestScenarioInformation(testScenario);
+    if ((storedCallbackTestScenarioInformationUpdated != null) && (storedCallbackTestScenarioInformationUpdated != undefined)) {
+      storedCallbackTestScenarioInformationUpdated();
+    }
+  });
+}
+
+function deleteTestScenarioInformation(testScenarioID, callbackTestScenarioInformationDeleted) {
+  if (!confirm('Are you sure to delete the test scenario?')) {
+    return;
+  }
+
+  deleteResource('test_scenarios', testScenarioID, '', function(result, xhr) {
+    showProcessResult(result, xhr, 204, "The test scenario information has been deleted successfully.");
+    callbackTestScenarioInformationDeleted();
+  });
+}

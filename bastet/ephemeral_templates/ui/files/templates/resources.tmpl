@@ -4,6 +4,8 @@
 {{ .ModelStore.Single "ephemeral_templates/port_group_information.tmpl/generation" "" }}
 {{ .ModelStore.Single "ephemeral_templates/vlan_information.tmpl/generation" "" }}
 {{ .ModelStore.Single "ephemeral_templates/template_information.tmpl/generation" "" }}
+{{ .ModelStore.Single "ephemeral_templates/test_step_information.tmpl/generation" "" }}
+{{ .ModelStore.Single "ephemeral_templates/test_scenario_information.tmpl/generation" "" }}
 
 <div id="main_panel">
 
@@ -15,6 +17,9 @@
 				<li><a href="#node_groups_tab" data-toggle="tab">NodeGroups</a></li>
 				<li><a href="#port_groups_tab" data-toggle="tab">PortGroups</a></li>
 				<li><a href="#templates_tab" data-toggle="tab">Templates</a></li>
+				<li><a href="#node_kinds_tab" data-toggle="tab">NodeKinds</a></li>
+				<li><a href="#test_steps_tab" data-toggle="tab">TestSteps</a></li>
+				<li><a href="#test_scenarios_tab" data-toggle="tab">TestScenarios</a></li>
 	    </ul>
 	  </div>
 	</div>
@@ -121,6 +126,72 @@
 			</div>
 		</div>
 
+
+		<div class="tab-pane" id="node_kinds_tab">
+			<div class="panel panel-default" id="node_kinds_panel">
+				<div class="panel-heading">
+					<h1 class="panel-title">
+						<span style="display: table-cell; vertical-align: middle; text-align: left; width=90%">
+							<span class="glyphicon glyphicon-blackboard"></span> Host Kinds
+						</span>
+						<span class="input-group-btn">
+							<button class="btn btn-default" name="add_node_kind_btn" type="button">
+								<span class="glyphicon glyphicon-plus"></span>
+							</button>
+						</span>
+					</h1>
+				</div>
+				<div class="panel-body">
+					<table id="node_kinds_table" class="table table-striped table-bordered table-hover">
+					</table>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="tab-pane" id="test_steps_tab">
+			<div class="panel panel-default" id="test_steps_panel">
+				<div class="panel-heading">
+					<h1 class="panel-title">
+						<span style="display: table-cell; vertical-align: middle; text-align: left; width=90%">
+							<span class="glyphicon glyphicon-pencil"></span> Test Steps
+						</span>
+						<span class="input-group-btn">
+							<button class="btn btn-default" name="add_test_step_btn" type="button">
+								<span class="glyphicon glyphicon-plus"></span>
+							</button>
+						</span>
+					</h1>
+				</div>
+				<div class="panel-body">
+					<table id="test_steps_table" class="table table-striped table-bordered table-hover">
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<div class="tab-pane" id="test_scenarios_tab">
+			<div class="panel panel-default" id="test_scenarios_panel">
+				<div class="panel-heading">
+					<h1 class="panel-title">
+						<span style="display: table-cell; vertical-align: middle; text-align: left; width=90%">
+							<span class="glyphicon glyphicon-duplicate"></span> Test Scenarios
+						</span>
+						<span class="input-group-btn">
+							<button class="btn btn-default" name="add_test_scenario_btn" type="button">
+								<span class="glyphicon glyphicon-plus"></span>
+							</button>
+						</span>
+					</h1>
+				</div>
+				<div class="panel-body">
+					<table id="test_scenarios_table" class="table table-striped table-bordered table-hover">
+					</table>
+				</div>
+			</div>
+		</div>
+
+
 	</div>
 </div>
 
@@ -133,12 +204,14 @@ $(function() {
 	{{ .ModelStore.Single "ephemeral_templates/functions_port_group_information.tmpl/generation" "" }}
 	{{ .ModelStore.Single "ephemeral_templates/functions_vlan_information.tmpl/generation" "" }}
 	{{ .ModelStore.Single "ephemeral_templates/functions_template_information.tmpl/generation" "" }}
+	{{ .ModelStore.Single "ephemeral_templates/functions_test_step_information.tmpl/generation" "" }}
+	{{ .ModelStore.Single "ephemeral_templates/functions_test_scenario_information.tmpl/generation" "" }}
 
 	function onLoad() {
 		$('#main_panel #nodes_tab #nodes_panel').fadeIn(150, function() {
 			$('#main_panel #nodes_tab #nodes_panel #nodes_table').DataTable({
 				ajax: {
-					url: '/ui/datatables?resource_name=nodes&resource_preloads=node_type&columns=null,name,node_type_id,virtual,description'
+					url: '/ui/datatables?resource_name=nodes&resource_preloads=node_type,node_kind&columns=null,name,node_type_id,node_kind_id,virtual,description'
 				},
 				serverSide: true,
 				order: [[1, 'asc']],
@@ -161,6 +234,10 @@ $(function() {
 					},
 					{title: 'Type', data: 'node_type.name', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
 							return createReadOnlyTextElement('node_type_name', 'in-table', '', '', data).outerHTML;
+						}
+					},
+					{title: 'Kind', data: 'node_kind.name', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+							return createReadOnlyTextElement('node_kind_name', 'in-table', '', '', data).outerHTML;
 						}
 					},
 					{title: 'Physical/Virtual', data: 'virtual', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
@@ -336,6 +413,99 @@ $(function() {
 					}
 				]
 			});
+
+			$('#main_panel #node_kinds_tab #node_kinds_table').DataTable({
+				ajax: {
+					url: '/ui/datatables?resource_name=node_kinds&resource_fields=name,image_name&columns=null,name,null'
+				},
+				serverSide: true,
+				order: [[1, 'asc']],
+				scrollX: true,
+				paginate : true,
+				destroy: true,
+				columns: [
+					{title: '', sortable: false, render: function (data, type, full, meta) {
+							var buttonElements = [
+								{name: 'edit_node_kind_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-edit', text: ''},
+								{name: 'delete_node_kind_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-minus', text: ''}
+							];
+							return createButtonGroupElement(buttonElements).outerHTML +
+								createHiddenElement('id', full.id).outerHTML;
+						}
+					},
+					{title: 'Name', data: 'name', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+							return createReadOnlyTextElement('name', 'in-table', '', '', data).outerHTML;
+						}
+					},
+					{title: 'Image Name', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+							return createReadOnlyTextElement('image_name', 'in-table', '', '', full.node_configuration.image_name).outerHTML;
+						}
+					}
+				]
+			});
+
+			$('#main_panel #test_steps_tab #test_steps_table').DataTable({
+				ajax: {
+					url: '/ui/datatables?resource_name=test_steps&columns=null,name,description'
+				},
+				serverSide: true,
+				order: [[1, 'asc']],
+				scrollX: true,
+				paginate : true,
+				destroy: true,
+				columns: [
+					{title: '', sortable: false, render: function (data, type, full, meta) {
+							var buttonElements = [
+								{name: 'edit_test_step_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-edit', text: ''},
+								{name: 'delete_test_step_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-minus', text: ''}
+							];
+							return createButtonGroupElement(buttonElements).outerHTML +
+								createHiddenElement('id', full.id).outerHTML;
+						}
+					},
+					{title: 'Name', data: 'name', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+							return createReadOnlyTextElement('name', 'in-table', '', '', data).outerHTML;
+						}
+					},
+					{title: 'Description', data: 'description', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+							return createReadOnlyTextElement('description', 'in-table test-description', '', '', data).outerHTML;
+						}
+					}
+				]
+			});
+
+
+			$('#main_panel #test_scenarios_tab #test_scenarios_table').DataTable({
+				ajax: {
+					url: '/ui/datatables?resource_name=test_scenarios&columns=null,name,description'
+				},
+				serverSide: true,
+				order: [[1, 'asc']],
+				scrollX: true,
+				paginate : true,
+				destroy: true,
+				columns: [
+					{title: '', sortable: false, render: function (data, type, full, meta) {
+							var buttonElements = [
+								{name: 'edit_test_scenario_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-edit', text: ''},
+								{name: 'delete_test_scenario_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-minus', text: ''}
+							];
+							return createButtonGroupElement(buttonElements).outerHTML +
+								createHiddenElement('id', full.id).outerHTML;
+						}
+					},
+					{title: 'Name', data: 'name', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+							return createReadOnlyTextElement('name', 'in-table', '', '', data).outerHTML;
+						}
+					},
+					{title: 'Description', data: 'description', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+							return createReadOnlyTextElement('description', 'in-table test-description', '', '', data).outerHTML;
+						}
+					}
+				]
+			});
+
+
 		});
 	}
 
@@ -409,12 +579,63 @@ $(function() {
 		deleteTemplateInformation(templateID, onLoad);
 	});
 
+	$('#main_panel #node_kinds_tab #node_kinds_panel button[name=add_node_kind_btn]').on('click', function() {
+		showHostKindInformation(null, onLoad);
+	});
+
+	$('#main_panel #node_kinds_tab #node_kinds_panel #node_kinds_table').on('click', 'button[name=edit_node_kind_btn]', function() {
+		var tr = $(this).closest('tr');
+		var node_kindID = tr.find('input[name=id]').val();
+		showHostKindInformation(node_kindID, onLoad);
+	});
+
+	$('#main_panel #node_kinds_tab #node_kinds_panel #node_kinds_table').on('click', 'button[name=delete_node_kind_btn]', function() {
+		var tr = $(this).closest('tr');
+		var node_kindID = tr.find('input[name=id]').val();
+		deleteHostKindInformation(node_kindID, onLoad);
+	});
+
+	$('#main_panel #test_steps_tab #test_steps_panel button[name=add_test_step_btn]').on('click', function() {
+		showTestStepInformation(null, onLoad);
+	});
+
+	$('#main_panel #test_steps_tab #test_steps_panel #test_steps_table').on('click', 'button[name=edit_test_step_btn]', function() {
+		var tr = $(this).closest('tr');
+		var testStepID = tr.find('input[name=id]').val();
+		showTestStepInformation(testStepID, onLoad);
+	});
+
+	$('#main_panel #test_steps_tab #test_steps_panel #test_steps_table').on('click', 'button[name=delete_test_step_btn]', function() {
+		var tr = $(this).closest('tr');
+		var testStepID = tr.find('input[name=id]').val();
+		deleteTestStepInformation(testStepID, onLoad);
+	});
+
+	$('#main_panel #test_scenarios_tab #test_scenarios_panel button[name=add_test_scenario_btn]').on('click', function() {
+		showTestScenarioInformation(null, onLoad);
+	});
+
+	$('#main_panel #test_scenarios_tab #test_scenarios_panel #test_scenarios_table').on('click', 'button[name=edit_test_scenario_btn]', function() {
+		var tr = $(this).closest('tr');
+		var testScenarioID = tr.find('input[name=id]').val();
+		showTestScenarioInformation(testScenarioID, onLoad);
+	});
+
+	$('#main_panel #test_scenarios_tab #test_scenarios_panel #test_scenarios_table').on('click', 'button[name=delete_test_scenario_btn]', function() {
+		var tr = $(this).closest('tr');
+		var testScenarioID = tr.find('input[name=id]').val();
+		deleteTestScenarioInformation(testScenarioID, onLoad);
+	});
+
 	$('#main_panel a[data-toggle=tab]').on('shown.bs.tab', function(e) {
 	  $('#main_panel #nodes_tab #nodes_panel #nodes_table').DataTable().draw();
 		$('#main_panel #vlans_tab #vlans_panel #vlans_table').DataTable().draw();
 		$('#main_panel #node_groups_tab #node_groups_panel #node_groups_table').DataTable().draw();
 		$('#main_panel #port_groups_tab #port_groups_panel #port_groups_table').DataTable().draw();
 		$('#main_panel #templates_tab #templates_panel #templates_table').DataTable().draw();
+		$('#main_panel #node_kinds_tab #node_kinds_panel #node_kinds_table').DataTable().draw();
+		$('#main_panel #test_steps_tab #test_steps_panel #test_steps_table').DataTable().draw();
+		$('#main_panel #test_scenarios_tab #test_scenarios_panel #test_scenarios_table').DataTable().draw();
 	})
 
 	onLoad();

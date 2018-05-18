@@ -27,6 +27,19 @@ h1, h2, h3, h4, h5, h6 {
   z-index: 1000;
 }
 
+.panel-float-90 {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 90%;
+  height: 90%;
+  position: absolute;
+  margin: 50px auto auto auto;
+  display: none;
+  z-index: 1000;
+}
+
 input.in-table {
   padding: 2px 4px;
   outline: 1;
@@ -54,11 +67,19 @@ input.ipv4-prefix {
   width: 32px;
 }
 
+input.test-description {
+  width: 640px;
+}
+
 select.in-table {
   padding: 2px 4px;
   outline: 1;
   border: 0px;
   background: transparent;
+}
+
+input.test-step-number {
+  width: 32px;
 }
 
 input.template-argument {

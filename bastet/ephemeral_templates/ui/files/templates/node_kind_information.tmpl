@@ -1,0 +1,71 @@
+<div class="panel-float" id="node_kind_information_float_panel">
+
+	<div class="panel panel-default" id="node_kind_information_panel">
+		<div class="panel-heading">
+			<h1 class="panel-title">
+				<span style="display: table-cell; vertical-align: middle; text-align: left; width=90%">
+					<span class="glyphicon glyphicon-info-sign"></span> Node Kind Information
+				</span>
+				<span class="input-group-btn">
+					<button class="btn btn-default" name="update_node_kind_btn" type="button">
+						<span class="glyphicon glyphicon-ok"></span>
+					</button>
+					<button class="btn btn-default" name="cancel_node_kind_btn" type="button">
+						<span class="glyphicon glyphicon-remove"></span>
+					</button>
+				</span>
+			</h1>
+		</div>
+		<div class="panel-body">
+
+			<div class="container-fluid">
+			  <div class="row">
+			    <ul class="nav nav-tabs">
+			      <li class="active"><a href="#node_kind_information_tab" data-toggle="tab">Information</a></li>
+						<li><a href="#node_kind_node_configuration_initialization_template_tab" data-toggle="tab">Initialization Template</a></li>
+						<li><a href="#node_kind_node_configuration_configuration_template_tab" data-toggle="tab">Configuration Template</a></li>
+			    </ul>
+			  </div>
+			</div>
+
+			<div class="tab-content clearfix">
+
+				<br>
+
+				<div class="tab-pane active" id="node_kind_information_tab">
+
+					<table class="table" id="node_kind_information_table">
+						<tr>
+							<td width="15%">Name</td>
+							<td width="85%">
+								<input name="id" type="hidden">
+								<input name="node_kind_node_configuration_id" type="hidden">
+								<input name="name" type="text" placeholder="node kind name like CentOS_Server" class="form-control">
+							</td>
+						</tr>
+						<tr>
+							<td width="15%">Image Name</td>
+							<td width="85%">
+								<input name="node_kind_node_configuration_image_name" type="text" placeholder="image name like centos/7/lxc" class="form-control">
+							</td>
+						</tr>
+					</table>
+
+				</div>
+
+				<div class="tab-pane" id="node_kind_node_configuration_initialization_template_tab">
+					<input name="node_kind_node_configuration_initialization_template_id" type="hidden">
+					<textarea name="node_kind_node_configuration_initialization_template_content" class="form-control" rows="15"></textarea>
+				</div>
+
+				<div class="tab-pane" id="node_kind_node_configuration_configuration_template_tab">
+					<input name="node_kind_node_configuration_configuration_template_id" type="hidden">
+					<textarea name="node_kind_node_configuration_configuration_template_content" class="form-control" rows="15"></textarea>
+				</div>
+
+			</div>
+
+		</div>
+	</div>
+
+</div>

@@ -20,6 +20,12 @@
       "type_name": "string"
     },
     {
+      "name": "TestScenarioParameters",
+      "tag": "json:\"test_scenario_parameters\" yaml:\"test_scenario_parameters\" gorm:\"ForeignKey:TestScenarioID\"",
+      "type_name": "TestScenarioParameter",
+      "is_slice": true
+    },
+    {
       "name": "TestScenarioTestStepAssociations",
       "tag": "json:\"test_scenario_test_step_associations\" yaml:\"test_scenario_test_step_associations\" gorm:\"ForeignKey:TestScenarioID\" validate:\"omitempty,dive\"",
       "type_name": "TestScenarioTestStepAssociation",

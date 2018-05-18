@@ -15,6 +15,11 @@
       "type_name": "string"
     },
     {
+      "name": "Name",
+      "tag": "json:\"name\" yaml:\"name\" gorm:\"not null;unique\"",
+      "type_name": "string"
+    },
+    {
       "name": "ImageName",
       "tag": "json:\"image_name\" yaml:\"image_name\" gorm:\"not null\"",
       "type_name": "string"
@@ -41,7 +46,7 @@
     },
     {
       "name": "Nodes",
-      "tag": "json:\"nodes\" yaml:\"nodes\" gorm:\"ForeignKey:NodeID\" validate:\"omitempty,dive\"",
+      "tag": "json:\"nodes\" yaml:\"nodes\" gorm:\"ForeignKey:NodeKindID\" validate:\"omitempty,dive\"",
       "type_name": "Node",
       "is_slice": true
     }

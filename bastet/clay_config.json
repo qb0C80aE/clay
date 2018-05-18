@@ -64,6 +64,9 @@
       "file_name": "bastet/test_scenario_test_step_association.json"
     },
     {
+      "file_name": "bastet/test_step_select2.json"
+    },
+    {
       "file_name": "ui/node_select2.json"
     },
     {
@@ -259,6 +262,30 @@
     {
       "name": "diagram_layer3.tmpl",
       "file_name": "ui/files/templates/diagram_layer3.tmpl"
+    },
+    {
+      "name": "functions_node_kind_information.tmpl",
+      "file_name": "ui/files/templates/functions_node_kind_information.tmpl"
+    },
+    {
+      "name": "functions_test_step_information.tmpl",
+      "file_name": "ui/files/templates/functions_test_step_information.tmpl"
+    },
+    {
+      "name": "functions_test_scenario_information.tmpl",
+      "file_name": "ui/files/templates/functions_test_scenario_information.tmpl"
+    },
+    {
+      "name": "node_kind_information.tmpl",
+      "file_name": "ui/files/templates/node_kind_information.tmpl"
+    },
+    {
+      "name": "test_step_information.tmpl",
+      "file_name": "ui/files/templates/test_step_information.tmpl"
+    },
+    {
+      "name": "test_scenario_information.tmpl",
+      "file_name": "ui/files/templates/test_scenario_information.tmpl"
     }
   ],
   "ephemeral_binary_objects": [

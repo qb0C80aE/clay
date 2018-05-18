@@ -1,0 +1,291 @@
+{{ .ModelStore.Single "ephemeral_templates/headerpart.tmpl/generation" "ui_menu=process" }}
+
+<div class="col-sm-12">
+
+	<div class="panel panel-default panel-custom" id="environment_panel">
+		<div class="panel-heading">
+			<h1 class="panel-title"><span class="glyphicon glyphicon-cog"></span> Environment </h1>
+		</div>
+		<div class="panel-body">
+
+			<div class="row">
+				<div class="col-xs-9">
+					<ul class="nav nav-tabs">
+						<li class="active">
+							<a href="#repository_configuration_tab" data-toggle="tab">Repository</a>
+						</li>
+						<li>
+							<a href="#template_configuration_tab" data-toggle="tab">Template</a>
+						</li>
+						<li>
+							<a href="#test_program_configuration_tab" data-toggle="tab">Test Program</a>
+						</li>
+						<li>
+							<a href="#node_configuration_tab" data-toggle="tab">Node Configuration</a>
+						</li>
+					</ul>
+				</div>
+				<div class="col-xs-3">
+					<span style="float: right">
+						<button class="btn btn-default" id="update_btn" type="button"><span class="glyphicon glyphicon-ok"></span> Update </button>
+						<button class="btn btn-default" id="commit_btn" type="button"><span class="glyphicon glyphicon-flash"></span> Update and Commit </button>
+					</span>
+				</div>
+			</div>
+
+			<div class="tab-content clearfix">
+
+			  <div class="tab-pane active" id="repository_configuration_tab">
+					<div class="row">
+						<div class="col-xs-12">
+						    &nbsp;
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-2">
+						    Git repository
+						</div>
+						<div class="col-xs-10">
+						    <input id="git_repository_uri" type="text" name="git_repository_uri" class="form-control">
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-12">
+						    &nbsp;
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-2">
+						    Git Username
+						</div>
+						<div class="col-xs-10">
+						    <input id="git_user_name" type="text" name="git_user_name" class="form-control">
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-12">
+						    &nbsp;
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-2">
+						    Git User E-Mail
+						</div>
+						<div class="col-xs-10">
+						    <input id="git_user_email" type="text" name="git_user_email" class="form-control">
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-12">
+						    &nbsp;
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-2">
+						    Design filename
+						</div>
+						<div class="col-xs-10">
+						    <input id="design_file_name" type="text" name="design_file_name" class="form-control">
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-12">
+						    &nbsp;
+						</div>
+					</div>
+				</div>
+
+				<div class="tab-pane" id="template_configuration_tab">
+					<div class="row">
+						<div class="col-xs-12">
+						    &nbsp;
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-2">
+						    Template filename
+						</div>
+						<div class="col-xs-10">
+						    <input id="template_file_name" type="text" name="template_file_name" class="form-control">
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-12">
+						    &nbsp;
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-2">
+						    Template
+						</div>
+						<div class="col-xs-10">
+							<input id="template_id" type="hidden">
+							<input id="template_name" type="hidden">
+							<textarea id="template_content" name="template_content" rows="20" class="form-control"></textarea>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-12">
+						    &nbsp;
+						</div>
+					</div>
+				</div>
+
+				<div class="tab-pane" id="test_program_configuration_tab">
+					<div class="row">
+						<div class="col-xs-12">
+						    &nbsp;
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-2">
+						    TestCase directory name
+						</div>
+						<div class="col-xs-10">
+						    <input id="test_case_directory_name" type="text" name="test_case_directory_name" class="form-control">
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-12">
+						    &nbsp;
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-2">
+						    TestRunner script template
+						</div>
+						<div class="col-xs-10">
+							<input id="test_runner_script_template_id" type="hidden">
+							<input id="test_runner_script_template_name" type="hidden">
+						    <textarea id="test_runner_script_template" name="test_runner_script_template" rows="20" class="form-control"></textarea>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-12">
+						    &nbsp;
+						</div>
+					</div>
+				</div>
+
+				<div class="tab-pane" id="node_configuration_tab">
+					<div class="row">
+						<div class="col-xs-12">
+						    &nbsp;
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-2">
+						    Physical device initialization
+						</div>
+						<div class="col-xs-10">
+						    <input id="device_initialization" type="checkbox" data-toggle="toggle">
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-12">
+						    &nbsp;
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-2">
+						    Node config directory name
+						</div>
+						<div class="col-xs-10">
+						    <input id="node_config_directory_name" type="text" name="node_config_directory_name" class="form-control">
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-xs-12">
+						    &nbsp;
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div><!--/Center Column-->
+
+<script language="javascript">
+	(function($) {
+
+    {{template "functions" .}}
+
+		const targetID = "present";
+
+		function onLoad() {
+			getResource('environments', targetID, 'preloads=template,test_runner_script', function(environmentResult) {
+				$("#git_repository_uri").val(environmentResult.git_repository_uri);
+				$("#git_user_name").val(environmentResult.git_user_name);
+				$("#git_user_email").val(environmentResult.git_user_email);
+				$("#design_file_name").val(environmentResult.design_file_name);
+				$("#template_file_name").val(environmentResult.template_file_name);
+				$("#test_case_directory_name").val(environmentResult.test_case_directory_name);
+				$("#template_id").val(environmentResult.template.id);
+				$("#template_name").val(environmentResult.template.name);
+				$("#template_content").val(environmentResult.template.template_content);
+				$("#test_runner_script_template_id").val(environmentResult.test_runner_script.id);
+				$("#test_runner_script_template_name").val(environmentResult.test_runner_script.name);
+				$("#test_runner_script_template").val(environmentResult.test_runner_script.template_content);
+				$("#node_config_directory_name").val(environmentResult.node_config_directory_name);
+			});
+
+			$('#environment_panel').fadeIn(150);
+		}
+
+		function updateEnvironment(onSuccess) {
+			var environment = {
+				git_repository_uri: $("#git_repository_uri").val(),
+				git_user_name: $("#git_user_name").val(),
+				git_user_email: $("#git_user_email").val(),
+				design_file_name: $("#design_file_name").val(),
+				template_file_name: $("#template_file_name").val(),
+				test_case_directory_name: $("#test_case_directory_name").val(),
+				template: {
+					id: parseInt($("#template_id").val()),
+					name: $("#template_name").val(),
+					template_content: $("#template_content").val()
+				},
+				test_runner_script: {
+					id: parseInt($("#test_runner_script_template_id").val()),
+					name: $("#test_runner_script_template_name").val(),
+					template_content: $("#test_runner_script_template").val()
+				},
+				node_config_directory_name: $("#node_config_directory_name").val(),
+			};
+
+			putResource('environments', targetID, environment, '', function(result, xhr) {
+				onSuccess(result, xhr);
+			});
+		}
+
+		$('#update_btn').on('click', function() {
+			if (!confirm("Are you sure to update?")) {
+				return;
+			}
+
+			updateEnvironment(function(result, xhr) {
+				onLoad();
+				showProcessResult(result, xhr, 200, "The environment has been updated successfully.");
+			});
+		});
+
+		$('#commit_btn').on('click', function() {
+			if (!confirm("Are you sure to update and commit?")) {
+				return;
+			}
+
+			updateEnvironment(function(result, xhr) {
+				onLoad();
+				var deviceInitialization = $("#device_initialization").prop('checked');
+				putResource('environments', targetID + '/generation?init=' + deviceInitialization, {}, '', function(result, xhr) {
+					showProcessResult(result, xhr, 200, "The environment has been updated and commited successfully.");
+				});
+			});
+		});
+
+		onLoad();
+
+	})(jQuery);
+</script>
+{{ .ModelStore.Single "ephemeral_templates/footerpart.tmpl/generation" "" }}

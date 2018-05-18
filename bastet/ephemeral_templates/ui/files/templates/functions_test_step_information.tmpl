@@ -1,0 +1,272 @@
+{{/* <script> */}}
+
+var storedCallbackTestStepInformationUpdated = null;
+
+function showTestStepInformation(testStepID, callbackTestStepInformationUpdated) {
+  storedCallbackTestStepInformationUpdated = callbackTestStepInformationUpdated;
+
+  if (testStepID == null) {
+    var testStep = {
+      name: '',
+      description: '',
+      template_id: 0,
+      template: {
+        name: '',
+        template_content: '',
+        template_arguments: []
+      }
+    };
+    repaintTestStepInformation(testStep, true);
+  } else {
+    getResource('test_steps', testStepID, 'preloads=template.template_arguments', function(testStep) {
+      repaintTestStepInformation(testStep, true);
+    });
+  }
+}
+
+function repaintTestStepInformation(testStep, initializeTabSelection) {
+  $('#test_step_information_float_panel #test_step_arguments_tab div[name=deleted_test_step_arguments]').children().remove();
+
+  $('#test_step_information_panel #test_step_preview_tab').find('input[name=test_step_argument_parameter]').val('');
+  $('#test_step_information_panel #test_step_preview_tab').find('textarea[name=test_step_preview]').val('');
+
+  var test_step_information_table = $('#test_step_information_float_panel #test_step_information_tab #test_step_information_table');
+
+  test_step_information_table.find('input[name=id]').val(testStep.id);
+  test_step_information_table.find('input[name=template_id]').val(testStep.template.id);
+  test_step_information_table.find('input[name=name]').val(testStep.name);
+  test_step_information_table.find('input[name=description]').val(testStep.description);
+  test_step_information_table.find('textarea[name=test_step_content]').val(testStep.template.template_content);
+
+  if (initializeTabSelection) {
+    $('#test_step_information_float_panel a[href="#test_step_information_tab"]').tab('show');
+  }
+  $('#test_step_information_float_panel').fadeIn(50);
+
+  $('#test_step_information_float_panel #test_step_arguments_tab #test_step_arguments_table').DataTable({
+    sDom: '<"row"<"col-sm-5"l><"col-sm-6 right"f>>tip',
+    order: [[1, 'asc']],
+    scrollX: true,
+    paginate: true,
+    destroy: true,
+    data: testStep.template.template_arguments,
+    columns: [
+      {title: '', sortable: false, render: function (data, type, full, meta) {
+          return createButtonElement('delete_test_step_argument_btn', 'btn btn-default', 'glyphicon glyphicon-minus', '').outerHTML +
+            createHiddenElement('id', full.id).outerHTML;
+        }
+      },
+      {title: 'Name', data: 'name', defaultContent: '', sortable: false, render: function (data, type, full, meta) {
+          return createTextElement('name', 'in-table', '', 'parameter name', data).outerHTML;
+        }
+      },
+      {title: 'Description', data: 'description', defaultContent: '', sortable: false, render: function (data, type, full, meta) {
+          return createTextElement('description', 'in-table', '', 'description', data).outerHTML;
+        }
+      },
+      {title: 'Type', data: 'type', defaultContent: '', sortable: false, render: function (data, type, full, meta) {
+        var options = [
+          {id: 'int', name: 'int'},
+          {id: 'float', name: 'float'},
+          {id: 'bool', name: 'bool'},
+          {id: 'string', name: 'string'}
+        ];
+        return createSelectElement('type', 'in-table', '', options, data).outerHTML;
+        }
+      },
+      {title: 'DefaultValue', data: 'default_value', defaultContent: '', sortable: false, render: function (data, type, full, meta) {
+          return createTextElement('default_value', 'in-table', '', '', data).outerHTML;
+        }
+      }
+    ],
+    drawCallback: function(settings) {
+      $('#test_step_information_float_panel #test_step_arguments_tab #test_step_arguments_table select[name=type]').select2({
+        width: '96px'
+      });
+    }
+  });
+
+  $('#page_cover').fadeIn(50);
+}
+
+$('#test_step_information_float_panel a[data-toggle=tab]').on('shown.bs.tab', function(e) {
+  $('#test_step_information_float_panel #test_step_arguments_tab #test_step_arguments_table').DataTable().draw();
+
+  PreviewTestStepInformation();
+});
+
+$('#test_step_information_float_panel #test_step_arguments_tab').on('click', 'button[name=add_test_step_argument_btn]', function() {
+  var data = {
+    id: null,
+    name: '',
+    description: '',
+    default_value: ''
+  };
+  $('#test_step_information_float_panel #test_step_arguments_tab #test_step_arguments_table').DataTable().row.add(data).draw();
+  $('#test_step_information_float_panel #test_step_arguments_tab #test_step_arguments_table').DataTable().draw();
+});
+
+$('#test_step_information_float_panel #test_step_arguments_tab #test_step_arguments_table').on('click', 'button[name=delete_test_step_argument_btn]', function() {
+  var tr = $(this).closest('tr');
+  var deletedTestStepArgumentID = tr.find('input[name=id]').val();
+  if ((deletedTestStepArgumentID != null) && (deletedTestStepArgumentID != undefined) && (deletedTestStepArgumentID != '') && (deletedTestStepArgumentID != 0)) {
+    $('#test_step_information_float_panel #test_step_arguments_tab div[name=deleted_test_step_arguments]').append(createHiddenElement('deleted', deletedTestStepArgumentID));
+  }
+  $('#test_step_information_float_panel #test_step_arguments_tab #test_step_arguments_table').DataTable().row(tr).remove().draw();
+});
+
+$('#test_step_information_panel #test_step_preview_tab').on('click', 'button[name=generate_test_step_btn]', function() {
+  var testStepID = $('#test_step_information_panel').find('input[name=id]').val();
+  if ((testStepID == null) || (testStepID == undefined) || (testStepID == '')) {
+    alert('Register test step first.');
+    return;
+  }
+
+  var parameter = $('#test_step_information_panel #test_step_preview_tab').find('input[name=test_step_argument_parameter]').val();
+
+  getResourceAsText('test_steps/' + testStepID, 'generation', parameter, function(testStep) {
+		var link = document.createElement('a');
+		link.href = window.URL.createObjectURL(new Blob([testStep]));
+		link.download = 'generated.txt';
+		link.click();
+  });
+});
+
+$('#test_step_information_panel #test_step_preview_tab').on('click', 'button[name=refresh_test_step_btn]', function() {
+  PreviewTestStepInformation();
+});
+
+$('#test_step_information_panel').on('click', 'button[name=cancel_test_step_btn]', function() {
+  $('#test_step_information_float_panel').fadeOut(50, function() {
+    $('#page_cover').fadeOut(50);
+  });
+});
+
+$('#test_step_information_panel').on('click', 'button[name=update_test_step_btn]', function() {
+  if (!confirm('Are you sure to register/update the test step?')) {
+    return;
+  }
+
+  var deletedTestStepArgumentIDMap = {};
+  var inputDeletedTestStepArguments = $('#test_step_information_float_panel #test_step_arguments_tab div[name=deleted_test_step_arguments]').find('input[name=deleted]');
+  for (var i = 0; i < inputDeletedTestStepArguments.length; i = i + 1) {
+    var inputDeletedTestStepArgument = inputDeletedTestStepArguments[i];
+    var deletedTestStepArgumentID = parseInt($(inputDeletedTestStepArgument).val());
+    deletedTestStepArgumentIDMap[deletedTestStepArgumentID] = deletedTestStepArgumentID;
+  }
+
+  var testStepID = $('#test_step_information_panel').find('input[name=id]').val();
+  if ((testStepID == null) || (testStepID == undefined) || (testStepID == '')) {
+    testStepID = 0;
+  }
+
+  var testStepTemplateID = $('#test_step_information_panel').find('input[name=template_id]').val();
+  if ((testStepTemplateID == null) || (testStepTemplateID == undefined) || (testStepTemplateID == '')) {
+    testStepTemplateID = 0;
+  }
+
+  var testStepName = $('#test_step_information_panel').find('input[name=name]').val();
+  var testStepDescription = $('#test_step_information_panel').find('input[name=description]').val();
+  var testStepContent = $('#test_step_information_panel').find('textarea[name=test_step_content]').val();
+
+  var testStep = {
+    id: parseInt(testStepID),
+    name: testStepName,
+    description: testStepDescription,
+    template_id: parseInt(testStepTemplateID),
+    template: {
+      id: parseInt(testStepTemplateID),
+      name: testStepName + '_template',
+      template_content: testStepContent,
+      template_arguments: []
+    }
+  };
+  if (testStepID == 0) {
+    delete(testStep['id']);
+  }
+  if (testStepTemplateID == 0) {
+    delete(testStep.template['id']);
+  }
+
+  $('#test_step_information_float_panel #test_step_arguments_tab #test_step_arguments_table').DataTable().rows().every(function(){
+    var testStepArgumentTr = $(this.node());
+    var testStepArgumentID = testStepArgumentTr.find('input[name=id]').val();
+    var testStepArgumentName = testStepArgumentTr.find('input[name=name]').val();
+    var testStepArgumentType = testStepArgumentTr.find('select[name=type]').val();
+    var testStepArgumentDescription = testStepArgumentTr.find('input[name=description]').val();
+    var testStepArgumentDefaultValue = testStepArgumentTr.find('input[name=default_value]').val();
+
+    var testStepArgument = {
+      id: parseInt(testStepArgumentID),
+      template_id: parseInt(testStepTemplateID),
+      name: testStepArgumentName,
+      type: testStepArgumentType,
+      description: testStepArgumentDescription,
+      default_value: testStepArgumentDefaultValue
+    };
+    if (testStepTemplateID == 0) {
+      delete(testStepArgument['template_id']);
+    }
+
+    testStep.template.template_arguments.push(testStepArgument);
+  });
+
+  for (testStepArgumentID in deletedTestStepArgumentIDMap) {
+    var testStepArgument = {
+      id: parseInt(testStepArgumentID),
+      to_be_deleted: true
+    };
+
+    testStep.template.template_arguments.push(testStepArgument);
+  }
+
+  if (testStep.id == undefined) {
+    postResource('test_steps', testStep, '', function(result, xhr) {
+      showProcessResult(result, xhr, 201, "The test step information has been registered successfully.");
+      postProcessUpdateTestStep(result, xhr);
+    });
+  } else {
+    putResource('test_steps', testStep.id, testStep, '', function(result, xhr) {
+      showProcessResult(result, xhr, 200, "The test step information has been updated successfully.");
+      postProcessUpdateTestStep(result, xhr);
+    });
+  }
+
+});
+
+function postProcessUpdateTestStep(result, xhr) {
+  var testStepID = result.id;
+
+  getResource('test_steps', testStepID, 'preloads=template.template_arguments', function(testStep) {
+    repaintTestStepInformation(testStep, false);
+    if ((storedCallbackTestStepInformationUpdated != null) && (storedCallbackTestStepInformationUpdated != undefined)) {
+      storedCallbackTestStepInformationUpdated();
+    }
+  });
+}
+
+function deleteTestStepInformation(testStepID, callbackTestStepInformationDeleted) {
+  if (!confirm('Are you sure to delete the test step?')) {
+    return;
+  }
+
+  deleteResource('test_steps', testStepID, '', function(result, xhr) {
+    showProcessResult(result, xhr, 204, "The test step information has been deleted successfully.");
+    callbackTestStepInformationDeleted();
+  });
+}
+
+function PreviewTestStepInformation() {
+  var testStepTemplateID = $('#test_step_information_panel').find('input[name=template_id]').val();
+  if ((testStepTemplateID == null) || (testStepTemplateID == undefined) || (testStepTemplateID == '')) {
+    $('#test_step_information_panel #test_step_preview_tab').find('input[name=test_step_argument_parameter]').val('');
+    $('#test_step_information_panel #test_step_preview_tab').find('textarea[name=test_step_preview]').val('#Register test step first.');
+    return;
+  }
+
+  var parameter = $('#test_step_information_panel #test_step_preview_tab').find('input[name=test_step_argument_parameter]').val();
+
+  getResourceAsText('templates/' + testStepTemplateID, 'generation', parameter, function(testStep) {
+    $('#test_step_information_panel #test_step_preview_tab').find('textarea[name=test_step_preview]').val(testStep);
+  });
+}
