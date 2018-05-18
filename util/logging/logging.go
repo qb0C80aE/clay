@@ -1,7 +1,6 @@
 package logging
 
 import (
-	"errors"
 	"fmt"
 	"github.com/qb0C80aE/clay/logging"
 )
@@ -18,110 +17,60 @@ func GetUtility() *Utility {
 }
 
 // Debug outputs debug message
-func (receiver *Utility) Debug(log interface{}) error {
-	message, ok := log.(string)
-	if !ok {
-		return errors.New("log is not a string")
-	}
-
-	logging.Logger().Debug(message)
+func (receiver *Utility) Debug(log interface{}) interface{} {
+	logging.Logger().Debug(log)
 	return nil
 }
 
 // Debugf outputs formatted debug message
-func (receiver *Utility) Debugf(log interface{}, parameters []interface{}) error {
-	message, ok := log.(string)
-	if !ok {
-		return errors.New("log is not a string")
-	}
-
-	logging.Logger().Debugf(message, parameters...)
+func (receiver *Utility) Debugf(format string, parameters []interface{}) interface{} {
+	logging.Logger().Debugf(format, parameters...)
 	return nil
 }
 
 // Info outputs information message
 func (receiver *Utility) Info(log interface{}) error {
-	message, ok := log.(string)
-	if !ok {
-		return errors.New("log is not a string")
-	}
-
-	logging.Logger().Info(message)
+	logging.Logger().Info(log)
 	return nil
 }
 
 // Infof outputs formatted information message
-func (receiver *Utility) Infof(log interface{}, parameters []interface{}) error {
-	message, ok := log.(string)
-	if !ok {
-		return errors.New("log is not a string")
-	}
-
-	logging.Logger().Infof(message, parameters...)
+func (receiver *Utility) Infof(format string, parameters []interface{}) interface{} {
+	logging.Logger().Infof(format, parameters...)
 	return nil
 }
 
 // Warn outputs warning message
 func (receiver *Utility) Warn(log interface{}) error {
-	message, ok := log.(string)
-	if !ok {
-		return errors.New("log is not a string")
-	}
-
-	logging.Logger().Warn(message)
+	logging.Logger().Warn(log)
 	return nil
 }
 
 // Warnf outputs formatted warning message
-func (receiver *Utility) Warnf(log interface{}, parameters []interface{}) error {
-	message, ok := log.(string)
-	if !ok {
-		return errors.New("log is not a string")
-	}
-
-	logging.Logger().Warnf(message, parameters...)
+func (receiver *Utility) Warnf(format string, parameters []interface{}) interface{} {
+	logging.Logger().Warnf(format, parameters...)
 	return nil
 }
 
 // Critical outputs critical message
 func (receiver *Utility) Critical(log interface{}) error {
-	message, ok := log.(string)
-	if !ok {
-		return errors.New("log is not a string")
-	}
-
-	logging.Logger().Critical(message)
+	logging.Logger().Critical(log)
 	return nil
 }
 
 // Criticalf outputs formatted critial message
-func (receiver *Utility) Criticalf(log interface{}, parameters []interface{}) error {
-	message, ok := log.(string)
-	if !ok {
-		return errors.New("log is not a string")
-	}
-
-	logging.Logger().Criticalf(message, parameters...)
+func (receiver *Utility) Criticalf(format string, parameters []interface{}) interface{} {
+	logging.Logger().Criticalf(format, parameters...)
 	return nil
 }
 
 // Panic throws panic with message
 func (receiver *Utility) Panic(log interface{}) error {
-	message, ok := log.(string)
-	if !ok {
-		return errors.New("log is not a string")
-	}
-
-	panic(message)
+	panic(log)
 }
 
 // Panicf throws panic with formatted message
-func (receiver *Utility) Panicf(log interface{}, parameters []interface{}) error {
-	message, ok := log.(string)
-	if !ok {
-		return errors.New("log is not a string")
-	}
-
-	message = fmt.Sprintf(message, parameters...)
+func (receiver *Utility) Panicf(format string, parameters []interface{}) interface{} {
+	message := fmt.Sprintf(format, parameters...)
 	panic(message)
 }
