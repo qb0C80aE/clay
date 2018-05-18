@@ -2,13 +2,14 @@ package modelstore
 
 import (
 	"errors"
+	"net/url"
+	"reflect"
+
 	"github.com/jinzhu/gorm"
 	dbpkg "github.com/qb0C80aE/clay/db"
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/helper"
 	"github.com/qb0C80aE/clay/logging"
-	"net/url"
-	"reflect"
 )
 
 // ModelStore handles model retrieving operation
@@ -68,7 +69,8 @@ func (receiver *ModelStore) Single(pathInterface interface{}, queryInterface int
 	db = parameter.SetPreloads(db)
 	db = parameter.FilterFields(db)
 	fields := helper.ParseFields(parameter.DefaultQuery(urlValues, "fields", "*"))
-	queryFields := helper.QueryFields(model, fields)
+	responseMappingTag := parameter.DefaultQuery(urlValues, "response_mapping_tag", extension.TagJSON)
+	queryFields := helper.QueryFields(model, fields, responseMappingTag)
 
 	result, err := model.GetSingle(model, db, parameters, urlValues, queryFields)
 	if err != nil {
@@ -126,7 +128,8 @@ func (receiver *ModelStore) Multi(pathInterface interface{}, queryInterface inte
 	db = parameter.SortRecords(db)
 	db = parameter.FilterFields(db)
 	fields := helper.ParseFields(parameter.DefaultQuery(urlValues, "fields", "*"))
-	queryFields := helper.QueryFields(model, fields)
+	responseMappingTag := parameter.DefaultQuery(urlValues, "response_mapping_tag", extension.TagJSON)
+	queryFields := helper.QueryFields(model, fields, responseMappingTag)
 	result, err := model.GetMulti(model, db, parameters, urlValues, queryFields)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
@@ -220,7 +223,8 @@ func (receiver *ModelStore) First(pathInterface interface{}, queryInterface inte
 	db = parameter.SortRecords(db)
 	db = parameter.FilterFields(db)
 	fields := helper.ParseFields(parameter.DefaultQuery(urlValues, "fields", "*"))
-	queryFields := helper.QueryFields(model, fields)
+	responseMappingTag := parameter.DefaultQuery(urlValues, "response_mapping_tag", extension.TagJSON)
+	queryFields := helper.QueryFields(model, fields, responseMappingTag)
 	result, err := model.GetMulti(model, db, parameters, urlValues, queryFields)
 	if err != nil {
 		logging.Logger().Debug(err.Error())

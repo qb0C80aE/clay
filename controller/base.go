@@ -170,6 +170,15 @@ func (receiver *BaseController) determineResponseCharsetTypeFromAcceptCharset(c 
 	}
 }
 
+func (receiver *BaseController) determineResponseMappingTagFromAccept(c *gin.Context) string {
+	switch receiver.determineResponseContentTypeFromAccept(c) {
+	case extension.AcceptXYAML, extension.AcceptTextYAML:
+		return extension.TagYAML
+	default:
+		return extension.TagJSON
+	}
+}
+
 func (receiver *BaseController) outputTextWithContentType(c *gin.Context, code int, result interface{}) {
 	text := result.(string)
 
@@ -483,9 +492,9 @@ func (receiver *BaseController) OutputGetSingle(c *gin.Context, code int, result
 		targetTag := ""
 		switch receiver.determineResponseContentTypeFromAccept(c) {
 		case extension.AcceptXYAML, extension.AcceptTextYAML:
-			targetTag = "yaml"
+			targetTag = extension.TagYAML
 		default:
-			targetTag = "json"
+			targetTag = extension.TagJSON
 		}
 
 		fieldMap, err := helper.FieldToMap(result, fields, targetTag)
@@ -510,9 +519,9 @@ func (receiver *BaseController) OutputGetMulti(c *gin.Context, code int, result 
 		targetTag := ""
 		switch receiver.determineResponseContentTypeFromAccept(c) {
 		case extension.AcceptXYAML, extension.AcceptTextYAML:
-			targetTag = "yaml"
+			targetTag = extension.TagYAML
 		default:
-			targetTag = "json"
+			targetTag = extension.TagJSON
 		}
 
 		v := reflect.ValueOf(result)
@@ -643,7 +652,7 @@ func (receiver *BaseController) GetSingle(c *gin.Context) {
 
 	db = parameter.SetPreloads(db)
 	fields := helper.ParseFields(c.DefaultQuery("fields", "*"))
-	queryFields := helper.QueryFields(resultForQueryFields, fields)
+	queryFields := helper.QueryFields(resultForQueryFields, fields, receiver.determineResponseMappingTagFromAccept(c))
 
 	result, err := receiver.model.GetSingle(receiver.model, db, c.Params, c.Request.URL.Query(), queryFields)
 	if err != nil {
@@ -702,7 +711,7 @@ func (receiver *BaseController) GetMulti(c *gin.Context) {
 	db = parameter.SortRecords(db)
 	db = parameter.FilterFields(db)
 	fields := helper.ParseFields(c.DefaultQuery("fields", "*"))
-	queryFields := helper.QueryFields(elementOfResultForQueryFields, fields)
+	queryFields := helper.QueryFields(elementOfResultForQueryFields, fields, receiver.determineResponseMappingTagFromAccept(c))
 
 	result, err := receiver.model.GetMulti(receiver.model, db, c.Params, c.Request.URL.Query(), queryFields)
 	if err != nil {

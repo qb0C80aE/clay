@@ -3,13 +3,22 @@ package extension
 import (
 	"errors"
 	"fmt"
+	"net/url"
+	"reflect"
+	"strings"
+
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"github.com/qb0C80aE/clay/logging"
 	"github.com/serenize/snaker"
-	"net/url"
-	"reflect"
-	"strings"
+)
+
+// TagSomething has a tag string used in model struct definitions
+const (
+	TagJSON string = "json"
+	TagGORM string = "gorm"
+	TagYAML string = "yaml"
+	TagForm string = "form"
 )
 
 var modelList = []Model{}
