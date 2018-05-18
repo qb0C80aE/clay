@@ -2,6 +2,8 @@ package helper
 
 import (
 	"testing"
+
+	"github.com/qb0C80aE/clay/extension"
 )
 
 type User struct {
@@ -36,7 +38,7 @@ type Company struct {
 
 func TestQueryFields_Wildcard(t *testing.T) {
 	fields := map[string]interface{}{"*": nil}
-	result := QueryFields(User{}, fields)
+	result := QueryFields(User{}, fields, extension.TagJSON)
 	expected := "*"
 
 	if result != expected {
@@ -46,7 +48,7 @@ func TestQueryFields_Wildcard(t *testing.T) {
 
 func TestQueryFields_Primitive(t *testing.T) {
 	fields := map[string]interface{}{"name": nil}
-	result := QueryFields(User{}, fields)
+	result := QueryFields(User{}, fields, extension.TagJSON)
 	expected := "name"
 
 	if result != expected {
@@ -56,7 +58,7 @@ func TestQueryFields_Primitive(t *testing.T) {
 
 func TestQueryFields_Multiple(t *testing.T) {
 	fields := map[string]interface{}{"id": nil, "name": nil}
-	result := QueryFields(User{}, fields)
+	result := QueryFields(User{}, fields, extension.TagJSON)
 	expected1 := "id,name"
 	expected2 := "name,id"
 
@@ -67,7 +69,7 @@ func TestQueryFields_Multiple(t *testing.T) {
 
 func TestQueryFields_BelongsTo(t *testing.T) {
 	fields := map[string]interface{}{"user": nil}
-	result := QueryFields(Profile{}, fields)
+	result := QueryFields(Profile{}, fields, extension.TagJSON)
 	expected := "user_id"
 
 	if result != expected {
@@ -77,7 +79,7 @@ func TestQueryFields_BelongsTo(t *testing.T) {
 
 func TestQueryFields_HasOne(t *testing.T) {
 	fields := map[string]interface{}{"profile": nil}
-	result := QueryFields(User{}, fields)
+	result := QueryFields(User{}, fields, extension.TagJSON)
 	expected := "id"
 
 	if result != expected {
@@ -87,7 +89,7 @@ func TestQueryFields_HasOne(t *testing.T) {
 
 func TestQueryFields_HasMany(t *testing.T) {
 	fields := map[string]interface{}{"jobs": nil}
-	result := QueryFields(User{}, fields)
+	result := QueryFields(User{}, fields, extension.TagJSON)
 	expected := "id"
 
 	if result != expected {

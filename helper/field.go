@@ -5,6 +5,8 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/qb0C80aE/clay/extension"
+
 	"github.com/serenize/snaker"
 )
 
@@ -39,8 +41,8 @@ func merge(m1, m2 map[string]interface{}) map[string]interface{} {
 }
 
 // QueryFields builds a query field string based on arguments
-func QueryFields(model interface{}, fields map[string]interface{}) string {
-	var jsonTag, jsonKey string
+func QueryFields(model interface{}, fields map[string]interface{}, targetTag string) string {
+	var targetFieldKey string
 
 	vs := reflect.ValueOf(model)
 
@@ -56,25 +58,26 @@ func QueryFields(model interface{}, fields map[string]interface{}) string {
 	ts := vs.Type()
 	for i := 0; i < ts.NumField(); i++ {
 		f := ts.Field(i)
-		jsonTag = f.Tag.Get("json")
 
-		if jsonTag == "" {
-			jsonKey = f.Name
+		targetFieldTag := f.Tag.Get(targetTag)
+
+		if targetFieldTag == "" {
+			targetFieldKey = f.Name
 		} else {
-			jsonKey = strings.Split(jsonTag, ",")[0]
+			targetFieldKey = strings.Split(targetFieldTag, ",")[0]
 		}
 
 		switch vs.Field(i).Kind() {
 		case reflect.Ptr:
 			if _, ok := ts.FieldByName(f.Name + "ID"); ok {
-				assocs[jsonKey] = belongsTo
+				assocs[targetFieldKey] = belongsTo
 			} else {
-				assocs[jsonKey] = hasOne
+				assocs[targetFieldKey] = hasOne
 			}
 		case reflect.Slice:
-			assocs[jsonKey] = hasMany
+			assocs[targetFieldKey] = hasMany
 		default:
-			assocs[jsonKey] = none
+			assocs[targetFieldKey] = none
 		}
 	}
 
@@ -149,10 +152,10 @@ func isEmptyValue(v reflect.Value) bool {
 // FieldToMap generates a map from the model in argument
 func FieldToMap(model interface{}, fields map[string]interface{}, targetTag string) (map[string]interface{}, error) {
 	switch targetTag {
-	case "yaml":
+	case extension.TagYAML:
 		// use as it is
 	default:
-		targetTag = "json"
+		targetTag = extension.TagJSON
 	}
 
 	u := make(map[string]interface{})
