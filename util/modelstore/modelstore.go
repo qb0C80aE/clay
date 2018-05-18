@@ -58,6 +58,13 @@ func (receiver *ModelStore) Single(pathInterface interface{}, queryInterface int
 		return nil, err
 	}
 
+	typeName := model.GetTypeName(model)
+	containerForQueryFields, err := extension.CreateOutputContainerByTypeName(typeName, urlValues.Get("preloads"))
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+
 	// single resets db conditions like preloads, so you should use this method in GetSingle or GetMulti only,
 	// and note that all conditions go away after this method.
 	db := receiver.db.New()
@@ -70,7 +77,11 @@ func (receiver *ModelStore) Single(pathInterface interface{}, queryInterface int
 	db = parameter.FilterFields(db)
 	fields := helper.ParseFields(parameter.DefaultQuery(urlValues, "fields", "*"))
 	responseMappingTag := parameter.DefaultQuery(urlValues, "response_mapping_tag", extension.TagJSON)
-	queryFields := helper.QueryFields(model, fields, responseMappingTag)
+	queryFields, err := helper.QueryFields(containerForQueryFields, fields, responseMappingTag)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
 
 	result, err := model.GetSingle(model, db, parameters, urlValues, queryFields)
 	if err != nil {
@@ -116,6 +127,13 @@ func (receiver *ModelStore) Multi(pathInterface interface{}, queryInterface inte
 		return nil, err
 	}
 
+	typeName := model.GetTypeName(model)
+	containerForQueryFields, err := extension.CreateOutputContainerByTypeName(typeName, urlValues.Get("preloads"))
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+
 	// multi resets db conditions like preloads, so you should use this method in GetSingle or GetMulti only,
 	// and note that all conditions go away after this method.
 	db := receiver.db.New()
@@ -129,7 +147,12 @@ func (receiver *ModelStore) Multi(pathInterface interface{}, queryInterface inte
 	db = parameter.FilterFields(db)
 	fields := helper.ParseFields(parameter.DefaultQuery(urlValues, "fields", "*"))
 	responseMappingTag := parameter.DefaultQuery(urlValues, "response_mapping_tag", extension.TagJSON)
-	queryFields := helper.QueryFields(model, fields, responseMappingTag)
+	queryFields, err := helper.QueryFields(containerForQueryFields, fields, responseMappingTag)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+
 	result, err := model.GetMulti(model, db, parameters, urlValues, queryFields)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
@@ -211,6 +234,13 @@ func (receiver *ModelStore) First(pathInterface interface{}, queryInterface inte
 		return nil, err
 	}
 
+	typeName := model.GetTypeName(model)
+	containerForQueryFields, err := extension.CreateOutputContainerByTypeName(typeName, urlValues.Get("preloads"))
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+
 	// first resets db conditions like preloads, so you should use this method in GetSingle or GetMulti only,
 	// and note that all conditions go away after this method.
 	db := receiver.db.New()
@@ -224,7 +254,12 @@ func (receiver *ModelStore) First(pathInterface interface{}, queryInterface inte
 	db = parameter.FilterFields(db)
 	fields := helper.ParseFields(parameter.DefaultQuery(urlValues, "fields", "*"))
 	responseMappingTag := parameter.DefaultQuery(urlValues, "response_mapping_tag", extension.TagJSON)
-	queryFields := helper.QueryFields(model, fields, responseMappingTag)
+	queryFields, err := helper.QueryFields(containerForQueryFields, fields, responseMappingTag)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+
 	result, err := model.GetMulti(model, db, parameters, urlValues, queryFields)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
