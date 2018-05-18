@@ -64,13 +64,13 @@ func (receiver *Utility) Criticalf(format string, parameters []interface{}) inte
 	return nil
 }
 
-// Panic throws panic with message
-func (receiver *Utility) Panic(log interface{}) error {
+// Fatal throws panic with message
+func (receiver *Utility) Fatal(log interface{}) error {
 	panic(log)
 }
 
-// Panicf throws panic with formatted message
-func (receiver *Utility) Panicf(format string, parameters []interface{}) interface{} {
+// Fatalf throws panic with formatted message
+func (receiver *Utility) Fatalf(format string, parameters []interface{}) interface{} {
 	message := fmt.Sprintf(format, parameters...)
 	panic(message)
 }
