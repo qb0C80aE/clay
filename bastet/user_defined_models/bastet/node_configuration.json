@@ -11,7 +11,7 @@
     },
     {
       "name": "NodeID",
-      "tag": "json:\"node_id\" yaml:\"node_id\" gorm:\"unique_index:node_id_port_name\" sql:\"type:integer references nodes(id)\"",
+      "tag": "json:\"node_id\" yaml:\"node_id\" sql:\"type:integer references nodes(id)\"",
       "type_name": "int"
     },
     {
@@ -48,7 +48,7 @@
       "name": "ConfigurationTemplate",
       "tag": "json:\"configuration_template\" yaml:\"configuration_template\" sql:\"type:integer references templates(id)\"",
       "type_name": "Template"
-    },
+    }
   ],
   "sql_after_migration": [
 		"create trigger if not exists DeleteTemplateBeforeNodeConfigurationDeletion before delete on node_configurations",

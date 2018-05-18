@@ -10,16 +10,6 @@
       "type_name": "int"
     },
     {
-      "name": "NodeID",
-      "tag": "json:\"node_id\" yaml:\"node_id\" gorm:\"unique_index:node_id_port_name\" sql:\"type:integer references nodes(id)\"",
-      "type_name": "int"
-    },
-    {
-      "name": "Node",
-      "tag": "json:\"node\" yaml:\"node\" gorm:\"ForeignKey:NodeID\" validate:\"omitempty,dive\"",
-      "type_name": "Node"
-    },
-    {
       "name": "Description",
       "tag": "json:\"description\" yaml:\"description\"",
       "type_name": "string"
@@ -49,6 +39,12 @@
       "tag": "json:\"configuration_template\" yaml:\"configuration_template\" sql:\"type:integer references templates(id)\"",
       "type_name": "Template"
     },
+    {
+      "name": "Nodes",
+      "tag": "json:\"nodes\" yaml:\"nodes\" gorm:\"ForeignKey:NodeID\" validate:\"omitempty,dive\"",
+      "type_name": "Node",
+      "is_slice": true
+    }
   ],
   "sql_after_migration": [
 		"create trigger if not exists DeleteTemplateBeforeNodeKindDeletion before delete on node_kinds",

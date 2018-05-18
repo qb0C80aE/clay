@@ -1,9 +1,9 @@
 {
   "general": {
-    "user_defined_models_directory": "examples/api_and_gui/user_defined_models",
-    "ephemeral_templates_directory": "examples/api_and_gui/ephemeral_templates",
-    "ephemeral_binary_objects_directory": "examples/api_and_gui/ephemeral_binary_objects",
-    "ephemeral_scripts_directory": "examples/api_and_gui/ephemeral_scripts"
+    "user_defined_models_directory": "bastet/user_defined_models",
+    "ephemeral_templates_directory": "bastet/ephemeral_templates",
+    "ephemeral_binary_objects_directory": "bastet/ephemeral_binary_objects",
+    "ephemeral_scripts_directory": "bastet/ephemeral_scripts"
   },
   "user_defined_models": [
     {
@@ -44,6 +44,24 @@
     },
     {
       "file_name": "essential/vlan_port_association.json"
+    },
+    {
+      "file_name": "bastet/node_kind.json"
+    },
+    {
+      "file_name": "bastet/node_configuration.json"
+    },
+    {
+      "file_name": "bastet/test_step.json"
+    },
+    {
+      "file_name": "bastet/test_scenario.json"
+    },
+    {
+      "file_name": "bastet/test_scenario_parameter.json"
+    },
+    {
+      "file_name": "bastet/test_scenario_test_step_association.json"
     },
     {
       "file_name": "ui/node_select2.json"

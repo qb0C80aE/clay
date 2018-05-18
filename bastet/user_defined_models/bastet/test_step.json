@@ -21,7 +21,7 @@
       },
       {
         "name": "TemplateID",
-        "tag": "json:\"template_id\" yaml:\"template_id\" gorm:\"unique_index:template_id_name\" sql:\"type:integer references templates(id)\"",
+        "tag": "json:\"template_id\" yaml:\"template_id\" sql:\"type:integer references templates(id)\"",
         "type_name": "int"
       },
       {
