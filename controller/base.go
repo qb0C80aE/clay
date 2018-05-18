@@ -139,19 +139,54 @@ func executeValidation(c *gin.Context, resourceName string, inputContainer inter
 	return nil
 }
 
-func (receiver *BaseController) determineResponseType(c *gin.Context) string {
+func (receiver *BaseController) determineResponseContentTypeFromAccept(c *gin.Context) string {
 	acceptList := strings.Split(c.Request.Header.Get("Accept"), ",")
 
 	if len(acceptList) == 0 {
-		return "application/json"
+		return extension.AcceptJSON
 	}
 
 	result := strings.Trim(acceptList[0], " ")
 	switch result {
-	case "application/x-yaml", "text/yaml":
-		return result
+	case extension.AcceptAll:
+		return extension.AcceptJSON
 	default:
-		return "application/json"
+		return result
+	}
+}
+
+func (receiver *BaseController) determineResponseCharsetTypeFromAcceptCharset(c *gin.Context) string {
+	acceptCharsetList := strings.Split(c.Request.Header.Get("Accept-Charset"), ",")
+
+	switch len(acceptCharsetList) {
+	case 0:
+		return extension.AcceptCharsetUTF8
+	default:
+		firstAcceptCharset := strings.Trim(acceptCharsetList[0], " ")
+		if len(firstAcceptCharset) == 0 {
+			return extension.AcceptCharsetUTF8
+		}
+		return firstAcceptCharset
+	}
+}
+
+func (receiver *BaseController) outputTextWithContentType(c *gin.Context, code int, result interface{}) {
+	text := result.(string)
+
+	accept := receiver.determineResponseContentTypeFromAccept(c)
+
+	switch accept {
+	case "", extension.AcceptAll:
+		c.String(code, text)
+	default:
+		acceptCharset := receiver.determineResponseCharsetTypeFromAcceptCharset(c)
+		var contentType string
+		if len(strings.Trim(acceptCharset, " ")) > 0 {
+			contentType = fmt.Sprintf("%s; charset=%s", accept, acceptCharset)
+		} else {
+			contentType = accept
+		}
+		c.Data(code, contentType, []byte(text))
 	}
 }
 
@@ -160,17 +195,17 @@ func (receiver *BaseController) Bind(c *gin.Context, resourceName string) (inter
 	preloadedBody := c.MustGet("PreloadedBody").([]byte)
 
 	switch c.ContentType() {
-	case "application/json", "application/x-yaml", "text/yaml":
+	case extension.ContentTypeJSON, extension.ContentTypeXYAML, extension.ContentTypeTextYAML:
 		inputMap := map[string]interface{}{}
 		var data interface{}
 		switch c.ContentType() {
-		case "application/json":
+		case extension.ContentTypeJSON:
 			if err := json.Unmarshal(preloadedBody, &inputMap); err != nil {
 				logging.Logger().Debug(err.Error())
 				return nil, err
 			}
 			data = inputMap
-		case "application/x-yaml", "text/yaml":
+		case extension.ContentTypeXYAML, extension.ContentTypeTextYAML:
 			if err := yaml.Unmarshal(preloadedBody, &inputMap); err != nil {
 				logging.Logger().Debug(err.Error())
 				return nil, err
@@ -198,7 +233,7 @@ func (receiver *BaseController) Bind(c *gin.Context, resourceName string) (inter
 		}
 
 		return container, nil
-	case "multipart/form-data":
+	case extension.ContentTypeMultipartFormData:
 		inputMap := map[string]interface{}{}
 		container, err := extension.CreateInputContainerByResourceName(resourceName, inputMap)
 		if err != nil {
@@ -421,8 +456,8 @@ func (receiver *BaseController) GetResourceMultiURL() (string, error) {
 }
 
 func (receiver *BaseController) outputDataWithType(c *gin.Context, code int, obj interface{}) {
-	switch receiver.determineResponseType(c) {
-	case "application/x-yaml", "text/yaml":
+	switch receiver.determineResponseContentTypeFromAccept(c) {
+	case extension.AcceptXYAML, extension.AcceptTextYAML:
 		c.YAML(code, obj)
 	default:
 		// default is json
@@ -446,8 +481,8 @@ func (receiver *BaseController) OutputGetSingle(c *gin.Context, code int, result
 		receiver.outputDataWithType(c, code, result)
 	} else {
 		targetTag := ""
-		switch receiver.determineResponseType(c) {
-		case "application/x-yaml", "text/yaml":
+		switch receiver.determineResponseContentTypeFromAccept(c) {
+		case extension.AcceptXYAML, extension.AcceptTextYAML:
 			targetTag = "yaml"
 		default:
 			targetTag = "json"
@@ -473,8 +508,8 @@ func (receiver *BaseController) OutputGetMulti(c *gin.Context, code int, result 
 		receiver.outputDataWithType(c, code, result)
 	} else {
 		targetTag := ""
-		switch receiver.determineResponseType(c) {
-		case "application/x-yaml", "text/yaml":
+		switch receiver.determineResponseContentTypeFromAccept(c) {
+		case extension.AcceptXYAML, extension.AcceptTextYAML:
 			targetTag = "yaml"
 		default:
 			targetTag = "json"

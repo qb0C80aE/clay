@@ -8,15 +8,23 @@ import (
 	"github.com/qb0C80aE/clay/logging"
 	"github.com/qb0C80aE/clay/model"
 	"net/http"
+	"strings"
 )
+
+type acceptSet struct {
+	accept        string
+	acceptCharset string
+}
 
 type urlAliasController struct {
 	BaseController
-	name    string
-	from    string
-	to      string
-	query   string
-	methods []*model.URLAliasMethodURLTypeDefinition
+	name      string
+	from      string
+	to        string
+	query     string
+	methods   []*model.URLAliasMethodURLTypeDefinition
+	routeMap  map[int]map[int]gin.HandlerFunc
+	acceptMap map[int]map[int]*acceptSet
 }
 
 func newURLAliasController(model extension.Model) *urlAliasController {
@@ -36,121 +44,18 @@ func (receiver *urlAliasController) GetResourceMultiURL() (string, error) {
 }
 
 func (receiver *urlAliasController) GetRouteMap() map[int]map[int]gin.HandlerFunc {
-	routeMap := map[int]map[int]gin.HandlerFunc{}
-
-	for _, method := range receiver.methods {
-		switch method.Method {
-		case "GET":
-			var route map[int]gin.HandlerFunc
-			var exists bool
-			if route, exists = routeMap[extension.MethodGet]; !exists {
-				route = map[int]gin.HandlerFunc{}
-			}
-			switch method.TargetURLType {
-			case "single":
-				route[extension.URLSingle] = receiver.GetSingle
-			case "multi":
-				route[extension.URLMulti] = receiver.GetMulti
-			}
-			if len(route) > 1 {
-				panic("an url alias cannot support both single and multi a method")
-			}
-			routeMap[extension.MethodGet] = route
-		case "POST":
-			var route map[int]gin.HandlerFunc
-			var exists bool
-			if route, exists = routeMap[extension.MethodPost]; !exists {
-				route = map[int]gin.HandlerFunc{}
-			}
-			switch method.TargetURLType {
-			case "single":
-				route[extension.URLSingle] = receiver.Create
-			case "multi":
-				route[extension.URLMulti] = receiver.Create
-			}
-			if len(route) > 1 {
-				panic("an url alias cannot support both single and multi a method")
-			}
-			routeMap[extension.MethodPost] = route
-		case "PUT":
-			var route map[int]gin.HandlerFunc
-			var exists bool
-			if route, exists = routeMap[extension.MethodPut]; !exists {
-				route = map[int]gin.HandlerFunc{}
-			}
-			switch method.TargetURLType {
-			case "single":
-				route[extension.URLSingle] = receiver.Update
-			case "multi":
-				route[extension.URLMulti] = receiver.Update
-			}
-			if len(route) > 1 {
-				panic("an url alias cannot support both single and multi a method")
-			}
-			routeMap[extension.MethodPut] = route
-		case "DELETE":
-			var route map[int]gin.HandlerFunc
-			var exists bool
-			if route, exists = routeMap[extension.MethodDelete]; !exists {
-				route = map[int]gin.HandlerFunc{}
-			}
-			switch method.TargetURLType {
-			case "single":
-				route[extension.URLSingle] = receiver.Delete
-			case "multi":
-				route[extension.URLMulti] = receiver.Delete
-			}
-			if len(route) > 1 {
-				panic("an url alias cannot support both single and multi a method")
-			}
-			routeMap[extension.MethodDelete] = route
-		case "PATCH":
-			var route map[int]gin.HandlerFunc
-			var exists bool
-			if route, exists = routeMap[extension.MethodPatch]; !exists {
-				route = map[int]gin.HandlerFunc{}
-			}
-			switch method.TargetURLType {
-			case "single":
-				route[extension.URLSingle] = receiver.Patch
-			case "multi":
-				route[extension.URLMulti] = receiver.Patch
-			}
-			if len(route) > 1 {
-				panic("an url alias cannot support both single and multi a method")
-			}
-			routeMap[extension.MethodPatch] = route
-		case "OPTIONS":
-			var route map[int]gin.HandlerFunc
-			var exists bool
-			if route, exists = routeMap[extension.MethodOptions]; !exists {
-				route = map[int]gin.HandlerFunc{}
-			}
-			switch method.TargetURLType {
-			case "single":
-				route[extension.URLSingle] = receiver.GetOptions
-			case "multi":
-				route[extension.URLMulti] = receiver.GetOptions
-			}
-			if len(route) > 1 {
-				panic("an url alias cannot support both single and multi a method")
-			}
-			routeMap[extension.MethodOptions] = route
-		}
-	}
-
-	return routeMap
+	return receiver.routeMap
 }
 
 func (receiver *urlAliasController) route(c *gin.Context, method int, selfURLType int) {
-	controller, err := extension.GetAssociatedControllerWithPath(receiver.to)
+	targetController, err := extension.GetAssociatedControllerWithPath(receiver.to)
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
 		return
 	}
 
-	resourceName, err := controller.GetResourceName()
+	resourceName, err := targetController.GetResourceName()
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
@@ -159,71 +64,115 @@ func (receiver *urlAliasController) route(c *gin.Context, method int, selfURLTyp
 
 	methodName := extension.LookUpMethodName(method)
 
-	routeMap := controller.GetRouteMap()
-	methodRoute, exists := routeMap[method]
+	methodRoute, exists := targetController.GetRouteMap()[method]
 	if !exists {
 		logging.Logger().Debugf("the controller for %s does not support %s", resourceName, methodName)
 		receiver.outputHandler.OutputError(c, http.StatusBadRequest, fmt.Errorf("the controller for %s does not support %s", resourceName, methodName))
 		return
 	}
 
+	methodAccept, exists := receiver.acceptMap[method]
+	if !exists {
+		logging.Logger().Debugf("the controller for %s does not support %s", resourceName, methodName)
+		receiver.outputHandler.OutputError(c, http.StatusBadRequest, fmt.Errorf("the controller for %s does not support %s", resourceName, methodName))
+		return
+	}
+
+	var url string
 	switch selfURLType {
 	case extension.URLSingle:
-		handler, exists := methodRoute[selfURLType]
-		if !exists {
-			logging.Logger().Debug("the controller for %s does not support %s", resourceName, methodName)
-			receiver.outputHandler.OutputError(c, http.StatusBadRequest, fmt.Errorf("the controller for %s does not support %s", resourceName, methodName))
-			return
-		}
-
-		url, err := controller.GetResourceSingleURL()
+		url, err = targetController.GetResourceSingleURL()
 		if err != nil {
 			logging.Logger().Debug(err.Error())
 			receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
 			return
 		}
-
-		c.Params, err = extension.CreateParametersFromPathAndRoute(receiver.to, url)
-		if err != nil {
-			logging.Logger().Debug(err.Error())
-			receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
-			return
-		}
-
-		c.Request.URL.RawQuery = fmt.Sprintf("%s&%s", receiver.query, c.Request.URL.RawQuery)
-		c.Request.URL.Path = receiver.to
-
-		handler(c)
 	case extension.URLMulti:
-		handler, exists := methodRoute[selfURLType]
-		if !exists {
-			logging.Logger().Debug("the controller does not support the given method")
-			receiver.outputHandler.OutputError(c, http.StatusBadRequest, errors.New("the controller does not support the given method"))
-			return
-		}
-
-		url, err := controller.GetResourceMultiURL()
+		url, err = targetController.GetResourceMultiURL()
 		if err != nil {
 			logging.Logger().Debug(err.Error())
 			receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
 			return
 		}
-
-		c.Params, err = extension.CreateParametersFromPathAndRoute(receiver.to, url)
-		if err != nil {
-			logging.Logger().Debug(err.Error())
-			receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
-			return
-		}
-
-		c.Request.URL.RawQuery = fmt.Sprintf("%s&%s", receiver.query, c.Request.URL.RawQuery)
-		c.Request.URL.Path = receiver.to
-
-		handler(c)
 	default:
 		logging.Logger().Debug("unknown url type")
 		receiver.outputHandler.OutputError(c, http.StatusBadRequest, errors.New("unknown url type"))
+		return
 	}
+
+	handler, exists := methodRoute[selfURLType]
+	if !exists {
+		logging.Logger().Debug("the controller for %s does not support %s", resourceName, methodName)
+		receiver.outputHandler.OutputError(c, http.StatusBadRequest, fmt.Errorf("the controller for %s does not support %s", resourceName, methodName))
+		return
+	}
+
+	c.Params, err = extension.CreateParametersFromPathAndRoute(receiver.to, url)
+	if err != nil {
+		logging.Logger().Debug(err.Error())
+		receiver.outputHandler.OutputError(c, http.StatusBadRequest, err)
+		return
+	}
+
+	targetAcceptSet, exists := methodAccept[selfURLType]
+	if !exists {
+		logging.Logger().Debug("the controller for %s does not support %s", resourceName, methodName)
+		receiver.outputHandler.OutputError(c, http.StatusBadRequest, fmt.Errorf("the controller for %s does not support %s", resourceName, methodName))
+		return
+	}
+
+	var acceptList []string
+	originalAcceptList := strings.Split(c.Request.Header.Get("Accept"), ",")
+	switch len(originalAcceptList) {
+	case 0:
+		acceptList = strings.Split(targetAcceptSet.accept, ",")
+	case 1:
+		if originalAcceptList[0] == extension.AcceptAll {
+			acceptList = strings.Split(targetAcceptSet.accept, ",")
+		} else {
+			if targetAcceptSet.accept == extension.AcceptAll {
+				acceptList = append(originalAcceptList, targetAcceptSet.accept)
+			} else {
+				acceptList = append(strings.Split(targetAcceptSet.accept, ","), originalAcceptList...)
+			}
+		}
+	default:
+		if targetAcceptSet.accept == extension.AcceptAll {
+			acceptList = append(originalAcceptList, targetAcceptSet.accept)
+		} else {
+			acceptList = append(strings.Split(targetAcceptSet.accept, ","), originalAcceptList...)
+		}
+	}
+
+	var acceptCharsetList []string
+	originalAcceptCharsetList := strings.Split(c.Request.Header.Get("Accept-Charset"), ",")
+	switch len(originalAcceptCharsetList) {
+	case 0:
+		acceptCharsetList = strings.Split(targetAcceptSet.acceptCharset, ",")
+	case 1:
+		if originalAcceptCharsetList[0] == extension.AcceptAll {
+			acceptCharsetList = strings.Split(targetAcceptSet.acceptCharset, ",")
+		} else {
+			if targetAcceptSet.acceptCharset == extension.AcceptAll {
+				acceptCharsetList = append(originalAcceptCharsetList, targetAcceptSet.acceptCharset)
+			} else {
+				acceptCharsetList = append(strings.Split(targetAcceptSet.acceptCharset, ","), originalAcceptCharsetList...)
+			}
+		}
+	default:
+		if targetAcceptSet.accept == extension.AcceptAll {
+			acceptCharsetList = append(originalAcceptCharsetList, targetAcceptSet.acceptCharset)
+		} else {
+			acceptCharsetList = append(strings.Split(targetAcceptSet.acceptCharset, ","), originalAcceptCharsetList...)
+		}
+	}
+
+	c.Request.URL.RawQuery = fmt.Sprintf("%s&%s", receiver.query, c.Request.URL.RawQuery)
+	c.Request.URL.Path = receiver.to
+	c.Request.Header.Set("Accept", strings.Join(acceptList, ","))
+	c.Request.Header.Set("Accept-Charset", strings.Join(acceptCharsetList, ","))
+
+	handler(c)
 }
 
 func (receiver *urlAliasController) GetSingle(c *gin.Context) {

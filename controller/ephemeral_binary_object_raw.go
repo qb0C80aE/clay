@@ -2,6 +2,8 @@ package controller
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/gin-gonic/gin"
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
@@ -44,12 +46,19 @@ func (receiver *ephemeralBinaryObjectRawController) GetRouteMap() map[int]map[in
 func (receiver *ephemeralBinaryObjectRawController) OutputGetSingle(c *gin.Context, code int, result interface{}, fields map[string]interface{}) {
 	data := result.([]byte)
 
-	contentType := c.Request.URL.Query().Get("content_type")
+	accept := receiver.determineResponseContentTypeFromAccept(c)
 
-	switch contentType {
-	case "":
-		c.Data(code, "application/octet-stream", []byte(data))
+	switch accept {
+	case "", extension.AcceptAll:
+		c.Data(code, extension.ContentTypeOctetStream, []byte(data))
 	default:
+		acceptCharset := receiver.determineResponseCharsetTypeFromAcceptCharset(c)
+		var contentType string
+		if len(strings.Trim(acceptCharset, " ")) > 0 {
+			contentType = fmt.Sprintf("%s; charset=%s", accept, acceptCharset)
+		} else {
+			contentType = accept
+		}
 		c.Data(code, contentType, []byte(data))
 	}
 }
