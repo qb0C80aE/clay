@@ -67,7 +67,6 @@
 
 {{- $query := printf "%s%s%s%s%s%s" $preloadsParameter $fieldsParameter $sortParameter $limitParameter $pageParameter $searchParameter -}}
 
-{{- $null := .Logging.Debug $query -}}
 {{- $data := .ModelStore.Multi $resourceName $query -}}
 
 {{- $dataRecordsJSON := .Conversion.JSONMarshal $data.Records "  " -}}
