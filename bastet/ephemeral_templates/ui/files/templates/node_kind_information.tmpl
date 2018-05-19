@@ -22,8 +22,8 @@
 			  <div class="row">
 			    <ul class="nav nav-tabs">
 			      <li class="active"><a href="#node_kind_information_tab" data-toggle="tab">Information</a></li>
-						<li><a href="#node_kind_node_configuration_initialization_template_tab" data-toggle="tab">Initialization Template</a></li>
-						<li><a href="#node_kind_node_configuration_configuration_template_tab" data-toggle="tab">Configuration Template</a></li>
+						<li><a href="#initialization_template_tab" data-toggle="tab">Initialization Template</a></li>
+						<li><a href="#configuration_template_tab" data-toggle="tab">Configuration Template</a></li>
 			    </ul>
 			  </div>
 			</div>
@@ -39,28 +39,28 @@
 							<td width="15%">Name</td>
 							<td width="85%">
 								<input name="id" type="hidden">
-								<input name="node_kind_node_configuration_id" type="hidden">
+								<input name="id" type="hidden">
 								<input name="name" type="text" placeholder="node kind name like CentOS_Server" class="form-control">
 							</td>
 						</tr>
 						<tr>
 							<td width="15%">Image Name</td>
 							<td width="85%">
-								<input name="node_kind_node_configuration_image_name" type="text" placeholder="image name like centos/7/lxc" class="form-control">
+								<input name="image_name" type="text" placeholder="image name like centos/7/lxc" class="form-control">
 							</td>
 						</tr>
 					</table>
 
 				</div>
 
-				<div class="tab-pane" id="node_kind_node_configuration_initialization_template_tab">
-					<input name="node_kind_node_configuration_initialization_template_id" type="hidden">
-					<textarea name="node_kind_node_configuration_initialization_template_content" class="form-control" rows="15"></textarea>
+				<div class="tab-pane" id="initialization_template_tab">
+					<input name="initialization_template_id" type="hidden">
+					<textarea name="initialization_template_content" class="form-control" rows="15"></textarea>
 				</div>
 
-				<div class="tab-pane" id="node_kind_node_configuration_configuration_template_tab">
-					<input name="node_kind_node_configuration_configuration_template_id" type="hidden">
-					<textarea name="node_kind_node_configuration_configuration_template_content" class="form-control" rows="15"></textarea>
+				<div class="tab-pane" id="configuration_template_tab">
+					<input name="configuration_template_id" type="hidden">
+					<textarea name="configuration_template_content" class="form-control" rows="15"></textarea>
 				</div>
 
 			</div>

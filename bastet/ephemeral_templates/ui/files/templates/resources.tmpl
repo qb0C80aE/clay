@@ -4,6 +4,7 @@
 {{ .ModelStore.Single "ephemeral_templates/port_group_information.tmpl/generation" "" }}
 {{ .ModelStore.Single "ephemeral_templates/vlan_information.tmpl/generation" "" }}
 {{ .ModelStore.Single "ephemeral_templates/template_information.tmpl/generation" "" }}
+{{ .ModelStore.Single "ephemeral_templates/node_kind_information.tmpl/generation" "" }}
 {{ .ModelStore.Single "ephemeral_templates/test_step_information.tmpl/generation" "" }}
 {{ .ModelStore.Single "ephemeral_templates/test_scenario_information.tmpl/generation" "" }}
 
@@ -132,7 +133,7 @@
 				<div class="panel-heading">
 					<h1 class="panel-title">
 						<span style="display: table-cell; vertical-align: middle; text-align: left; width=90%">
-							<span class="glyphicon glyphicon-blackboard"></span> Host Kinds
+							<span class="glyphicon glyphicon-blackboard"></span> Node Kinds
 						</span>
 						<span class="input-group-btn">
 							<button class="btn btn-default" name="add_node_kind_btn" type="button">
@@ -204,6 +205,7 @@ $(function() {
 	{{ .ModelStore.Single "ephemeral_templates/functions_port_group_information.tmpl/generation" "" }}
 	{{ .ModelStore.Single "ephemeral_templates/functions_vlan_information.tmpl/generation" "" }}
 	{{ .ModelStore.Single "ephemeral_templates/functions_template_information.tmpl/generation" "" }}
+	{{ .ModelStore.Single "ephemeral_templates/functions_node_kind_information.tmpl/generation" "" }}
 	{{ .ModelStore.Single "ephemeral_templates/functions_test_step_information.tmpl/generation" "" }}
 	{{ .ModelStore.Single "ephemeral_templates/functions_test_scenario_information.tmpl/generation" "" }}
 
@@ -374,7 +376,7 @@ $(function() {
 
 			$('#main_panel #templates_tab #templates_table').DataTable({
 				ajax: {
-					url: '/ui/datatables?resource_name=templates&resource_preloads=template_arguments&resource_fields=name,description,template_arguments&columns=null,name,null,description'
+					url: '/ui/datatables?resource_name=templates&resource_preloads=template_arguments&resource_fields=id,name,description,template_arguments&columns=null,name,null,description'
 				},
 				serverSide: true,
 				order: [[1, 'asc']],
@@ -416,7 +418,7 @@ $(function() {
 
 			$('#main_panel #node_kinds_tab #node_kinds_table').DataTable({
 				ajax: {
-					url: '/ui/datatables?resource_name=node_kinds&resource_fields=name,image_name&columns=null,name,null'
+					url: '/ui/datatables?resource_name=node_kinds&resource_fields=id,name,image_name&columns=null,name,null'
 				},
 				serverSide: true,
 				order: [[1, 'asc']],
@@ -438,7 +440,7 @@ $(function() {
 						}
 					},
 					{title: 'Image Name', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
-							return createReadOnlyTextElement('image_name', 'in-table', '', '', full.node_configuration.image_name).outerHTML;
+							return createReadOnlyTextElement('image_name', 'in-table', '', '', full.image_name).outerHTML;
 						}
 					}
 				]
@@ -580,19 +582,19 @@ $(function() {
 	});
 
 	$('#main_panel #node_kinds_tab #node_kinds_panel button[name=add_node_kind_btn]').on('click', function() {
-		showHostKindInformation(null, onLoad);
+		showNodeKindInformation(null, onLoad);
 	});
 
 	$('#main_panel #node_kinds_tab #node_kinds_panel #node_kinds_table').on('click', 'button[name=edit_node_kind_btn]', function() {
 		var tr = $(this).closest('tr');
-		var node_kindID = tr.find('input[name=id]').val();
-		showHostKindInformation(node_kindID, onLoad);
+		var nodeKindID = tr.find('input[name=id]').val();
+		showNodeKindInformation(nodeKindID, onLoad);
 	});
 
 	$('#main_panel #node_kinds_tab #node_kinds_panel #node_kinds_table').on('click', 'button[name=delete_node_kind_btn]', function() {
 		var tr = $(this).closest('tr');
-		var node_kindID = tr.find('input[name=id]').val();
-		deleteHostKindInformation(node_kindID, onLoad);
+		var nodeKindID = tr.find('input[name=id]').val();
+		deleteNodeKindInformation(nodeKindID, onLoad);
 	});
 
 	$('#main_panel #test_steps_tab #test_steps_panel button[name=add_test_step_btn]').on('click', function() {

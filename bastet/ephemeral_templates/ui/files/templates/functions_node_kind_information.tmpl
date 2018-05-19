@@ -1,142 +1,137 @@
 {{/* <script> */}}
 
-var storedCallbackHostKindInformationUpdated = null;
+var storedCallbackNodeKindInformationUpdated = null;
 
-function showHostKindInformation(hostKindID, callbackHostKindInformationUpdated) {
-  storedCallbackHostKindInformationUpdated = callbackHostKindInformationUpdated;
+function showNodeKindInformation(nodeKindID, callbackNodeKindInformationUpdated) {
+  storedCallbackNodeKindInformationUpdated = callbackNodeKindInformationUpdated;
 
-  if (hostKindID == null) {
-    var hostKind = {
+  if (nodeKindID == null) {
+    var nodeKind = {
       id: 0,
       name: '',
-      host_configuration: {
-        id: 0,
-        image_name: '',
-        initialization_template_id: 0,
-        initialization_template: {
-          template_content: ''
-        },
-        configuration_template_id: 0,
-        configuration_template: {
-          template_content: ''
-        }
+      image_name: '',
+      initialization_template_id: 0,
+      initialization_template: {
+        name: '',
+        template_content: ''
+      },
+      configuration_template_id: 0,
+      configuration_template: {
+        name: '',
+        template_content: ''
       }
     };
-    repaintHostKindInformation(hostKind, true);
+    repaintNodeKindInformation(nodeKind, true);
   } else {
-    getResource('host_kinds', hostKindID, 'preloads=host_configuration.initialization_template,host_configuration.configuration_template', function(hostKind) {
-      repaintHostKindInformation(hostKind, true);
+    getResource('node_kinds', nodeKindID, 'preloads=initialization_template,configuration_template', function(nodeKind) {
+      repaintNodeKindInformation(nodeKind, true);
     });
   }
 }
 
-function repaintHostKindInformation(hostKind, initializeTabSelection) {
-  var host_kind_information_table = $('#host_kind_information_float_panel #host_kind_information_tab #host_kind_information_table');
+function repaintNodeKindInformation(nodeKind, initializeTabSelection) {
+  var node_kind_information_table = $('#node_kind_information_float_panel #node_kind_information_tab #node_kind_information_table');
 
-  host_kind_information_table.find('input[name=id]').val(hostKind.id);
-  host_kind_information_table.find('input[name=name]').val(hostKind.name);
-  host_kind_information_table.find('input[name=host_kind_host_configuration_image_name]').val(hostKind.host_configuration.image_name);
-  host_kind_information_table.find('input[name=host_kind_host_configuration_id]').val(hostKind.host_configuration.id);
+  node_kind_information_table.find('input[name=id]').val(nodeKind.id);
+  node_kind_information_table.find('input[name=name]').val(nodeKind.name);
+  node_kind_information_table.find('input[name=image_name]').val(nodeKind.image_name);
 
-  $('#host_kind_information_float_panel #host_kind_host_configuration_initialization_template_tab').find('input[name=host_kind_host_configuration_initialization_template_id]').val(hostKind.host_configuration.initialization_template.id);
-  $('#host_kind_information_float_panel #host_kind_host_configuration_initialization_template_tab').find('textarea[name=host_kind_host_configuration_initialization_template_content]').val(hostKind.host_configuration.initialization_template.template_content);
-  $('#host_kind_information_float_panel #host_kind_host_configuration_configuration_template_tab').find('input[name=host_kind_host_configuration_configuration_template_id]').val(hostKind.host_configuration.configuration_template.id);
-  $('#host_kind_information_float_panel #host_kind_host_configuration_configuration_template_tab').find('textarea[name=host_kind_host_configuration_configuration_template_content]').val(hostKind.host_configuration.configuration_template.template_content);
+  $('#node_kind_information_float_panel #initialization_template_tab').find('input[name=initialization_template_id]').val(nodeKind.initialization_template.id);
+  $('#node_kind_information_float_panel #initialization_template_tab').find('textarea[name=initialization_template_content]').val(nodeKind.initialization_template.template_content);
+  $('#node_kind_information_float_panel #configuration_template_tab').find('input[name=configuration_template_id]').val(nodeKind.configuration_template.id);
+  $('#node_kind_information_float_panel #configuration_template_tab').find('textarea[name=configuration_template_content]').val(nodeKind.configuration_template.template_content);
 
   if (initializeTabSelection) {
-    $('#host_kind_information_float_panel a[href="#host_kind_information_tab"]').tab('show');
+    $('#node_kind_information_float_panel a[href="#node_kind_information_tab"]').tab('show');
   }
-  $('#host_kind_information_float_panel').fadeIn(50);
+  $('#node_kind_information_float_panel').fadeIn(50);
 
   $('#page_cover').fadeIn(50);
 }
 
-$('#host_kind_information_float_panel a[data-toggle=tab]').on('shown.bs.tab', function(e) {
+$('#node_kind_information_float_panel a[data-toggle=tab]').on('shown.bs.tab', function(e) {
 });
 
-$('#host_kind_information_panel').on('click', 'button[name=cancel_host_kind_btn]', function() {
-  $('#host_kind_information_float_panel').fadeOut(50, function() {
+$('#node_kind_information_panel').on('click', 'button[name=cancel_node_kind_btn]', function() {
+  $('#node_kind_information_float_panel').fadeOut(50, function() {
     $('#page_cover').fadeOut(50);
   });
 });
 
-$('#host_kind_information_panel').on('click', 'button[name=update_host_kind_btn]', function() {
-  if (!confirm('Are you sure to register/update the host kind?')) {
+$('#node_kind_information_panel').on('click', 'button[name=update_node_kind_btn]', function() {
+  if (!confirm('Are you sure to register/update the node kind?')) {
     return;
   }
 
-  var hostKindID = $('#host_kind_information_panel').find('input[name=id]').val();
-  if ((hostKindID == null) || (hostKindID == undefined) || (hostKindID == '')) {
-    hostKindID = 0;
+  var nodeKindID = $('#node_kind_information_panel').find('input[name=id]').val();
+  if ((nodeKindID == null) || (nodeKindID == undefined) || (nodeKindID == '')) {
+    nodeKindID = 0;
   }
 
-  var hostKindName = $('#host_kind_information_panel').find('input[name=name]').val();
-  var hostKindConfigurationID = $('#host_kind_information_panel').find('input[name=host_kind_host_configuration_id]').val();
-  var hostKindConfigurationImageName = $('#host_kind_information_panel').find('input[name=host_kind_host_configuration_image_name]').val();
-  var hostKindConfigurationInitializationTemplateID = $('#host_kind_information_panel').find('input[name=host_kind_host_configuration_initialization_template_id]').val();
-  var hostKindConfigurationInitializationTemplate = $('#host_kind_information_panel').find('textarea[name=host_kind_host_configuration_initialization_template_content]').val();
-  var hostKindConfigurationConfigurationTemplateID = $('#host_kind_information_panel').find('input[name=host_kind_host_configuration_configuration_template_id]').val();
-  var hostKindConfigurationConfigurationTemplate = $('#host_kind_information_panel').find('textarea[name=host_kind_host_configuration_configuration_template_content]').val();
+  var nodeKindName = $('#node_kind_information_panel').find('input[name=name]').val();
+  var imageName = $('#node_kind_information_panel').find('input[name=image_name]').val();
+  var initializationTemplateID = $('#node_kind_information_panel').find('input[name=initialization_template_id]').val();
+  var initializationTemplate = $('#node_kind_information_panel').find('textarea[name=initialization_template_content]').val();
+  var configurationTemplateID = $('#node_kind_information_panel').find('input[name=configuration_template_id]').val();
+  var configurationTemplate = $('#node_kind_information_panel').find('textarea[name=configuration_template_content]').val();
 
-  var hostKind = {
-    id: parseInt(hostKindID),
-    name: hostKindName,
-    host_configuration: {
-      id: parseInt(hostKindConfigurationID),
-      image_name: hostKindConfigurationImageName,
-      initialization_template_id: parseInt(hostKindConfigurationInitializationTemplateID),
-      initialization_template: {
-        id: parseInt(hostKindConfigurationInitializationTemplateID),
-        template_content: hostKindConfigurationInitializationTemplate
-      },
-      configuration_template_id: parseInt(hostKindConfigurationConfigurationTemplateID),
-      configuration_template: {
-        id: parseInt(hostKindConfigurationConfigurationTemplateID),
-        template_content: hostKindConfigurationConfigurationTemplate
-      }
+  var nodeKind = {
+    id: parseInt(nodeKindID),
+    name: nodeKindName,
+    image_name: imageName,
+    initialization_template_id: parseInt(initializationTemplateID),
+    initialization_template: {
+      id: parseInt(initializationTemplateID),
+      name: nodeKindName + '_NodeKind_InitializationTemplate',
+      template_content: initializationTemplate
+    },
+    configuration_template_id: parseInt(configurationTemplateID),
+    configuration_template: {
+      id: parseInt(configurationTemplateID),
+      name: nodeKindName + '_NodeKind_ConfigurationTemplate',
+      template_content: configurationTemplate
     }
   };
-  if (hostKindID == 0) {
-    delete(hostKind['id']);
-    delete(hostKind.host_configuration['id']);
-    delete(hostKind.host_configuration['initialization_template_id']);
-    delete(hostKind.host_configuration['configuration_template_id']);
-    delete(hostKind.host_configuration.initialization_template['id']);
-    delete(hostKind.host_configuration.configuration_template['id']);
+  if (nodeKindID == 0) {
+    delete(nodeKind['id']);
+    delete(nodeKind.initialization_template_id);
+    delete(nodeKind.configuration_template_id);
+    delete(nodeKind.initialization_template['id']);
+    delete(nodeKind.configuration_template['id']);
   }
 
-  if (hostKind.id == undefined) {
-    postResource('host_kinds', hostKind, '', function(result, xhr) {
-      showProcessResult(result, xhr, 201, "The host kind information has been registered successfully.");
-      postProcessUpdateHostKind(result, xhr);
+  if (nodeKind.id == undefined) {
+    postResource('node_kinds', nodeKind, '', function(result, xhr) {
+      showProcessResult(result, xhr, 201, "The node kind information has been registered successfully.");
+      postProcessUpdateNodeKind(result, xhr);
     });
   } else {
-    putResource('host_kinds', hostKind.id, hostKind, '', function(result, xhr) {
-      showProcessResult(result, xhr, 200, "The host kind information has been updated successfully.");
-      postProcessUpdateHostKind(result, xhr);
+    putResource('node_kinds', nodeKind.id, nodeKind, '', function(result, xhr) {
+      showProcessResult(result, xhr, 200, "The node kind information has been updated successfully.");
+      postProcessUpdateNodeKind(result, xhr);
     });
   }
 
 });
 
-function postProcessUpdateHostKind(result, xhr) {
-  var hostKindID = result.id;
+function postProcessUpdateNodeKind(result, xhr) {
+  var nodeKindID = result.id;
 
-  getResource('host_kinds', hostKindID, 'preloads=host_configuration.initialization_template,host_configuration.configuration_template', function(hostKind) {
-    repaintHostKindInformation(hostKind, false);
-    if ((storedCallbackHostKindInformationUpdated != null) && (storedCallbackHostKindInformationUpdated != undefined)) {
-      storedCallbackHostKindInformationUpdated();
+  getResource('node_kinds', nodeKindID, 'preloads=initialization_template,configuration_template', function(nodeKind) {
+    repaintNodeKindInformation(nodeKind, false);
+    if ((storedCallbackNodeKindInformationUpdated != null) && (storedCallbackNodeKindInformationUpdated != undefined)) {
+      storedCallbackNodeKindInformationUpdated();
     }
   });
 }
 
-function deleteHostKindInformation(hostKindID, callbackHostKindInformationDeleted) {
-  if (!confirm('Are you sure to delete the host kind?')) {
+function deleteNodeKindInformation(nodeKindID, callbackNodeKindInformationDeleted) {
+  if (!confirm('Are you sure to delete the node kind?')) {
     return;
   }
 
-  deleteResource('host_kinds', hostKindID, '', function(result, xhr) {
-    showProcessResult(result, xhr, 204, "The host kind information has been deleted successfully.");
-    callbackHostKindInformationDeleted();
+  deleteResource('node_kinds', nodeKindID, '', function(result, xhr) {
+    showProcessResult(result, xhr, 204, "The node kind information has been deleted successfully.");
+    callbackNodeKindInformationDeleted();
   });
 }
