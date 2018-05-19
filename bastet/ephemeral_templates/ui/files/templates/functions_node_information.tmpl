@@ -93,12 +93,24 @@ function showNodeInformation(nodeID, callbackNodeInformationUpdated) {
       description: '',
       ports: [],
       node_type_id: 1,
+      node_kind_id: 0,
       virtual: false,
-      routes: []
+      routes: [],
+      node_configuration: {
+        image_name: '',
+        initialization_template_id: 0,
+        initialization_template: {
+          template_content: ''
+        },
+        configuration_template_id: 0,
+        configuration_template: {
+          template_content: ''
+        }
+      }
     };
     repaintNodeInformation(node, true);
   } else {
-    getResource('nodes', nodeID, 'preloads=node_type,routes.output_port,routes.gateway_port_ipv4_address.port.node,ports.link.destination_port.node,ports.ipv4_addresses,ports.vlan_port_associations', function(node) {
+    getResource('nodes', nodeID, 'preloads=node_type,node_kind,routes.output_port,routes.gateway_port_ipv4_address.port.node,ports.link.destination_port.node,ports.ipv4_addresses,ports.vlan_port_associations', function(node) {
       repaintNodeInformation(node, true);
     });
   }
@@ -121,167 +133,183 @@ function repaintNodeInformation(node, initializeTabSelection) {
   }
 
   getResources('node_types', '', function(nodeTypesResult) {
-    var node_information_node_type_id = $('#node_information_float_panel #node_information_tab #node_information_table').find('select[name=node_type_id]');
-    node_information_node_type_id.children().remove();
-    for (var i = 0; i < nodeTypesResult.length; i = i + 1) {
-      node_information_node_type_id.append($('<option>').val(nodeTypesResult[i].id).text(nodeTypesResult[i].name));
-    }
+    getResources('node_kinds', '', function(nodeKindsResult) {
+      var node_information_node_type_id = $('#node_information_float_panel #node_information_tab #node_information_table').find('select[name=node_type_id]');
+      node_information_node_type_id.children().remove();
+      for (var i = 0; i < nodeTypesResult.length; i = i + 1) {
+        node_information_node_type_id.append($('<option>').val(nodeTypesResult[i].id).text(nodeTypesResult[i].name));
+      }
 
-    var node_information_table = $('#node_information_float_panel #node_information_tab #node_information_table');
+      var node_information_node_kind_id = $('#node_information_float_panel #node_information_tab #node_information_table').find('select[name=node_kind_id]');
+      node_information_node_kind_id.children().remove();
+      for (var i = 0; i < nodeKindsResult.length; i = i + 1) {
+        node_information_node_kind_id.append($('<option>').val(nodeKindsResult[i].id).text(nodeKindsResult[i].name));
+      }
 
-    node_information_table.find('input[name=id]').val(node.id);
-    node_information_table.find('input[name=name]').val(node.name);
-    node_information_table.find('input[name=description]').val(node.description);
-    node_information_table.find('select[name=node_type_id]').val(node.node_type_id);
-    node_information_table.find('select[name=virtual]').val(convertBooleanToString(node.virtual));
-    node_information_table.find('select[name=tagged]').val(convertBooleanToString(node.tagged));
+      var node_information_table = $('#node_information_float_panel #node_information_tab #node_information_table');
 
-    if (initializeTabSelection) {
-      $('#node_information_float_panel a[href="#node_information_tab"]').tab('show');
-    }
-    $('#node_information_float_panel').fadeIn(50);
+      node_information_table.find('input[name=id]').val(node.id);
+      node_information_table.find('input[name=name]').val(node.name);
+      node_information_table.find('input[name=description]').val(node.description);
+      node_information_table.find('select[name=node_type_id]').val(node.node_type_id);
+      node_information_table.find('select[name=node_kind_id]').val(node.node_kind_id);
+      node_information_table.find('select[name=virtual]').val(convertBooleanToString(node.virtual));
+      node_information_table.find('select[name=tagged]').val(convertBooleanToString(node.tagged));
 
-    $('#node_information_float_panel #ports_tab #ports_table').DataTable({
-      sDom: '<"row"<"col-sm-5"l><"col-sm-6 right"f>>tip',
-      order: [[1, 'asc']],
-      scrollX: true,
-      paginate: true,
-      destroy: true,
-      data: node.ports,
-      columns: [
-        {title: '', sortable: false, render: function (data, type, full, meta) {
-            return createButtonElement('delete_port_btn', 'btn btn-default', 'glyphicon glyphicon-minus', '').outerHTML +
-              createHiddenElement('id', full.id).outerHTML +
-              createFormElement('deleted_ipv4_addresses').outerHTML;
-          }
-        },
-        {title: 'Port No.', data: 'number', defaultContent: '', sortable: true, orderDataType: "dom-text-numeric", render: function (data, type, full, meta) {
-            if ((data == 0) || (data == null) || (data == undefined)) {
-              data = 1;
-            }
-            return createTextElement('number', 'in-table port-number', '', '1', data).outerHTML;
-          }
-        },
-        {title: 'Name', data: 'name', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
-            return createTextElement('name', 'in-table', '', 'eth0', data).outerHTML;
-          }
-        },
-        {title: 'VLAN', data: 'vlan_port_associations', defaultContent: '', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
-            return createTextElement('vlans', 'in-table', '', '100,200-300', compactVlans(data)).outerHTML;
-          }
-        },
-        {title: 'Tagged', data: 'tagged', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
-            var options = [
-              {id: false, name: 'Untagged'},
-              {id: true, name: 'Tagged'}
-            ];
-            return createSelectElement('tagged', 'in-table', '', options, convertBooleanToString(data)).outerHTML;
-          }
-        },
-        {title: 'MAC Address', data: 'mac_address', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
-            return createTextElement('mac_address', 'in-table mac-address', '', '00:00:00:00:00:00', data).outerHTML;
-          }
-        },
-        {title: 'IPv4 Addresses', data: 'ipv4_addresses', defaultContent: '', sortable: false, render: function (data, type, full, meta) {
-            return createIPv4TableElement(data, true, true, false).outerHTML;
-          }
-        },
-        {title: 'Destination Port', data: 'link', defaultContent: '', type: 'int', sortable: true, orderDataType: 'dom-numeric', render: function (data, type, full, meta) {
-            var options = [];
-            var value = null;
-            if ((data != null) && (data != undefined)) {
-              var name = data.destination_port.node.name + '.' + data.destination_port.name;
-              options = [{id: data.destination_port_id, name: name}];
-              value = data.destination_port_id;
-            }
-            return createHiddenElement('previous_destination_port_id', value).outerHTML + createSelectElement('destination_port_id', 'in-table', '', options, value).outerHTML;
-          }
-        },
-        {title: 'Description', data: 'description', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
-            return createTextElement('description', 'in-table', '', 'description', data).outerHTML;
-          }
-        }
-      ],
-      drawCallback: function(settings) {
-        $('#node_information_float_panel #ports_tab #ports_table select[name=tagged]').select2({
-          width: '128px'
-        });
-        $('#node_information_float_panel #ports_tab #ports_table select[name=destination_port_id]').select2({
-          allowClear: true,
-          minimumInputLength: 1,
-          ajax: {
-            url:'/ui/select2',
-            dataType: 'json',
-            delay: 50,
-            data: function(params) {
-              return { 'resource_name': 'port_select2', 'terms_order': 'node_name,name', 'terms': params.term, 'limit': 10 };
+      if (initializeTabSelection) {
+        $('#node_information_float_panel a[href="#node_information_tab"]').tab('show');
+      }
+      $('#node_information_float_panel').fadeIn(50);
+
+      $('#node_information_float_panel #ports_tab #ports_table').DataTable({
+        sDom: '<"row"<"col-sm-5"l><"col-sm-6 right"f>>tip',
+        order: [[1, 'asc']],
+        scrollX: true,
+        paginate: true,
+        destroy: true,
+        data: node.ports,
+        columns: [
+          {title: '', sortable: false, render: function (data, type, full, meta) {
+              return createButtonElement('delete_port_btn', 'btn btn-default', 'glyphicon glyphicon-minus', '').outerHTML +
+                createHiddenElement('id', full.id).outerHTML +
+                createFormElement('deleted_ipv4_addresses').outerHTML;
             }
           },
-          width: '384px',
-          placeholder: 'None',
-        });
-      }
-    });
-
-    $('#node_information_float_panel #routes_tab #routes_table').DataTable({
-      sDom: '<"row"<"col-sm-5"l><"col-sm-6 right"f>>tip',
-      order: [[1, "asc"]],
-      scrollX: true,
-      paginate: true,
-      destroy: true,
-      data: node.routes,
-      columns: [
-        {title: '', sortable: false, render: function (data, type, full, meta) {
-            return createButtonElement('delete_route_btn', 'btn btn-default', 'glyphicon glyphicon-minus', '').outerHTML;
-          }
-        },
-        {title: 'Destination Network', defaultContent: '', type: 'string', sortable: true, render: function (data, type, full, meta) {
-            return createIPv4TableElement([full], false, false, false).outerHTML +
-              createHiddenElement('id', full.id).outerHTML;
-          }
-        },
-        {title: 'Output Port', data: 'output_port_id', defaultContent: '', type: 'int', sortable: true, orderDataType: 'dom-numeric', render: function (data, type, full, meta) {
-            var outputPortOptions = [{}].concat(node.ports);
-            return createSelectElement('output_port_id', 'in-table', '', outputPortOptions, data).outerHTML;
-          }
-        },
-        {title: 'Gateway Addrees', data: 'gateway_port_ipv4_address_id', defaultContent: '', type: 'int', sortable: true, orderDataType: 'dom-numeric', render: function (data, type, full, meta) {
-            var options = [];
-            var value = null;
-            if (full.gateway_port_ipv4_address != null) {
-              var name = full.gateway_port_ipv4_address.address + ' (' + full.gateway_port_ipv4_address.port.node.name + '.' + full.gateway_port_ipv4_address.port.name + ')';
-              options = [{id: full.gateway_port_ipv4_address.id, name: name}];
-              value = full.gateway_port_ipv4_address.id;
-            }
-            return createSelectElement('gateway_port_ipv4_address_id', 'in-table', '', options, value).outerHTML;
-          }
-        }
-      ],
-      drawCallback: function(settings) {
-        $('#node_information_float_panel #routes_tab #routes_table select[name=output_port_id]').select2({
-          allowClear: true,
-          placeholder: 'None',
-          width: '196px'
-        });
-        $('#node_information_float_panel #routes_tab #routes_table select[name=gateway_port_ipv4_address_id]').select2({
-          allowClear: true,
-          minimumInputLength: 1,
-          ajax: {
-            url:'/ui/select2',
-            dataType: 'json',
-            delay: 50,
-            data: function(params) {
-              return { 'resource_name': 'port_ipv4_address_select2', 'terms_order': 'node_name,port_name', 'terms': params.term, 'limit': 10 };
+          {title: 'Port No.', data: 'number', defaultContent: '', sortable: true, orderDataType: "dom-text-numeric", render: function (data, type, full, meta) {
+              if ((data == 0) || (data == null) || (data == undefined)) {
+                data = 1;
+              }
+              return createTextElement('number', 'in-table port-number', '', '1', data).outerHTML;
             }
           },
-          width: '384px',
-          placeholder: 'None',
-        });
-      }
+          {title: 'Name', data: 'name', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+              return createTextElement('name', 'in-table', '', 'eth0', data).outerHTML;
+            }
+          },
+          {title: 'VLAN', data: 'vlan_port_associations', defaultContent: '', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+              return createTextElement('vlans', 'in-table', '', '100,200-300', compactVlans(data)).outerHTML;
+            }
+          },
+          {title: 'Tagged', data: 'tagged', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+              var options = [
+                {id: false, name: 'Untagged'},
+                {id: true, name: 'Tagged'}
+              ];
+              return createSelectElement('tagged', 'in-table', '', options, convertBooleanToString(data)).outerHTML;
+            }
+          },
+          {title: 'MAC Address', data: 'mac_address', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+              return createTextElement('mac_address', 'in-table mac-address', '', '00:00:00:00:00:00', data).outerHTML;
+            }
+          },
+          {title: 'IPv4 Addresses', data: 'ipv4_addresses', defaultContent: '', sortable: false, render: function (data, type, full, meta) {
+              return createIPv4TableElement(data, true, true, false).outerHTML;
+            }
+          },
+          {title: 'Destination Port', data: 'link', defaultContent: '', type: 'int', sortable: true, orderDataType: 'dom-numeric', render: function (data, type, full, meta) {
+              var options = [];
+              var value = null;
+              if ((data != null) && (data != undefined)) {
+                var name = data.destination_port.node.name + '.' + data.destination_port.name;
+                options = [{id: data.destination_port_id, name: name}];
+                value = data.destination_port_id;
+              }
+              return createHiddenElement('previous_destination_port_id', value).outerHTML + createSelectElement('destination_port_id', 'in-table', '', options, value).outerHTML;
+            }
+          },
+          {title: 'Description', data: 'description', defaultContent: '', type: 'string', sortable: true, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+              return createTextElement('description', 'in-table', '', 'description', data).outerHTML;
+            }
+          }
+        ],
+        drawCallback: function(settings) {
+          $('#node_information_float_panel #ports_tab #ports_table select[name=tagged]').select2({
+            width: '128px'
+          });
+          $('#node_information_float_panel #ports_tab #ports_table select[name=destination_port_id]').select2({
+            allowClear: true,
+            minimumInputLength: 1,
+            ajax: {
+              url:'/ui/select2',
+              dataType: 'json',
+              delay: 50,
+              data: function(params) {
+                return { 'resource_name': 'port_select2', 'terms_order': 'node_name,name', 'terms': params.term, 'limit': 10 };
+              }
+            },
+            width: '384px',
+            placeholder: 'None',
+          });
+        }
+      });
+
+      $('#node_information_float_panel #routes_tab #routes_table').DataTable({
+        sDom: '<"row"<"col-sm-5"l><"col-sm-6 right"f>>tip',
+        order: [[1, "asc"]],
+        scrollX: true,
+        paginate: true,
+        destroy: true,
+        data: node.routes,
+        columns: [
+          {title: '', sortable: false, render: function (data, type, full, meta) {
+              return createButtonElement('delete_route_btn', 'btn btn-default', 'glyphicon glyphicon-minus', '').outerHTML;
+            }
+          },
+          {title: 'Destination Network', defaultContent: '', type: 'string', sortable: true, render: function (data, type, full, meta) {
+              return createIPv4TableElement([full], false, false, false).outerHTML +
+                createHiddenElement('id', full.id).outerHTML;
+            }
+          },
+          {title: 'Output Port', data: 'output_port_id', defaultContent: '', type: 'int', sortable: true, orderDataType: 'dom-numeric', render: function (data, type, full, meta) {
+              var outputPortOptions = [{}].concat(node.ports);
+              return createSelectElement('output_port_id', 'in-table', '', outputPortOptions, data).outerHTML;
+            }
+          },
+          {title: 'Gateway Addrees', data: 'gateway_port_ipv4_address_id', defaultContent: '', type: 'int', sortable: true, orderDataType: 'dom-numeric', render: function (data, type, full, meta) {
+              var options = [];
+              var value = null;
+              if (full.gateway_port_ipv4_address != null) {
+                var name = full.gateway_port_ipv4_address.address + ' (' + full.gateway_port_ipv4_address.port.node.name + '.' + full.gateway_port_ipv4_address.port.name + ')';
+                options = [{id: full.gateway_port_ipv4_address.id, name: name}];
+                value = full.gateway_port_ipv4_address.id;
+              }
+              return createSelectElement('gateway_port_ipv4_address_id', 'in-table', '', options, value).outerHTML;
+            }
+          }
+        ],
+        drawCallback: function(settings) {
+          $('#node_information_float_panel #routes_tab #routes_table select[name=output_port_id]').select2({
+            allowClear: true,
+            placeholder: 'None',
+            width: '196px'
+          });
+          $('#node_information_float_panel #routes_tab #routes_table select[name=gateway_port_ipv4_address_id]').select2({
+            allowClear: true,
+            minimumInputLength: 1,
+            ajax: {
+              url:'/ui/select2',
+              dataType: 'json',
+              delay: 50,
+              data: function(params) {
+                return { 'resource_name': 'port_ipv4_address_select2', 'terms_order': 'node_name,port_name', 'terms': params.term, 'limit': 10 };
+              }
+            },
+            width: '384px',
+            placeholder: 'None',
+          });
+        }
+      });
+
+      $('#node_information_float_panel #node_configuration_tab').find('input[name=node_configuration_image_name]').val(node.node_configuration.image_name);
+      $('#node_information_float_panel #node_configuration_tab #node_configuration_initialization_template_tab').find('textarea[name=node_configuration_initialization_template_content]').val(node.node_configuration.initialization_template.template_content);
+      $('#node_information_float_panel #node_configuration_tab #node_configuration_configuration_template_tab').find('textarea[name=node_configuration_configuration_template_content]').val(node.node_configuration.configuration_template.template_content);
+
+      $('#node_information_float_panel a[href="#node_configuration_configuration_template_tab"]').tab('show');
+      $('#node_information_float_panel a[href="#node_configuration_initialization_template_tab"]').tab('show');
+
+      $('#page_cover').fadeIn(50);
+
     });
-
-    $('#page_cover').fadeIn(50);
-
   });
 }
 
@@ -397,6 +425,7 @@ $('#node_information_panel').on('click', 'button[name=update_node_btn]', functio
   var nodeName = $('#node_information_panel').find('input[name=name]').val();
   var nodeDescription = $('#node_information_panel').find('input[name=description]').val();
   var nodeTypeID = $('#node_information_panel').find('select[name=node_type_id]').val();
+  var nodeKindID = $('#node_information_panel').find('select[name=node_kind_id]').val();
   var nodeVirtual = $('#node_information_panel').find('select[name=virtual]').val();
 
   var node = {
@@ -404,6 +433,7 @@ $('#node_information_panel').on('click', 'button[name=update_node_btn]', functio
     name: nodeName,
     description: nodeDescription,
     node_type_id: parseInt(nodeTypeID),
+    node_kind_id: parseInt(nodeKindID),
     virtual: convertStringToBoolean(nodeVirtual),
     ports: [],
     routes: []

@@ -24,6 +24,7 @@
 			      <li class="active"><a href="#node_information_tab" data-toggle="tab">Information</a></li>
 						<li><a href="#ports_tab" data-toggle="tab">Ports</a></li>
 						<li><a href="#routes_tab" data-toggle="tab">Routes</a></li>
+						<li><a href="#node_configuration_tab" data-toggle="tab">Node Configuration</a></li>
 			    </ul>
 			  </div>
 			</div>
@@ -46,6 +47,12 @@
 							<td width="15%">Node Type</td>
 							<td width="85%">
 								<select name="node_type_id" class="form-control"></select>
+							</td>
+						</tr>
+						<tr>
+							<td width="15%">Node Kind</td>
+							<td width="85%">
+								<select name="node_kind_id" class="form-control"></select>
 							</td>
 						</tr>
 						<tr>
@@ -86,6 +93,43 @@
 					</div>
 					<table id="routes_table" class="table table-striped table-bordered">
 					</table>
+				</div>
+
+				<div class="tab-pane" id="node_configuration_tab">
+					*image_name and configurations in NodeKind will be ignored when you put something below
+					<br>
+					<br>
+					<table class="table" id="node_configuration_table">
+						<tr>
+							<td width="15%">Image Name</td>
+							<td width="85%">
+								<input type="text" name="node_configuration_image_name" class="form-control">
+							</td>
+						</tr>
+						<tr>
+							<td width="100%" colspan=2>
+								<div class="container-fluid">
+									<div class="row">
+										<ul class="nav nav-tabs">
+											<li class="active"><a href="#node_configuration_initialization_template_tab" data-toggle="tab">Initialization Template</a></li>
+											<li><a href="#node_configuration_configuration_template_tab" data-toggle="tab">Configuration Template</a></li>
+										</ul>
+									</div>
+								</div>
+								<div class="tab-content clearfix">
+									<div class="tab-pane" id="node_configuration_initialization_template_tab">
+										<br>
+										<textarea name="node_configuration_initialization_template_content" class="form-control" rows="15"></textarea>
+									</div>
+									<div class="tab-pane" id="node_configuration_configuration_template_tab">
+										<br>
+										<textarea name="node_configuration_configuration_template_content" class="form-control" rows="15"></textarea>
+									</div>
+								</div>
+							</td>
+						</tr>
+					</table>
+
 				</div>
 
 			</div>
