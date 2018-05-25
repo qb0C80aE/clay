@@ -436,7 +436,18 @@ $('#node_information_panel').on('click', 'button[name=update_node_btn]', functio
     node_kind_id: parseInt(nodeKindID),
     virtual: convertStringToBoolean(nodeVirtual),
     ports: [],
-    routes: []
+    routes: [],
+    node_configuration: {
+      image_name: '',
+      initialization_template_id: 0,
+      initialization_template: {
+        template_content: ''
+      },
+      configuration_template_id: 0,
+      configuration_template: {
+        template_content: ''
+      }
+    }
   };
   if (nodeID == 0) {
     delete(node['id']);
