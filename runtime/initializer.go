@@ -15,7 +15,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
-	"path"
 	"path/filepath"
 	"time"
 )
@@ -62,8 +61,11 @@ func (receiver *clayRuntimeInitializer) readFile(filePath string) ([]byte, error
 	environmentalVariableSet := extension.GetCurrentEnvironmentalVariableSet()
 	switch environmentalVariableSet.GetClayAssetMode() {
 	case "internal":
+		// since go-assets uses path(always slashed path)
+		filePath = filepath.ToSlash(filePath)
 		file, err := asset.Assets.Open(filePath)
 		if err != nil {
+			logging.Logger().Debug(filePath)
 			logging.Logger().Debug(err.Error())
 			return nil, err
 		}
@@ -82,6 +84,8 @@ func (receiver *clayRuntimeInitializer) copyFromFile(writer io.Writer, filePath 
 	environmentalVariableSet := extension.GetCurrentEnvironmentalVariableSet()
 	switch environmentalVariableSet.GetClayAssetMode() {
 	case "internal":
+		// since go-assets uses path(always slashed path)
+		filePath = filepath.ToSlash(filePath)
 		file, err := asset.Assets.Open(filePath)
 		if err != nil {
 			logging.Logger().Debug(err.Error())
@@ -153,7 +157,7 @@ func (receiver *clayRuntimeInitializer) initialize() {
 			os.Exit(1)
 		}
 
-		configFilePath = path.Join(dir, "clay_config.json")
+		configFilePath = filepath.Join(dir, "clay_config.json")
 	}
 
 	configJSONData, err := receiver.readFile(configFilePath)
