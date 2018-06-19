@@ -304,7 +304,7 @@ $('#node_information_float_panel a[data-toggle=tab]').on('shown.bs.tab', functio
 $('#node_information_float_panel #ports_tab').on('click', 'button[name=add_port_btn]', function() {
   var data = {
     id: null,
-    number: 0,
+    number: 1,
     name: '',
     description: '',
     mac_address: '',
@@ -507,7 +507,7 @@ $('#node_information_panel').on('click', 'button[name=update_node_btn]', functio
   for (portID in deletedPortIDMap) {
     var iface = {
       id: parseInt(portID),
-      number: 0,
+      number: 1,
       name: '',
       description: '',
       mac_address: '',
