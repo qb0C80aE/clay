@@ -1,15 +1,16 @@
 {{- $layer1Interfaces := .ModelStore.Multi "diagram_layer1_interfaces" "preloads=node,destination_node" -}}
 {{- $nodes := .ModelStore.Multi "nodes" "preloads=ports,node_type" -}}
 {{- $lastNodeIndex := sub $nodes.Total 1 -}}
-{{- $interfaceMap := .Collection.Map -}}
+{{- $nodeLinkNameMap := .Collection.Map -}}
 {
   "links": [
   {{ range $i, $layer1Interface := $layer1Interfaces.Records }}
     {{ if ne $layer1Interface.DestinationID "" }}
-      {{- $interfaceProcessed := $interfaceMap.Exists $layer1Interface.ID -}}
-      {{- if eq $interfaceProcessed false -}}
-        {{- $interfaceProcessedLen := len $interfaceMap }}
-    {{ if ne $interfaceProcessedLen 0 }},{{ end }}{
+      {{- $nodeLinkName := printf "%d_%d" $layer1Interface.NodeID $layer1Interface.DestinationNodeID -}}
+      {{- $nodeLinkProcessed := $nodeLinkNameMap.Exists $nodeLinkName -}}
+      {{- if eq $nodeLinkProcessed false -}}
+        {{- $nodeLinkProcessedLen := len $nodeLinkNameMap }}
+    {{ if ne $nodeLinkProcessedLen 0 }},{{ end }}{
       "source": "{{ $layer1Interface.Node.Name }}",
       "target": "{{ $layer1Interface.DestinationNode.Name }}",
       "meta": {
@@ -21,8 +22,10 @@
         "ipv4_address": null
       }
     }
-        {{- $interfaceMap := $interfaceMap.Put $layer1Interface.ID true -}}
-        {{- $interfaceMap := $interfaceMap.Put $layer1Interface.DestinationID true -}}
+        {{- $nodeLinkName := printf "%d_%d" $layer1Interface.NodeID $layer1Interface.DestinationNodeID -}}
+        {{- $nodeLinkNameMap := $nodeLinkNameMap.Put $nodeLinkName true -}}
+        {{- $nodeLinkName := printf "%d_%d" $layer1Interface.DestinationNodeID $layer1Interface.NodeID -}}
+        {{- $nodeLinkNameMap := $nodeLinkNameMap.Put $nodeLinkName true -}}
       {{ end }}
     {{ end }}
   {{ end }}
