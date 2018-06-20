@@ -93,11 +93,11 @@ $('#node_kind_information_panel').on('click', 'button[name=update_node_kind_btn]
     }
   };
   if (nodeKindID == 0) {
-    delete(nodeKind['id']);
+    delete(nodeKind.id);
     delete(nodeKind.initialization_template_id);
     delete(nodeKind.configuration_template_id);
-    delete(nodeKind.initialization_template['id']);
-    delete(nodeKind.configuration_template['id']);
+    delete(nodeKind.initialization_template.id);
+    delete(nodeKind.configuration_template.id);
   }
 
   if (nodeKind.id == undefined) {

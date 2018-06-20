@@ -17,13 +17,18 @@
     },
     {
       "name": "TestStepID",
-      "tag": "json:\"test_step_id\" yaml:\"test_step_id\" gorm:\"primary_key\" sql:\"type:integer references test_steps(id)\" clay:\"many_to_many_right_resource_name=test_steps\"",
+      "tag": "json:\"test_step_id\" yaml:\"test_step_id\" sql:\"type:integer references test_steps(id)\" clay:\"many_to_many_right_resource_name=test_steps\"",
       "type_name": "int"
     },
     {
       "name": "TestStep",
       "tag": "json:\"test_step\" yaml:\"test_step\" gorm:\"ForeignKey:TestStepID\" validate:\"omitempty,dive\"",
       "type_name": "TestStep"
+    },
+    {
+      "name": "Number",
+      "tag": "json:\"number\" yaml:\"number\" gorm:\"primary_key\" validate:\"min=1\"",
+      "type_name": "int"
     },
     {
       "name": "ToBeDeleted",

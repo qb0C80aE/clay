@@ -110,7 +110,7 @@ function showNodeInformation(nodeID, callbackNodeInformationUpdated) {
     };
     repaintNodeInformation(node, true);
   } else {
-    getResource('nodes', nodeID, 'preloads=node_type,node_kind,routes.output_port,routes.gateway_port_ipv4_address.port.node,ports.link.destination_port.node,ports.ipv4_addresses,ports.vlan_port_associations', function(node) {
+    getResource('nodes', nodeID, 'preloads=node_type,node_kind,node_configuration.initialization_template,node_configuration.configuration_template,routes.output_port,routes.gateway_port_ipv4_address.port.node,ports.link.destination_port.node,ports.ipv4_addresses,ports.vlan_port_associations', function(node) {
       repaintNodeInformation(node, true);
     });
   }
@@ -155,6 +155,13 @@ function repaintNodeInformation(node, initializeTabSelection) {
       node_information_table.find('select[name=node_kind_id]').val(node.node_kind_id);
       node_information_table.find('select[name=virtual]').val(convertBooleanToString(node.virtual));
       node_information_table.find('select[name=tagged]').val(convertBooleanToString(node.tagged));
+
+      var node_configuration_table = $('#node_information_panel #node_configuration_tab #node_configuration_table');
+      node_configuration_table.find('input[name=node_configuration_image_name]').val(node.node_configuration.image_name);
+      node_configuration_table.find('input[name=node_configuration_initialization_template_id]').val(node.node_configuration.initialization_template.id);
+      node_configuration_table.find('textarea[name=node_configuration_initialization_template_content]').val(node.node_configuration.initialization_template.template_content);
+      node_configuration_table.find('input[name=node_configuration_configuration_template_id]').val(node.node_configuration.configuration_template.id);
+      node_configuration_table.find('textarea[name=node_configuration_configuration_template_content]').val(node.node_configuration.configuration_template.template_content);
 
       if (initializeTabSelection) {
         $('#node_information_float_panel a[href="#node_information_tab"]').tab('show');
@@ -300,9 +307,9 @@ function repaintNodeInformation(node, initializeTabSelection) {
         }
       });
 
-      $('#node_information_float_panel #node_configuration_tab').find('input[name=node_configuration_image_name]').val(node.node_configuration.image_name);
-      $('#node_information_float_panel #node_configuration_tab #node_configuration_initialization_template_tab').find('textarea[name=node_configuration_initialization_template_content]').val(node.node_configuration.initialization_template.template_content);
-      $('#node_information_float_panel #node_configuration_tab #node_configuration_configuration_template_tab').find('textarea[name=node_configuration_configuration_template_content]').val(node.node_configuration.configuration_template.template_content);
+      $('#node_information_float_panel #node_configuration_tab #node_configuration_table').find('input[name=node_configuration_image_name]').val(node.node_configuration.image_name);
+      $('#node_information_float_panel #node_configuration_tab #node_configuration_table').find('textarea[name=node_configuration_initialization_template_content]').val(node.node_configuration.initialization_template.template_content);
+      $('#node_information_float_panel #node_configuration_tab #node_configuration_table').find('textarea[name=node_configuration_configuration_template_content]').val(node.node_configuration.configuration_template.template_content);
 
       $('#node_information_float_panel a[href="#node_configuration_configuration_template_tab"]').tab('show');
       $('#node_information_float_panel a[href="#node_configuration_initialization_template_tab"]').tab('show');
@@ -428,6 +435,12 @@ $('#node_information_panel').on('click', 'button[name=update_node_btn]', functio
   var nodeKindID = $('#node_information_panel').find('select[name=node_kind_id]').val();
   var nodeVirtual = $('#node_information_panel').find('select[name=virtual]').val();
 
+  var nodeConfigurationImageName = $('#node_information_panel #node_configuration_tab #node_configuration_table').find('input[name=node_configuration_image_name]').val();
+  var nodeConfigurationInitializationTemplateID = $('#node_information_panel #node_configuration_tab #node_configuration_table').find('input[name=node_configuration_initialization_template_id]').val();
+  var nodeConfigurationInitializationTemplateContent = $('#node_information_panel #node_configuration_tab #node_configuration_table').find('textarea[name=node_configuration_initialization_template_content]').val();
+  var nodeConfigurationConfigurationTemplateID = $('#node_information_panel #node_configuration_tab #node_configuration_table').find('input[name=node_configuration_configuration_template_id]').val();
+  var nodeConfigurationConfigurationTemplateContent = $('#node_information_panel #node_configuration_tab #node_configuration_table').find('textarea[name=node_configuration_configuration_template_content]').val();
+
   var node = {
     id: parseInt(nodeID),
     name: nodeName,
@@ -438,19 +451,27 @@ $('#node_information_panel').on('click', 'button[name=update_node_btn]', functio
     ports: [],
     routes: [],
     node_configuration: {
-      image_name: '',
-      initialization_template_id: 0,
+      image_name: nodeConfigurationImageName,
+      initialization_template_id: parseInt(nodeConfigurationInitializationTemplateID),
       initialization_template: {
-        template_content: ''
+        id: parseInt(nodeConfigurationInitializationTemplateID),
+        name: nodeName + '_NodeConfiguration_InitializationTemplate',
+        template_content: nodeConfigurationInitializationTemplateContent
       },
-      configuration_template_id: 0,
+      configuration_template_id: parseInt(nodeConfigurationConfigurationTemplateID),
       configuration_template: {
-        template_content: ''
+        id: parseInt(nodeConfigurationConfigurationTemplateID),
+        name: nodeName + '_NodeConfiguration_ConfigurationTemplate',
+        template_content: nodeConfigurationConfigurationTemplateContent
       }
     }
   };
   if (nodeID == 0) {
-    delete(node['id']);
+    delete(node.id);
+    delete(node.node_configuration.initialization_template_id);
+    delete(node.node_configuration.configuration_template_id);
+    delete(node.node_configuration.initialization_template.id);
+    delete(node.node_configuration.configuration_template.id);
   }
 
   $('#node_information_float_panel #ports_tab #ports_table').DataTable().rows().every(function(){
@@ -617,7 +638,7 @@ $('#node_information_panel').on('click', 'button[name=update_node_btn]', functio
 function postProcessUpdateNode(result, xhr) {
   var nodeID = result.id;
 
-  getResource('nodes', nodeID, 'preloads=node_type,routes.output_port,routes.gateway_port_ipv4_address.port.node,ports.link.destination_port.node,ports.ipv4_addresses,ports.vlan_port_associations', function(node) {
+  getResource('nodes', nodeID, 'preloads=node_type,node_kind,node_configuration.initialization_template,node_configuration.configuration_template,routes.output_port,routes.gateway_port_ipv4_address.port.node,ports.link.destination_port.node,ports.ipv4_addresses,ports.vlan_port_associations', function(node) {
     repaintNodeInformation(node, false);
     if ((storedCallbackNodeInformationUpdated != null) && (storedCallbackNodeInformationUpdated != undefined)) {
       storedCallbackNodeInformationUpdated();

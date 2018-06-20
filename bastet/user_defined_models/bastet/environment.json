@@ -1,0 +1,110 @@
+{
+  "type_name": "Environment",
+  "resource_name": "environments",
+  "to_be_migrated": true,
+  "is_controller_enabled": true,
+  "fields": [
+    {
+      "name": "ID",
+      "tag": "json:\"id\" yaml:\"id\" gorm:\"primary_key;auto_increment\"",
+      "type_name": "int"
+    },
+    {
+      "name": "Description",
+      "tag": "json:\"description\" yaml:\"description\"",
+      "type_name": "string"
+    },
+    {
+      "name": "TemplateID",
+      "tag": "json:\"template_id\" yaml:\"template_id\"",
+      "type_name": "int"
+    },
+    {
+      "name": "Template",
+      "tag": "json:\"template\" yaml:\"template\" gorm:\"ForeignKey:TemplateID\"",
+      "type_name": "Template"
+    },
+    {
+      "name": "TestRunnerScriptID",
+      "tag": "json:\"test_runner_script_id\" yaml:\"test_runner_script_id\" sql:\"type:integer references templates(id)\"",
+      "type_name": "int"
+    },
+    {
+      "name": "TestRunnerScript",
+      "tag": "json:\"test_runner_script\" yaml:\"test_runner_script\" gorm:\"ForeignKey:TestRunnerScriptID\" sql:\"type:integer references templates(id)\"",
+      "type_name": "Template"
+    },
+    {
+      "name": "GitRepositoryURI",
+      "tag": "json:\"git_repository_uri\" yaml:\"git_repository_uri\" gorm:\"not null\"",
+      "type_name": "string"
+    },
+    {
+      "name": "GitUserName",
+      "tag": "json:\"git_user_name\" yaml:\"git_user_name\" gorm:\"not null\"",
+      "type_name": "string"
+    },
+    {
+      "name": "GitUserEmail",
+      "tag": "json:\"git_user_email\" yaml:\"git_user_email\" gorm:\"not null\"",
+      "type_name": "string"
+    },
+    {
+      "name": "DesignFileName",
+      "tag": "json:\"design_file_name\" yaml:\"design_file_name\" gorm:\"not null\"",
+      "type_name": "string"
+    },
+    {
+      "name": "TemplateFileName",
+      "tag": "json:\"template_file_name\" yaml:\"template_file_name\" gorm:\"not null\"",
+      "type_name": "string"
+    },
+    {
+      "name": "TestCaseDirectoryName",
+      "tag": "json:\"test_case_directory_name\" yaml:\"test_case_directory_name\" gorm:\"not null\"",
+      "type_name": "string"
+    },
+    {
+      "name": "NodeConfigDirectoryName",
+      "tag": "json:\"node_config_directory_name\" yaml:\"node_config_directory_name\" gorm:\"not null\"",
+      "type_name": "string"
+    }
+  ],
+  "sql_after_migration": [
+    "create trigger if not exists DeleteTemplateBeforeEnvironmentDeletion before delete on environments",
+		"  begin",
+		"    delete from templates where id = old.template_id;",
+		"    delete from templates where id = old.test_runner_script_id;",
+		"  end;",
+		"create trigger if not exists DeleteEnvironmentBeforeTemplateDeletion before delete on templates",
+		"  begin",
+		"    delete from environments where template_id = old.id or test_runner_script_id = old.id;",
+		"  end;",
+    "insert or ignore into templates(name) values('environment_template');",
+    "insert or ignore into templates(name) values('environment_test_runner_script');",
+    "insert or ignore into environments(",
+    "  id,",
+    "  description,",
+    "  template_id,",
+    "  test_runner_script_id,",
+    "  git_repository_uri,",
+    "  git_user_name,",
+    "  git_user_email,",
+    "  design_file_name,",
+    "  template_file_name,",
+    "  test_case_directory_name,",
+    "  node_config_directory_name)",
+    "values(",
+    "  1,",
+    "  '',",
+    "  (select id from templates where name = 'environment_template'),",
+    "  (select id from templates where name = 'environment_test_runner_script'),",
+    "  '/data/clay_generated_conf',",
+    "  'clay',",
+    "  'clay@example.com',",
+    "  'design.json',",
+    "  'terraform.tf',",
+    "  'testcases',",
+    "  'node_config');"
+  ]
+}

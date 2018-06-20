@@ -204,14 +204,14 @@
 			</div>
 		</div>
 	</div>
-</div><!--/Center Column-->
+</div>
 
 <script language="javascript">
 	(function($) {
 
-    {{template "functions" .}}
+    {{ .ModelStore.Single "ephemeral_templates/functions.tmpl/generation" "" }}
 
-		const targetID = "present";
+		const targetID = "1";
 
 		function onLoad() {
 			getResource('environments', targetID, 'preloads=template,test_runner_script', function(environmentResult) {
@@ -278,8 +278,8 @@
 			updateEnvironment(function(result, xhr) {
 				onLoad();
 				var deviceInitialization = $("#device_initialization").prop('checked');
-				putResource('environments', targetID + '/generation?init=' + deviceInitialization, {}, '', function(result, xhr) {
-					showProcessResult(result, xhr, 200, "The environment has been updated and commited successfully.");
+				postResource('environments/' + targetID + '/generation?execution_mode=sync&init=' + deviceInitialization, {}, '', function(result, xhr) {
+					showProcessResult(result, xhr, 201, "The environment has been updated and commited successfully.");
 				});
 			});
 		});

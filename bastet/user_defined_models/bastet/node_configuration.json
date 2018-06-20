@@ -31,12 +31,12 @@
     },
     {
       "name": "InitializationTemplateID",
-      "tag": "json:\"initialization_template_id\" yaml:\"initialization_template_id\"",
+      "tag": "json:\"initialization_template_id\" yaml:\"initialization_template_id\" sql:\"type:integer references templates(id)\"",
       "type_name": "int"
     },
     {
       "name": "InitializationTemplate",
-      "tag": "json:\"initialization_template\" yaml:\"initialization_template\"",
+      "tag": "json:\"initialization_template\" yaml:\"initialization_template\" gorm:\"ForeignKey:InitializationTemplateID\"",
       "type_name": "Template"
     },
     {
@@ -46,7 +46,7 @@
     },
     {
       "name": "ConfigurationTemplate",
-      "tag": "json:\"configuration_template\" yaml:\"configuration_template\" sql:\"type:integer references templates(id)\"",
+      "tag": "json:\"configuration_template\" yaml:\"configuration_template\" gorm:\"ForeignKey:ConfigurationTemplateID\"",
       "type_name": "Template"
     }
   ],

@@ -58,13 +58,8 @@
       "type_name": "NodeKind"
     },
     {
-      "name": "NodeConfigurationID",
-      "tag": "json:\"node_configuration_id\" yaml:\"node_configuration_id\" gorm:\"not null\" sql:\"type:integer references node_configurations(id)\"",
-      "type_name": "int"
-    },
-    {
       "name": "NodeConfiguration",
-      "tag": "json:\"node_configuration\" yaml:\"node_configuration\" gorm:\"ForeignKey:NodeConfigurationID\" validate:\"omitempty,dive\"",
+      "tag": "json:\"node_configuration\" yaml:\"node_configuration\" gorm:\"ForeignKey:NodeID\" validate:\"omitempty,dive\"",
       "type_name": "NodeConfiguration"
     },
     {
