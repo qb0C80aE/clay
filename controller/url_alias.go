@@ -102,7 +102,7 @@ func (receiver *urlAliasController) route(c *gin.Context, method int, selfURLTyp
 
 	handler, exists := methodRoute[selfURLType]
 	if !exists {
-		logging.Logger().Debug("the controller for %s does not support %s", resourceName, methodName)
+		logging.Logger().Debugf("the controller for %s does not support %s", resourceName, methodName)
 		receiver.outputHandler.OutputError(c, http.StatusBadRequest, fmt.Errorf("the controller for %s does not support %s", resourceName, methodName))
 		return
 	}
