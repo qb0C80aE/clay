@@ -18,6 +18,11 @@ func GetUtility() *Utility {
 	return utility
 }
 
+// Sprintf apply sprintf to given strings
+func (receiver *Utility) Sprintf(format string, parameters ...interface{}) interface{} {
+	return fmt.Sprintf(format, parameters...)
+}
+
 // Split splits string by given separator into an slice
 func (receiver *Utility) Split(value interface{}, separator string) interface{} {
 	data := fmt.Sprintf("%v", value)
