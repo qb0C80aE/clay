@@ -46,6 +46,11 @@
     "  begin",
     "    delete from links where source_port_id = new.source_port_id or source_port_id = new.destination_port_id or destination_port_id = new.source_port_id or destination_port_id = new.destination_port_id;",
     "    insert into links(source_port_id, destination_port_id) values(new.destination_port_id, new.source_port_id);",
+    "  end;",
+    "drop trigger if exists DeleteLinkBeforeLinkUpdate;",
+    "create trigger if not exists DeleteLinkBeforeLinkUpdate before update of destination_port_id on links",
+    "  begin",
+    "    delete from links where destination_port_id = new.source_port_id;",
     "  end;"
   ]
 }
