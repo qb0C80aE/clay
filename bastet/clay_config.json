@@ -67,6 +67,9 @@
       "file_name": "bastet/test_step_select2.json"
     },
     {
+      "file_name": "bastet/firewall_test_definition.json"
+    },
+    {
       "file_name": "bastet/environment.json"
     },
     {
@@ -293,6 +296,10 @@
     {
       "name": "test_scenario_information.tmpl",
       "file_name": "ui/files/templates/test_scenario_information.tmpl"
+    },
+    {
+      "name": "firewall_test_definitions.tmpl",
+      "file_name": "ui/files/templates/firewall_test_definitions.tmpl"
     }
   ],
   "ephemeral_binary_objects": [
@@ -996,6 +1003,20 @@
           "method": "GET",
           "target_url_type": "single",
           "accept": "application/json",
+          "accept_charset": "utf-8"
+        }
+      ]
+    },
+    {
+      "name": "firewall_test_definitions",
+      "from": "/ui/firewall_test_definitions",
+      "to": "/ephemeral_templates/firewall_test_definitions.tmpl/generation",
+      "query": "",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single",
+          "accept": "text/html",
           "accept_charset": "utf-8"
         }
       ]

@@ -1,0 +1,229 @@
+{{ .ModelStore.Single "ephemeral_templates/headerpart.tmpl/generation" "ui_menu=design" }}
+
+<div id="main_panel">
+	<div class="panel panel-default panel-custom" id="firewall_test_definitions_panel">
+		<div class="panel-heading">
+			<h1 class="panel-title">
+				<span style="display: table-cell; vertical-align: middle; text-align: left; width=90%">
+					<span class="glyphicon glyphicon-fire"></span> Firewall Test Definitions
+				</span>
+			</h1>
+		</div>
+		<div class="panel-body">
+			<div class="row">
+				<div class="col-sm-4">
+					<div class="panel panel-default" id="edit_firewall_test_definition_panel">
+						<div class="panel-heading">
+							<h1 class="panel-title"><span class="glyphicon glyphicon-transfer"></span> Requirement </h1>
+						</div>
+						<div class="panel-body">
+							<table class="table">
+								<tr>
+									<td width="20%">From</td>
+									<td width="80%"><select class="form-control" id="edit_firewall_test_definition_source_port_ipv4_address_id"></select></td>
+								</tr>
+								<tr>
+									<td>To</td>
+									<td><select class="form-control" id="edit_firewall_test_definition_destination_port_ipv4_address_id"></select></td>
+								</tr>
+								<tr>
+									<td>Service</td>
+									<td><select class="form-control" id="edit_firewall_test_definition_service"></select></td>
+								</tr>
+								<tr>
+									<td>Access</td>
+									<td>
+										<select class="form-control" id="edit_firewall_test_definition_access">
+											<option value="true">
+												Allow
+											</option>
+											<option value="false">
+												Deny
+											</option>
+										</select>
+									</td>
+								</tr>
+							</table>
+							<span style="float: right"><button class="btn btn-default" id="edit_add_firewall_test_definition_btn" type="button"><span class="glyphicon glyphicon-ok"></span> Register</button></span>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-8">
+					<input id="firewall_test_scenario_id" type="hidden">
+					<table id="firewall_test_definitions_table" class="table table-striped table-bordered table-hover">
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script language="javascript">
+$(function() {
+
+	{{ .ModelStore.Single "ephemeral_templates/functions.tmpl/generation" "" }}
+
+	function onLoad() {
+		$('#main_panel #edit_firewall_test_definition_source_port_ipv4_address_id').val(0);
+		$('#main_panel #edit_firewall_test_definition_destination_port_ipv4_address_id').val(0);
+		$('#main_panel #edit_firewall_test_definition_access').val('true');
+
+		getResources('firewall_test_definitions', '', function(testFirewallTestDefinitionResult) {
+			getResource('test_scenarios', 'FirewallTestScenario', 'key_parameter=name', function(testScenarioResult) {
+				getResources('test_steps', 'q[name]=FirewallTestStep_%25', function(testStepResult) {
+
+					$('#main_panel #firewall_test_scenario_id').val(testScenarioResult.id);
+
+					var maxTestStepNumber = 0;
+
+			    var edit_firewall_test_definition_service = $('#main_panel #edit_firewall_test_definition_service');
+			    edit_firewall_test_definition_service.children().remove();
+			    for (var i = 0; i < testStepResult.length; i = i + 1) {
+						var text = testStepResult[i].name.split("_")[1];
+			      edit_firewall_test_definition_service.append($('<option>').val(testStepResult[i].id).text(text));
+			    }
+
+					$('#main_panel #firewall_test_definitions_panel').fadeIn(150, function() {
+
+						$('#main_panel #firewall_test_definitions_table').DataTable({
+							data: testFirewallTestDefinitionResult.Records,
+							order: [[1, 'asc']],
+							scrollX: true,
+							paginate : true,
+							destroy: true,
+							columns: [
+								{title: '', sortable: false, render: function (data, type, full, meta) {
+										var buttonElements = [
+											{name: 'delete_firewall_test_definition_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-minus', text: ''}
+										];
+										return createButtonGroupElement(buttonElements).outerHTML;
+									}
+								},
+								{title: 'No.', data: 'number', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+									  if (maxTestStepNumber < data) {
+											maxTestStepNumber = data;
+										}
+										return createReadOnlyTextElement('number', 'in-table', '', '', data).outerHTML;
+									}
+								},
+								{title: 'Source', data: 'source_port_ipv4_address_id', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+										var text = '';
+										if ((data == undefined) || (data == null)) {
+											text = '(deleted)';
+										} else {
+											text = data.port.node.name + '.' + data.port.name + ' (' + data.address + ')';
+										}
+										return createReadOnlyTextElement('source_port_ipv4_address_id', 'in-table', '', '', text).outerHTML;
+									}
+								},
+								{title: 'Destination', data: 'destination_port_ipv4_address_id', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+										var text = '';
+										if ((data == undefined) || (data == null)) {
+											text = '(deleted)';
+										} else {
+											text = data.port.node.name + '.' + data.port.name + ' (' + data.address + ')';
+										}
+										return createReadOnlyTextElement('destination_port_ipv4_address_id', 'in-table', '', '', text).outerHTML;
+									}
+								},
+								{title: 'Service', data: 'test_step', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+										return createReadOnlyTextElement('test_step', 'in-table', '', '', data.name.split("_")[1]).outerHTML;
+									}
+								},
+								{title: 'Access', data: 'access', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+										var text = '';
+										if (data) {
+											text = 'allow';
+										} else {
+											text = 'deny';
+										}
+										return createReadOnlyTextElement('description', 'in-table', '', '', text).outerHTML;
+									}
+								}
+							]
+						});
+
+						$('#main_panel #edit_firewall_test_definition_source_port_ipv4_address_id').select2({
+							minimumInputLength: 1,
+							ajax: {
+								url:'/ui/select2',
+								dataType: 'json',
+								delay: 50,
+								data: function(params) {
+									return { 'resource_name': 'port_ipv4_address_select2', 'terms_order': 'node_name,port_name', 'terms': params.term, 'limit': 10 };
+								}
+							},
+							width: '100%',
+							placeholder: 'None'
+						});
+
+						$('#main_panel #edit_firewall_test_definition_destination_port_ipv4_address_id').select2({
+							minimumInputLength: 1,
+							ajax: {
+								url:'/ui/select2',
+								dataType: 'json',
+								delay: 50,
+								data: function(params) {
+									return { 'resource_name': 'port_ipv4_address_select2', 'terms_order': 'node_name,port_name', 'terms': params.term, 'limit': 10 };
+								}
+							},
+							width: '100%',
+							placeholder: 'None'
+						});
+
+					});
+
+				});
+			});
+		});
+
+	}
+
+
+	$('#main_panel #edit_add_firewall_test_definition_btn').on('click', function() {
+	  if (!confirm('Are you sure to register the test?')) {
+	    return;
+	  }
+
+	  var sourceIpv4AddressID = $('#main_panel #edit_firewall_test_definition_source_port_ipv4_address_id').val();
+	  var destinationIpv4AddressID = $('#main_panel #edit_firewall_test_definition_destination_port_ipv4_address_id').val();
+	  var serviceID = $('#main_panel #edit_firewall_test_definition_service').val();
+		var access = $('#main_panel #edit_firewall_test_definition_access').val();
+
+		var firewallTestScenario = {
+			source_port_ipv4_address_id_id: parseInt(sourceIpv4AddressID),
+			destination_port_ipv4_address_id_id: parseInt(destinationIpv4AddressID),
+			test_step_id: parseInt(serviceID),
+			access: convertStringToBoolean(access)
+		};
+
+    postResource('firewall_test_definitions', firewallTestDefinition, '', function(result, xhr) {
+      showProcessResult(result, xhr, 201, "The test definition has been registered successfully.");
+      postProcessUpdateFirewallTestDefinition(result, xhr);
+    });
+
+	});
+
+	function postProcessUpdateFirewallTestDefinition(result, xhr) {
+		onLoad();
+	}
+
+	$('#main_panel #firewall_test_definitions_table').on('click', 'button[name=delete_firewall_test_definition_btn]', function() {
+		var tr = $(this).closest('tr');
+		var id = tr.find('input[name=id]').val();
+
+		if (!confirm('Are you sure to delete the test definition?')) {
+	    return;
+	  }
+
+	  deleteResource('firewall_test_definitions', id, '', function(result, xhr) {
+	    showProcessResult(result, xhr, 204, "The test definition information has been deleted successfully.");
+			onLoad();
+	  });
+	});
+
+	onLoad();
+
+});
+</script>
+{{ .ModelStore.Single "ephemeral_templates/footerpart.tmpl/generation" "" }}
