@@ -83,6 +83,9 @@ func (receiver *EphemeralScriptExecution) Create(model extension.Model, db *gorm
 
 	if urlValues.Get("execution_mode") == "sync" {
 		executeEphemeralScript(ephemeralScript)
+		if len(ephemeralScript.Error) != 0 {
+			return nil, errors.New(ephemeralScript.Error)
+		}
 	} else {
 		go executeEphemeralScript(ephemeralScript)
 	}
