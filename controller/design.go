@@ -3,7 +3,6 @@ package controller
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/qb0C80aE/clay/db"
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
 	"github.com/qb0C80aE/clay/model"
@@ -39,21 +38,6 @@ func (receiver *designController) GetRouteMap() map[int]map[int]gin.HandlerFunc 
 		},
 	}
 	return routeMap
-}
-
-// Caution: Even if you input the inconsistent data like foreign keys do not exist,
-//          it will be registered, and never be checked this time.
-//          Todo: It requires order resolution logic like "depends on" between models.
-func (receiver *designController) Update(c *gin.Context) {
-	db.Instance(c).Exec("pragma foreign_keys = off;")
-	receiver.BaseController.Update(c)
-	db.Instance(c).Exec("pragma foreign_keys = on;")
-}
-
-func (receiver *designController) Delete(c *gin.Context) {
-	db.Instance(c).Exec("pragma foreign_keys = off;")
-	receiver.BaseController.Delete(c)
-	db.Instance(c).Exec("pragma foreign_keys = on;")
 }
 
 func init() {
