@@ -705,8 +705,6 @@ func SetupModel(db *gorm.DB, initializerList []Initializer, modelList []Model) (
 		return db, err
 	}
 
-	db.Exec("pragma foreign_keys = off;")
-
 	tx := db.Begin()
 	for _, initializer := range initializerList {
 		err := initializer.DoAfterDBMigration(tx)
@@ -717,8 +715,6 @@ func SetupModel(db *gorm.DB, initializerList []Initializer, modelList []Model) (
 		}
 	}
 	tx.Commit()
-
-	db.Exec("pragma foreign_keys = on;")
 
 	return db, nil
 }
