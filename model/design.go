@@ -9,13 +9,15 @@ import (
 	mapstructutilpkg "github.com/qb0C80aE/clay/util/mapstruct"
 	"net/url"
 	"reflect"
+	"sort"
 	"time"
 )
 
-type master struct {
-	Name string
-	SQL  string
-	Type string
+type sqliteMaster struct {
+	Name     string `json:"name" yaml:"name"`
+	SQL      string `json:"sql" yaml:"sql"`
+	Type     string `json:"type" yaml:"type"`
+	Rootpage int    `json:"rootpage" yaml:"rootpage"`
 }
 
 // Design is the model class what represents the whole object model store
@@ -69,9 +71,44 @@ func (receiver *Design) GetSingle(_ extension.Model, db *gorm.DB, _ gin.Params, 
 	return design, nil
 }
 
+func sortDesignAccessorList(designAccessorList []extension.DesignAccessor, tableMap map[string]*sqliteMaster, rootPageOrderAsc bool) error {
+	var err error
+	defer func() {
+		recoverResult := recover()
+		if recoverResult != nil {
+			err = fmt.Errorf("%v", recoverResult)
+		}
+	}()
+
+	sort.Slice(designAccessorList, func(i, j int) bool {
+		left, err := designAccessorList[i].GetResourceName(designAccessorList[i])
+		if err != nil {
+			logging.Logger().Debug(err.Error())
+			panic(err)
+		}
+		right, err := designAccessorList[j].GetResourceName(designAccessorList[j])
+		if err != nil {
+			logging.Logger().Debug(err.Error())
+			panic(err)
+		}
+		if _, exists := tableMap[left]; !exists {
+			return rootPageOrderAsc
+		} else if _, exists := tableMap[right]; !exists {
+			return !rootPageOrderAsc
+		}
+		if rootPageOrderAsc {
+			return tableMap[left].Rootpage < tableMap[right].Rootpage
+		}
+		return tableMap[left].Rootpage > tableMap[right].Rootpage
+	})
+
+	return err
+}
+
 // Update deletes and updates all models bases on the given data
 func (receiver *Design) Update(_ extension.Model, db *gorm.DB, _ gin.Params, _ url.Values, inputContainer interface{}) (interface{}, error) {
-	triggerList := []*master{}
+	triggerList := []*sqliteMaster{}
+	tableList := []*sqliteMaster{}
 
 	if err := db.Table("sqlite_master").Where("type = ?", "trigger").Find(&triggerList).Error; err != nil {
 		logging.Logger().Debug(err.Error())
@@ -83,6 +120,16 @@ func (receiver *Design) Update(_ extension.Model, db *gorm.DB, _ gin.Params, _ u
 			logging.Logger().Debug(err.Error())
 			return nil, err
 		}
+	}
+
+	if err := db.Table("sqlite_master").Where("type = ?", "table").Order("rootpage asc").Find(&tableList).Error; err != nil {
+		logging.Logger().Debug(err.Error())
+		return nil, err
+	}
+
+	tableMap := make(map[string]*sqliteMaster, len(tableList))
+	for _, table := range tableList {
+		tableMap[table.Name] = table
 	}
 
 	design := NewDesign()
@@ -99,14 +146,20 @@ func (receiver *Design) Update(_ extension.Model, db *gorm.DB, _ gin.Params, _ u
 		}
 	}
 
-	designAccessors := extension.GetRegisteredDesignAccessorList()
-	for _, accessor := range designAccessors {
+	designAccessorList := extension.GetRegisteredDesignAccessorList()
+
+	// delete by following the rootpage index
+	sortDesignAccessorList(designAccessorList, tableMap, false)
+	for _, accessor := range designAccessorList {
 		if err := accessor.DeleteFromDesign(accessor, db); err != nil {
 			logging.Logger().Debug(err.Error())
 			return nil, err
 		}
 	}
-	for _, accessor := range designAccessors {
+
+	// insert by following the rootpage index
+	sortDesignAccessorList(designAccessorList, tableMap, true)
+	for _, accessor := range designAccessorList {
 		if err := accessor.LoadToDesign(accessor, db, design); err != nil {
 			logging.Logger().Debug(err.Error())
 			return nil, err
@@ -125,7 +178,8 @@ func (receiver *Design) Update(_ extension.Model, db *gorm.DB, _ gin.Params, _ u
 
 // Delete deletes all models
 func (receiver *Design) Delete(_ extension.Model, db *gorm.DB, _ gin.Params, _ url.Values) error {
-	triggerList := []*master{}
+	triggerList := []*sqliteMaster{}
+	tableList := []*sqliteMaster{}
 
 	if err := db.Table("sqlite_master").Where("type = ?", "trigger").Find(&triggerList).Error; err != nil {
 		logging.Logger().Debug(err.Error())
@@ -139,8 +193,21 @@ func (receiver *Design) Delete(_ extension.Model, db *gorm.DB, _ gin.Params, _ u
 		}
 	}
 
-	designAccessors := extension.GetRegisteredDesignAccessorList()
-	for _, accessor := range designAccessors {
+	if err := db.Table("sqlite_master").Where("type = ?", "table").Order("rootpage asc").Find(&tableList).Error; err != nil {
+		logging.Logger().Debug(err.Error())
+		return err
+	}
+
+	tableMap := make(map[string]*sqliteMaster, len(tableList))
+	for _, table := range tableList {
+		tableMap[table.Name] = table
+	}
+
+	designAccessorList := extension.GetRegisteredDesignAccessorList()
+
+	// delete by following the rootpage index
+	sortDesignAccessorList(designAccessorList, tableMap, false)
+	for _, accessor := range designAccessorList {
 		if err := accessor.DeleteFromDesign(accessor, db); err != nil {
 			logging.Logger().Debug(err.Error())
 			return err
