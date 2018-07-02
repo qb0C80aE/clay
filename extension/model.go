@@ -660,11 +660,9 @@ func GetRegisteredModelByContainer(container interface{}) (Model, error) {
 // SetupModel setups models
 // It's responsible in DB table creation, and resource/table name registration
 func SetupModel(db *gorm.DB, initializerList []Initializer, modelList []Model) (*gorm.DB, error) {
-	// Caution: Even if you input the inconsistent data like foreign keys do not exist,
-	//          it will be registered, and never be checked this time.
-	//          Todo: It requires order resolution logic like "depends on" between models.
-
-	db.Exec("pragma foreign_keys = on")
+	// Caution: Even if you create the invalid constraints like references for the table which does not exist,
+	//          it will be created, and errors will occur when actual records are inserted.
+	//          So, it's better to check if tables exist or not in DoBeforeDBMigration.
 
 	for _, initializer := range initializerList {
 		err := initializer.DoBeforeDBMigration(db)

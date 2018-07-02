@@ -52,5 +52,8 @@
       "tag": "json:\"virtual\" yaml:\"virtual\"",
       "type_name": "bool"
     }
+  ],
+  "sql_before_migration": [
+    "select 1 from node_types;"
   ]
 }

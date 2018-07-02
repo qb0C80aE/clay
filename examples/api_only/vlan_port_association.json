@@ -26,6 +26,10 @@
       "type_name": "Port"
     }
   ],
+  "sql_before_migration": [
+    "select 1 from vlans;",
+    "select 1 from ports;"
+  ],
   "sql_after_migration": [
     "drop trigger if exists DeleteVlanPortAssociationBeforeVlanDeletion;",
     "create trigger if not exists DeleteVlanPortAssociationBeforeVlanDeletion before delete on vlans",

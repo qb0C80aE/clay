@@ -61,6 +61,11 @@
       "type_name": "bool"
     }
   ],
+  "sql_before_migration": [
+    "select 1 from nodes;",
+    "select 1 from ports;",
+    "select 1 from port_ipv4_addresses;"
+  ],
   "sql_after_migration": [
     "drop trigger if exists DeleteNodeRouteBeforeNodeDeletion;",
     "create trigger if not exists DeleteNodeRouteBeforeNodeDeletion before delete on nodes",

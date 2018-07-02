@@ -41,6 +41,9 @@
       "type_name": "bool"
     }
   ],
+  "sql_before_migration": [
+    "select 1 from ports;"
+  ],
   "sql_after_migration": [
     "drop trigger if exists DeletePortIpv4AddressBeforePortDeletion;",
     "create trigger if not exists DeletePortIpv4AddressBeforePortDeletion before delete on ports",

@@ -30,6 +30,9 @@
       "type_name": "bool"
     }
   ],
+  "sql_before_migration": [
+    "select 1 from ports;"
+  ],
   "sql_after_migration": [
     "drop trigger if exists DeleteLinkBeforePortDeletion;",
     "create trigger if not exists DeleteLinkBeforePortDeletion before delete on ports",

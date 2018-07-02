@@ -31,6 +31,10 @@
       "type_name": "bool"
     }
   ],
+  "sql_before_migration": [
+    "select 1 from port_groups;",
+    "select 1 from ports;"
+  ],
   "sql_after_migration": [
     "drop trigger if exists DeletePortGroupPortAssociationBeforePortGroupDeletion;",
     "create trigger if not exists DeletePortGroupPortAssociationBeforePortGroupDeletion before delete on port_groups",
