@@ -18,6 +18,12 @@
       "name": "Description",
       "tag": "json:\"description\" yaml:\"description\"",
       "type_name": "string"
+    },
+    {
+      "name": "Nodes",
+      "tag": "json:\"nodes\" yaml:\"nodes\" gorm:\"ForeignKey:NodeKindID\" validate:\"omitempty,dive\"",
+      "type_name": "Node",
+      "is_slice": true
     }
   ],
   "sql_after_migration": [

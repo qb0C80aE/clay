@@ -27,6 +27,9 @@
     }
   ],
   "sql_after_migration": [
+    "select 1 from ports;",
+    "select 1 from links;",
+    "select 1 from nodes;",
     "drop view if exists port_select2;",
     "create view if not exists port_select2 as",
     "  select ports.id id,",

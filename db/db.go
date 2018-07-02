@@ -66,6 +66,11 @@ func Connect(dbMode string) (*gorm.DB, error) {
 		db.LogMode(true)
 	}
 
+	if err := db.Exec("pragma foreign_keys = on").Error; err != nil {
+		logging.Logger().Critical(err)
+		return nil, err
+	}
+
 	gorm.DefaultTableNameHandler = defaultTableNameHandler
 
 	return db, nil

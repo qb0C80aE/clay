@@ -42,6 +42,8 @@
     }
   ],
   "sql_after_migration": [
+    "select 1 from layer3_interfaces;",
+    "select 1 from nodes;",
     "drop view if exists port_ipv4_address_select2;",
     "create view if not exists port_ipv4_address_select2 as",
     "  select layer3_interfaces.ipv4_address_id id,",

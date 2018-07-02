@@ -78,6 +78,9 @@
       "type_name": "bool"
     }
   ],
+  "sql_before_migration": [
+    "select 1 from nodes;"
+  ],
   "sql_after_migration": [
     "drop trigger if exists DeletePortBeforeNodeDeletion;",
     "create trigger if not exists DeletePortBeforeNodeDeletion before delete on nodes",

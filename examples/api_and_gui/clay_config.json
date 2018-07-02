@@ -52,10 +52,10 @@
       "file_name": "ui/port_select2.json"
     },
     {
-      "file_name": "ui/port_ipv4_address_select2.json"
+      "file_name": "ui/layer3_interface.json"
     },
     {
-      "file_name": "ui/layer3_interface.json"
+      "file_name": "ui/port_ipv4_address_select2.json"
     },
     {
       "file_name": "ui/diagram_node.json"

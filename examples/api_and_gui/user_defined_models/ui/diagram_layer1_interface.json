@@ -57,6 +57,8 @@
     }
   ],
   "sql_after_migration": [
+    "select 1 from ports;",
+    "select 1 from links;",
     "drop view if exists diagram_layer1_interfaces;",
     "create view if not exists diagram_layer1_interfaces as",
     "  select group_concat(ports.id, ',') id,",

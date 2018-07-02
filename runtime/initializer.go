@@ -228,7 +228,7 @@ func (receiver *clayRuntimeInitializer) loadUserDefinedModels(config *clayConfig
 		if response.StatusCode != http.StatusCreated {
 			logging.Logger().Critical(fmt.Errorf("status code was %d", response.StatusCode))
 			logging.Logger().Critical(string(responseBody))
-			logging.Logger().Criticalf("failed to load %s, it might not be a correct model file", filePath)
+			logging.Logger().Criticalf("failed to load %s, it might not be a correct model file, or loading dependencies sequence is wrong", filePath)
 			return fmt.Errorf("status code was %d", response.StatusCode)
 		}
 	}

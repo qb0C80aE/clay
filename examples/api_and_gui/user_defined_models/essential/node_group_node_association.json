@@ -31,6 +31,10 @@
       "type_name": "bool"
     }
   ],
+  "sql_before_migration": [
+    "select 1 from node_groups;",
+    "select 1 from nodes;"
+  ],
   "sql_after_migration": [
     "drop trigger if exists DeleteNodeGroupNodeAssociationBeforeNodeGroupDeletion;",
     "create trigger if not exists DeleteNodeGroupNodeAssociationBeforeNodeGroupDeletion before delete on node_groups",

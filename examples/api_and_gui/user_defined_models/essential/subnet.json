@@ -46,6 +46,9 @@
       "type_name": "bool"
     }
   ],
+  "sql_before_migration": [
+    "select 1 from vlans;"
+  ],
   "sql_after_migration": [
     "drop trigger if exists DeleteSubnetBeforeVlanDeletion;",
     "create trigger if not exists DeleteSubnetBeforeVlanDeletion before delete on vlans",
