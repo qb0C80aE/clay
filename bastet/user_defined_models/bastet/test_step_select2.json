@@ -21,6 +21,9 @@
       "type_name": "string"
     }
   ],
+  "sql_before_migration": [
+    "select 1 from test_steps;"
+  ],
   "sql_after_migration": [
     "drop view if exists test_step_select2;",
     "create view if not exists test_step_select2 as",

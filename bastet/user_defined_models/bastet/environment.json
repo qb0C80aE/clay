@@ -70,8 +70,10 @@
       "type_name": "string"
     }
   ],
+  "sql_before_migration": [
+    "select 1 from templates;"
+  ],
   "sql_after_migration": [
-    "select 1 from templates;",
     "create trigger if not exists DeleteTemplateBeforeEnvironmentDeletion before delete on environments",
 		"  begin",
 		"    delete from templates where id = old.template_id;",

@@ -45,8 +45,10 @@
         "type_name": "bool"
       }
     ],
+    "sql_before_migration": [
+      "select 1 from test_scenarios;"
+    ],
     "sql_after_migration": [
-      "select 1 from test_scenarios;",
       "create trigger if not exists DeleteTestScenarioParameterBeforeTestScenarioDeletion before delete on test_scenarios",
   		"  begin",
   		"    delete from test_scenario_parameters where test_scenario_id = old.id;",

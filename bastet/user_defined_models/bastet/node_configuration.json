@@ -50,9 +50,11 @@
       "type_name": "Template"
     }
   ],
-  "sql_after_migration": [
+  "sql_before_migration": [
     "select 1 from nodes;",
-    "select 1 from templates;",
+    "select 1 from templates;"
+  ],
+  "sql_after_migration": [
 		"create trigger if not exists DeleteTemplateBeforeNodeConfigurationDeletion before delete on node_configurations",
 		"  begin",
 		"    delete from templates where id = old.initialization_template_id;",
