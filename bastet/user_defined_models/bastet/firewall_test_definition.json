@@ -57,6 +57,10 @@
     }
   ],
   "sql_after_migration": [
+    "select 1 from test_scenario_parameters;",
+    "select 1 from test_steps;",
+    "select 1 from test_scenario_test_step_associations;",
+    "select 1 from test_scenarios;",
     "drop view if exists firewall_test_definitions;",
     "create view if not exists firewall_test_definitions as",
     "  select source.test_step_number number,",

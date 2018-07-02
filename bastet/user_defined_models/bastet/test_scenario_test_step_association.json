@@ -37,6 +37,8 @@
     }
   ],
   "sql_after_migration": [
+    "select 1 from test_scenarios;",
+    "select 1 from test_steps;",
     "drop trigger if exists DeleteTestScenarioTestStepAssociationBeforeTestScenarioDeletion;",
     "create trigger if not exists DeleteTestScenarioTestStepAssociationBeforeTestScenarioDeletion before delete on test_scenarios",
     "  begin",

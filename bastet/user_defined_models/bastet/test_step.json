@@ -36,6 +36,7 @@
       }
     ],
     "sql_after_migration": [
+      "select 1 from templates;",
       "create trigger if not exists DeleteTemplateBeforeTestStepDeletion before delete on test_steps",
   		"  begin",
   		"    delete from templates where id = old.template_id;",

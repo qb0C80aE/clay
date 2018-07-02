@@ -69,6 +69,7 @@
     }
   ],
   "sql_before_migration": [
-    "select 1 from node_types;"
+    "select 1 from node_types;",
+    "select 1 from node_kinds;"
   ]
 }

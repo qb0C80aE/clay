@@ -52,6 +52,7 @@
     }
   ],
   "sql_after_migration": [
+    "select 1 from templates;",
 		"create trigger if not exists DeleteTemplateBeforeNodeKindDeletion before delete on node_kinds",
 		"  begin",
 		"    delete from templates where id = old.initialization_template_id;",

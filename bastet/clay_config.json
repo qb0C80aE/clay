@@ -7,6 +7,9 @@
   },
   "user_defined_models": [
     {
+      "file_name": "bastet/node_kind.json"
+    },
+    {
       "file_name": "essential/node_type.json"
     },
     {
@@ -44,9 +47,6 @@
     },
     {
       "file_name": "essential/vlan_port_association.json"
-    },
-    {
-      "file_name": "bastet/node_kind.json"
     },
     {
       "file_name": "bastet/node_configuration.json"
