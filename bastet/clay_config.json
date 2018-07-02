@@ -126,6 +126,10 @@
       "file_name": "ui/files/css/select2.min.css"
     },
     {
+      "name": "bootstrap-toggle.min.css",
+      "file_name": "ui/files/css/bootstrap-toggle.min.css"
+    },
+    {
       "name": "cola.3.1.3.min.js",
       "file_name": "ui/files/js/cola.3.1.3.min.js"
     },
@@ -160,6 +164,10 @@
     {
       "name": "spin.min.js",
       "file_name": "ui/files/js/spin.min.js"
+    },
+    {
+      "name": "bootstrap-toggle.min.js",
+      "file_name": "ui/files/js/bootstrap-toggle.min.js"
     },
     {
       "name": "designs.tmpl",
@@ -442,6 +450,20 @@
       ]
     },
     {
+      "name": "bootstrap-toggle.min.css",
+      "from": "/ui/files/css/bootstrap-toggle.min.css",
+      "to": "/ephemeral_templates/bootstrap-toggle.min.css/raw",
+      "query": "",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single",
+          "accept": "text/css",
+          "accept_charset": "utf-8"
+        }
+      ]
+    },
+    {
       "name": "cola.3.1.3.min.js",
       "from": "/ui/files/js/cola.3.1.3.min.js",
       "to": "/ephemeral_templates/cola.3.1.3.min.js/raw",
@@ -557,6 +579,20 @@
       "name": "spin.min.js",
       "from": "/ui/files/js/spin.min.js",
       "to": "/ephemeral_templates/spin.min.js/raw",
+      "query": "",
+      "methods": [
+        {
+          "method": "GET",
+          "target_url_type": "single",
+          "accept": "application/javascript",
+          "accept_charset": "utf-8"
+        }
+      ]
+    },
+    {
+      "name": "bootstrap-toggle.min.js",
+      "from": "/ui/files/js/bootstrap-toggle.min.js",
+      "to": "/ephemeral_templates/bootstrap-toggle.min.js/raw",
       "query": "",
       "methods": [
         {
