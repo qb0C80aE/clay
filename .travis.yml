@@ -42,6 +42,6 @@ after_success:
  - (cd windows_386; zip -r ../clay.bastet.windows-386.zip clay.exe)
  - (cd darwin_amd64; tar zcvf ../clay.bastet.darwin-amd64.tgz clay)
  - (cd darwin_386; tar zcvf ../clay.bastet.darwin-386.tgz clay)
-  - ls -la
+ - ls -la
  - ./upload.sh
 
