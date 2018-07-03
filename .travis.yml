@@ -30,10 +30,10 @@ script:
  - CLAY_ASSET_MODE=internal BUILD_ASSET=true BUILD_ASSET_SOURCE=../bastet CLAY_CONFIG_FILE_PATH=bastet/clay_config.json go generate -tags=prebuild prebuild/generate.go
  - CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -a -tags "netgo sqlite_omit_load_extension" --ldflags '-extldflags "-static"' -o linux_amd64/clay
  - CGO_ENABLED=1 GOOS=linux GOARCH=386 go build -a -tags "netgo sqlite_omit_load_extension" --ldflags '-extldflags "-static"' -o linux_386/clay
- - CC=x86_64-w64-mingw32-gcc LD=x86_64-w64-mingw32-ld CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build -a -o windows_amd64/clay.exe
- - CC=i686-w64-mingw32-gcc LD=i686-w64-mingw32-ld CGO_ENABLED=1 GOOS=windows GOARCH=386 go build -a -o windows_386/clay.exe
- - CC=o64-clang CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -a -o darwin_amd64/clay
- - CC=o32-clang CGO_ENABLED=1 GOOS=darwin GOARCH=386 go build -a -o darwin_386/clay
+ - CC=x86_64-w64-mingw32-gcc LD=x86_64-w64-mingw32-ld CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build -a -tags "netgo sqlite_omit_load_extension" --ldflags '-extldflags "-static"' -o windows_amd64/clay.exe
+ - CC=i686-w64-mingw32-gcc LD=i686-w64-mingw32-ld CGO_ENABLED=1 GOOS=windows GOARCH=386 go build -a -tags "netgo sqlite_omit_load_extension" --ldflags '-extldflags "-static"' -o windows_386/clay.exe
+ - CC=o64-clang CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -a -tags "netgo sqlite_omit_load_extension" -o darwin_amd64/clay
+ - CC=o32-clang CGO_ENABLED=1 GOOS=darwin GOARCH=386 go build -a -tags "netgo sqlite_omit_load_extension" -o darwin_386/clay
 
 after_success:
  - (cd linux_amd64; tar zcvf ../clay.bastet.linux-amd64.tgz clay)
