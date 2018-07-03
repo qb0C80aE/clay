@@ -46,10 +46,13 @@ func (clayRuntime *clayRuntime) Run() {
 		os.Exit(1)
 	}
 
+	extension.RegisterEngine(engine)
+
 	if err := server.Run(fmt.Sprintf("%s:%d", host, port)); err != nil {
 		logging.Logger().Criticalf("failed to start: %s", err)
 		os.Exit(1)
 	}
+
 }
 
 func init() {

@@ -14,9 +14,9 @@ import (
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
-	"time"
 )
 
 type clayRuntimeInitializer struct {
@@ -123,33 +123,6 @@ func (receiver *clayRuntimeInitializer) initialize() {
 	environmentalVariableSet := extension.GetCurrentEnvironmentalVariableSet()
 	configFilePath := environmentalVariableSet.GetClayConfigFilePath()
 
-	host := environmentalVariableSet.GetClayHost()
-	port := environmentalVariableSet.GetClayPortInt()
-
-	maxRetry := 10
-	for i := 1; i <= maxRetry; i++ {
-		url := fmt.Sprintf("http://%s:%d", host, port)
-		request, _ := http.NewRequest("GET", url, nil)
-		client := &http.Client{}
-		response, err := client.Do(request)
-
-		if err == nil {
-			defer response.Body.Close()
-			if response.StatusCode == http.StatusOK {
-				break
-			} else {
-				os.Exit(1)
-			}
-		}
-
-		if i == maxRetry {
-			logging.Logger().Critical("failed to connect server at model loading")
-			os.Exit(1)
-		}
-
-		time.Sleep(time.Second)
-	}
-
 	if len(configFilePath) == 0 {
 		dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 		if err != nil {
@@ -172,33 +145,33 @@ func (receiver *clayRuntimeInitializer) initialize() {
 		os.Exit(1)
 	}
 
-	if err := receiver.loadUserDefinedModels(config, host, port); err != nil {
+	if err := receiver.loadUserDefinedModels(config); err != nil {
 		logging.Logger().Critical(err.Error())
 		os.Exit(1)
 	}
 
-	if err := receiver.loadEphemeralTemplates(config, host, port); err != nil {
+	if err := receiver.loadEphemeralTemplates(config); err != nil {
 		logging.Logger().Critical(err.Error())
 		os.Exit(1)
 	}
 
-	if err := receiver.loadEphemeralBinaryObjects(config, host, port); err != nil {
+	if err := receiver.loadEphemeralBinaryObjects(config); err != nil {
 		logging.Logger().Critical(err.Error())
 		os.Exit(1)
 	}
 
-	if err := receiver.loadEphemeralScripts(config, host, port); err != nil {
+	if err := receiver.loadEphemeralScripts(config); err != nil {
 		logging.Logger().Critical(err.Error())
 		os.Exit(1)
 	}
 
-	if err := receiver.loadURLAliases(config, host, port); err != nil {
+	if err := receiver.loadURLAliases(config); err != nil {
 		logging.Logger().Critical(err.Error())
 		os.Exit(1)
 	}
 }
 
-func (receiver *clayRuntimeInitializer) loadUserDefinedModels(config *clayConfig, host string, port int) error {
+func (receiver *clayRuntimeInitializer) loadUserDefinedModels(config *clayConfig) error {
 	for _, userDefinedModel := range config.UserDefinedModels {
 		filePath := filepath.Join(config.General.UserDefinedModelsDirectory, userDefinedModel.FileName)
 		jsonData, err := receiver.readFile(filePath)
@@ -207,16 +180,12 @@ func (receiver *clayRuntimeInitializer) loadUserDefinedModels(config *clayConfig
 			return err
 		}
 
-		url := fmt.Sprintf("http://%s:%d/user_defined_model_definitions", host, port)
-		request, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
+		request, err := http.NewRequest(extension.LookUpMethodName(extension.MethodPost), "/user_defined_model_definitions", bytes.NewBuffer(jsonData))
 		request.Header.Set("Content-Type", "application/json")
+		responseWriter := httptest.NewRecorder()
 
-		client := &http.Client{}
-		response, err := client.Do(request)
-		if err != nil {
-			logging.Logger().Critical(err.Error())
-			return err
-		}
+		extension.GetRegisteredEngine().ServeHTTP(responseWriter, request)
+		response := responseWriter.Result()
 		defer response.Body.Close()
 
 		responseBody, err := ioutil.ReadAll(response.Body)
@@ -235,7 +204,7 @@ func (receiver *clayRuntimeInitializer) loadUserDefinedModels(config *clayConfig
 	return nil
 }
 
-func (receiver *clayRuntimeInitializer) loadEphemeralTemplates(config *clayConfig, host string, port int) error {
+func (receiver *clayRuntimeInitializer) loadEphemeralTemplates(config *clayConfig) error {
 	for _, ephemeralTemplate := range config.EphemeralTemplates {
 		filePath := filepath.Join(config.General.EphemeralTemplatesDirectory, ephemeralTemplate.FileName)
 		data, err := receiver.readFile(filePath)
@@ -254,16 +223,12 @@ func (receiver *clayRuntimeInitializer) loadEphemeralTemplates(config *clayConfi
 			return err
 		}
 
-		url := fmt.Sprintf("http://%s:%d/ephemeral_templates", host, port)
-		request, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
+		request, err := http.NewRequest(extension.LookUpMethodName(extension.MethodPost), "/ephemeral_templates", bytes.NewBuffer(jsonData))
 		request.Header.Set("Content-Type", "application/json")
+		responseWriter := httptest.NewRecorder()
 
-		client := &http.Client{}
-		response, err := client.Do(request)
-		if err != nil {
-			logging.Logger().Critical(err.Error())
-			return err
-		}
+		extension.GetRegisteredEngine().ServeHTTP(responseWriter, request)
+		response := responseWriter.Result()
 		defer response.Body.Close()
 
 		responseBody, err := ioutil.ReadAll(response.Body)
@@ -281,7 +246,7 @@ func (receiver *clayRuntimeInitializer) loadEphemeralTemplates(config *clayConfi
 	return nil
 }
 
-func (receiver *clayRuntimeInitializer) loadEphemeralBinaryObjects(config *clayConfig, host string, port int) error {
+func (receiver *clayRuntimeInitializer) loadEphemeralBinaryObjects(config *clayConfig) error {
 	for _, ephemeralBinaryObject := range config.EphemeralBinaryObjects {
 		filePath := filepath.Join(config.General.EphemeralBinaryObjectsDirectory, ephemeralBinaryObject.FileName)
 
@@ -315,16 +280,12 @@ func (receiver *clayRuntimeInitializer) loadEphemeralBinaryObjects(config *clayC
 			return err
 		}
 
-		url := fmt.Sprintf("http://%s:%d/ephemeral_binary_objects", host, port)
-		request, err := http.NewRequest("POST", url, &bytesBuffer)
+		request, err := http.NewRequest(extension.LookUpMethodName(extension.MethodPost), "/ephemeral_binary_objects", &bytesBuffer)
 		request.Header.Set("Content-Type", multipartWriter.FormDataContentType())
+		responseWriter := httptest.NewRecorder()
 
-		client := &http.Client{}
-		response, err := client.Do(request)
-		if err != nil {
-			logging.Logger().Critical(err.Error())
-			return err
-		}
+		extension.GetRegisteredEngine().ServeHTTP(responseWriter, request)
+		response := responseWriter.Result()
 		defer response.Body.Close()
 
 		responseBody, err := ioutil.ReadAll(response.Body)
@@ -342,7 +303,7 @@ func (receiver *clayRuntimeInitializer) loadEphemeralBinaryObjects(config *clayC
 	return nil
 }
 
-func (receiver *clayRuntimeInitializer) loadEphemeralScripts(config *clayConfig, host string, port int) error {
+func (receiver *clayRuntimeInitializer) loadEphemeralScripts(config *clayConfig) error {
 	for _, ephemeralScript := range config.EphemeralScripts {
 		filePath := filepath.Join(config.General.EphemeralScriptsDirectory, ephemeralScript.FileName)
 		data, err := receiver.readFile(filePath)
@@ -361,16 +322,12 @@ func (receiver *clayRuntimeInitializer) loadEphemeralScripts(config *clayConfig,
 			return err
 		}
 
-		url := fmt.Sprintf("http://%s:%d/ephemeral_scripts", host, port)
-		request, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
+		request, err := http.NewRequest(extension.LookUpMethodName(extension.MethodPost), "/ephemeral_scripts", bytes.NewBuffer(jsonData))
 		request.Header.Set("Content-Type", "application/json")
+		responseWriter := httptest.NewRecorder()
 
-		client := &http.Client{}
-		response, err := client.Do(request)
-		if err != nil {
-			logging.Logger().Critical(err.Error())
-			return err
-		}
+		extension.GetRegisteredEngine().ServeHTTP(responseWriter, request)
+		response := responseWriter.Result()
 		defer response.Body.Close()
 
 		responseBody, err := ioutil.ReadAll(response.Body)
@@ -388,7 +345,7 @@ func (receiver *clayRuntimeInitializer) loadEphemeralScripts(config *clayConfig,
 	return nil
 }
 
-func (receiver *clayRuntimeInitializer) loadURLAliases(config *clayConfig, host string, port int) error {
+func (receiver *clayRuntimeInitializer) loadURLAliases(config *clayConfig) error {
 	for _, urlAliasDefinition := range config.URLAliases {
 		jsonData, err := json.Marshal(urlAliasDefinition)
 		if err != nil {
@@ -396,16 +353,12 @@ func (receiver *clayRuntimeInitializer) loadURLAliases(config *clayConfig, host 
 			return err
 		}
 
-		url := fmt.Sprintf("http://%s:%d/url_alias_definitions", host, port)
-		request, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
+		request, err := http.NewRequest(extension.LookUpMethodName(extension.MethodPost), "/url_alias_definitions", bytes.NewBuffer(jsonData))
 		request.Header.Set("Content-Type", "application/json")
+		responseWriter := httptest.NewRecorder()
 
-		client := &http.Client{}
-		response, err := client.Do(request)
-		if err != nil {
-			logging.Logger().Critical(err.Error())
-			return err
-		}
+		extension.GetRegisteredEngine().ServeHTTP(responseWriter, request)
+		response := responseWriter.Result()
 		defer response.Body.Close()
 
 		responseBody, err := ioutil.ReadAll(response.Body)

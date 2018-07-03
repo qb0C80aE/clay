@@ -1,6 +1,7 @@
 package extension
 
 import (
+	"github.com/gin-gonic/gin"
 	"os"
 	"strconv"
 	"strings"
@@ -13,6 +14,7 @@ type Runtime interface {
 }
 
 var registeredRuntime Runtime
+var registeredEngine *gin.Engine
 
 // RegisterRuntime registers the runtime
 func RegisterRuntime(runtime Runtime) {
@@ -22,6 +24,16 @@ func RegisterRuntime(runtime Runtime) {
 // GetRegisteredRuntime returns the registered runtime
 func GetRegisteredRuntime() Runtime {
 	return registeredRuntime
+}
+
+// RegisterEngine registers the engine
+func RegisterEngine(engine *gin.Engine) {
+	registeredEngine = engine
+}
+
+// GetRegisteredEngine returns the registered engine
+func GetRegisteredEngine() *gin.Engine {
+	return registeredEngine
 }
 
 // EnvironmentalVariableSet is the interface what handles variable environments used in Clay
