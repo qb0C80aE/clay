@@ -41,6 +41,6 @@ after_success:
  - (cd windows_386; cp -prf ../examples .; zip -r ../clay.windows-386.zip clay.exe examples)
  - (cd darwin_amd64; cp -prf ../examples .; tar zcvf ../clay.darwin-amd64.tgz clay examples)
  - (cd darwin_386; cp -prf ../examples .; tar zcvf ../clay.darwin-386.tgz clay examples)
-  - ls -la
+ - ls -la
  - ./upload.sh
 
