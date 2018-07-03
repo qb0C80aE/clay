@@ -2,35 +2,46 @@ language: go
 go: "1.10"
 
 notifications:
-  email: false
+ email: false
 
 env:
   global:
-   - TAGS=()
+    - OSX_VERSION_MIN="10.7"
+    - PATH=$PATH:/home/travis/gopath/src/github.com/qb0C80aE/clay/osxcross/target/bin
 
 before_install:
-  - TAGS+=(debug)
-  - TAGS+=(integration)
-  - TAGS+=(prebuild)
-  - go version
+ - go version
+ - sudo apt-get -qq update
 
 install:
-  - go get -u github.com/golang/dep/cmd/dep
-  - go get -u github.com/golang/lint/golint
-  - go get -u github.com/jessevdk/go-assets-builder
-
+ - git clone https://github.com/tpoechtrager/osxcross.git
+ - curl -X GET -H AuthKey:${AUTH_KEY} https://clay-download.herokuapp.com/1011.tar.xz > osxcross/tarballs/MacOSX10.11.sdk.tar.xz
+ - (cd osxcross; echo y | ./build.sh)
+ - sudo apt-get -qq install -y gcc-multilib
+ - sudo apt-get -qq install -y binutils-mingw-w64 mingw-w64
+ - wget https://storage.googleapis.com/golang/go1.4.3.linux-amd64.tar.gz
+ - tar -C $HOME -xzf go1.4.3.linux-amd64.tar.gz
+ - mv $HOME/go $HOME/go1.4
+ - (cd `which go | sed -e 's/\/bin\/go//g'`/src; GOOS=linux GOARCH=386 ./make.bash; GOOS=windows GOARCH=amd64 ./make.bash; GOOS=windows GOARCH=386 ./make.bash; GOOS=darwin GOARCH=amd64 ./make.bash; GOOS=darwin GOARCH=386 ./make.bash)
+ - go get -u github.com/golang/dep/cmd/dep
+ - go get -u github.com/jessevdk/go-assets-builder
 script:
-  - dep ensure
-  - (result="`find . -type d -name vendor -prune -o -type f -name '*.go' -exec golint {} \;`"; if [ ! -z "${result}" ]; then echo "${result}"; exit 1; fi)
-  - go vet -tags="`echo ${TAGS[@]}`" ./...
-  - cp buildtime/buildtime.go /tmp
-  - go generate -tags=prebuild ./...
-  - |
-    for tag in ${TAGS[@]}; do
-      echo "go build -v -tags=${tag} ./..."
-      go build -v -tags=${tag} ./...
-    done
-  - go build -v
-  - cp /tmp/buildtime.go buildtime/buildtime.go
-  - go test -tags=integration -v -race ./...
+ - dep ensure
+ - CLAY_ASSET_MODE=internal BUILD_ASSET=true BUILD_ASSET_SOURCE=../bastet CLAY_CONFIG_FILE_PATH=bastet/clay_config.json go generate -tags=prebuild prebuild/generate.go
+ - CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -a -tags "netgo sqlite_omit_load_extension" --ldflags '-extldflags "-static"' -o linux_amd64/clay
+ - CGO_ENABLED=1 GOOS=linux GOARCH=386 go build -a -tags "netgo sqlite_omit_load_extension" --ldflags '-extldflags "-static"' -o linux_386/clay
+ - CC=x86_64-w64-mingw32-gcc LD=x86_64-w64-mingw32-ld CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build -a -tags "netgo sqlite_omit_load_extension" --ldflags '-extldflags "-static"' -o windows_amd64/clay.exe
+ - CC=i686-w64-mingw32-gcc LD=i686-w64-mingw32-ld CGO_ENABLED=1 GOOS=windows GOARCH=386 go build -a -tags "netgo sqlite_omit_load_extension" --ldflags '-extldflags "-static"' -o windows_386/clay.exe
+ - CC=o64-clang CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -a -tags "netgo sqlite_omit_load_extension" -o darwin_amd64/clay
+ - CC=o32-clang CGO_ENABLED=1 GOOS=darwin GOARCH=386 go build -a -tags "netgo sqlite_omit_load_extension" -o darwin_386/clay
+
+after_success:
+ - (cd linux_amd64; tar zcvf ../clay.linux-amd64.tgz clay)
+ - (cd linux_386; tar zcvf ../clay.linux-386.tgz clay)
+ - (cd windows_amd64; zip -r ../clay.windows-amd64.zip clay.exe)
+ - (cd windows_386; zip -r ../clay.windows-386.zip clay.exe)
+ - (cd darwin_amd64; tar zcvf ../clay.darwin-amd64.tgz clay)
+ - (cd darwin_386; tar zcvf ../clay.darwin-386.tgz clay)
+  - ls -la
+ - ./upload.sh
 
