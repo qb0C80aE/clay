@@ -4,6 +4,11 @@ go: "1.10"
 notifications:
  email: false
 
+env:
+  global:
+    - OSX_VERSION_MIN="10.7"
+    - PATH=$PATH:/home/travis/gopath/src/github.com/qb0C80aE/clay/osxcross/target/bin
+
 before_install:
  - go version
  - sudo apt-get -qq update
@@ -11,7 +16,7 @@ before_install:
 install:
  - git clone https://github.com/tpoechtrager/osxcross.git
  - curl -X GET -H AuthKey:${AUTH_KEY} https://clay-download.herokuapp.com/1011.tar.xz > osxcross/tarballs/MacOSX10.11.sdk.tar.xz
- - (cd osxcross; echo y | OSX_VERSION_MIN="10.7" ./build.sh)
+ - (cd osxcross; echo y | ./build.sh)
  - sudo apt-get -qq install -y gcc-multilib
  - sudo apt-get -qq install -y binutils-mingw-w64 mingw-w64
  - wget https://storage.googleapis.com/golang/go1.4.3.linux-amd64.tar.gz
@@ -27,8 +32,8 @@ script:
  - CGO_ENABLED=1 GOOS=linux GOARCH=386 go build -a -tags "netgo sqlite_omit_load_extension" --ldflags '-extldflags "-static"' -o linux_386/clay
  - CC=x86_64-w64-mingw32-gcc LD=x86_64-w64-mingw32-ld CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build -a -o windows_amd64/clay.exe
  - CC=i686-w64-mingw32-gcc LD=i686-w64-mingw32-ld CGO_ENABLED=1 GOOS=windows GOARCH=386 go build -a -o windows_386/clay.exe
- - PATH=$PATH:/home/travis/gopath/src/github.com/qb0C80aE/clay/osxcross/target/bin CC=o64-clang CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -a -o darwin_amd64/clay
- - PATH=$PATH:/home/travis/gopath/src/github.com/qb0C80aE/clay/osxcross/target/bin CC=o32-clang CGO_ENABLED=1 GOOS=darwin GOARCH=386 go build -a -o darwin_386/clay
+ - CC=o64-clang CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -a -o darwin_amd64/clay
+ - CC=o32-clang CGO_ENABLED=1 GOOS=darwin GOARCH=386 go build -a -o darwin_386/clay
 
 after_success:
  - (cd linux_amd64; tar zcvf ../clay.bastet.linux-amd64.tgz clay)
