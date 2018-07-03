@@ -27,7 +27,6 @@ install:
  - go get -u github.com/jessevdk/go-assets-builder
 script:
  - dep ensure
- - CLAY_ASSET_MODE=internal BUILD_ASSET=true BUILD_ASSET_SOURCE=../bastet CLAY_CONFIG_FILE_PATH=bastet/clay_config.json go generate -tags=prebuild prebuild/generate.go
  - CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -a -tags "netgo sqlite_omit_load_extension" --ldflags '-extldflags "-static"' -o linux_amd64/clay
  - CGO_ENABLED=1 GOOS=linux GOARCH=386 go build -a -tags "netgo sqlite_omit_load_extension" --ldflags '-extldflags "-static"' -o linux_386/clay
  - CC=x86_64-w64-mingw32-gcc LD=x86_64-w64-mingw32-ld CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build -a -tags "netgo sqlite_omit_load_extension" --ldflags '-extldflags "-static"' -o windows_amd64/clay.exe
@@ -36,12 +35,12 @@ script:
  - CC=o32-clang CGO_ENABLED=1 GOOS=darwin GOARCH=386 go build -a -tags "netgo sqlite_omit_load_extension" -o darwin_386/clay
 
 after_success:
- - (cd linux_amd64; tar zcvf ../clay.linux-amd64.tgz clay)
- - (cd linux_386; tar zcvf ../clay.linux-386.tgz clay)
- - (cd windows_amd64; zip -r ../clay.windows-amd64.zip clay.exe)
- - (cd windows_386; zip -r ../clay.windows-386.zip clay.exe)
- - (cd darwin_amd64; tar zcvf ../clay.darwin-amd64.tgz clay)
- - (cd darwin_386; tar zcvf ../clay.darwin-386.tgz clay)
+ - (cd linux_amd64; cp -prf ../examples .; tar zcvf ../clay.linux-amd64.tgz clay examples)
+ - (cd linux_386; cp -prf ../examples .; tar zcvf ../clay.linux-386.tgz clay examples)
+ - (cd windows_amd64; cp -prf ../examples .; zip -r ../clay.windows-amd64.zip clay.exe examples)
+ - (cd windows_386; cp -prf ../examples .; zip -r ../clay.windows-386.zip clay.exe examples)
+ - (cd darwin_amd64; cp -prf ../examples .; tar zcvf ../clay.darwin-amd64.tgz clay examples)
+ - (cd darwin_386; cp -prf ../examples .; tar zcvf ../clay.darwin-386.tgz clay examples)
   - ls -la
  - ./upload.sh
 
