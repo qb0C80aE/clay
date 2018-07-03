@@ -12,13 +12,16 @@ before_install:
 install:
  - sudo apt-get -qq install -y gcc-multilib
  - sudo apt-get -qq install -y binutils-mingw-w64 mingw-w64
+ - git clone https://github.com/tpoechtrager/osxcross.git
+ - wget https://github.com/phracker/MacOSX-SDKs/releases/download/10.13/MacOSX10.11.sdk.tar.xz -O osxcross/tarballs/MacOSX10.11.sdk.tar.xz
+ - (cd osxcross; echo y | ./build.sh)
  - wget https://storage.googleapis.com/golang/go1.4.3.linux-amd64.tar.gz
+ - PATH=$PATH:$HOME/osxcross/target/bin o64-clang
  - tar -C $HOME -xzf go1.4.3.linux-amd64.tar.gz
  - mv $HOME/go $HOME/go1.4
- - (cd `which go | sed -e 's/\/bin\/go//g'`/src; GOOS=linux GOARCH=386 ./make.bash; GOOS=windows GOARCH=amd64 ./make.bash; GOOS=windows GOARCH=386 ./make.bash)
+ - (cd `which go | sed -e 's/\/bin\/go//g'`/src; GOOS=linux GOARCH=386 ./make.bash; GOOS=windows GOARCH=amd64 ./make.bash; GOOS=windows GOARCH=386 ./make.bash; GOOS=darwin GOARCH=amd64 ./make.bash; GOOS=darwin GOARCH=386 ./make.bash)
  - go get -u github.com/golang/dep/cmd/dep
  - go get -u github.com/jessevdk/go-assets-builder
-
 script:
  - dep ensure
  - CLAY_ASSET_MODE=internal BUILD_ASSET=true BUILD_ASSET_SOURCE=../bastet CLAY_CONFIG_FILE_PATH=bastet/clay_config.json go generate -tags=prebuild prebuild/generate.go
