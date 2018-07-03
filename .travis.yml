@@ -11,7 +11,7 @@ before_install:
 install:
  - git clone https://github.com/tpoechtrager/osxcross.git
  - wget https://github.com/phracker/MacOSX-SDKs/releases/download/10.13/MacOSX10.11.sdk.tar.xz -O osxcross/tarballs/MacOSX10.11.sdk.tar.xz
- - (cd osxcross; echo y | ./build.sh)
+ - (cd osxcross; OSX_VERSION_MIN="10.7" echo y | ./build.sh)
  - PATH=$PATH:/home/travis/gopath/src/github.com/qb0C80aE/clay/osxcross/target/bin o64-clang
  - sudo apt-get -qq install -y gcc-multilib
  - sudo apt-get -qq install -y binutils-mingw-w64 mingw-w64
