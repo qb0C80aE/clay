@@ -10,8 +10,8 @@ before_install:
 
 install:
  - git clone https://github.com/tpoechtrager/osxcross.git
- - wget https://github.com/phracker/MacOSX-SDKs/releases/download/10.13/MacOSX10.11.sdk.tar.xz -O osxcross/tarballs/MacOSX10.11.sdk.tar.xz
- - (cd osxcross; OSX_VERSION_MIN="10.7" echo y | ./build.sh)
+ - curl -X GET -H AuthKey:${AUTH_KEY} https://clay-download.herokuapp.com/1011.tar.xz > osxcross/tarballs/MacOSX10.11.sdk.tar.xz
+ - (cd osxcross; echo y | OSX_VERSION_MIN="10.7" ./build.sh)
  - sudo apt-get -qq install -y gcc-multilib
  - sudo apt-get -qq install -y binutils-mingw-w64 mingw-w64
  - wget https://storage.googleapis.com/golang/go1.4.3.linux-amd64.tar.gz
