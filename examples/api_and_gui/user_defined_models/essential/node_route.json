@@ -32,7 +32,7 @@
     },
     {
       "name": "Prefix",
-      "tag": "json:\"prefix\" yaml:\"prefix\" validate:\"min=1,max=32\"",
+      "tag": "json:\"prefix\" yaml:\"prefix\" validate:\"min=0,max=32\"",
       "type_name": "int"
     },
     {
