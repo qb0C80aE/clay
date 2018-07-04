@@ -1,57 +1,57 @@
 {
-    "type_name": "TestScenarioParameter",
-    "resource_name": "test_scenario_parameters",
-    "to_be_migrated": true,
-    "is_controller_enabled": true,
-    "fields": [
-      {
-        "name": "ID",
-        "tag": "json:\"id\" yaml:\"id\" gorm:\"primary_key;auto_increment\"",
-        "type_name": "int"
-      },
-      {
-        "name": "Name",
-        "tag": "json:\"name\" yaml:\"name\" gorm:\"not null;unique_index:test_scenario_id_test_step_number_name\"",
-        "type_name": "string"
-      },
-      {
-        "name": "Description",
-        "tag": "json:\"description\" yaml:\"description\"",
-        "type_name": "string"
-      },
-      {
-        "name": "TestScenarioID",
-        "tag": "json:\"test_scenario_id\" yaml:\"test_scenario_id\" gorm:\"not null;unique_index:test_scenario_id_test_step_number_name\" sql:\"type:integer references test_scenarios(id)\"",
-        "type_name": "int"
-      },
-      {
-        "name": "TestScenario",
-        "tag": "json:\"test_scenario\" yaml:\"test_scenario\" gorm:\"ForeignKey:TestScenarioID\" validate:\"omitempty,dive\"",
-        "type_name": "TestScenario"
-      },
-      {
-        "name": "TestStepNumber",
-        "tag": "json:\"test_step_number\" yaml:\"test_step_number\" gorm:\"not null;unique_index:test_scenario_id_test_step_number_name\" validate:\"min=1\"",
-        "type_name": "int"
-      },
-      {
-        "name": "Value",
-        "tag": "json:\"value\" yaml:\"value\" gorm:\"not null\"",
-        "type_name": "string"
-      },
-      {
-        "name": "ToBeDeleted",
-        "tag": "json:\"to_be_deleted,omitempty\" yaml:\"to_be_deleted,omitempty\" sql:\"-\"",
-        "type_name": "bool"
-      }
-    ],
-    "sql_before_migration": [
-      "select 1 from test_scenarios;"
-    ],
-    "sql_after_migration": [
-      "create trigger if not exists DeleteTestScenarioParameterBeforeTestScenarioDeletion before delete on test_scenarios",
-  		"  begin",
-  		"    delete from test_scenario_parameters where test_scenario_id = old.id;",
-  		"  end;"
-    ]
-  }
+  "type_name": "TestScenarioParameter",
+  "resource_name": "test_scenario_parameters",
+  "to_be_migrated": true,
+  "is_controller_enabled": true,
+  "fields": [
+    {
+      "name": "ID",
+      "tag": "json:\"id\" yaml:\"id\" gorm:\"primary_key;auto_increment\"",
+      "type_name": "int"
+    },
+    {
+      "name": "Name",
+      "tag": "json:\"name\" yaml:\"name\" gorm:\"not null;unique_index:test_scenario_id_test_step_number_name\"",
+      "type_name": "string"
+    },
+    {
+      "name": "Description",
+      "tag": "json:\"description\" yaml:\"description\"",
+      "type_name": "string"
+    },
+    {
+      "name": "TestScenarioID",
+      "tag": "json:\"test_scenario_id\" yaml:\"test_scenario_id\" gorm:\"not null;unique_index:test_scenario_id_test_step_number_name\" sql:\"type:integer references test_scenarios(id)\"",
+      "type_name": "int"
+    },
+    {
+      "name": "TestScenario",
+      "tag": "json:\"test_scenario\" yaml:\"test_scenario\" gorm:\"ForeignKey:TestScenarioID\" validate:\"omitempty,dive\"",
+      "type_name": "TestScenario"
+    },
+    {
+      "name": "TestStepNumber",
+      "tag": "json:\"test_step_number\" yaml:\"test_step_number\" gorm:\"not null;unique_index:test_scenario_id_test_step_number_name\" validate:\"min=1\"",
+      "type_name": "int"
+    },
+    {
+      "name": "Value",
+      "tag": "json:\"value\" yaml:\"value\" gorm:\"not null\"",
+      "type_name": "string"
+    },
+    {
+      "name": "ToBeDeleted",
+      "tag": "json:\"to_be_deleted,omitempty\" yaml:\"to_be_deleted,omitempty\" sql:\"-\"",
+      "type_name": "bool"
+    }
+  ],
+  "sql_before_migration": [
+    "select 1 from test_scenarios;"
+  ],
+  "sql_after_migration": [
+    "create trigger if not exists DeleteTestScenarioParameterBeforeTestScenarioDeletion before delete on test_scenarios",
+		"  begin",
+		"    delete from test_scenario_parameters where test_scenario_id = old.id;",
+		"  end;"
+  ]
+}

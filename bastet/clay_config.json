@@ -67,7 +67,10 @@
       "file_name": "bastet/test_step_select2.json"
     },
     {
-      "file_name": "bastet/firewall_test_definition.json"
+      "file_name": "bastet/firewall_test_scenario.json"
+    },
+    {
+      "file_name": "bastet/firewall_test_step.json"
     },
     {
       "file_name": "bastet/environment.json"

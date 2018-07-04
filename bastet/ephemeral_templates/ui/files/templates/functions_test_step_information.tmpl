@@ -91,8 +91,6 @@ function repaintTestStepInformation(testStep, initializeTabSelection) {
 
 $('#test_step_information_float_panel a[data-toggle=tab]').on('shown.bs.tab', function(e) {
   $('#test_step_information_float_panel #test_step_arguments_tab #test_step_arguments_table').DataTable().draw();
-
-  PreviewTestStepInformation();
 });
 
 $('#test_step_information_float_panel #test_step_arguments_tab').on('click', 'button[name=add_test_step_argument_btn]', function() {

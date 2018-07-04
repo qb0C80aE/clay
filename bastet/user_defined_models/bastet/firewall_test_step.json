@@ -1,0 +1,111 @@
+{
+  "type_name": "FirewallTestStep",
+  "resource_name": "firewall_test_steps",
+  "to_be_migrated": false,
+  "is_controller_enabled": true,
+  "is_design_access_disabled": true,
+  "fields": [
+    {
+      "name": "ID",
+      "tag": "json:\"id\" yaml:\"id\"",
+      "type_name": "int"
+    },
+    {
+      "name": "Name",
+      "tag": "json:\"name\" yaml:\"name\"",
+      "type_name": "string"
+    },
+    {
+      "name": "Number",
+      "tag": "json:\"number\" yaml:\"number\"",
+      "type_name": "int"
+    },
+    {
+      "name": "FirewallTestScenarioID",
+      "tag": "json:\"firewall_test_scenario_id\" yaml:\"firewall_test_scenario_id\"",
+      "type_name": "int"
+    },
+    {
+      "name": "FirewallTestScenario",
+      "tag": "json:\"firewall_test_scenario\" yaml:\"firewall_test_scenario\"",
+      "type_name": "FirewallTestScenario"
+    },
+    {
+      "name": "SourceParameterID",
+      "tag": "json:\"source_parameter_id\" yaml:\"source_parameter_id\"",
+      "type_name": "int"
+    },
+    {
+      "name": "SourceParameterValue",
+      "tag": "json:\"source_parameter_value\" yaml:\"source_parameter_value\"",
+      "type_name": "string"
+    },
+    {
+      "name": "SourcePortIpv4Address",
+      "tag": "json:\"source_port_ipv4_address\" yaml:\"source_port_ipv4_address\" gorm:\"ForeignKey:SourceParameterValue\"",
+      "type_name": "PortIpv4Address"
+    },
+    {
+      "name": "DestinationParameterID",
+      "tag": "json:\"destination_parameter_id\" yaml:\"destination_parameter_id\"",
+      "type_name": "int"
+    },
+    {
+      "name": "DestinationParameterValue",
+      "tag": "json:\"destination_parameter_value\" yaml:\"destination_parameter_value\"",
+      "type_name": "string"
+    },
+    {
+      "name": "DestinationPortIpv4Address",
+      "tag": "json:\"destination_port_ipv4_address\" yaml:\"destination_port_ipv4_address\" gorm:\"ForeignKey:DestinationParameterValue\"",
+      "type_name": "PortIpv4Address"
+    },
+    {
+      "name": "AccessParameterID",
+      "tag": "json:\"access_parameter_id\" yaml:\"access_parameter_id\"",
+      "type_name": "int"
+    },
+    {
+      "name": "AccessParameterValue",
+      "tag": "json:\"access_parameter_value\" yaml:\"access_parameter_value\"",
+      "type_name": "string"
+    }
+  ],
+  "sql_before_migration": [
+    "select 1 from test_steps;",
+    "select 1 from test_scenario_test_step_associations;",
+    "select 1 from firewall_test_scenarios;",
+    "select 1 from test_scenario_parameters;"
+  ],
+  "sql_after_migration": [
+    "drop view if exists firewall_test_steps;",
+    "create view if not exists firewall_test_steps as",
+    "  select test_steps.id id,",
+    "    test_steps.name name,",
+    "    firewall_test_scenarios.id firewall_test_scenario_id,",
+    "    test_scenario_test_step_associations.number number,",
+    "    source_parameters.id source_parameter_id,",
+    "    source_parameters.value source_parameter_value,",
+    "    destination_parameters.id destination_parameter_id,",
+    "    destination_parameters.value destination_parameter_value,",
+    "    access_parameters.id access_parameter_id,",
+    "    access_parameters.value access_parameter_value",
+    "  from test_steps",
+    "    inner join test_scenario_test_step_associations",
+    "      on test_steps.id = test_scenario_test_step_associations.test_step_id",
+    "    inner join firewall_test_scenarios",
+    "      on test_scenario_test_step_associations.test_scenario_id = firewall_test_scenarios.id",
+    "    inner join test_scenario_parameters source_parameters",
+    "      on firewall_test_scenarios.id = source_parameters.test_scenario_id",
+    "      and test_scenario_test_step_associations.number = source_parameters.test_step_number",
+    "      and source_parameters.name = 'source'",
+    "    inner join test_scenario_parameters destination_parameters",
+    "      on firewall_test_scenarios.id = destination_parameters.test_scenario_id",
+    "      and test_scenario_test_step_associations.number = destination_parameters.test_step_number",
+    "      and destination_parameters.name = 'destination'",
+    "    inner join test_scenario_parameters access_parameters",
+    "      on firewall_test_scenarios.id = access_parameters.test_scenario_id",
+    "      and test_scenario_test_step_associations.number = access_parameters.test_step_number",
+    "      and access_parameters.name = 'access';"
+  ]
+}

@@ -50,6 +50,8 @@
 				</div>
 				<div class="col-sm-8">
 					<input id="firewall_test_scenario_id" type="hidden">
+					<input id="firewall_test_scenario_name" type="hidden">
+					<input id="firewall_test_scenario_description" type="hidden">
 					<table id="firewall_test_definitions_table" class="table table-striped table-bordered table-hover">
 					</table>
 				</div>
@@ -68,112 +70,107 @@ $(function() {
 		$('#main_panel #edit_firewall_test_definition_destination_port_ipv4_address_id').val(0);
 		$('#main_panel #edit_firewall_test_definition_access').val('true');
 
-		getResources('firewall_test_definitions', '', function(testFirewallTestDefinitionResult) {
-			getResource('test_scenarios', 'FirewallTestScenario', 'key_parameter=name', function(testScenarioResult) {
-				getResources('test_steps', 'q[name]=FirewallTestStep_%25', function(testStepResult) {
+		getResources('firewall_test_scenarios', 'first&preloads=firewall_test_steps.source_port_ipv4_address.port.node,firewall_test_steps.destination_port_ipv4_address.port.node', function(firewallTestScenarioResult) {
+			getResources('test_steps', 'q[name]=FirewallTestStep_%25', function(testStepResult) {
 
-					$('#main_panel #firewall_test_scenario_id').val(testScenarioResult.id);
+				$('#main_panel #firewall_test_scenario_id').val(firewallTestScenarioResult.id);
+				$('#main_panel #firewall_test_scenario_name').val(firewallTestScenarioResult.name);
+				$('#main_panel #firewall_test_scenario_description').val(firewallTestScenarioResult.description);
 
-					var maxTestStepNumber = 0;
+		    var edit_firewall_test_definition_service = $('#main_panel #edit_firewall_test_definition_service');
+		    edit_firewall_test_definition_service.children().remove();
+		    for (var i = 0; i < testStepResult.length; i = i + 1) {
+					var text = testStepResult[i].name.split("_")[1];
+		      edit_firewall_test_definition_service.append($('<option>').val(testStepResult[i].id).text(text));
+		    }
 
-			    var edit_firewall_test_definition_service = $('#main_panel #edit_firewall_test_definition_service');
-			    edit_firewall_test_definition_service.children().remove();
-			    for (var i = 0; i < testStepResult.length; i = i + 1) {
-						var text = testStepResult[i].name.split("_")[1];
-			      edit_firewall_test_definition_service.append($('<option>').val(testStepResult[i].id).text(text));
-			    }
+				$('#main_panel #firewall_test_definitions_panel').fadeIn(150, function() {
 
-					$('#main_panel #firewall_test_definitions_panel').fadeIn(150, function() {
-
-						$('#main_panel #firewall_test_definitions_table').DataTable({
-							data: testFirewallTestDefinitionResult.Records,
-							order: [[1, 'asc']],
-							scrollX: true,
-							paginate : true,
-							destroy: true,
-							columns: [
-								{title: '', sortable: false, render: function (data, type, full, meta) {
-										var buttonElements = [
-											{name: 'delete_firewall_test_definition_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-minus', text: ''}
-										];
-										return createButtonGroupElement(buttonElements).outerHTML;
-									}
-								},
-								{title: 'No.', data: 'number', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
-									  if (maxTestStepNumber < data) {
-											maxTestStepNumber = data;
-										}
-										return createReadOnlyTextElement('number', 'in-table', '', '', data).outerHTML;
-									}
-								},
-								{title: 'Source', data: 'source_port_ipv4_address_id', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
-										var text = '';
-										if ((data == undefined) || (data == null)) {
-											text = '(deleted)';
-										} else {
-											text = data.port.node.name + '.' + data.port.name + ' (' + data.address + ')';
-										}
-										return createReadOnlyTextElement('source_port_ipv4_address_id', 'in-table', '', '', text).outerHTML;
-									}
-								},
-								{title: 'Destination', data: 'destination_port_ipv4_address_id', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
-										var text = '';
-										if ((data == undefined) || (data == null)) {
-											text = '(deleted)';
-										} else {
-											text = data.port.node.name + '.' + data.port.name + ' (' + data.address + ')';
-										}
-										return createReadOnlyTextElement('destination_port_ipv4_address_id', 'in-table', '', '', text).outerHTML;
-									}
-								},
-								{title: 'Service', data: 'test_step', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
-										return createReadOnlyTextElement('test_step', 'in-table', '', '', data.name.split("_")[1]).outerHTML;
-									}
-								},
-								{title: 'Access', data: 'access', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
-										var text = '';
-										if (data) {
-											text = 'allow';
-										} else {
-											text = 'deny';
-										}
-										return createReadOnlyTextElement('description', 'in-table', '', '', text).outerHTML;
-									}
-								}
-							]
-						});
-
-						$('#main_panel #edit_firewall_test_definition_source_port_ipv4_address_id').select2({
-							minimumInputLength: 1,
-							ajax: {
-								url:'/ui/select2',
-								dataType: 'json',
-								delay: 50,
-								data: function(params) {
-									return { 'resource_name': 'port_ipv4_address_select2', 'terms_order': 'node_name,port_name', 'terms': params.term, 'limit': 10 };
+					$('#main_panel #firewall_test_definitions_table').DataTable({
+						data: firewallTestScenarioResult.firewall_test_steps,
+						order: [[1, 'asc']],
+						scrollX: true,
+						paginate : true,
+						destroy: true,
+						columns: [
+							{title: '', sortable: false, render: function (data, type, full, meta) {
+									var buttonElements = [
+										{name: 'delete_firewall_test_definition_btn', buttonClass: 'btn btn-default', spanClass: 'glyphicon glyphicon-minus', text: ''}
+									];
+									return createHiddenElement('id', full.id).outerHTML + createButtonGroupElement(buttonElements).outerHTML;
 								}
 							},
-							width: '100%',
-							placeholder: 'None'
-						});
-
-						$('#main_panel #edit_firewall_test_definition_destination_port_ipv4_address_id').select2({
-							minimumInputLength: 1,
-							ajax: {
-								url:'/ui/select2',
-								dataType: 'json',
-								delay: 50,
-								data: function(params) {
-									return { 'resource_name': 'port_ipv4_address_select2', 'terms_order': 'node_name,port_name', 'terms': params.term, 'limit': 10 };
+							{title: 'No.', data: 'number', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+									return createReadOnlyTextElement('number', 'in-table', '', '', data).outerHTML;
 								}
 							},
-							width: '100%',
-							placeholder: 'None'
-						});
+							{title: 'Source', data: 'source_port_ipv4_address', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+									var text = '';
+									if ((data == undefined) || (data == null)) {
+										text = '(deleted)';
+									} else {
+										text = data.port.node.name + '.' + data.port.name + ' (' + data.address + ')';
+									}
+									return createHiddenElement('source_parameter_id', full.source_parameter_id).outerHTML + createReadOnlyTextElement('source_port_ipv4_address_id', 'in-table', '', '', text).outerHTML;
+								}
+							},
+							{title: 'Destination', data: 'destination_port_ipv4_address', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+									var text = '';
+									if ((data == undefined) || (data == null)) {
+										text = '(deleted)';
+									} else {
+										text = data.port.node.name + '.' + data.port.name + ' (' + data.address + ')';
+									}
+									return createHiddenElement('destination_parameter_id', full.destination_parameter_id).outerHTML + createReadOnlyTextElement('destination_port_ipv4_address_id', 'in-table', '', '', text).outerHTML;
+								}
+							},
+							{title: 'Service', data: 'name', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+									return createReadOnlyTextElement('name', 'in-table', '', '', data.split("_")[1]).outerHTML;
+								}
+							},
+							{title: 'Access', data: 'access_parameter_value', defaultContent: '', type: 'string', sortable: false, orderDataType: 'dom-text', render: function (data, type, full, meta) {
+									var text = '';
+									if (data == 'true') {
+										text = 'allow';
+									} else {
+										text = 'deny';
+									}
+									return createHiddenElement('access_parameter_id', full.access_parameter_id).outerHTML + createReadOnlyTextElement('description', 'in-table', '', '', text).outerHTML;
+								}
+							}
+						]
+					});
 
+					$('#main_panel #edit_firewall_test_definition_source_port_ipv4_address_id').select2({
+						minimumInputLength: 1,
+						ajax: {
+							url:'/ui/select2',
+							dataType: 'json',
+							delay: 50,
+							data: function(params) {
+								return { 'resource_name': 'port_ipv4_address_select2', 'terms_order': 'node_name,port_name', 'terms': params.term, 'limit': 10 };
+							}
+						},
+						width: '100%',
+						placeholder: 'None'
+					});
+
+					$('#main_panel #edit_firewall_test_definition_destination_port_ipv4_address_id').select2({
+						minimumInputLength: 1,
+						ajax: {
+							url:'/ui/select2',
+							dataType: 'json',
+							delay: 50,
+							data: function(params) {
+								return { 'resource_name': 'port_ipv4_address_select2', 'terms_order': 'node_name,port_name', 'terms': params.term, 'limit': 10 };
+							}
+						},
+						width: '100%',
+						placeholder: 'None'
 					});
 
 				});
+
 			});
 		});
 
@@ -185,20 +182,75 @@ $(function() {
 	    return;
 	  }
 
-	  var sourceIpv4AddressID = $('#main_panel #edit_firewall_test_definition_source_port_ipv4_address_id').val();
-	  var destinationIpv4AddressID = $('#main_panel #edit_firewall_test_definition_destination_port_ipv4_address_id').val();
+		var firewallTestScenarioID = $('#main_panel #firewall_test_scenario_id').val();
+		var firewallTestScenarioName = $('#main_panel #firewall_test_scenario_name').val();
+		var firewallTestScenarioDescription = $('#main_panel #firewall_test_scenario_description').val();
+	  var sourcePortIpv4AddressID = $('#main_panel #edit_firewall_test_definition_source_port_ipv4_address_id').val();
+	  var destinationPortIpv4AddressID = $('#main_panel #edit_firewall_test_definition_destination_port_ipv4_address_id').val();
 	  var serviceID = $('#main_panel #edit_firewall_test_definition_service').val();
 		var access = $('#main_panel #edit_firewall_test_definition_access').val();
 
+		if ((sourcePortIpv4AddressID == "") || (sourcePortIpv4AddressID == null) || (sourcePortIpv4AddressID == undefined)) {
+			showProcessResult({}, {status: -1, responseJSON: {error: "Source must not be empty"}}, 0, "");
+			return;
+		}
+		if ((destinationPortIpv4AddressID == "") || (destinationPortIpv4AddressID == null) || (destinationPortIpv4AddressID == undefined)) {
+			showProcessResult({}, {status: -1, responseJSON: {error: "Destination must not be empty"}}, 0, "");
+			return;
+		}
+		if ((serviceID == "") || (serviceID == null) || (serviceID == undefined)) {
+			showProcessResult({}, {status: -1, responseJSON: {error: "Service must not be empty"}}, 0, "");
+			return;
+		}
+
+		var number = 0;
+		$('#main_panel #firewall_test_definitions_table').DataTable().rows().every(function(){
+			var tr = $(this.node());
+			var testStepNumber = tr.find('input[name=number]').val();
+			if ((testStepNumber == "") || (testStepNumber == null) || (testStepNumber == undefined)) {
+				testStepNumber = 0;
+			}
+
+			testStepNumber = parseInt(testStepNumber);
+
+			if (number < testStepNumber) {
+				number = testStepNumber;
+			}
+		});
+		number = number + 1;
+
 		var firewallTestScenario = {
-			source_port_ipv4_address_id_id: parseInt(sourceIpv4AddressID),
-			destination_port_ipv4_address_id_id: parseInt(destinationIpv4AddressID),
-			test_step_id: parseInt(serviceID),
-			access: convertStringToBoolean(access)
+			id: parseInt(firewallTestScenarioID),
+			name: firewallTestScenarioName,
+			description: firewallTestScenarioDescription,
+			test_scenario_parameters: [
+				{
+					name: 'source',
+					value: sourcePortIpv4AddressID,
+					test_step_number: number
+				},
+				{
+					name: 'destination',
+					value: destinationPortIpv4AddressID,
+					test_step_number: number
+				},
+				{
+					name: 'access',
+					value: access,
+					test_step_number: number
+				},
+			],
+			test_scenario_test_step_associations: [
+				{
+					test_scenario_id: parseInt(firewallTestScenarioID),
+					test_step_id: parseInt(serviceID),
+					number: number
+				}
+			]
 		};
 
-    postResource('firewall_test_definitions', firewallTestDefinition, '', function(result, xhr) {
-      showProcessResult(result, xhr, 201, "The test definition has been registered successfully.");
+    putResource('test_scenarios', firewallTestScenarioID, firewallTestScenario, '', function(result, xhr) {
+      showProcessResult(result, xhr, 200, "The test definition has been registered successfully.");
       postProcessUpdateFirewallTestDefinition(result, xhr);
     });
 
@@ -209,17 +261,53 @@ $(function() {
 	}
 
 	$('#main_panel #firewall_test_definitions_table').on('click', 'button[name=delete_firewall_test_definition_btn]', function() {
-		var tr = $(this).closest('tr');
-		var id = tr.find('input[name=id]').val();
-
 		if (!confirm('Are you sure to delete the test definition?')) {
 	    return;
 	  }
 
-	  deleteResource('firewall_test_definitions', id, '', function(result, xhr) {
-	    showProcessResult(result, xhr, 204, "The test definition information has been deleted successfully.");
-			onLoad();
-	  });
+		var tr = $(this).closest('tr');
+		var id = tr.find('input[name=id]').val();
+		var number = tr.find('input[name=number]').val();
+		var sourceParameterID = tr.find('input[name=source_parameter_id]').val();
+		var destinationParameterID = tr.find('input[name=destination_parameter_id]').val();
+		var accessParameterID = tr.find('input[name=access_parameter_id]').val();
+
+		var firewallTestScenarioID = $('#main_panel #firewall_test_scenario_id').val();
+		var firewallTestScenarioName = $('#main_panel #firewall_test_scenario_name').val();
+		var firewallTestScenarioDescription = $('#main_panel #firewall_test_scenario_description').val();
+
+		var firewallTestScenario = {
+			id: parseInt(firewallTestScenarioID),
+			name: firewallTestScenarioName,
+			description: firewallTestScenarioDescription,
+			test_scenario_parameters: [
+				{
+					id: parseInt(sourceParameterID),
+					to_be_deleted: true
+				},
+				{
+					id: parseInt(destinationParameterID),
+					to_be_deleted: true
+				},
+				{
+					id: parseInt(accessParameterID),
+					to_be_deleted: true
+				}
+			],
+			test_scenario_test_step_associations: [
+				{
+					test_scenario_id: parseInt(firewallTestScenarioID),
+					test_step_id: parseInt(id),
+					number: parseInt(number),
+					to_be_deleted: true
+				}
+			]
+		};
+
+    putResource('test_scenarios', firewallTestScenarioID, firewallTestScenario, '', function(result, xhr) {
+      showProcessResult(result, xhr, 200, "The test definition has been deleted successfully.");
+      postProcessUpdateFirewallTestDefinition(result, xhr);
+    });
 	});
 
 	onLoad();

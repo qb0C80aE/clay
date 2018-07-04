@@ -1,0 +1,43 @@
+{
+  "type_name": "FirewallTestScenario",
+  "resource_name": "firewall_test_scenarios",
+  "to_be_migrated": false,
+  "is_controller_enabled": true,
+  "is_design_access_disabled": true,
+  "fields": [
+    {
+      "name": "ID",
+      "tag": "json:\"id\" yaml:\"id\"",
+      "type_name": "int"
+    },
+    {
+      "name": "Name",
+      "tag": "json:\"name\" yaml:\"name\"",
+      "type_name": "string"
+    },
+    {
+      "name": "Description",
+      "tag": "json:\"description\" yaml:\"description\"",
+      "type_name": "string"
+    },
+    {
+      "name": "FirewallTestSteps",
+      "tag": "json:\"firewall_test_steps\" yaml:\"firewall_test_step\" gorm:\"ForeignKey:FirewallTestScenarioID\"",
+      "type_name": "FirewallTestStep",
+      "is_slice": true
+    }
+  ],
+  "sql_before_migration": [
+    "select 1 from test_scenarios;"
+  ],
+  "sql_after_migration": [
+    "drop view if exists firewall_test_scenarios;",
+    "create view if not exists firewall_test_scenarios as",
+    "  select test_scenarios.id id,",
+    "    test_scenarios.name name,",
+    "    test_scenarios.description description",
+    "  from test_scenarios",
+    "  where name = 'FirewallTestScenario';",
+    "insert or ignore into test_scenarios(name) values('FirewallTestScenario');"
+  ]
+}
