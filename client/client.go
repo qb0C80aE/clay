@@ -102,7 +102,13 @@ func sendRequest(method string, url string, contentType string, body io.Reader) 
 	if len(contentType) > 0 {
 		request.Header.Set("Content-Type", contentType)
 	}
-	return httpClient.Do(request)
+	response, err := httpClient.Do(request)
+	if request.MultipartForm != nil {
+		if err := request.MultipartForm.RemoveAll(); err != nil {
+			return response, err
+		}
+	}
+	return response, err
 }
 
 func outputClientResponse(cmd *cobra.Command, response *http.Response) error {
