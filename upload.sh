@@ -1,4 +1,7 @@
 #!/bin/bash
+
+exit 0
+
 curl -X DELETE -H "AuthKey: ${AUTH_KEY}" https://clay-download.herokuapp.com/clay.bastet.linux-amd64.tgz
 curl -X DELETE -H "AuthKey: ${AUTH_KEY}" https://clay-download.herokuapp.com/clay.bastet.linux-386.tgz
 curl -X DELETE -H "AuthKey: ${AUTH_KEY}" https://clay-download.herokuapp.com/clay.bastet.windows-amd64.zip
