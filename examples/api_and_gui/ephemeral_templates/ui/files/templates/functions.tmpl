@@ -113,7 +113,10 @@ function getResourceAsText(target, id, query, callbackSuccess, callbackFailure) 
 
   $.ajax({
     type: 'GET',
-    url: '/' + target + '/' + id + query
+    url: '/' + target + '/' + id + query,
+    headers: {
+      Accept: "text/plain"
+    }
   }).done(function(result, status, xhr) {
     if ((callbackSuccess != null) && (callbackSuccess != undefined)) {
       callbackSuccess(result, xhr);
