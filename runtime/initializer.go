@@ -285,6 +285,11 @@ func (receiver *clayRuntimeInitializer) loadEphemeralBinaryObjects(config *clayC
 		responseWriter := httptest.NewRecorder()
 
 		extension.GetRegisteredEngine().ServeHTTP(responseWriter, request)
+		if err := request.MultipartForm.RemoveAll(); err != nil {
+			logging.Logger().Critical(err.Error())
+			return err
+		}
+
 		response := responseWriter.Result()
 		defer response.Body.Close()
 
