@@ -10,6 +10,7 @@ var designAccessors = []DesignAccessor{}
 // * DeleteFromDesign deletes the model related to this logic in db
 // * LoadToDesign loads the model related to this logic into db
 type DesignAccessor interface {
+	GetSequenceNumber() int
 	ExtractFromDesign(db *gorm.DB) (string, interface{}, error)
 	DeleteFromDesign(db *gorm.DB) error
 	LoadToDesign(db *gorm.DB, model interface{}) error

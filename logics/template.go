@@ -18,6 +18,10 @@ func newTemplateLogic() *templateLogic {
 	return logic
 }
 
+func (receiver *templateLogic) GetSequenceNumber() int {
+	return 1
+}
+
 var uniqueTemplateLogic = newTemplateLogic()
 
 // UniqueTemplateLogic returns the unique template logic instance
