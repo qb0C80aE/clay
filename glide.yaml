@@ -10,8 +10,8 @@ import:
   version: ~1.2.0
 - package: github.com/umisama/golog
 - package: github.com/qb0C80aE/loam
-  version: develop
+  version: bastet-old-20180711
 - package: github.com/qb0C80aE/pottery
-  version: bastet
+  version: bastet-old-20180711
 testImport:
 - package: github.com/bouk/monkey
