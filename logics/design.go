@@ -8,6 +8,7 @@ import (
 	"github.com/qb0C80aE/clay/models"
 	"net/url"
 	"time"
+	"sort"
 )
 
 type designLogic struct {
@@ -58,12 +59,20 @@ func (logic *designLogic) Update(db *gorm.DB, _ gin.Params, _ url.Values, data i
 	design := data.(*models.Design)
 
 	designAccessors := extensions.RegisteredDesignAccessors()
+
+	sort.Slice(designAccessors, func(i, j int) bool {
+		return designAccessors[i].GetSequenceNumber() > designAccessors[j].GetSequenceNumber()
+	})
 	for _, accessor := range designAccessors {
 		if err := accessor.DeleteFromDesign(db); err != nil {
 			logging.Logger().Debug(err.Error())
 			return nil, err
 		}
 	}
+
+	sort.Slice(designAccessors, func(i, j int) bool {
+		return designAccessors[i].GetSequenceNumber() < designAccessors[j].GetSequenceNumber()
+	})
 	for _, accessor := range designAccessors {
 		if err := accessor.LoadToDesign(db, design); err != nil {
 			logging.Logger().Debug(err.Error())
@@ -77,6 +86,10 @@ func (logic *designLogic) Update(db *gorm.DB, _ gin.Params, _ url.Values, data i
 // Delete deletes all models
 func (logic *designLogic) Delete(db *gorm.DB, _ gin.Params, _ url.Values) error {
 	designAccessors := extensions.RegisteredDesignAccessors()
+
+	sort.Slice(designAccessors, func(i, j int) bool {
+		return designAccessors[i].GetSequenceNumber() > designAccessors[j].GetSequenceNumber()
+	})
 	for _, accessor := range designAccessors {
 		if err := accessor.DeleteFromDesign(db); err != nil {
 			logging.Logger().Debug(err.Error())

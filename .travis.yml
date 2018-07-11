@@ -21,6 +21,7 @@ install:
 script:
  - glide install
  - go generate -tags=prebuild ./...
+ - (cd vendor/github.com/qb0C80aE/pottery/; go generate -tags=prebuild ./...)
  - GOOS=linux GOARCH=amd64 go build --ldflags '-extldflags "-static"' -o linux_amd64/clay/clay
  - CGO_ENABLED=1 GOOS=linux GOARCH=386 go build --ldflags '-extldflags "-static"' -o linux_386/clay/clay
  - CC=x86_64-w64-mingw32-gcc LD=x86_64-w64-mingw32-ld CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build --ldflags '-extldflags "-static"' -o windows_amd64/clay/clay.exe
