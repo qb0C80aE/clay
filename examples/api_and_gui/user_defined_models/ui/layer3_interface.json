@@ -83,9 +83,17 @@
     "    ports.mac_address mac_address,",
     "    port_ipv4_addresses.id ipv4_address_id,",
     "    port_ipv4_addresses.address ipv4_address,",
-    "    port_ipv4_addresses.prefix ipv4_prefix",
+    "    port_ipv4_addresses.prefix ipv4_prefix,",
+    "    vlan_port_associations.vlan_id vlan_id,",
+    "    subnets.id subnet_id",
     "  from ports",
     "    inner join port_ipv4_addresses",
-    "      on ports.id = port_ipv4_addresses.port_id;"
+    "      on ports.id = port_ipv4_addresses.port_id",
+    "    inner join vlan_port_associations",
+    "      on ports.id = vlan_port_associations.port_id",
+    "    inner join vlans",
+    "      on vlan_port_associations.vlan_id = vlans.id",
+    "    inner join subnets",
+    "      on vlans.id = subnets.vlan_id;"
   ]
 }
