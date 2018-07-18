@@ -383,6 +383,7 @@ One more thing, import and export will be processed following the sequence that 
 ## Templates
 
 You can register some text templates and generate something using the models in Clay.
+Templates are written in Golang ``text/template`` format.
 Some functions are provided in template processing, see an example template in Clay like ``examples/api_only/sample.template``.
 
 ```
@@ -422,10 +423,8 @@ See ``examples/api_and_gui/ephemeral_*`` directories to know in detail.
 
 ## URL aliases
 
-Clay provides url aliases like or request forwarding.
-You can register those information to Clay through REST API.
-
-You can use this feature for various kinds of purpose, such as creating url shortcut, pretending static files.
+Clay provides url alias feature like request forwarding by registering specific information to Clay through REST API.
+This feature can be used for various kinds of purpose, such as creating url shortcut, pretending static files.
 
 For example, write ``alias.json`` in a specific format like below.
 
@@ -492,24 +491,11 @@ You have seen it so far that you can register various kinds of items into Clay. 
     {
       "name": <string>,
       "file_name": <string>
-    }
+    },
     ...
   ],
   "url_aliases": [
-    {
-      "name": <string>,                 # Name
-      "from": <string>,                 # Redirect path from
-      "to": <string>,                   # Redirect path to
-      "query": <string>,                # Queries added when access is redirected
-      "methods": [                      # HTTP methods
-        {
-          "method": <string>,           # HTTP methods (GET|POST|PUT|DELETE)
-          "target_url_type": <string>,  # Target resource url type (multi|single)
-          "accept": <string>,           # Accept header value
-          "accept_charset": <string>    # Accept-Charset header value
-        }
-      ]
-    },
+    <the same format as URL aliases section>,
     ...
   ]
 }
@@ -612,7 +598,7 @@ After building the binary, you can boot Clay without any parameters, any other f
 $ ./clay
 ```
 
-Even if you are using this single binary, you can let Clay load external files by setting ``CLAY_ASSET_MODE`` variable to ``external`` at boot time.
+Even if you are using this single binary, you can get Clay to load external files by setting ``CLAY_ASSET_MODE`` variable to ``external`` at boot time.
 
 # Etc.
 
