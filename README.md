@@ -596,6 +596,24 @@ PS> cd $env:GOPATH/src/github.com/qb0C80aE/clay
 PS> powershell { $env:PATH+=";C:\msys64\mingw64\bin"; go build }
 ```
 
+## Build as a single binary
+
+If you want to build Clay as a single binary file including assets like files in examples, just specify ``CLAY_ASSET_MODE`` to ``internal``, ``BUILD_ASSET`` to true, and ``BUILD_ASSET_SOURCE`` to the assets path at prebuild generation.
+And one more thing, please don't forget to specify ``CLAY_CONFIG_FILE_PATH`` to tell the default config file in the internal assets to Clay. This value is used at boot time as a default value.
+
+```
+$ CLAY_ASSET_MODE=internal BUILD_ASSET=true BUILD_ASSET_SOURCE=../examples/api_and_gui CLAY_CONFIG_FILE_PATH=examples/api_and_gui/clay_config.json go generate -tags=prebuild prebuild/generate.go
+$ go build
+```
+
+After building the binary, you can boot Clay without any parameters, any other files.
+
+```
+$ ./clay
+```
+
+Even if you are using this single binary, you can let Clay load external files by setting ``CLAY_ASSET_MODE`` variable to ``external`` at boot time.
+
 # Etc.
 
 * Clay is using [dep](https://github.com/golang/dep) to manage dependencies of its packages
