@@ -9,6 +9,7 @@ import (
 	"github.com/qb0C80aE/clay/logging"
 	mapstructutilpkg "github.com/qb0C80aE/clay/util/mapstruct"
 	"github.com/robertkrimen/otto"
+	"github.com/robertkrimen/otto/parser"
 	"net/url"
 	"sort"
 	"sync"
@@ -102,6 +103,19 @@ func (receiver *EphemeralScript) Create(_ extension.Model, db *gorm.DB, _ gin.Pa
 	if _, exists := nameEphemeralScriptMap[ephemeralScript.Name]; exists {
 		logging.Logger().Debugf("ephemeralScript %s already exists", ephemeralScript.Name)
 		return nil, fmt.Errorf("ephemeralScript %s already exists", ephemeralScript.Name)
+	}
+
+	if _, err := parser.ParseFile(nil, "", fmt.Sprintf(`(function() { %s })();`, ephemeralScript.ScriptContent), 0); err != nil {
+		if _, ok := err.(parser.ErrorList); ok {
+			logging.Logger().Debugf("parse errors have occured during parsing %s: ", ephemeralScript.Name)
+			errList := err.(parser.ErrorList)
+			for _, err := range errList {
+				logging.Logger().Debugf("%v", err.Error())
+			}
+			return nil, fmt.Errorf("parse errors have occured during parsing %s: %v", ephemeralScript.Name, err.Error())
+		}
+		logging.Logger().Debugf("a parse error has occured during parsing %s: %v", ephemeralScript.Name, err.Error())
+		return nil, fmt.Errorf("a parse error has occured during parsing %s: %v", ephemeralScript.Name, err.Error())
 	}
 
 	ephemeralScript.Status = ephemeralScriptStatusCreated

@@ -16,8 +16,10 @@ import (
 	modelstorepkg "github.com/qb0C80aE/clay/util/modelstore"
 	networkutilpkg "github.com/qb0C80aE/clay/util/network"
 	stringutilpkg "github.com/qb0C80aE/clay/util/string"
+	"github.com/robertkrimen/otto"
 	"net/url"
 	"reflect"
+	"strings"
 	"time"
 )
 
@@ -144,8 +146,18 @@ func executeEphemeralScript(ephemeralScript *EphemeralScript) {
 	value, err := ephemeralScript.vm.Run(scriptContent)
 
 	if err != nil {
-		logging.Logger().Debug(err.Error())
-		ephemeralScript.Error = fmt.Sprintf("%v", err.Error())
+		logging.Logger().Debugf("an error has occured during execution of %s: ", ephemeralScript.Name)
+		if _, ok := err.(*otto.Error); ok {
+			err := err.(*otto.Error)
+			errStringList := strings.Split(err.String(), "\n")
+			for _, errString := range errStringList {
+				logging.Logger().Debug(errString)
+			}
+			ephemeralScript.Error = fmt.Sprintf("%v", err.String())
+		} else {
+			logging.Logger().Debug(err.Error())
+			ephemeralScript.Error = fmt.Sprintf("%v", err.Error())
+		}
 	} else {
 		ephemeralScript.Error = ""
 	}
