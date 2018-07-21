@@ -1,21 +1,21 @@
 function getEnvironment() {
-  var result = ModelStore.Single('environments/1', '');
-  if (result[1] != null) {
-    error(result[1].Error() + ': ' + Conversion.String(result[0]));
+  var singleResult = ModelStore.Single('environments/1', '');
+  if (singleResult[1] != null) {
+    error(singleResult[1].Error() + ': ' + Conversion.String(singleResult[0]));
   }
-  return result[0];
+  return singleResult[0];
 }
 
 function initGitRepository(environment) {
-  var result = Exec.Command(['mkdir', '-p', environment.GitRepositoryURI]).CombinedOutput();
-  if (result[1] != null) {
-    error(result[1].Error() + ': ' + Conversion.String(result[0]));
+  var cmdCombinedOutput = Exec.Command(['mkdir', '-p', environment.GitRepositoryURI]).CombinedOutput();
+  if (cmdCombinedOutput[1] != null) {
+    error(cmdCombinedOutput[1].Error() + ': ' + Conversion.String(cmdCombinedOutput[0]));
   }
 
   var cmd = Exec.Command(['git', 'status']);
   cmd.Dir = environment.GitRepositoryURI;
-  result = cmd.Run();
-  if (result != null) {
+  var cmdRun  = cmd.Run();
+  if (cmdRun != null) {
     cmd = Exec.Command(['git', 'init']);
     cmd.Dir = environment.GitRepositoryURI;
     cmd.Run();
@@ -23,16 +23,16 @@ function initGitRepository(environment) {
 
   cmd = Exec.Command(['git', 'config', '--local', 'user.name', environment.GitUserName]);
   cmd.Dir = environment.GitRepositoryURI;
-  result = cmd.CombinedOutput();
-  if (result[1] != null) {
-    error(result[1].Error() + ': ' + Conversion.String(result[0]));
+  cmdCombinedOutput = cmd.CombinedOutput();
+  if (cmdCombinedOutput[1] != null) {
+    error(cmdCombinedOutput[1].Error() + ': ' + Conversion.String(cmdCombinedOutput[0]));
   }
 
   cmd = Exec.Command(['git', 'config', '--local', 'user.email', environment.GitUserEmail]);
   cmd.Dir = environment.GitRepositoryURI;
-  result = cmd.CombinedOutput();
-  if (result[1] != null) {
-    error(result[1].Error() + ': ' + Conversion.String(result[0]));
+  cmdCombinedOutput = cmd.CombinedOutput();
+  if (cmdCombinedOutput[1] != null) {
+    error(cmdCombinedOutput[1].Error() + ': ' + Conversion.String(cmdCombinedOutput[0]));
   }
 }
 
@@ -47,103 +47,104 @@ function unzip(environment) {
 
   var cmd = Exec.Command(['rm', '-rf', 'uploaded']);
 	cmd.Dir = environment.GitRepositoryURI;
-	result = cmd.CombinedOutput();
-  if (result[1] != null) {
-    error(result[1].Error() + ': ' + Conversion.String(result[0]));
+	var cmdCombinedOutput = cmd.CombinedOutput();
+  if (cmdCombinedOutput[1] != null) {
+    error(cmdCombinedOutput[1].Error() + ': ' + Conversion.String(cmdCombinedOutput[0]));
   }
 
   cmd = Exec.Command(['mkdir', '-p', 'uploaded']);
   cmd.Dir = environment.GitRepositoryURI;
-  result = cmd.CombinedOutput();
-  if (result[1] != null) {
-    error(result[1].Error() + ': ' + Conversion.String(result[0]));
+  cmdCombinedOutput = cmd.CombinedOutput();
+  if (cmdCombinedOutput[1] != null) {
+    error(cmdCombinedOutput[1].Error() + ': ' + Conversion.String(cmdCombinedOutput[0]));
   }
 
   var fileName = String.Sprintf('%s/%s/uploaded.zip', environment.GitRepositoryURI, 'uploaded');
-  result = IO.WriteFile(fileName, Data.zip_file, 0644);
-  if (result != null) {
+  var writeResult = IO.WriteFile(fileName, Data.zip_file, 0644);
+  if (writeResult != null) {
     error(result.Error());
   }
 
   cmd = Exec.Command(['unzip', 'uploaded.zip']);
   cmd.Dir = String.Sprintf('%s/%s', environment.GitRepositoryURI, 'uploaded');
-  result = cmd.CombinedOutput();
-  if (result[1] != null) {
-    error(result[1].Error() + ': ' + Conversion.String(result[0]));
+  cmdCombinedOutput = cmd.CombinedOutput();
+  if (cmdCombinedOutput[1] != null) {
+    error(cmdCombinedOutput[1].Error() + ': ' + Conversion.String(cmdCombinedOutput[0]));
   }
 
   fileName = String.Sprintf('%s/%s/notification_url.txt', environment.GitRepositoryURI, 'uploaded');
-  result = Conversion.Bytes(Data.notification_url);
-  if (result[1] != null) {
-    error(result[1].Error());
+  var notificationURIBytes = Conversion.Bytes(Data.notification_url);
+  if (notificationURIBytes[1] != null) {
+    error(notificationURIBytes[1].Error());
   }
-  result = IO.WriteFile(fileName, result[0], 0644);
-  if (result != null) {
+
+  writeResult = IO.WriteFile(fileName, notificationURIBytes[0], 0644);
+  if (writeResult != null) {
     error(result.Error());
   }
 }
 
 function updateDesign(environment) {
-  cmd = Exec.Command(['curl', '-X', 'PUT', '-H', 'Content-Type: application/json', 'http://localhost:8080/designs/present', '-d', '@design.json']);
+  var cmd = Exec.Command(['curl', '-X', 'PUT', '-H', 'Content-Type: application/json', 'http://localhost:8080/designs/present', '-d', '@design.json']);
   cmd.Dir = String.Sprintf('%s/%s', environment.GitRepositoryURI, 'uploaded');
-  result = cmd.CombinedOutput();
-  if (result[1] != null) {
-    error(result[1].Error() + ': ' + Conversion.String(result[0]));
+  var cmdCombinedOutput = cmd.CombinedOutput();
+  if (cmdCombinedOutput[1] != null) {
+    error(cmdCombinedOutput[1].Error() + ': ' + Conversion.String(cmdCombinedOutput[0]));
   }
 }
 
 function createTemplateFile(environment) {
-  var result = ModelStore.Single('templates/environment_template/generation', 'key_parameter=name');
-  if (result[1] != null) {
-    error(result[1].Error());
+  var singleResult = ModelStore.Single('templates/environment_template/generation', 'key_parameter=name');
+  if (singleResult[1] != null) {
+    error(singleResult[1].Error());
   }
 
-  result = Conversion.Bytes(result[0]);
-  if (result[1] != null) {
-    error(result[1].Error());
+  var singleResultBytes = Conversion.Bytes(singleResult[0]);
+  if (singleResultBytes[1] != null) {
+    error(singleResultBytes[1].Error());
   }
 
-  result = IO.WriteFile(environment.GitRepositoryURI + '/' + environment.TemplateFileName, result[0], 0644);
-  if (result != null) {
+  var writeResult = IO.WriteFile(environment.GitRepositoryURI + '/' + environment.TemplateFileName, singleResultBytes[0], 0644);
+  if (writeResult != null) {
     error(result.Error());
   }
 }
 
 function createTestRunnerScriptFile(environment) {
-  var result = ModelStore.Single('templates/environment_test_runner_script/generation', 'key_parameter=name');
-  if (result[1] != null) {
-    error(result[1].Error());
+  var singleResult = ModelStore.Single('templates/environment_test_runner_script/generation', 'key_parameter=name');
+  if (singleResult[1] != null) {
+    error(singleResult[1].Error());
   }
 
-  result = Conversion.Bytes(result[0]);
-  if (result[1] != null) {
-    error(result[1].Error());
+  var singleResultBytes = Conversion.Bytes(singleResult[0]);
+  if (singleResultBytes[1] != null) {
+    error(singleResultBytes[1].Error());
   }
 
-  result = IO.WriteFile(environment.GitRepositoryURI + '/test_runner.sh', result[0], 0644);
-  if (result != null) {
+  var writeResult = IO.WriteFile(environment.GitRepositoryURI + '/test_runner.sh', singleResultBytes[0], 0644);
+  if (writeResult != null) {
     error(result.Error());
   }
 }
 
 function createDesignFile(environment) {
-  var result = ModelStore.Single('designs/present', '');
-  if (result[1] != null) {
-    error(result[1].Error());
+  var singleResult = ModelStore.Single('designs/present', '');
+  if (singleResult[1] != null) {
+    error(singleResult[1].Error());
   }
 
-  result = Conversion.JSONMarshal(result[0], '  ');
-  if (result[1] != null) {
-    error(result[1].Error());
+  var singleResultJSON = Conversion.JSONMarshal(singleResult[0], '  ');
+  if (singleResultJSON[1] != null) {
+    error(singleResultJSON[1].Error());
   }
 
-  result = Conversion.Bytes(result[0]);
-  if (result[1] != null) {
-    error(result[1].Error());
+  var singleResultJSONBytes = Conversion.Bytes(singleResultJSON[0]);
+  if (singleResultJSONBytes[1] != null) {
+    error(singleResultJSONBytes[1].Error());
   }
 
-  result = IO.WriteFile(environment.GitRepositoryURI + '/' + environment.DesignFileName, result[0], 0644);
-  if (result != null) {
+  var writeResult = IO.WriteFile(environment.GitRepositoryURI + '/' + environment.DesignFileName, singleResultJSONBytes[0], 0644);
+  if (writeResult != null) {
     error(result.Error());
   }
 }
@@ -151,31 +152,31 @@ function createDesignFile(environment) {
 function createNodeConfigFiles(environment) {
   var cmd = Exec.Command(['rm', '-rf', environment.NodeConfigDirectoryName]);
 	cmd.Dir = environment.GitRepositoryURI;
-	result = cmd.CombinedOutput();
-  if (result[1] != null) {
-    error(result[1].Error() + ': ' + Conversion.String(result[0]));
+	var cmdCombinedOutput = cmd.CombinedOutput();
+  if (cmdCombinedOutput[1] != null) {
+    error(cmdCombinedOutput[1].Error() + ': ' + Conversion.String(cmdCombinedOutput[0]));
   }
 
 	cmd = Exec.Command(['mkdir', environment.NodeConfigDirectoryName]);
 	cmd.Dir = environment.GitRepositoryURI;
-  result = cmd.CombinedOutput();
-  if (result[1] != null) {
-    error(result[1].Error() + ': ' + Conversion.String(result[0]));
+  cmdCombinedOutput = cmd.CombinedOutput();
+  if (cmdCombinedOutput[1] != null) {
+    error(cmdCombinedOutput[1].Error() + ': ' + Conversion.String(cmdCombinedOutput[0]));
   }
 
-  var result = ModelStore.Multi('nodes', 'preloads=node_kind,node_configuration.initialization_template,node_configuration.configuration_template');
-  if (result[1] != null) {
-    error(result[1].Error());
+  var multiResult = ModelStore.Multi('nodes', 'preloads=node_kind,node_configuration.initialization_template,node_configuration.configuration_template');
+  if (multiResult[1] != null) {
+    error(multiResult[1].Error());
   }
-  var nodes = result[0].Records;
+  var nodes = multiResult[0].Records;
 
 	for (i in nodes) {
     var node = nodes[i];
 		var cmd = Exec.Command(['mkdir', '-p', node.Name]);
 		cmd.Dir = String.Sprintf('%s/%s', [environment.GitRepositoryURI, environment.NodeConfigDirectoryName]);
-		result = cmd.CombinedOutput();
-    if (result[1] != null) {
-      error(result[1].Error() + ': ' + Conversion.String(result[0]));
+		var cmdCombinedOutput = cmd.CombinedOutput();
+    if (cmdCombinedOutput[1] != null) {
+      error(cmdCombinedOutput[1].Error() + ': ' + Conversion.String(cmdCombinedOutput[0]));
     }
 
     var query = String.Sprintf('node_id=%d', [node.ID]);
@@ -185,14 +186,14 @@ function createNodeConfigFiles(environment) {
       if (node.NodeConfiguration.InitializationTemplate.TemplateContent.length > 0) {
         templateID = node.NodeConfiguration.InitializationTemplateID;
       }
-      var result = ModelStore.Single('templates/' + templateID + '/generation', query);
-      if (result[1] != null) {
-        error(result[1].Error());
+      var singleResult = ModelStore.Single('templates/' + templateID + '/generation', query);
+      if (singleResult[1] != null) {
+        error(singleResult[1].Error());
       }
 
-      result = Conversion.Bytes(result[0]);
-      if (result[1] != null) {
-        error(result[1].Error());
+      singleResultBytes = Conversion.Bytes(singleResult[0]);
+      if (singleResultBytes[1] != null) {
+        error(singleResultBytes[1].Error());
       }
 
       var fileName = String.Sprintf('%s/%s/%s/initialize.txt',
@@ -203,20 +204,20 @@ function createNodeConfigFiles(environment) {
         ]
       );
 
-      result = IO.WriteFile(fileName, result[0], 0644);
-      if (result != null) {
+      var writeResult = IO.WriteFile(fileName, singleResultBytes[0], 0644);
+      if (writeResult != null) {
         error(result.Error());
       }
 		}
 
-    var result = ModelStore.Single('templates/' + node.NodeKind.ConfigurationTemplateID + '/generation', query);
-    if (result[1] != null) {
-      error(result[1].Error());
+    var singleResult = ModelStore.Single('templates/' + node.NodeKind.ConfigurationTemplateID + '/generation', query);
+    if (singleResult[1] != null) {
+      error(singleResult[1].Error());
     }
 
-    result = Conversion.Bytes(result[0]);
-    if (result[1] != null) {
-      error(result[1].Error());
+    var singleResultBytes = Conversion.Bytes(singleResult[0]);
+    if (singleResultBytes[1] != null) {
+      error(singleResultBytes[1].Error());
     }
 
     var fileName = String.Sprintf('%s/%s/%s/config.txt',
@@ -227,14 +228,14 @@ function createNodeConfigFiles(environment) {
       ]
     );
 
-    result = IO.WriteFile(fileName, result[0], 0644);
-    if (result != null) {
+    var writeResult = IO.WriteFile(fileName, singleResultBytes[0], 0644);
+    if (writeResult != null) {
       error(result.Error());
     }
 	}
 }
 
-function generateTestScript(testScenarioDirectoryName, testScenario) {
+function generateTestScript(environment, testScenarioDirectoryName, testScenario) {
   var testScenarioParameterMap = {
     0: {}
   };
@@ -247,30 +248,30 @@ function generateTestScript(testScenarioDirectoryName, testScenario) {
     testScenarioParameterMap[testScenarioParameter.TestStepNumber][testScenarioParameter.Name] = testScenarioParameter.Value;
   }
 
-  testScenarioParameterConsumedMap = {
+  var testScenarioParameterConsumedMap = {
     0: {}
   };
 
   for (i in testScenario.TestScenarioTestStepAssociations) {
     var testScenarioTestStepAssociation = testScenario.TestScenarioTestStepAssociations[i];
 
-    var result = ModelStore.Single('test_steps/' + testScenarioTestStepAssociation.TestStepID, '');
-    if (result[1] != null) {
-      error(result[1].Error());
+    var singleResult = ModelStore.Single('test_steps/' + testScenarioTestStepAssociation.TestStepID, '');
+    if (singleResult[1] != null) {
+      error(singleResult[1].Error());
     }
-    var testStep = result[0];
+    var testStep = singleResult[0];
 
-    var result = ModelStore.Single('templates/' + testStep.TemplateID, '');
-    if (result[1] != null) {
-      error(result[1].Error());
+    singleResult = ModelStore.Single('templates/' + testStep.TemplateID, '');
+    if (singleResult[1] != null) {
+      error(singleResult[1].Error());
     }
-    var template = result[0];
+    var template = singleResult[0];
 
-    var result = ModelStore.Multi('template_arguments', 'q[template_id]=' + template.ID);
-    if (result[1] != null) {
-      error(result[1].Error());
+    var multiResult = ModelStore.Multi('template_arguments', 'q[template_id]=' + template.ID);
+    if (multiResult[1] != null) {
+      error(multiResult[1].Error());
     }
-    var templateArguments = result[0].Records;
+    var templateArguments = multiResult[0].Records;
 
     var globalParameterMap = testScenarioParameterMap[0];
     var localParameterMap = globalParameterMap;
@@ -307,14 +308,14 @@ function generateTestScript(testScenarioDirectoryName, testScenario) {
       query = query + 'p[' + key + ']=' + templateArgumentParameterMap[key];
     }
 
-    var result = ModelStore.Single('templates/' + testStep.TemplateID + '/generation', query);
-    if (result[1] != null) {
-      error(result[1].Error());
+    var singleResult = ModelStore.Single('templates/' + testStep.TemplateID + '/generation', query);
+    if (singleResult[1] != null) {
+      error(singleResult[1].Error());
     }
 
-    result = Conversion.Bytes(result[0]);
-    if (result[1] != null) {
-      error(result[1].Error());
+    singleResultBytes = Conversion.Bytes(singleResult[0]);
+    if (singleResultBytes[1] != null) {
+      error(singleResultBytes[1].Error());
     }
 
     var fileName = String.Sprintf('%s/%s/%s/%s_%s',
@@ -326,20 +327,21 @@ function generateTestScript(testScenarioDirectoryName, testScenario) {
         testStep.Name
       ]
     );
-    result = IO.WriteFile(fileName, result[0], 0644);
-    if (result != null) {
+
+    var writeResult = IO.WriteFile(fileName, singleResultBytes[0], 0644);
+    if (writeResult != null) {
       error(result.Error());
     }
   }
 
-  for (number in testScenarioParameterMap) {
+  for (var number in testScenarioParameterMap) {
     var specificNumberTestScenarioParameterMap = testScenarioParameterMap[number];
     var specificNumberTestScenarioParameterConsumedMap = testScenarioParameterConsumedMap[number];
     if (specificNumberTestScenarioParameterConsumedMap == undefined) {
       error('the parameter for the test step ' + number + ' is not used in any test steps');
     }
 
-    for (key in specificNumberTestScenarioParameterMap) {
+    for (var key in specificNumberTestScenarioParameterMap) {
       if (specificNumberTestScenarioParameterConsumedMap[key] == undefined) {
         error('the parameter '+ key +' does not exist in step ' + number);
       }
@@ -350,64 +352,64 @@ function generateTestScript(testScenarioDirectoryName, testScenario) {
 function createTestCaseFiles(environment) {
   var cmd = Exec.Command(['rm', '-rf', environment.TestCaseDirectoryName]);
 	cmd.Dir = environment.GitRepositoryURI;
-	result = cmd.CombinedOutput();
-  if (result[1] != null) {
-    error(result[1].Error() + ': ' + Conversion.String(result[0]));
+	var cmdCombinedOutput = cmd.CombinedOutput();
+  if (cmdCombinedOutput[1] != null) {
+    error(cmdCombinedOutput[1].Error() + ': ' + Conversion.String(cmdCombinedOutput[0]));
   }
 
 	cmd = Exec.Command(['mkdir', environment.TestCaseDirectoryName]);
 	cmd.Dir = environment.GitRepositoryURI;
-  result = cmd.CombinedOutput();
-  if (result[1] != null) {
-    error(result[1].Error() + ': ' + Conversion.String(result[0]));
+  cmdCombinedOutput = cmd.CombinedOutput();
+  if (cmdCombinedOutput[1] != null) {
+    error(cmdCombinedOutput[1].Error() + ': ' + Conversion.String(cmdCombinedOutput[0]));
   }
 
-  result = ModelStore.Multi('test_scenarios', 'preloads=test_scenario_parameters,test_scenario_test_step_associations');
-  if (result[1] != null) {
-    error(result[1].Error());
+  var multiResult = ModelStore.Multi('test_scenarios', 'preloads=test_scenario_parameters,test_scenario_test_step_associations');
+  if (multiResult[1] != null) {
+    error(multiResult[1].Error());
   }
 
-  for (i in result[0].Records) {
-    var testScenario = result[0].Records[i];
-    cmd = Exec.Command(['mkdir', environment.TestCaseDirectoryName + '/' + testScenario.Name]);
+  for (i in multiResult[0].Records) {
+    var testScenario = multiResult[0].Records[i];
+    var cmd = Exec.Command(['mkdir', environment.TestCaseDirectoryName + '/' + testScenario.Name]);
     cmd.Dir = environment.GitRepositoryURI;
-    result = cmd.CombinedOutput();
-    if (result[1] != null) {
-      error(result[1].Error() + ': ' + Conversion.String(result[0]));
+    var cmdCombinedOutput = cmd.CombinedOutput();
+    if (cmdCombinedOutput[1] != null) {
+      error(cmdCombinedOutput[1].Error() + ': ' + Conversion.String(cmdCombinedOutput[0]));
     }
 
     var testScenarioDirectoryName = environment.GitRepositoryURI + '/' + environment.TestCaseDirectoryName +'/' + testScenario.Name;
-    generateTestScript(testScenarioDirectoryName, testScenario);
+    generateTestScript(environment, testScenarioDirectoryName, testScenario);
   }
 }
 
 function commit(environment) {
-  cmd = Exec.Command(['git', 'add', '-u']);
+  var cmd = Exec.Command(['git', 'add', '-u']);
 	cmd.Dir = environment.GitRepositoryURI;
-  result = cmd.CombinedOutput();
-  if (result[1] != null) {
-    error(result[1].Error() + ': ' + Conversion.String(result[0]));
+  var cmdCombinedOutput = cmd.CombinedOutput();
+  if (cmdCombinedOutput[1] != null) {
+    error(cmdCombinedOutput[1].Error() + ': ' + Conversion.String(cmdCombinedOutput[0]));
   }
 
   cmd = Exec.Command(['git', 'add', '-A']);
 	cmd.Dir = environment.GitRepositoryURI;
-  result = cmd.CombinedOutput();
-  if (result[1] != null) {
-    error(result[1].Error() + ': ' + Conversion.String(result[0]));
+  cmdCombinedOutput = cmd.CombinedOutput();
+  if (cmdCombinedOutput[1] != null) {
+    error(cmdCombinedOutput[1].Error() + ': ' + Conversion.String(cmdCombinedOutput[0]));
   }
 
   cmd = Exec.Command(['date']);
-  result = cmd.CombinedOutput();
-  if (result[1] != null) {
-    error(result[1].Error() + ': ' + Conversion.String(result[0]));
+  cmdCombinedOutput = cmd.CombinedOutput();
+  if (cmdCombinedOutput[1] != null) {
+    error(cmdCombinedOutput[1].Error() + ': ' + Conversion.String(cmdCombinedOutput[0]));
   }
 
-  var commitMessage = String.Sprintf('Automatic commit at %s', Conversion.String(result[0]));
+  var commitMessage = String.Sprintf('Automatic commit at %s', Conversion.String(cmdCombinedOutput[0]));
   cmd = Exec.Command(['git', 'commit', '-m', commitMessage]);
 	cmd.Dir = environment.GitRepositoryURI;
-  result = cmd.CombinedOutput();
-  if (result[1] != null) {
-    error(result[1].Error() + ': ' + Conversion.String(result[0]));
+  cmdCombinedOutput = cmd.CombinedOutput();
+  if (cmdCombinedOutput[1] != null) {
+    error(cmdCombinedOutput[1].Error() + ': ' + Conversion.String(cmdCombinedOutput[0]));
   }
 }
 
