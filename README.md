@@ -19,7 +19,21 @@ via Wikimedia Commons
 
 ## Concept ans usecases
 
+Clay is a simple client tool that enables you to define various kind of models what you need, to register and pull those model data, and to generate data what you want like program code, text data using those models through REST API.
+It concentrates on those tasks in order to help you to try such as Infrastructure as Code, DevOps.
+
+Clay itself does not manage any data, and leaves the management of data to  versioning systems like Git, which are good at managing versions of human-readable text data.
+On Clay, you can build models, retrieve them as JSON or something human-readable, and then, manage them in Git.
+If you want to edit them again, all you have to do is just registering them to Clay again through API.
+
 ![Concept](https://github.com/qb0C80aE/clay/raw/develop/images/concept.png)
+
+Suppose that there are developers, and non-programmer system administrators. Admins can offer their meaningful operation sequences as commands, and using them, developers can create code templates for orchestrators, testers, automation tools, or small shell scripts in order to make machines process those things.
+
+By working together, they might be able to get sophisticated techniques of each other. After getting used to the situation, might become to start to code their infrastructure together.
+
+Clay is designed not to disturb their original work as possible. This is also the reason why Clay is provided as a single binary that does not cause dependency/install problems at use time, in order to get them to focus on their main work. If they have become to code their works together by learning how to code their infrastructure and operations through Clay, then they can throw away Clay and manage their systems with their code only.
+
 ![Usecase](https://github.com/qb0C80aE/clay/raw/develop/images/usecase.png)
 
 ## Download binaries
