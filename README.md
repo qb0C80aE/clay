@@ -207,10 +207,12 @@ $ curl "localhost:8080/nodes/1" # Select a node which has the id 1. It's the def
 $ curl "localhost:8080/nodes/Node1?key_parameter=name" # Select a node which has the name Node1. It identifies a single resource by using name instead of id.
 ```
 
+Note that if you give Clay a non-unique field name as ``key_parameter``, Clay will return the first record in specified order, which means, the parameter does not mean the identifier any longer, in that case.
+
 You can know resources which can be identified by ``key_parameter``, by accessing root path.
 
 ```
-curl "localhost:8080/"
+curl "localhost:8080"
 ...
 nodes_url [GET] http://localhost:8080/nodes/:key_parameter(default=id)
 ...
@@ -237,6 +239,8 @@ $ curl "localhost:8080/nodes?limit=2&page=2" # Select nodes limiting the count o
 ## User defined models
 
 The one of main features of Clay is defining models through REST API at runtime or boot time without recompiling Clay binary. The model definition is described in JSON or YAML format, and it's handled as Golang struct in Clay.
+
+The models may be the ones what you  need and consider based on your business, or the standard models like [RFC 8345 - A YANG Data Model for Network Topologies](https://datatracker.ietf.org/doc/rfc8345/). Clay can handle any models if you describe and register those.
 
 Clay's Rest API is using [Gin](https://github.com/gin-gonic/gin)(framework) & [GORM](https://github.com/jinzhu/gorm)(orm). Which means, by defining Golang struct field tags, various features like json/yaml marshal, GORM instruction, or field validation, will be available.
 
