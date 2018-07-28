@@ -36,6 +36,9 @@ Clay is designed not to disturb their original work as possible. This is also th
 
 ![Usecase](https://github.com/qb0C80aE/clay/raw/develop/images/usecase.png)
 
+Generally, design information like network diagram drawn with illustration tools are not reusable for machines to process, furthermore, this kind of information is tend to get different from its actual implementation.
+As a result, people have to sync them manually. Clay might allow you to be able to sync those two in some better ways.
+
 ## Download binaries
 
 * [Linux/64bit](http://download.clay.dynu.net/clay.linux-amd64.tgz)
