@@ -256,7 +256,7 @@ $(function() {
 
 			$('#main_panel #port_groups_tab #port_groups_table').DataTable({
 				ajax: {
-					url: '/ui/datatables?resource_name=port_groups&resource_preloads=port_group_port_associations.port&columns=null,name,null,description'
+					url: '/ui/datatables?resource_name=port_groups&resource_preloads=port_group_port_associations.port.node&columns=null,name,null,description'
 				},
 				serverSide: true,
 				order: [[1, 'asc']],
@@ -283,7 +283,7 @@ $(function() {
 								if (i != 0) {
 									text = text + ',';
 								}
-								text = text + createReadOnlyTextElement('member', 'in-table', '', '', data[i].port.name).outerHTML;
+								text = text + createReadOnlyTextElement('member', 'in-table', '', '', data[i].port.node.name + '.' + data[i].port.name).outerHTML;
 							}
 							return text;
 						}
