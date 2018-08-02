@@ -367,10 +367,10 @@ Clay is designed as a standalone modeling tool, and the created design can be st
 Of course, the data related to user defined models will be also available in the design resource, if their ``is_design_access_disabled`` field is false.
 
 ```
+$ # Import and overwrite the design
+$ curl -X PUT 'localhost:8080/designs/present' -H 'Content-Type: application/json' -d @examples/design_example.json
 $ # Export the design
 $ curl -X GET 'localhost:8080/designs/present?pretty' > design.json
-$ # Import and overwrite the design
-$ curl -X PUT 'localhost:8080/designs/present' -H 'Content-Type: application/json' -d @design.json
 ```
 
 If you have booted Clay with examples, you can see the file below that includes user defined model types after export.
