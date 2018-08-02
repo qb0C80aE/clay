@@ -1,8 +1,25 @@
 {{- $layer2Interfaces := .ModelStore.Multi "diagram_layer2_interfaces" "preloads=node.node_type,vlan" -}}
+{{- $nodes := .ModelStore.Multi "nodes" "preloads=node_type" -}}
 {{- $diagramNodeMap := .Collection.Map -}}
 {{- $interfaceMap := .Collection.Map -}}
 {
   "nodes": [
+  {{ range $i, $node := $nodes.Records }}
+    {{ $diagramNodeKey := printf "%d_2_1" $node.ID }}
+    {{ $diagramNodeCount := len $diagramNodeMap }}
+      {{ $nodeExists := $diagramNodeMap.Exists $diagramNodeKey }}
+      {{ if ne $nodeExists true }}
+    {{ if ne $diagramNodeCount 0 }},{{ end }}{
+      "name": "{{ $node.Name }}",
+      "icon": "/ui/files/images/diagram/{{ $node.NodeType.Name }}_{{ $node.Virtual }}.png",
+      "meta": {
+        "node_extra_information": "-",
+        "diagram_node_id": "{{ $diagramNodeKey }}"
+      }
+    }
+      {{ $diagramNodeMap := $diagramNodeMap.Put $diagramNodeKey true }}
+    {{ end }}
+  {{ end }}
   {{ range $i, $layer2Interface := $layer2Interfaces.Records }}
     {{ $diagramNodeKey := printf "%d_2_2" $layer2Interface.VlanID }}
     {{ $diagramNodeCount := len $diagramNodeMap }}
@@ -17,31 +34,15 @@
         "diagram_node_id": "{{ $diagramNodeKey }}"
       }
     }
-        {{ $diagramNodeMap := $diagramNodeMap.Put $diagramNodeKey true }}
-      {{ end}}
-    {{ end }}
-
-    {{ $diagramNodeKey := printf "%d_2_1" $layer2Interface.Node.ID }}
-    {{ $diagramNodeCount := len $diagramNodeMap }}
-    {{ $nodeExists := $diagramNodeMap.Exists $diagramNodeKey }}
-    {{ if ne $nodeExists true }}
-    {{ if ne $diagramNodeCount 0 }},{{ end }}{
-      "name": "{{ $layer2Interface.Node.Name }}",
-      "icon": "/ui/files/images/diagram/{{ $layer2Interface.Node.NodeType.Name }}_{{ $layer2Interface.Node.Virtual }}.png",
-      "meta": {
-        "node_extra_information": "-",
-        "diagram_node_id": "{{ $diagramNodeKey }}"
-      }
-    }
       {{ $diagramNodeMap := $diagramNodeMap.Put $diagramNodeKey true }}
-    {{ end}}
+      {{ end }}
+    {{ end }}
   {{ end }}
   ],
   "links": [
   {{ range $i, $layer2Interface := $layer2Interfaces.Records }}
     {{ $interfaceCount := len $interfaceMap }}
-    {{ if eq $layer2Interface.IsConnected true }}
-      {{ if ne $interfaceCount 0 }},{{ end }}{
+    {{ if ne $interfaceCount 0 }},{{ end }}{
         "source": "{{ $layer2Interface.Node.Name }}",
         "target": "{{ $layer2Interface.Vlan.Name }}",
         "meta": {
@@ -57,8 +58,7 @@
           "ipv4_address": null
         }
     }
-        {{ $interfaceMap := $interfaceMap.Put true true }}
-      {{ end}}
-    {{ end }}
+      {{ $interfaceMap := $interfaceMap.Put true true }}
+    {{ end}}
   ]
 }

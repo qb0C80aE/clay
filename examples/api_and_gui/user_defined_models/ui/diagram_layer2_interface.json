@@ -34,38 +34,20 @@
       "name": "Vlan",
       "tag": "json:\"vlan\" yaml:\"vlan\" gorm:\"ForeignKey:VlanID\"",
       "type_name": "Vlan"
-    },
-    {
-      "name": "IsConnected",
-      "tag": "json:\"is_connected\" yaml:\"is_connected\"",
-      "type_name": "bool"
     }
   ],
   "sql_after_migration": [
     "select 1 from ports;",
     "select 1 from vlan_port_associations;",
-    "select 1 from links;",
     "drop view if exists diagram_layer2_interfaces;",
     "create view if not exists diagram_layer2_interfaces as",
     "  select group_concat(ports.name, ',') name,",
     "    ports.node_id node_id,",
     "    group_concat(ports.mac_address, ',') mac_address,",
-    "    vlan_port_associations.vlan_id vlan_id,",
-    "    max(connection_check.is_connected) is_connected",
+    "    vlan_port_associations.vlan_id vlan_id",
     "  from ports",
     "    inner join vlan_port_associations",
     "      on ports.id = vlan_port_associations.port_id",
-    "    left outer join (",
-    "      select ports.node_id node_id,",
-    "        ports.number number,",
-    "        max(case when links.source_port_id is null then 0 else 1 end) is_connected",
-    "      from ports",
-    "        left outer join links",
-    "          on ports.id = links.source_port_id",
-    "      group by node_id,",
-    "        number) connection_check",
-    "      on ports.node_id = connection_check.node_id",
-    "      and ports.number = connection_check.number",
     "  group by ports.node_id,",
     "    vlan_port_associations.vlan_id;"
   ]
