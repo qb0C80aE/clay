@@ -63,6 +63,10 @@
 		"create trigger if not exists DeleteNodeConfigurationBeforeTemplateDeletion before delete on templates",
 		"  begin",
 		"    delete from node_configurations where initialization_template_id = old.id or configuration_template_id = old.id;",
+		"  end;",
+    "create trigger if not exists DeleteNodeConfigurationBeforeNodeDeletion before delete on nodes",
+		"  begin",
+		"    delete from node_configurations where node_id = old.id;",
 		"  end;"
   ]
 }

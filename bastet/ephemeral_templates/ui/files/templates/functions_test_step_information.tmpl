@@ -212,6 +212,9 @@ $('#test_step_information_panel').on('click', 'button[name=update_test_step_btn]
   for (testStepArgumentID in deletedTestStepArgumentIDMap) {
     var testStepArgument = {
       id: parseInt(testStepArgumentID),
+      name: 'deleted',
+      type: 'int',
+      default_value: '0',
       to_be_deleted: true
     };
 

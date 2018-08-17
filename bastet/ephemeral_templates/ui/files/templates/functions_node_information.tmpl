@@ -100,11 +100,25 @@ function showNodeInformation(nodeID, callbackNodeInformationUpdated) {
         image_name: '',
         initialization_template_id: 0,
         initialization_template: {
-          template_content: ''
+          template_content: '',
+          template_arguments: [
+            {
+              name: 'node_id',
+              type: 'int',
+              default_value: '0'
+            }
+          ]
         },
         configuration_template_id: 0,
         configuration_template: {
-          template_content: ''
+          template_content: '',
+          template_arguments: [
+            {
+              name: 'node_id',
+              type: 'int',
+              default_value: '0'
+            }
+          ]
         }
       }
     };
@@ -307,6 +321,7 @@ function repaintNodeInformation(node, initializeTabSelection) {
         }
       });
 
+      $('#node_information_float_panel #node_configuration_tab #node_configuration_table').find('input[name=node_configuration_id]').val(node.node_configuration.id);
       $('#node_information_float_panel #node_configuration_tab #node_configuration_table').find('input[name=node_configuration_image_name]').val(node.node_configuration.image_name);
       $('#node_information_float_panel #node_configuration_tab #node_configuration_table').find('textarea[name=node_configuration_initialization_template_content]').val(node.node_configuration.initialization_template.template_content);
       $('#node_information_float_panel #node_configuration_tab #node_configuration_table').find('textarea[name=node_configuration_configuration_template_content]').val(node.node_configuration.configuration_template.template_content);
@@ -435,6 +450,7 @@ $('#node_information_panel').on('click', 'button[name=update_node_btn]', functio
   var nodeKindID = $('#node_information_panel').find('select[name=node_kind_id]').val();
   var nodeVirtual = $('#node_information_panel').find('select[name=virtual]').val();
 
+  var nodeConfigurationID = $('#node_information_panel #node_configuration_tab #node_configuration_table').find('input[name=node_configuration_id]').val();
   var nodeConfigurationImageName = $('#node_information_panel #node_configuration_tab #node_configuration_table').find('input[name=node_configuration_image_name]').val();
   var nodeConfigurationInitializationTemplateID = $('#node_information_panel #node_configuration_tab #node_configuration_table').find('input[name=node_configuration_initialization_template_id]').val();
   var nodeConfigurationInitializationTemplateContent = $('#node_information_panel #node_configuration_tab #node_configuration_table').find('textarea[name=node_configuration_initialization_template_content]').val();
@@ -451,27 +467,46 @@ $('#node_information_panel').on('click', 'button[name=update_node_btn]', functio
     ports: [],
     routes: [],
     node_configuration: {
+      id: parseInt(nodeConfigurationID),
       image_name: nodeConfigurationImageName,
       initialization_template_id: parseInt(nodeConfigurationInitializationTemplateID),
       initialization_template: {
         id: parseInt(nodeConfigurationInitializationTemplateID),
         name: nodeName + '_NodeConfiguration_InitializationTemplate',
-        template_content: nodeConfigurationInitializationTemplateContent
+        template_content: nodeConfigurationInitializationTemplateContent,
+        template_arguments: [
+          {
+            name: 'node_id',
+            type: 'int',
+            default_value: '0'
+          }
+        ]
       },
       configuration_template_id: parseInt(nodeConfigurationConfigurationTemplateID),
       configuration_template: {
         id: parseInt(nodeConfigurationConfigurationTemplateID),
         name: nodeName + '_NodeConfiguration_ConfigurationTemplate',
-        template_content: nodeConfigurationConfigurationTemplateContent
+        template_content: nodeConfigurationConfigurationTemplateContent,
+        template_arguments: [
+          {
+            name: 'node_id',
+            type: 'int',
+            default_value: '0'
+          }
+        ]
       }
     }
   };
   if (nodeID == 0) {
     delete(node.id);
+    delete(node.node_configuration.id);
     delete(node.node_configuration.initialization_template_id);
     delete(node.node_configuration.configuration_template_id);
     delete(node.node_configuration.initialization_template.id);
     delete(node.node_configuration.configuration_template.id);
+  } else {
+    delete(node.node_configuration.initialization_template.template_arguments);
+    delete(node.node_configuration.configuration_template.template_arguments);
   }
 
   $('#node_information_float_panel #ports_tab #ports_table').DataTable().rows().every(function(){

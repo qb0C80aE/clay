@@ -94,7 +94,7 @@ function updateDesign(environment) {
 }
 
 function createTemplateFile(environment) {
-  var singleResult = ModelStore.Single('templates/environment_template/generation', 'key_parameter=name');
+  var singleResult = ModelStore.Single('templates/Environment_Template/generation', 'key_parameter=name');
   if (singleResult[1] != null) {
     error(singleResult[1].Error());
   }
@@ -111,7 +111,7 @@ function createTemplateFile(environment) {
 }
 
 function createTestRunnerScriptFile(environment) {
-  var singleResult = ModelStore.Single('templates/environment_test_runner_script/generation', 'key_parameter=name');
+  var singleResult = ModelStore.Single('templates/Environment_TestRunnerScript/generation', 'key_parameter=name');
   if (singleResult[1] != null) {
     error(singleResult[1].Error());
   }
@@ -179,7 +179,7 @@ function createNodeConfigFiles(environment) {
       error(cmdCombinedOutput[1].Error() + ': ' + Conversion.String(cmdCombinedOutput[0]));
     }
 
-    var query = String.Sprintf('node_id=%d', [node.ID]);
+    var query = String.Sprintf('p[node_id]=%d', [node.ID]);
 
 		if (!node.Virtual && (Query.Get('init') == 'true')) {
       var templateID = node.NodeKind.InitializationTemplateID;
@@ -210,7 +210,12 @@ function createNodeConfigFiles(environment) {
       }
 		}
 
-    var singleResult = ModelStore.Single('templates/' + node.NodeKind.ConfigurationTemplateID + '/generation', query);
+    var templateID = node.NodeKind.ConfigurationTemplateID;
+    if (node.NodeConfiguration.ConfigurationTemplate.TemplateContent.length > 0) {
+      templateID = node.NodeConfiguration.ConfigurationTemplateID;
+    }
+
+    var singleResult = ModelStore.Single('templates/' + templateID + '/generation', query);
     if (singleResult[1] != null) {
       error(singleResult[1].Error());
     }
