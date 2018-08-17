@@ -197,6 +197,9 @@ $('#template_information_panel').on('click', 'button[name=update_template_btn]',
   for (templateArgumentID in deletedTemplateArgumentIDMap) {
     var templateArgument = {
       id: parseInt(templateArgumentID),
+      name: 'deleted',
+      type: 'int',
+      default_value: '0',
       to_be_deleted: true
     };
 
