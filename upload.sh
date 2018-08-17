@@ -1,11 +1,4 @@
 #!/bin/bash
-curl -X DELETE -H "AuthKey: ${AUTH_KEY}" https://clay-download.herokuapp.com/clay.baster-20180808.linux-amd64.tgz
-curl -X DELETE -H "AuthKey: ${AUTH_KEY}" https://clay-download.herokuapp.com/clay.baster-20180808.linux-386.tgz
-curl -X DELETE -H "AuthKey: ${AUTH_KEY}" https://clay-download.herokuapp.com/clay.baster-20180808.windows-amd64.zip
-curl -X DELETE -H "AuthKey: ${AUTH_KEY}" https://clay-download.herokuapp.com/clay.baster-20180808.windows-386.zip
-curl -X DELETE -H "AuthKey: ${AUTH_KEY}" https://clay-download.herokuapp.com/clay.baster-20180808.darwin-amd64.tgz
-curl -X DELETE -H "AuthKey: ${AUTH_KEY}" https://clay-download.herokuapp.com/clay.baster-20180808.darwin-386.tgz
-c
 curl -X DELETE -H "AuthKey: ${AUTH_KEY}" https://clay-download.herokuapp.com/clay.bastet-20180817.linux-amd64.tgz
 curl -X DELETE -H "AuthKey: ${AUTH_KEY}" https://clay-download.herokuapp.com/clay.bastet-20180817.linux-386.tgz
 curl -X DELETE -H "AuthKey: ${AUTH_KEY}" https://clay-download.herokuapp.com/clay.bastet-20180817.windows-amd64.zip
