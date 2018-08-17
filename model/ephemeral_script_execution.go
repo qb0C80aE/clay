@@ -81,6 +81,8 @@ func (receiver *EphemeralScriptExecution) Create(model extension.Model, db *gorm
 	ephemeralScript.vm.Set("Network", networkutilpkg.GetUtility())
 	ephemeralScript.vm.Set("String", stringutilpkg.GetUtility())
 	ephemeralScript.vm.Set("Logging", loggingutilpkg.GetUtility())
+	ephemeralScript.vm.Set("EnvironmentalVariableSet", extension.GetCurrentEnvironmentalVariableSet())
+
 	ephemeralScript.vm.Set("error", func(message interface{}) {
 		errorMessage := fmt.Sprintf("an error has occured during execution of %s: %s at line %d",
 			ephemeralScript.Name,

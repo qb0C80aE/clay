@@ -25,16 +25,17 @@ import (
 var parameterRegexp = regexp.MustCompile("p\\[(.+)\\]")
 
 type templateParameter struct {
-	ModelStore         *modelstorepkg.ModelStore
-	Collection         *collectionutilpkg.Utility
-	Conversion         *conversionutilpkg.Utility
-	MapStruct          *mapstructutilpkg.Utility
-	Network            *networkutilpkg.Utility
-	String             *stringutilpkg.Utility
-	Parameter          map[interface{}]interface{}
-	Query              url.Values
-	ProgramInformation extension.ProgramInformation
-	Logging            *loggingutilpkg.Utility
+	ModelStore               *modelstorepkg.ModelStore
+	Collection               *collectionutilpkg.Utility
+	Conversion               *conversionutilpkg.Utility
+	MapStruct                *mapstructutilpkg.Utility
+	Network                  *networkutilpkg.Utility
+	String                   *stringutilpkg.Utility
+	Parameter                map[interface{}]interface{}
+	Query                    url.Values
+	ProgramInformation       extension.ProgramInformation
+	Logging                  *loggingutilpkg.Utility
+	EnvironmentalVariableSet extension.EnvironmentalVariableSet
 }
 
 // TemplateGeneration is the model class what represents template generation
@@ -193,16 +194,17 @@ func (receiver *TemplateGeneration) GenerateTemplate(db *gorm.DB, parameters gin
 	}
 
 	templateParameter := &templateParameter{
-		ModelStore:         modelstorepkg.NewModelStore(db),
-		Collection:         collectionutilpkg.GetUtility(),
-		Conversion:         conversionutilpkg.GetUtility(),
-		MapStruct:          mapstructutilpkg.GetUtility(),
-		Network:            networkutilpkg.GetUtility(),
-		String:             stringutilpkg.GetUtility(),
-		Parameter:          templateParameterMap,
-		Query:              urlValues,
-		ProgramInformation: extension.GetRegisteredProgramInformation(),
-		Logging:            loggingutilpkg.GetUtility(),
+		ModelStore:               modelstorepkg.NewModelStore(db),
+		Collection:               collectionutilpkg.GetUtility(),
+		Conversion:               conversionutilpkg.GetUtility(),
+		MapStruct:                mapstructutilpkg.GetUtility(),
+		Network:                  networkutilpkg.GetUtility(),
+		String:                   stringutilpkg.GetUtility(),
+		Parameter:                templateParameterMap,
+		Query:                    urlValues,
+		ProgramInformation:       extension.GetRegisteredProgramInformation(),
+		Logging:                  loggingutilpkg.GetUtility(),
+		EnvironmentalVariableSet: extension.GetCurrentEnvironmentalVariableSet(),
 	}
 
 	var doc bytes.Buffer

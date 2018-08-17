@@ -566,3 +566,12 @@ json
 {{ .Conversion.JSONMarshal $x2 "	" }}
 yaml
 {{ .Conversion.YAMLMarshal $x2 }}
+
+--- env ---
+{{ .EnvironmentalVariableSet.GetClayConfigFilePath }}
+{{ .EnvironmentalVariableSet.GetClayHost }}
+{{ .EnvironmentalVariableSet.GetClayPort }}
+{{ .EnvironmentalVariableSet.GetClayPortInt }}
+{{ .EnvironmentalVariableSet.GetClayDBMode }}
+{{ .EnvironmentalVariableSet.GetClayDBFilePath }}
+{{ .EnvironmentalVariableSet.GetClayAssetMode }}

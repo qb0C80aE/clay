@@ -65,16 +65,17 @@ func (receiver *EphemeralTemplateGeneration) GetSingle(model extension.Model, db
 	}
 
 	templateParameter := &templateParameter{
-		ModelStore:         modelstorepkg.NewModelStore(db),
-		Collection:         collectionutilpkg.GetUtility(),
-		Conversion:         conversionutilpkg.GetUtility(),
-		MapStruct:          mapstructutilpkg.GetUtility(),
-		Network:            networkutilpkg.GetUtility(),
-		String:             stringutilpkg.GetUtility(),
-		Parameter:          map[interface{}]interface{}{},
-		Query:              urlValues,
-		ProgramInformation: extension.GetRegisteredProgramInformation(),
-		Logging:            loggingutilpkg.GetUtility(),
+		ModelStore:               modelstorepkg.NewModelStore(db),
+		Collection:               collectionutilpkg.GetUtility(),
+		Conversion:               conversionutilpkg.GetUtility(),
+		MapStruct:                mapstructutilpkg.GetUtility(),
+		Network:                  networkutilpkg.GetUtility(),
+		String:                   stringutilpkg.GetUtility(),
+		Parameter:                map[interface{}]interface{}{},
+		Query:                    urlValues,
+		ProgramInformation:       extension.GetRegisteredProgramInformation(),
+		Logging:                  loggingutilpkg.GetUtility(),
+		EnvironmentalVariableSet: extension.GetCurrentEnvironmentalVariableSet(),
 	}
 
 	var doc bytes.Buffer
