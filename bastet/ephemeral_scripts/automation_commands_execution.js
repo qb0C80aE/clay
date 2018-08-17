@@ -85,7 +85,7 @@ function unzip(environment) {
 }
 
 function updateDesign(environment) {
-  var cmd = Exec.Command(['curl', '-X', 'PUT', '-H', 'Content-Type: application/json', 'http://localhost:8080/designs/present', '-d', '@design.json']);
+  var cmd = Exec.Command(['curl', '-X', 'PUT', '-H', 'Content-Type: application/json', 'http://localhost:' + EnvironmentalVariableSet.GetClayPort() + '/designs/present', '-d', '@design.json']);
   cmd.Dir = String.Sprintf('%s/%s', environment.GitRepositoryURI, 'uploaded');
   var cmdCombinedOutput = cmd.CombinedOutput();
   if (cmdCombinedOutput[1] != null) {
