@@ -64,7 +64,7 @@ function createTestRunnerScriptFile(environment) {
     error(singleResultBytes[1].Error());
   }
 
-  var writeResult = IO.WriteFile(environment.GitRepositoryURI + '/test_runner.sh', singleResultBytes[0], 0644);
+  var writeResult = IO.WriteFile(environment.GitRepositoryURI + '/test_runner.sh', singleResultBytes[0], 0755);
   if (writeResult != null) {
     error(result.Error());
   }
