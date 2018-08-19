@@ -46,7 +46,8 @@ func (receiver *ephemeralBinaryObjectRawController) GetRouteMap() map[int]map[in
 func (receiver *ephemeralBinaryObjectRawController) OutputGetSingle(c *gin.Context, code int, result interface{}, fields map[string]interface{}) {
 	data := result.([]byte)
 
-	accept := receiver.determineResponseContentTypeFromAccept(c)
+	acceptList := strings.Split(c.Request.Header.Get("Accept"), ",")
+	accept := extension.DetermineResponseContentTypeFromAccept(acceptList)
 
 	switch accept {
 	case "", extension.AcceptAll:

@@ -289,3 +289,28 @@ func CreateParametersFromPathAndRoute(path, route string) (gin.Params, error) {
 
 	return parameters, nil
 }
+
+// DetermineResponseContentTypeFromAccept determines ContentType in the response header based on Accept header in the request
+func DetermineResponseContentTypeFromAccept(acceptList []string) string {
+	if len(acceptList) == 0 {
+		return AcceptJSON
+	}
+
+	result := strings.Trim(acceptList[0], " ")
+	switch result {
+	case AcceptAll:
+		return AcceptJSON
+	default:
+		return result
+	}
+}
+
+// DetermineResponseMappingTagFromAccept determines the tag name based on Accept header in the request
+func DetermineResponseMappingTagFromAccept(acceptList []string) string {
+	switch DetermineResponseContentTypeFromAccept(acceptList) {
+	case AcceptXYAML, AcceptTextYAML:
+		return TagYAML
+	default:
+		return TagJSON
+	}
+}

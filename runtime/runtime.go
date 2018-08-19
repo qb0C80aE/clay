@@ -39,7 +39,7 @@ func (clayRuntime *clayRuntime) Run() {
 		os.Exit(1)
 	}
 
-	engine := gin.Default()
+	engine := gin.New()
 	server, err := serverpkg.Setup(engine, db)
 	if err != nil {
 		logging.Logger().Criticalf("failed to start: %s", err)
