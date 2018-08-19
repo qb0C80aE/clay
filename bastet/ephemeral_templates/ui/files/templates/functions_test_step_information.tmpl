@@ -27,9 +27,6 @@ function showTestStepInformation(testStepID, callbackTestStepInformationUpdated)
 function repaintTestStepInformation(testStep, initializeTabSelection) {
   $('#test_step_information_float_panel #test_step_arguments_tab div[name=deleted_test_step_arguments]').children().remove();
 
-  $('#test_step_information_panel #test_step_preview_tab').find('input[name=test_step_argument_parameter]').val('');
-  $('#test_step_information_panel #test_step_preview_tab').find('textarea[name=test_step_preview]').val('');
-
   var test_step_information_table = $('#test_step_information_float_panel #test_step_information_tab #test_step_information_table');
 
   test_step_information_table.find('input[name=id]').val(testStep.id);
