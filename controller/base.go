@@ -139,22 +139,6 @@ func executeValidation(c *gin.Context, resourceName string, inputContainer inter
 	return nil
 }
 
-func (receiver *BaseController) determineResponseContentTypeFromAccept(c *gin.Context) string {
-	acceptList := strings.Split(c.Request.Header.Get("Accept"), ",")
-
-	if len(acceptList) == 0 {
-		return extension.AcceptJSON
-	}
-
-	result := strings.Trim(acceptList[0], " ")
-	switch result {
-	case extension.AcceptAll:
-		return extension.AcceptJSON
-	default:
-		return result
-	}
-}
-
 func (receiver *BaseController) determineResponseCharsetTypeFromAcceptCharset(c *gin.Context) string {
 	acceptCharsetList := strings.Split(c.Request.Header.Get("Accept-Charset"), ",")
 
@@ -170,19 +154,11 @@ func (receiver *BaseController) determineResponseCharsetTypeFromAcceptCharset(c 
 	}
 }
 
-func (receiver *BaseController) determineResponseMappingTagFromAccept(c *gin.Context) string {
-	switch receiver.determineResponseContentTypeFromAccept(c) {
-	case extension.AcceptXYAML, extension.AcceptTextYAML:
-		return extension.TagYAML
-	default:
-		return extension.TagJSON
-	}
-}
-
 func (receiver *BaseController) outputTextWithContentType(c *gin.Context, code int, result interface{}) {
 	text := result.(string)
 
-	accept := receiver.determineResponseContentTypeFromAccept(c)
+	acceptList := strings.Split(c.Request.Header.Get("Accept"), ",")
+	accept := extension.DetermineResponseContentTypeFromAccept(acceptList)
 
 	switch accept {
 	case "", extension.AcceptAll:
@@ -465,7 +441,9 @@ func (receiver *BaseController) GetResourceMultiURL() (string, error) {
 }
 
 func (receiver *BaseController) outputDataWithType(c *gin.Context, code int, obj interface{}) {
-	switch receiver.determineResponseContentTypeFromAccept(c) {
+	acceptList := strings.Split(c.Request.Header.Get("Accept"), ",")
+
+	switch extension.DetermineResponseContentTypeFromAccept(acceptList) {
 	case extension.AcceptXYAML, extension.AcceptTextYAML:
 		c.YAML(code, obj)
 	default:
@@ -490,7 +468,8 @@ func (receiver *BaseController) OutputGetSingle(c *gin.Context, code int, result
 		receiver.outputDataWithType(c, code, result)
 	} else {
 		targetTag := ""
-		switch receiver.determineResponseContentTypeFromAccept(c) {
+		acceptList := strings.Split(c.Request.Header.Get("Accept"), ",")
+		switch extension.DetermineResponseContentTypeFromAccept(acceptList) {
 		case extension.AcceptXYAML, extension.AcceptTextYAML:
 			targetTag = extension.TagYAML
 		default:
@@ -517,7 +496,8 @@ func (receiver *BaseController) OutputGetMulti(c *gin.Context, code int, result 
 		receiver.outputDataWithType(c, code, result)
 	} else {
 		targetTag := ""
-		switch receiver.determineResponseContentTypeFromAccept(c) {
+		acceptList := strings.Split(c.Request.Header.Get("Accept"), ",")
+		switch extension.DetermineResponseContentTypeFromAccept(acceptList) {
 		case extension.AcceptXYAML, extension.AcceptTextYAML:
 			targetTag = extension.TagYAML
 		default:
@@ -652,7 +632,8 @@ func (receiver *BaseController) GetSingle(c *gin.Context) {
 
 	db = parameter.SetPreloads(db)
 	fields := helper.ParseFields(c.DefaultQuery("fields", "*"))
-	queryFields, err := helper.QueryFields(resultForQueryFields, fields, receiver.determineResponseMappingTagFromAccept(c))
+	acceptList := strings.Split(c.Request.Header.Get("Accept"), ",")
+	queryFields, err := helper.QueryFields(resultForQueryFields, fields, extension.DetermineResponseMappingTagFromAccept(acceptList))
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		receiver.outputHandler.OutputError(c, http.StatusNotFound, err)
@@ -716,7 +697,8 @@ func (receiver *BaseController) GetMulti(c *gin.Context) {
 	db = parameter.SortRecords(db)
 	db = parameter.FilterFields(db)
 	fields := helper.ParseFields(c.DefaultQuery("fields", "*"))
-	queryFields, err := helper.QueryFields(elementOfResultForQueryFields, fields, receiver.determineResponseMappingTagFromAccept(c))
+	acceptList := strings.Split(c.Request.Header.Get("Accept"), ",")
+	queryFields, err := helper.QueryFields(elementOfResultForQueryFields, fields, extension.DetermineResponseMappingTagFromAccept(acceptList))
 	if err != nil {
 		logging.Logger().Debug(err.Error())
 		receiver.outputHandler.OutputError(c, http.StatusNotFound, err)
