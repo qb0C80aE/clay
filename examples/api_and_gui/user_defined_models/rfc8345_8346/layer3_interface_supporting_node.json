@@ -1,0 +1,32 @@
+{
+  "type_name": "Layer3InterfaceSupportingNode",
+  "resource_name": "layer3_interface_supporting_nodes",
+  "to_be_migrated": false,
+  "is_controller_enabled": true,
+  "is_design_access_disabled": true,
+  "fields": [
+    {
+      "name": "ID",
+      "tag": "json:\"id\" yaml:\"id\"",
+      "type_name": "int"
+    },
+    {
+      "name": "BridgeName",
+      "tag": "json:\"bridge_name\" yaml:\"bridge_name\"",
+      "type_name": "string"
+    }
+  ],
+  "sql_before_migration": [
+    "select 1 from layer3_interfaces;",
+    "select 1 from layer2_links;"
+  ],
+  "sql_after_migration": [
+    "drop view if exists layer3_interface_supporting_nodes;",
+    "create view if not exists layer3_interface_supporting_nodes as",
+    "  select layer3_interfaces.id id,",
+    "    layer2_links.source_bridge_name bridge_name",
+    "  from layer3_interfaces",
+    "    inner join layer2_links",
+    "      on layer3_interfaces.id = layer2_links.source_port_id;"
+  ]
+}

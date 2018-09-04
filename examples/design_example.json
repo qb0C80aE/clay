@@ -9,28 +9,28 @@
       },
       {
         "diagram_node_id": "2_1_1",
-        "x": 642.3724,
-        "y": 257.3335
+        "x": 643.2357,
+        "y": 255.60681
       },
       {
         "diagram_node_id": "3_1_1",
-        "x": 430.09183,
-        "y": 404.6264
+        "x": 431.09183,
+        "y": 399.89963
       },
       {
         "diagram_node_id": "4_1_1",
-        "x": 643.39374,
-        "y": 401.3213
+        "x": 643.87555,
+        "y": 401.81522
       },
       {
         "diagram_node_id": "5_1_1",
-        "x": 429.22696,
-        "y": 530.7364
+        "x": 430.71765,
+        "y": 529.991
       },
       {
         "diagram_node_id": "6_1_1",
-        "x": 643.62274,
-        "y": 532.17194
+        "x": 644.8186,
+        "y": 531.57404
       },
       {
         "diagram_node_id": "10_2_2",
@@ -170,7 +170,7 @@
       {
         "diagram_node_id": "12_1_1",
         "x": 217.82986,
-        "y": 146.02592
+        "y": 145.98953
       },
       {
         "diagram_node_id": "12_2_1",
@@ -359,8 +359,8 @@
       },
       {
         "diagram_node_id": "5_3_1",
-        "x": 540.59705,
-        "y": 568.2151
+        "x": 543.20264,
+        "y": 587.75684
       },
       {
         "diagram_node_id": "2_3_1",
@@ -369,8 +369,8 @@
       },
       {
         "diagram_node_id": "6_3_1",
-        "x": 792.9018,
-        "y": 575.4102
+        "x": 795.5074,
+        "y": 592.34644
       },
       {
         "diagram_node_id": "1_3_1",
@@ -379,13 +379,13 @@
       },
       {
         "diagram_node_id": "4_3_1",
-        "x": 539.69403,
-        "y": 460.74835
+        "x": 793.35486,
+        "y": 475.6149
       },
       {
         "diagram_node_id": "3_3_1",
-        "x": 789.4998,
-        "y": 460.50024
+        "x": 544.2014,
+        "y": 469.47437
       },
       {
         "diagram_node_id": "10_3_1",
@@ -1769,7 +1769,7 @@
         "name": "Gi0/0",
         "description": "",
         "number": 1,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:01",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -1784,7 +1784,7 @@
         "name": "Gi0/1",
         "description": "",
         "number": 2,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:02",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -1799,7 +1799,7 @@
         "name": "Gi0/2",
         "description": "",
         "number": 3,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:03",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -1814,7 +1814,7 @@
         "name": "Gi0/3",
         "description": "",
         "number": 4,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:04",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -1829,7 +1829,7 @@
         "name": "Gi0/0",
         "description": "",
         "number": 1,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:05",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -1844,7 +1844,7 @@
         "name": "Gi0/1",
         "description": "",
         "number": 2,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:06",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -1859,7 +1859,7 @@
         "name": "Gi0/2",
         "description": "",
         "number": 3,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:07",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -1874,7 +1874,7 @@
         "name": "Gi0/3",
         "description": "",
         "number": 4,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:08",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -1889,9 +1889,9 @@
         "name": "Eth1",
         "description": "",
         "number": 1,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:09",
         "ipv4_addresses": null,
-        "tagged": true,
+        "tagged": false,
         "link": null,
         "port_group_port_associations": null,
         "vlans": "1",
@@ -1904,9 +1904,9 @@
         "name": "Eth2",
         "description": "",
         "number": 2,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:0A",
         "ipv4_addresses": null,
-        "tagged": true,
+        "tagged": false,
         "link": null,
         "port_group_port_associations": null,
         "vlans": "1",
@@ -1919,9 +1919,9 @@
         "name": "Eth3",
         "description": "",
         "number": 3,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:0B",
         "ipv4_addresses": null,
-        "tagged": true,
+        "tagged": false,
         "link": null,
         "port_group_port_associations": null,
         "vlans": "1",
@@ -1934,7 +1934,7 @@
         "name": "SVI30",
         "description": "",
         "number": 4,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:0C",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -1949,7 +1949,7 @@
         "name": "SVI40",
         "description": "",
         "number": 4,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:0D",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -1964,7 +1964,7 @@
         "name": "Eth5",
         "description": "",
         "number": 4,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:0E",
         "ipv4_addresses": null,
         "tagged": true,
         "link": null,
@@ -1979,7 +1979,7 @@
         "name": "SVI10",
         "description": "",
         "number": 5,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:0F",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -1994,7 +1994,7 @@
         "name": "SVI20",
         "description": "",
         "number": 5,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:10",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2009,7 +2009,7 @@
         "name": "Eth4",
         "description": "",
         "number": 5,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:11",
         "ipv4_addresses": null,
         "tagged": true,
         "link": null,
@@ -2024,7 +2024,7 @@
         "name": "Eth1",
         "description": "",
         "number": 1,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:12",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2039,7 +2039,7 @@
         "name": "Eth2",
         "description": "",
         "number": 2,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:13",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2054,7 +2054,7 @@
         "name": "Eth3",
         "description": "",
         "number": 3,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:14",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2069,7 +2069,7 @@
         "name": "Eth4",
         "description": "",
         "number": 4,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:15",
         "ipv4_addresses": null,
         "tagged": true,
         "link": null,
@@ -2084,7 +2084,7 @@
         "name": "SVI30",
         "description": "",
         "number": 4,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:16",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2099,7 +2099,7 @@
         "name": "SVI40",
         "description": "",
         "number": 4,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:17",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2114,7 +2114,7 @@
         "name": "Eth5",
         "description": "",
         "number": 5,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:18",
         "ipv4_addresses": null,
         "tagged": true,
         "link": null,
@@ -2129,7 +2129,7 @@
         "name": "SVI10",
         "description": "",
         "number": 5,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:19",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2144,7 +2144,7 @@
         "name": "SVI20",
         "description": "",
         "number": 5,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:1A",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2159,7 +2159,7 @@
         "name": "eth1",
         "description": "",
         "number": 1,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:1B",
         "ipv4_addresses": null,
         "tagged": true,
         "link": null,
@@ -2173,8 +2173,8 @@
         "node": null,
         "name": "eth2",
         "description": "",
-        "number": 1,
-        "mac_address": "",
+        "number": 2,
+        "mac_address": "00:00:5E:00:53:1C",
         "ipv4_addresses": null,
         "tagged": true,
         "link": null,
@@ -2188,8 +2188,8 @@
         "node": null,
         "name": "eth3",
         "description": "",
-        "number": 1,
-        "mac_address": "",
+        "number": 3,
+        "mac_address": "00:00:5E:00:53:1D",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2203,8 +2203,8 @@
         "node": null,
         "name": "eth4",
         "description": "",
-        "number": 1,
-        "mac_address": "",
+        "number": 4,
+        "mac_address": "00:00:5E:00:53:1E",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2219,7 +2219,7 @@
         "name": "eth1",
         "description": "",
         "number": 1,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:1F",
         "ipv4_addresses": null,
         "tagged": true,
         "link": null,
@@ -2234,7 +2234,7 @@
         "name": "eth2",
         "description": "",
         "number": 2,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:20",
         "ipv4_addresses": null,
         "tagged": true,
         "link": null,
@@ -2249,7 +2249,7 @@
         "name": "eth3",
         "description": "",
         "number": 3,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:21",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2264,7 +2264,7 @@
         "name": "eth4",
         "description": "",
         "number": 4,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:22",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2279,7 +2279,7 @@
         "name": "eth0",
         "description": "",
         "number": 1,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:23",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2294,7 +2294,7 @@
         "name": "eth0",
         "description": "",
         "number": 1,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:24",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2309,7 +2309,7 @@
         "name": "eth0",
         "description": "",
         "number": 1,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:25",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2324,7 +2324,7 @@
         "name": "eth0",
         "description": "",
         "number": 1,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:26",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2339,7 +2339,7 @@
         "name": "Gi0/0",
         "description": "",
         "number": 1,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:27",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2354,7 +2354,7 @@
         "name": "Gi0/1",
         "description": "",
         "number": 2,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:28",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2369,7 +2369,7 @@
         "name": "Gi0/2",
         "description": "",
         "number": 3,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:29",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2384,7 +2384,7 @@
         "name": "Gi0/3",
         "description": "",
         "number": 4,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:2A",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2399,7 +2399,7 @@
         "name": "Gi0/0",
         "description": "",
         "number": 1,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:2B",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2412,9 +2412,9 @@
         "node_id": 12,
         "node": null,
         "name": "SVI50",
-        "description": "",
-        "number": 3,
-        "mac_address": "",
+        "description": "PortChannel(Connected Virtually)",
+        "number": 2,
+        "mac_address": "00:00:5E:00:53:2C",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2429,12 +2429,12 @@
         "name": "Gi0/2",
         "description": "",
         "number": 2,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:2D",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
         "port_group_port_associations": null,
-        "vlans": "1",
+        "vlans": "50",
         "vlan_port_associations": null
       },
       {
@@ -2443,8 +2443,8 @@
         "node": null,
         "name": "Gi0/3",
         "description": "",
-        "number": 3,
-        "mac_address": "",
+        "number": 2,
+        "mac_address": "00:00:5E:00:53:2E",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2457,9 +2457,9 @@
         "node_id": 13,
         "node": null,
         "name": "bond0",
-        "description": "",
+        "description": "PortChannel(Connected Virtually)",
         "number": 1,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:2F",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2473,8 +2473,8 @@
         "node": null,
         "name": "ens3",
         "description": "",
-        "number": 2,
-        "mac_address": "",
+        "number": 1,
+        "mac_address": "00:00:5E:00:53:30",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2488,8 +2488,8 @@
         "node": null,
         "name": "ens4",
         "description": "",
-        "number": 3,
-        "mac_address": "",
+        "number": 1,
+        "mac_address": "00:00:5E:00:53:31",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2504,7 +2504,7 @@
         "name": "Gi0/0",
         "description": "",
         "number": 1,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:32",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2519,7 +2519,7 @@
         "name": "Gi0/1",
         "description": "",
         "number": 2,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:33",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2534,7 +2534,7 @@
         "name": "Gi0/2",
         "description": "",
         "number": 3,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:34",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2549,7 +2549,7 @@
         "name": "Gi0/3",
         "description": "",
         "number": 4,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:35",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2564,7 +2564,7 @@
         "name": "g0/0",
         "description": "",
         "number": 1,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:36",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2579,7 +2579,7 @@
         "name": "g0/1",
         "description": "",
         "number": 2,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:37",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2594,7 +2594,7 @@
         "name": "g0/0",
         "description": "",
         "number": 1,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:38",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2609,7 +2609,7 @@
         "name": "g0/1",
         "description": "",
         "number": 2,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:39",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2624,7 +2624,7 @@
         "name": "Gi0/1",
         "description": "",
         "number": 1,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:3A",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2639,7 +2639,7 @@
         "name": "Gi0/2",
         "description": "",
         "number": 2,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:3B",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2654,7 +2654,7 @@
         "name": "Gi0/0",
         "description": "",
         "number": 1,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:3C",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2669,7 +2669,7 @@
         "name": "Gi0/1",
         "description": "",
         "number": 2,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:3D",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2684,7 +2684,7 @@
         "name": "eth0",
         "description": "",
         "number": 1,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:3E",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2699,7 +2699,7 @@
         "name": "1",
         "description": "",
         "number": 1,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:3F",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2714,7 +2714,7 @@
         "name": "2",
         "description": "",
         "number": 2,
-        "mac_address": "",
+        "mac_address": "00:00:5E:00:53:40",
         "ipv4_addresses": null,
         "tagged": false,
         "link": null,
@@ -2731,7 +2731,8 @@
         "name": "Distr_Access3",
         "description": "",
         "address": "192.168.10.0",
-        "prefix": 24
+        "prefix": 24,
+        "layer3_interfaces": null
       },
       {
         "id": 2,
@@ -2740,7 +2741,8 @@
         "name": "Distr_Access1",
         "description": "",
         "address": "192.168.20.0",
-        "prefix": 24
+        "prefix": 24,
+        "layer3_interfaces": null
       },
       {
         "id": 3,
@@ -2749,7 +2751,8 @@
         "name": "Distr_Access2",
         "description": "",
         "address": "192.168.30.0",
-        "prefix": 24
+        "prefix": 24,
+        "layer3_interfaces": null
       },
       {
         "id": 4,
@@ -2758,7 +2761,8 @@
         "name": "Distr_Access4",
         "description": "",
         "address": "192.168.40.0",
-        "prefix": 24
+        "prefix": 24,
+        "layer3_interfaces": null
       },
       {
         "id": 22,
@@ -2767,7 +2771,8 @@
         "name": "Core_Distr4",
         "description": "",
         "address": "10.0.0.20",
-        "prefix": 30
+        "prefix": 30,
+        "layer3_interfaces": null
       },
       {
         "id": 23,
@@ -2776,7 +2781,8 @@
         "name": "Distr_Distr",
         "description": "",
         "address": "10.0.0.0",
-        "prefix": 30
+        "prefix": 30,
+        "layer3_interfaces": null
       },
       {
         "id": 24,
@@ -2785,7 +2791,8 @@
         "name": "Core_Core",
         "description": "",
         "address": "10.0.0.4",
-        "prefix": 30
+        "prefix": 30,
+        "layer3_interfaces": null
       },
       {
         "id": 25,
@@ -2794,7 +2801,8 @@
         "name": "Core_Distr1",
         "description": "",
         "address": "10.0.0.8",
-        "prefix": 30
+        "prefix": 30,
+        "layer3_interfaces": null
       },
       {
         "id": 26,
@@ -2803,7 +2811,8 @@
         "name": "Core_Distr2",
         "description": "",
         "address": "10.0.0.12",
-        "prefix": 30
+        "prefix": 30,
+        "layer3_interfaces": null
       },
       {
         "id": 27,
@@ -2812,7 +2821,8 @@
         "name": "Core_Distr3",
         "description": "",
         "address": "10.0.0.16",
-        "prefix": 30
+        "prefix": 30,
+        "layer3_interfaces": null
       },
       {
         "id": 28,
@@ -2821,7 +2831,8 @@
         "name": "Inside1",
         "description": "",
         "address": "172.16.0.8",
-        "prefix": 30
+        "prefix": 30,
+        "layer3_interfaces": null
       },
       {
         "id": 29,
@@ -2830,7 +2841,8 @@
         "name": "Inside2",
         "description": "",
         "address": "172.16.0.12",
-        "prefix": 30
+        "prefix": 30,
+        "layer3_interfaces": null
       },
       {
         "id": 30,
@@ -2839,7 +2851,8 @@
         "name": "DC0",
         "description": "",
         "address": "172.16.0.4",
-        "prefix": 30
+        "prefix": 30,
+        "layer3_interfaces": null
       },
       {
         "id": 31,
@@ -2848,7 +2861,8 @@
         "name": "Outside",
         "description": "",
         "address": "172.16.0.0",
-        "prefix": 30
+        "prefix": 30,
+        "layer3_interfaces": null
       },
       {
         "id": 32,
@@ -2857,7 +2871,8 @@
         "name": "ISP1",
         "description": "",
         "address": "198.10.10.0",
-        "prefix": 30
+        "prefix": 30,
+        "layer3_interfaces": null
       },
       {
         "id": 33,
@@ -2866,7 +2881,8 @@
         "name": "ISP2",
         "description": "",
         "address": "197.10.10.0",
-        "prefix": 30
+        "prefix": 30,
+        "layer3_interfaces": null
       },
       {
         "id": 34,
@@ -2875,7 +2891,8 @@
         "name": "DMZ0",
         "description": "",
         "address": "195.1.1.128",
-        "prefix": 30
+        "prefix": 30,
+        "layer3_interfaces": null
       },
       {
         "id": 35,
@@ -2884,7 +2901,8 @@
         "name": "DMZ1",
         "description": "",
         "address": "195.1.1.132",
-        "prefix": 30
+        "prefix": 30,
+        "layer3_interfaces": null
       },
       {
         "id": 37,
@@ -2893,7 +2911,8 @@
         "name": "DC1",
         "description": "",
         "address": "172.16.50.0",
-        "prefix": 24
+        "prefix": 24,
+        "layer3_interfaces": null
       },
       {
         "id": 38,
@@ -2902,7 +2921,8 @@
         "name": "DMZ2",
         "description": "",
         "address": "195.1.1.167",
-        "prefix": 29
+        "prefix": 29,
+        "layer3_interfaces": null
       },
       {
         "id": 39,
@@ -2911,7 +2931,8 @@
         "name": "Blackhole",
         "description": "",
         "address": "0.0.0.0",
-        "prefix": 32
+        "prefix": 32,
+        "layer3_interfaces": null
       }
     ],
     "template_arguments": [],
@@ -2922,9 +2943,203 @@
         "template_content": "{{- $layer3Interfaces := .ModelStore.Multi \"layer3_interfaces\" \"preloads=node\" -}}\n{{- $subnets := .ModelStore.Multi \"subnets\" \"sort=+name\" -}}\n{{- $networkUtil := .Network -}}\n{{- $collectionUtil := .Collection -}}\n\n{{- $subnetMap := $collectionUtil.Hash $subnets.Records \"ID\" -}}\n{{- $subnetNodeInterfacesMap := $collectionUtil.Map -}}\n\nnwdiag {\n{{- range $i, $subnet := $subnets.Records }}\n  network {{ $subnet.Name }} {\n    address = \"{{ $subnet.Address }}/{{ $subnet.Prefix }}\"\n  {{- $subnetCIDRString := printf \"%s/%d\" $subnet.Address $subnet.Prefix }}\n  {{- $subnetCIDR := $networkUtil.ParseCIDR $subnetCIDRString }}\n\n  {{- range $j, $layer3Interface := $layer3Interfaces.Records }}\n    {{- if eq $subnet.VlanID $layer3Interface.VlanID }}\n      {{- $layer3InterfaceCIDRString := printf \"%s/%d\" $layer3Interface.Ipv4Address $layer3Interface.Ipv4Prefix }}\n      {{- $layer3InterfaceCIDR := $networkUtil.ParseCIDR $layer3InterfaceCIDRString }}\n\n      {{- $isIncluding := $subnetCIDR.IsIncluding $layer3InterfaceCIDR }}\n      {{- if eq $isIncluding true }}\n    {{ $layer3Interface.Node.Name }} [address = \"{{ $layer3Interface.Name }} ({{ $layer3Interface.Ipv4Address }})\"]\n      {{- end }}\n    {{- end }}\n  {{- end }}\n  }\n{{- end }}\n}",
         "description": "Generate Layer3 nwdiag json from models",
         "template_arguments": null
+      },
+      {
+        "id": 2,
+        "name": "Neo4j_csv_and_cypher",
+        "template_content": "{{- $nodes := .ModelStore.Multi \"nodes\" \"preloads=ports\" -}}\n{{- $ports := .ModelStore.Multi \"ports\" \"\" -}}\n{{- $nodeMap := .Collection.Hash $nodes.Records \"ID\" -}}\n{{- $links := .ModelStore.Multi \"links\" \"\" -}}\n---------- nodes.csv ----------\nID,Name\n{{- range $i, $node := $nodes.Records }}\n{{ $node.ID }},{{ $node.Name }}\n{{- end }}\n---------- ports.csv ----------\nID,Name\n{{- range $i, $port := $ports.Records }}\n{{ $port.ID }},{{ $port.Name }}\n{{- end }}\n---------- nodeports.csv ----------\nNodeID,PortID\n{{- range $i, $node := $nodes.Records }}\n  {{- range $j, $port := $node.Ports }}\n{{ $node.ID }},{{ $port.ID }}\n  {{- end }}\n{{- end }}\n---------- links.csv ----------\nSourcePortID,DestinationPortID\n{{- range $i, $link := $links.Records }}\n{{ $link.SourcePortID }},{{ $link.DestinationPortID }}\n{{- end }}\n--------------------\n\nLOAD CSV WITH HEADERS FROM \"file:///nodes.csv\" AS csvLine\nCREATE (n: Node {id: toInt(csvLine.ID), name: csvLine.Name} )\n\nLOAD CSV WITH HEADERS FROM \"file:///ports.csv\" AS csvLine\nCREATE (p: Port {id: toInt(csvLine.ID), name: csvLine.Name} )\n\nLOAD CSV WITH HEADERS FROM \"file:///nodeports.csv\" AS csvLine\nMATCH (p: Port {id: toInt(csvLine.PortID)}), (n: Node {id: toInt(csvLine.NodeID)})\nCREATE (n)-[:has]->(p)\n\nLOAD CSV WITH HEADERS FROM \"file:///links.csv\" AS csvLine\nMATCH (sp: Port {id: toInt(csvLine.SourcePortID)}), (dp: Port {id: toInt(csvLine.DestinationPortID)})\nCREATE (sp)-[:connected]->(dp)",
+        "description": "Generate csv data and cypher for Neo4j",
+        "template_arguments": null
+      },
+      {
+        "id": 3,
+        "name": "RFC_8345_8346_json_data",
+        "template_content": "{{- $modelStore := .ModelStore -}}\n{{- $collectionUtil := .Collection -}}\n{{- $nodes := $modelStore.Multi \"nodes\" \"preloads=ports\" -}}\n{{- $nodeMap := $collectionUtil.Hash $nodes.Records \"ID\" -}}\n{{- $links := $modelStore.Multi \"links\" \"\" -}}\n{{- $ports := $modelStore.Multi \"ports\" \"preloads=link,vlan_port_associations.vlan\" -}}\n{{- $portMap := $collectionUtil.Hash $ports.Records \"ID\" -}}\n{{- $subnets := $modelStore.Multi \"subnets\" \"preloads=layer3_interfaces\" -}}\n{{- $subnetMap := $collectionUtil.Hash $subnets.Records \"ID\" -}}\n{{- $layer2Links := $modelStore.Multi \"layer2_links\" \"\" -}}\n{{- $layer2Nodes := $modelStore.Multi \"layer2_nodes\" \"preloads=ports.vlan\" -}}\n{{- $layer2Ports := $modelStore.Multi \"layer2_ports\" \"preloads=layer3_interfaces\" -}}\n{{- $layer2PortMap := $collectionUtil.Hash $layer2Ports.Records \"PortID\" -}}\n{{- $layer3Nodes := $modelStore.Multi \"layer3_nodes\" \"preloads=layer3_interfaces\" -}}\n{{- $layer3NodeMap := $collectionUtil.Hash $layer3Nodes.Records \"NodeID\" -}}\n{{- $layer3InterfaceSupportingNodes := $modelStore.Multi \"layer3_interface_supporting_nodes\" \"\" -}}\n{{- $layer3InterfaceSupportingNodeMap := $collectionUtil.Hash $layer3InterfaceSupportingNodes.Records \"ID\" -}}\n{\n  \"ietf-network:networks\": {\n    \"network\": [\n      {{/* Layer1 */ -}}\n      {\n        \"network-types\": {},\n        \"network-id\": \"target-L1\",\n        \"node\": [\n{{- $iFirst := $collectionUtil.Map \"first\" true }}\n{{- range $i, $node := $nodes.Records }}\n          {{- $first := $iFirst.Get \"first\" }}{{ if eq $first false }},{{ end }}\n          {\n            \"node-id\": \"{{ $node.Name }}\",\n            \"ietf-network-topology:termination-point\": [\n  {{- $jFirst := $collectionUtil.Map \"first\" true }}\n  {{- range $j, $port := $node.Ports }}\n    {{- $port := $portMap.Get $port.ID }}\n    {{- if not $port.Link }}\n    {{- else }}\n      {{- $first := $jFirst.Get \"first\" }}{{ if eq $first false }},{{ end }}\n              {\n                \"tp-id\": \"{{ $port.Name }}\"\n              }{{ $iFirst := $jFirst.Put \"first\" false }}\n    {{- end }}\n  {{- end }}\n            ]\n          }{{ $iFirst := $iFirst.Put \"first\" false }}\n{{- end }}\n        ],\n        \"ietf-network-topology:link\": [\n{{- $iFirst := $iFirst.Put \"first\" true }}\n{{- range $i, $link := $links.Records }}\n  {{- $first := $iFirst.Get \"first\" }}{{ if eq $first false }},{{ end }}\n          {\n    {{- $sourcePort := $portMap.Get $link.SourcePortID }}\n    {{- $destinationPort := $portMap.Get $link.DestinationPortID }}\n    {{- $sourceNode := $nodeMap.Get $sourcePort.NodeID }}\n    {{- $destinationNode := $nodeMap.Get $destinationPort.NodeID }}\n            \"link-id\": \"{{ $sourceNode.Name }},{{ $sourcePort.Name }},{{ $destinationNode.Name }},{{ $destinationPort.Name }}\",\n            \"source\": {\n              \"source-node\": \"{{ $sourceNode.Name }}\",\n              \"source-tp\": \"{{ $sourcePort.Name }}\"\n            },\n            \"destination\": {\n              \"dest-node\": \"{{ $destinationNode.Name }}\",\n              \"dest-tp\": \"{{ $destinationPort.Name }}\"\n            }\n          }{{ $iFirst := $iFirst.Put \"first\" false }}\n{{- end }}\n        ]\n      },\n      {{/* Layer2 */ -}}\n      {\n        \"network-types\": {\n          \"ietf-l2-topology:l2-network\": {}\n        },\n        \"network-id\": \"target-L2\",\n        \"ietf-l2-topology:l2-network-attributes\": {\n          \"name\": \"L2 of target network\",\n          \"flag\": []\n        },\n        \"supporting-network\": [\n          {\n            \"network-ref\": \"target-L1\"\n          }\n        ],\n        \"node\": [\n{{- $iFirst := $collectionUtil.Map \"first\" true }}\n{{- range $i, $layer2Node := $layer2Nodes.Records }}\n  {{- $first := $iFirst.Get \"first\" }}{{ if eq $first false }},{{ end }}\n          {\n            \"node-id\": \"{{ $layer2Node.BridgeName }}\",\n            \"ietf-network-topology:termination-point\": [\n  {{- $jFirst := $collectionUtil.Map \"first\" true }}\n  {{- range $j, $layer2Port := $layer2Node.Ports }}\n    {{- $port := $portMap.Get $layer2Port.PortID }}\n    {{- $first := $jFirst.Get \"first\" }}{{ if eq $first false }},{{ end }}\n              {\n                \"tp-id\": \"{{ $layer2Port.PortName }}\"\n    {{- if  $layer2Port.Layer3Interfaces }},\n                \"ietf-l2-topology:l2-termination-point-attributes\": {\n                  \"description\": \"\",\n                  \"maximum-frame-size\": 1500,\n                  \"mac-address\": \"{{ $port.MacAddress }}\",\n                  \"eth-encapsulation\": \"\",\n                  \"port-vlan-id\": {{ $layer2Port.VlanID }},\n                  \"vlan-id-name\": [\n      {{- $jFirst := $collectionUtil.Map \"first\" true }}\n      {{- range $j, $layer3Interface := $layer2Port.Layer3Interfaces }}\n        {{- $subnet := $subnetMap.Get $layer3Interface.SubnetID }}\n        {{- $first := $jFirst.Get \"first\" }}{{ if eq $first false }},{{ end }}\n                    {\n                      \"vlan-id\": {{ $layer2Port.VlanID }},\n                      \"vlan-name\": \"{{ $subnet.Name }}\"\n                    }{{ $jFirst := $jFirst.Put \"first\" false }}\n        {{- end }}\n                  ],\n                  \"tp-state\": \"in-use\"\n                }\n      {{- end }}\n      {{- if ne $layer2Port.PortID 0 }}\n        {{- if $port.Link }},\n          {{- $node := $nodeMap.Get $port.NodeID }}\n                \"supporting-termination-point\": [\n                  {\n                    \"network-ref\": \"target-L1\",\n                    \"node-ref\": \"{{ $node.Name }}\",\n                    \"tp-ref\": \"{{ $port.Name }}\"\n                  }\n                ]\n        {{- end }}\n      {{- end }}\n              }{{ $jFirst := $jFirst.Put \"first\" false }}\n  {{- end }}\n            ],\n            \"ietf-l2-topology:l2-node-attributes\": {\n              \"name\": \"{{ $layer2Node.BridgeName }}\",\n              \"description\": \"L2 of {{ $layer2Node.NodeName }}\",\n              \"management-address\": [],\n              \"sys-mac-address\": \"\",\n              \"management-vid\": 0,\n              \"flag\": []\n            },\n            \"supporting-node\": [\n              {\n                \"network-ref\": \"target-L1\",\n                \"node-ref\": \"{{ $layer2Node.NodeName }}\"\n              }\n            ]\n          }{{ $iFirst := $iFirst.Put \"first\" false }}\n{{- end }}\n        ],\n        \"ietf-network-topology:link\": [\n{{- $iFirst := $iFirst.Put \"first\" true }}\n{{- range $i, $layer2Link := $layer2Links.Records }}\n  {{- $first := $iFirst.Get \"first\" }}{{ if eq $first false }},{{ end }}\n          {\n            \"link-id\": \"{{ $layer2Link.SourceBridgeName }},{{ $layer2Link.SourcePortName }},{{ $layer2Link.DestinationBridgeName }},{{ $layer2Link.DestinationPortName }}\",\n            \"source\": {\n              \"source-node\": \"{{ $layer2Link.SourceBridgeName }}\",\n              \"source-tp\": \"{{ $layer2Link.SourcePortName  }}\"\n            },\n            \"destination\": {\n              \"dest-node\": \"{{ $layer2Link.DestinationBridgeName }}\",\n              \"dest-tp\": \"{{ $layer2Link.DestinationPortName }}\"\n            }\n          }{{ $iFirst := $iFirst.Put \"first\" false }}\n{{- end }}\n        ]\n      },\n      {\n        \"network-id\": \"target-L3\",\n        \"network-types\": {\n          \"ietf-l3-unicast-topology:l3-unicast-topology\": {}\n        },\n        \"supporting-network\": [\n          {\n            \"network-ref\": \"target-L2\"\n          },\n          {\n            \"network-ref\": \"target-L1\"\n          }\n        ],\n        \"node\": [\n{{- $iFirst := $iFirst.Put \"first\" true }}\n{{- range $i, $layer3Node := $layer3Nodes.Records }}\n  {{- $first := $iFirst.Get \"first\" }}{{ if eq $first false }},{{ end }}\n          {\n            \"node-id\": \"{{ $layer3Node.NodeName }}\",\n            \"ietf-network-topology:termination-point\": [\n  {{- $jFirst := $collectionUtil.Map \"first\" true }}\n  {{- range $j, $layer3Interface := $layer3Node.Layer3Interfaces }}\n    {{- $first := $jFirst.Get \"first\" }}{{ if eq $first false }},{{ end }}\n              {\n                \"tp-id\": \"{{ $layer3Interface.Name }}\",\n                \"ietf-l3-unicast-topology:l3-termination-point-attributes\": {\n                  \"ip-address\": [\"{{ $layer3Interface.Ipv4Address }}\"]\n                },\n                \"supporting-termination-point\": [\n                  {\n                    \"network-ref\": \"target-L2\",\n                    \"node-ref\": \"{{ $layer3Node.NodeName }}\",\n                    \"tp-ref\": \"{{ $layer3Interface.Name }}\"\n                  }\n                ]\n              }{{ $jFirst := $jFirst.Put \"first\" false }}\n    {{- end }}\n            ],\n            \"ietf-l3-unicast-topology:l3-node-attributes\": {\n              \"prefix\": [\n  {{- $jFirst := $jFirst.Put \"first\" true }}\n  {{- range $j, $layer3Interface := $layer3Node.Layer3Interfaces }}\n    {{- $first := $jFirst.Get \"first\" }}{{ if eq $first false }},{{ end }}\n    {{- $subnet := $subnetMap.Get $layer3Interface.SubnetID }}\n                {\n                  \"prefix\": \"{{ $subnet.Address }}/{{ $subnet.Prefix }}\",\n                  \"metric\": 100,\n                  \"flag\": []\n                }{{ $jFirst := $jFirst.Put \"first\" false }}\n  {{- end }}\n              ]\n            },\n            \"supporting-node\": [\n              {\n                \"network-ref\": \"target-L2\",\n                \"node-ref\": \"{{ $layer3Node.NodeName }}\"\n              }\n            ]\n          }{{ $iFirst := $iFirst.Put \"first\" false }}\n{{- end }}\n{{- range $i, $subnet := $subnets.Records }}\n  {{- $first := $iFirst.Get \"first\" }}{{ if eq $first false }},{{ end }}\n          {\n            \"node-id\": \"Seg-{{ $subnet.Name }}\",\n            \"ietf-network-topology:termination-point\": [\n  {{- $jFirst := $collectionUtil.Map \"first\" true }}\n  {{- range $j, $layer3Interface := $subnet.Layer3Interfaces }}\n    {{- $node := $nodeMap.Get $layer3Interface.NodeID }}\n    {{- $first := $jFirst.Get \"first\" }}{{ if eq $first false }},{{ end }}\n              {\n                \"tp-id\": \"p{{ $layer3Interface.ID }}\",\n                \"supporting-termination-point\": [\n                  {\n                    \"network-ref\": \"target-L2\",\n                    \"node-ref\": \"{{ $node.Name }}\",\n                    \"tp-ref\": \"{{ $layer3Interface.Name }}\"\n                  }\n                ]\n              }{{ $jFirst := $jFirst.Put \"first\" false }}\n  {{- end }}\n            ],\n            \"ietf-l3-unicast-topology:l3-node-attributes\": {\n              \"prefix\": [\n                {\n                  \"prefix\": \"{{ $subnet.Address }}/{{ $subnet.Prefix }}\",\n                  \"metric\": 100,\n                  \"flag\": [\"l3-segment\", \"pseudo-node\"]\n                }{{ $jFirst := $jFirst.Put \"first\" false }}\n              ]\n            },\n            \"supporting-node\": [\n  {{- $jFirst := $collectionUtil.Map \"first\" true }}\n  {{- range $j, $layer3Interface := $subnet.Layer3Interfaces }}\n    {{- $layer3InterfaceSupportingNode := $layer3InterfaceSupportingNodeMap.Get $layer3Interface.ID }}\n    {{- $first := $jFirst.Get \"first\" }}{{ if eq $first false }},{{ end }}\n              {\n                \"network-ref\": \"target-L2\",\n                \"node-ref\": \"{{ $layer3InterfaceSupportingNode.BridgeName }}\"\n              }{{ $jFirst := $jFirst.Put \"first\" false }}\n  {{- end }}\n            ]\n          }{{ $iFirst := $iFirst.Put \"first\" false }}\n{{- end }}\n        ],\n        \"ietf-network-topology:link\": [\n{{- $iFirst := $collectionUtil.Map \"first\" true }}\n{{- range $i, $subnet := $subnets.Records }}\n  {{- range $j, $layer3Interface := $subnet.Layer3Interfaces }}\n    {{- $node := $layer3NodeMap.Get $layer3Interface.NodeID }}\n    {{- $first := $iFirst.Get \"first\" }}{{ if eq $first false }},{{ end }}\n          {\n            \"link-id\": \"Seg-{{ $subnet.Name }},p{{ $layer3Interface.ID}},{{ $node.NodeName }},{{ $layer3Interface.Name }}\",\n            \"source\": {\n              \"source-node\": \"Seg-{{ $subnet.Name }}\",\n              \"source-tp\": \"p{{ $layer3Interface.ID}}\"\n            },\n            \"destination\": {\n              \"dest-node\": \"{{ $node.NodeName }}\",\n              \"dest-tp\": \"{{ $layer3Interface.Name }}\"\n            }\n          },\n          {\n            \"link-id\": \"{{ $node.NodeName }},{{ $layer3Interface.Name }},Seg-{{ $subnet.Name }},p{{ $layer3Interface.ID}}\",\n            \"source\": {\n              \"source-node\": \"{{ $node.NodeName }}\",\n              \"source-tp\": \"{{ $layer3Interface.Name }}\"\n            },\n            \"destination\": {\n              \"dest-node\": \"Seg-{{ $subnet.Name }}\",\n              \"dest-tp\": \"p{{ $layer3Interface.ID}}\"\n            }\n          }{{ $iFirst := $iFirst.Put \"first\" false }}\n  {{- end }}\n{{- end }}\n        ]\n      }\n    ]\n  }\n}",
+        "description": "Generate RFC 8345 (A YANG Data Model for Network Topologies) and 8346 (A YANG Data Model for Layer 3 Topologies) example json data",
+        "template_arguments": null
       }
     ],
     "vlan_port_associations": [
+      {
+        "vlan_id": 1,
+        "vlan": null,
+        "port_id": 1,
+        "port": null
+      },
+      {
+        "vlan_id": 1,
+        "vlan": null,
+        "port_id": 2,
+        "port": null
+      },
+      {
+        "vlan_id": 1,
+        "vlan": null,
+        "port_id": 3,
+        "port": null
+      },
+      {
+        "vlan_id": 1,
+        "vlan": null,
+        "port_id": 4,
+        "port": null
+      },
+      {
+        "vlan_id": 1,
+        "vlan": null,
+        "port_id": 5,
+        "port": null
+      },
+      {
+        "vlan_id": 1,
+        "vlan": null,
+        "port_id": 6,
+        "port": null
+      },
+      {
+        "vlan_id": 1,
+        "vlan": null,
+        "port_id": 7,
+        "port": null
+      },
+      {
+        "vlan_id": 1,
+        "vlan": null,
+        "port_id": 8,
+        "port": null
+      },
+      {
+        "vlan_id": 1,
+        "vlan": null,
+        "port_id": 9,
+        "port": null
+      },
+      {
+        "vlan_id": 1,
+        "vlan": null,
+        "port_id": 10,
+        "port": null
+      },
+      {
+        "vlan_id": 1,
+        "vlan": null,
+        "port_id": 11,
+        "port": null
+      },
+      {
+        "vlan_id": 30,
+        "vlan": null,
+        "port_id": 13,
+        "port": null
+      },
+      {
+        "vlan_id": 40,
+        "vlan": null,
+        "port_id": 14,
+        "port": null
+      },
+      {
+        "vlan_id": 30,
+        "vlan": null,
+        "port_id": 15,
+        "port": null
+      },
+      {
+        "vlan_id": 40,
+        "vlan": null,
+        "port_id": 15,
+        "port": null
+      },
+      {
+        "vlan_id": 10,
+        "vlan": null,
+        "port_id": 16,
+        "port": null
+      },
+      {
+        "vlan_id": 20,
+        "vlan": null,
+        "port_id": 17,
+        "port": null
+      },
+      {
+        "vlan_id": 10,
+        "vlan": null,
+        "port_id": 18,
+        "port": null
+      },
+      {
+        "vlan_id": 20,
+        "vlan": null,
+        "port_id": 18,
+        "port": null
+      },
+      {
+        "vlan_id": 1,
+        "vlan": null,
+        "port_id": 19,
+        "port": null
+      },
+      {
+        "vlan_id": 1,
+        "vlan": null,
+        "port_id": 20,
+        "port": null
+      },
+      {
+        "vlan_id": 1,
+        "vlan": null,
+        "port_id": 21,
+        "port": null
+      },
+      {
+        "vlan_id": 30,
+        "vlan": null,
+        "port_id": 22,
+        "port": null
+      },
+      {
+        "vlan_id": 40,
+        "vlan": null,
+        "port_id": 22,
+        "port": null
+      },
+      {
+        "vlan_id": 30,
+        "vlan": null,
+        "port_id": 23,
+        "port": null
+      },
+      {
+        "vlan_id": 40,
+        "vlan": null,
+        "port_id": 24,
+        "port": null
+      },
+      {
+        "vlan_id": 10,
+        "vlan": null,
+        "port_id": 25,
+        "port": null
+      },
+      {
+        "vlan_id": 20,
+        "vlan": null,
+        "port_id": 25,
+        "port": null
+      },
+      {
+        "vlan_id": 10,
+        "vlan": null,
+        "port_id": 26,
+        "port": null
+      },
+      {
+        "vlan_id": 20,
+        "vlan": null,
+        "port_id": 27,
+        "port": null
+      },
       {
         "vlan_id": 10,
         "vlan": null,
@@ -3016,252 +3231,6 @@
         "port": null
       },
       {
-        "vlan_id": 1,
-        "vlan": null,
-        "port_id": 19,
-        "port": null
-      },
-      {
-        "vlan_id": 1,
-        "vlan": null,
-        "port_id": 20,
-        "port": null
-      },
-      {
-        "vlan_id": 1,
-        "vlan": null,
-        "port_id": 21,
-        "port": null
-      },
-      {
-        "vlan_id": 30,
-        "vlan": null,
-        "port_id": 22,
-        "port": null
-      },
-      {
-        "vlan_id": 40,
-        "vlan": null,
-        "port_id": 22,
-        "port": null
-      },
-      {
-        "vlan_id": 30,
-        "vlan": null,
-        "port_id": 23,
-        "port": null
-      },
-      {
-        "vlan_id": 40,
-        "vlan": null,
-        "port_id": 24,
-        "port": null
-      },
-      {
-        "vlan_id": 10,
-        "vlan": null,
-        "port_id": 25,
-        "port": null
-      },
-      {
-        "vlan_id": 20,
-        "vlan": null,
-        "port_id": 25,
-        "port": null
-      },
-      {
-        "vlan_id": 10,
-        "vlan": null,
-        "port_id": 26,
-        "port": null
-      },
-      {
-        "vlan_id": 20,
-        "vlan": null,
-        "port_id": 27,
-        "port": null
-      },
-      {
-        "vlan_id": 1,
-        "vlan": null,
-        "port_id": 44,
-        "port": null
-      },
-      {
-        "vlan_id": 1,
-        "vlan": null,
-        "port_id": 46,
-        "port": null
-      },
-      {
-        "vlan_id": 50,
-        "vlan": null,
-        "port_id": 45,
-        "port": null
-      },
-      {
-        "vlan_id": 50,
-        "vlan": null,
-        "port_id": 47,
-        "port": null
-      },
-      {
-        "vlan_id": 50,
-        "vlan": null,
-        "port_id": 48,
-        "port": null
-      },
-      {
-        "vlan_id": 50,
-        "vlan": null,
-        "port_id": 49,
-        "port": null
-      },
-      {
-        "vlan_id": 50,
-        "vlan": null,
-        "port_id": 50,
-        "port": null
-      },
-      {
-        "vlan_id": 1,
-        "vlan": null,
-        "port_id": 59,
-        "port": null
-      },
-      {
-        "vlan_id": 1,
-        "vlan": null,
-        "port_id": 60,
-        "port": null
-      },
-      {
-        "vlan_id": 1,
-        "vlan": null,
-        "port_id": 61,
-        "port": null
-      },
-      {
-        "vlan_id": 60,
-        "vlan": null,
-        "port_id": 62,
-        "port": null
-      },
-      {
-        "vlan_id": 1,
-        "vlan": null,
-        "port_id": 9,
-        "port": null
-      },
-      {
-        "vlan_id": 1,
-        "vlan": null,
-        "port_id": 10,
-        "port": null
-      },
-      {
-        "vlan_id": 1,
-        "vlan": null,
-        "port_id": 11,
-        "port": null
-      },
-      {
-        "vlan_id": 30,
-        "vlan": null,
-        "port_id": 13,
-        "port": null
-      },
-      {
-        "vlan_id": 40,
-        "vlan": null,
-        "port_id": 14,
-        "port": null
-      },
-      {
-        "vlan_id": 30,
-        "vlan": null,
-        "port_id": 15,
-        "port": null
-      },
-      {
-        "vlan_id": 40,
-        "vlan": null,
-        "port_id": 15,
-        "port": null
-      },
-      {
-        "vlan_id": 10,
-        "vlan": null,
-        "port_id": 16,
-        "port": null
-      },
-      {
-        "vlan_id": 20,
-        "vlan": null,
-        "port_id": 17,
-        "port": null
-      },
-      {
-        "vlan_id": 10,
-        "vlan": null,
-        "port_id": 18,
-        "port": null
-      },
-      {
-        "vlan_id": 20,
-        "vlan": null,
-        "port_id": 18,
-        "port": null
-      },
-      {
-        "vlan_id": 1,
-        "vlan": null,
-        "port_id": 1,
-        "port": null
-      },
-      {
-        "vlan_id": 1,
-        "vlan": null,
-        "port_id": 2,
-        "port": null
-      },
-      {
-        "vlan_id": 1,
-        "vlan": null,
-        "port_id": 3,
-        "port": null
-      },
-      {
-        "vlan_id": 1,
-        "vlan": null,
-        "port_id": 4,
-        "port": null
-      },
-      {
-        "vlan_id": 1,
-        "vlan": null,
-        "port_id": 5,
-        "port": null
-      },
-      {
-        "vlan_id": 1,
-        "vlan": null,
-        "port_id": 6,
-        "port": null
-      },
-      {
-        "vlan_id": 1,
-        "vlan": null,
-        "port_id": 7,
-        "port": null
-      },
-      {
-        "vlan_id": 1,
-        "vlan": null,
-        "port_id": 8,
-        "port": null
-      },
-      {
         "vlan_id": 40,
         "vlan": null,
         "port_id": 39,
@@ -3289,12 +3258,6 @@
         "vlan_id": 1,
         "vlan": null,
         "port_id": 43,
-        "port": null
-      },
-      {
-        "vlan_id": 60,
-        "vlan": null,
-        "port_id": 63,
         "port": null
       },
       {
@@ -3336,6 +3299,48 @@
       {
         "vlan_id": 1,
         "vlan": null,
+        "port_id": 57,
+        "port": null
+      },
+      {
+        "vlan_id": 1,
+        "vlan": null,
+        "port_id": 58,
+        "port": null
+      },
+      {
+        "vlan_id": 1,
+        "vlan": null,
+        "port_id": 59,
+        "port": null
+      },
+      {
+        "vlan_id": 1,
+        "vlan": null,
+        "port_id": 60,
+        "port": null
+      },
+      {
+        "vlan_id": 1,
+        "vlan": null,
+        "port_id": 61,
+        "port": null
+      },
+      {
+        "vlan_id": 60,
+        "vlan": null,
+        "port_id": 62,
+        "port": null
+      },
+      {
+        "vlan_id": 60,
+        "vlan": null,
+        "port_id": 63,
+        "port": null
+      },
+      {
+        "vlan_id": 1,
+        "vlan": null,
         "port_id": 64,
         "port": null
       },
@@ -3348,13 +3353,43 @@
       {
         "vlan_id": 1,
         "vlan": null,
-        "port_id": 57,
+        "port_id": 44,
         "port": null
       },
       {
-        "vlan_id": 1,
+        "vlan_id": 50,
         "vlan": null,
-        "port_id": 58,
+        "port_id": 45,
+        "port": null
+      },
+      {
+        "vlan_id": 50,
+        "vlan": null,
+        "port_id": 46,
+        "port": null
+      },
+      {
+        "vlan_id": 50,
+        "vlan": null,
+        "port_id": 47,
+        "port": null
+      },
+      {
+        "vlan_id": 50,
+        "vlan": null,
+        "port_id": 48,
+        "port": null
+      },
+      {
+        "vlan_id": 50,
+        "vlan": null,
+        "port_id": 49,
+        "port": null
+      },
+      {
+        "vlan_id": 50,
+        "vlan": null,
+        "port_id": 50,
         "port": null
       }
     ],

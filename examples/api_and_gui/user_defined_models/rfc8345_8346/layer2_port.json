@@ -1,0 +1,60 @@
+{
+  "type_name": "Layer2Port",
+  "resource_name": "layer2_ports",
+  "to_be_migrated": false,
+  "is_controller_enabled": true,
+  "is_design_access_disabled": true,
+  "fields": [
+    {
+      "name": "BridgeName",
+      "tag": "json:\"bridge_name\" yaml:\"bridge_name\"",
+      "type_name": "string"
+    },
+    {
+      "name": "PortID",
+      "tag": "json:\"port_id\" yaml:\"port_id\"",
+      "type_name": "int"
+    },
+    {
+      "name": "Port",
+      "tag": "json:\"port\" yaml:\"port\" gorm:\"ForeignKey:PortID\"",
+      "type_name": "Port"
+    },
+    {
+      "name": "PortName",
+      "tag": "json:\"port_name\" yaml:\"port_name\"",
+      "type_name": "string"
+    },
+    {
+      "name": "VlanID",
+      "tag": "json:\"vlan_id\" yaml:\"vlan_id\"",
+      "type_name": "int"
+    },
+    {
+      "name": "Vlan",
+      "tag": "json:\"vlan\" yaml:\"vlan\" gorm:\"ForeignKey:VlanID\"",
+      "type_name": "Vlan"
+    },
+    {
+      "name": "Layer3Interfaces",
+      "tag": "json:\"layer3_interfaces\" yaml:\"layer3_interfaces\" gorm:\"ForeignKey:ID;AssociationForeignKey:PortID\"",
+      "type_name": "Layer3Interface",
+      "is_slice": true
+    }
+  ],
+  "sql_before_migration": [
+    "select 1 from layer3_interfaces;",
+    "select 1 from layer2_links;"
+  ],
+  "sql_after_migration": [
+    "drop view if exists layer2_ports;",
+    "create view if not exists layer2_ports as",
+    "  select distinct layer2_nodes.source_bridge_name bridge_name,",
+    "    layer2_ports.source_port_id port_id,",
+    "    layer2_ports.source_port_name port_name,",
+    "    layer2_ports.vlan_id vlan_id",
+    "  from layer2_links layer2_nodes",
+    "    inner join layer2_links layer2_ports",
+    "      on layer2_nodes.source_bridge_name = layer2_ports.source_bridge_name;"
+  ]
+}
