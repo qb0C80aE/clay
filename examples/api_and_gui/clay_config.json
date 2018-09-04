@@ -68,6 +68,21 @@
     },
     {
       "file_name": "ui/diagram_layer3_interface.json"
+    },
+    {
+      "file_name": "rfc8345_8346/layer2_link.json"
+    },
+    {
+      "file_name": "rfc8345_8346/layer2_node.json"
+    },
+    {
+      "file_name": "rfc8345_8346/layer2_port.json"
+    },
+    {
+      "file_name": "rfc8345_8346/layer3_node.json"
+    },
+    {
+      "file_name": "rfc8345_8346/layer3_interface_supporting_node.json"
     }
   ],
   "ephemeral_templates": [

@@ -255,9 +255,9 @@ $ curl "localhost:8080/nodes?limit=2&page=2" # Select nodes limiting the count o
 
 ## User defined models
 
-The one of main features of Clay is defining models through REST API at runtime or boot time without recompiling Clay binary. The model definition is described in JSON or YAML format, and it's handled as Golang struct in Clay.
+The one of main features of Clay is defining models through REST API at runtime or boot time without recompiling Clay binary. The model definition is described in JSON or YAML format, and it's handled as Golang struct in Clay. This model definition is bound with tables or view in the database, so you can define data models in various ways as you want using well known language, SQL.
 
-The models may be the ones what you  need and consider based on your business, or the standard models like [RFC 8345 - A YANG Data Model for Network Topologies](https://datatracker.ietf.org/doc/rfc8345/). Clay can handle any models if you describe and register those.
+The models may be the ones what you  need and consider based on your business, or the standard models like [RFC 8345 - A YANG Data Model for Network Topologies](https://datatracker.ietf.org/doc/rfc8345/) and [RFC 8346 - A YANG Data Model for Layer 3 Topologies](https://datatracker.ietf.org/doc/rfc8346/). Clay can handle any models if you describe and register those.
 
 Clay's Rest API is using [Gin](https://github.com/gin-gonic/gin)(framework) & [GORM](https://github.com/jinzhu/gorm)(orm). Which means, by defining Golang struct field tags, various features like json/yaml marshal, GORM instruction, or field validation, will be available.
 
@@ -359,6 +359,8 @@ $ curl http://localhost:8080/
 ]
 ```
 
+As implemented in examples, you can also define views instead of tables in order to pick up data that you need efficiently.
+
 ## Import and export the design
 
 You can import and export the models you created through ``designs`` resource.
@@ -432,6 +434,8 @@ If you want to get raw data or generated text data in a specific ``Content-Type`
 $ curl -X GET -H "Accept: application/x-yaml" -H "Accept-Charset: Shift_JIS" "localhost:8080/templates/1/raw"
 $ curl -X GET -H "Accept: application/x-yaml" -H "Accept-Charset: Shift_JIS" "localhost:8080/templates/1/generation"
 ```
+
+As described earlier, there is a way to design your target, using standard models in the first place. And as another way, you can generate these standard models from your own models using this template function. In detail, see template resources tab in the api_and_gui example.
 
 ## Ephemeral templates, scripts and objects
 
