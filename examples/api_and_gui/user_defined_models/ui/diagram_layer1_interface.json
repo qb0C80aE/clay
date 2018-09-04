@@ -56,9 +56,11 @@
       "type_name": "Node"
     }
   ],
-  "sql_after_migration": [
+  "sql_before_migration": [
     "select 1 from ports;",
-    "select 1 from links;",
+    "select 1 from links;"
+  ],
+  "sql_after_migration": [
     "drop view if exists diagram_layer1_interfaces;",
     "create view if not exists diagram_layer1_interfaces as",
     "  select group_concat(ports.id, ',') id,",

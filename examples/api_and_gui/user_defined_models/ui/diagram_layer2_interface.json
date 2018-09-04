@@ -36,9 +36,11 @@
       "type_name": "Vlan"
     }
   ],
-  "sql_after_migration": [
+  "sql_before_migration": [
     "select 1 from ports;",
-    "select 1 from vlan_port_associations;",
+    "select 1 from vlan_port_associations;"
+  ],
+  "sql_after_migration": [
     "drop view if exists diagram_layer2_interfaces;",
     "create view if not exists diagram_layer2_interfaces as",
     "  select group_concat(ports.name, ',') name,",

@@ -41,6 +41,12 @@
       "type_name": "int"
     },
     {
+      "name": "Layer3Interfaces",
+      "tag": "json:\"layer3_interfaces\" yaml:\"layer3_interfaces\" gorm:\"ForeignKey:SubnetID\"",
+      "type_name": "Layer3Interface",
+      "is_slice": true
+    },
+    {
       "name": "ToBeDeleted",
       "tag": "json:\"to_be_deleted,omitempty\" yaml:\"to_be_deleted,omitempty\" sql:\"-\"",
       "type_name": "bool"

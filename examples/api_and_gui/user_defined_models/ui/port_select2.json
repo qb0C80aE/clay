@@ -26,10 +26,12 @@
       "type_name": "string"
     }
   ],
-  "sql_after_migration": [
+  "sql_before_migration": [
     "select 1 from ports;",
     "select 1 from links;",
-    "select 1 from nodes;",
+    "select 1 from nodes;"
+  ],
+  "sql_after_migration": [
     "drop view if exists port_select2;",
     "create view if not exists port_select2 as",
     "  select ports.id id,",

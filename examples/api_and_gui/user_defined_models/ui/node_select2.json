@@ -21,8 +21,10 @@
       "type_name": "string"
     }
   ],
+  "sql_before_migration": [
+    "select 1 from nodes;"
+  ],
   "sql_after_migration": [
-    "select 1 from nodes;",
     "drop view if exists node_select2;",
     "create view if not exists node_select2 as",
     "  select nodes.id id,",

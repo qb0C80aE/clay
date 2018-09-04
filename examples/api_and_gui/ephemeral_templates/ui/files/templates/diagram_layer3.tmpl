@@ -1,11 +1,13 @@
+{{- $collectionUtil := .Collection -}}
+{{- $networkUtil := .Network -}}
+{{- $stringUtil := .String -}}
 {{- $layer3Interfaces := .ModelStore.Multi "layer3_interfaces" "preloads=node.node_type" -}}
 {{- $subnets := .ModelStore.Multi "subnets" "" -}}
+{{- $subnetMap := $collectionUtil.Hash $subnets.Records "ID" -}}
 {{- $nodes := .ModelStore.Multi "nodes" "preloads=node_type" -}}
+{{- $nodeMap := $collectionUtil.Hash $nodes.Records "ID" -}}
 {{- $diagramNodeMap := .Collection.Map -}}
 {{- $interfaceMap := .Collection.Map -}}
-{{- $networkUtil := .Network -}}
-{{- $collectionUtil := .Collection -}}
-{{- $stringUtil := .String -}}
 {
   "nodes": [
   {{ range $i, $node := $nodes.Records }}
@@ -39,40 +41,25 @@
   {{ end }}
   ],
   "links": [
-  {{ $subnetMap := $collectionUtil.Hash $subnets.Records "ID" }}
-  {{ $nodeMap := $collectionUtil.Hash $nodes.Records "ID" }}
   {{ $subnetNodeInterfacesMap := $collectionUtil.Map }}
-  {{ range $i, $subnet := $subnets.Records }}
-    {{ $subnetCIDRString := printf "%s/%d" $subnet.Address $subnet.Prefix }}
-    {{ $subnetCIDR := $networkUtil.ParseCIDR $subnetCIDRString }}
 
-    {{ range $j, $layer3Interface := $layer3Interfaces.Records }}
-      {{ if eq $subnet.VlanID $layer3Interface.VlanID }}
-        {{ $layer3InterfaceCIDRString := printf "%s/%d" $layer3Interface.Ipv4Address $layer3Interface.Ipv4Prefix }}
-        {{ $layer3InterfaceCIDR := $networkUtil.ParseCIDR $layer3InterfaceCIDRString }}
+  {{ range $i, $layer3Interface := $layer3Interfaces.Records }}
+    {{ $subnet := $subnetMap.Get $layer3Interface.SubnetID }}
+    {{ $exists := $subnetNodeInterfacesMap.Exists $subnet.ID }}
+    {{ if ne $exists true }}
+      {{ $a := $collectionUtil.Map }}
+      {{ $subnetNodeInterfacesMap := $subnetNodeInterfacesMap.Put $subnet.ID $a }}
+    {{ end }}
 
-        {{ $isIncluding := $subnetCIDR.IsIncluding $layer3InterfaceCIDR }}
-        {{ if eq $isIncluding true }}
-
-          {{ $exists := $subnetNodeInterfacesMap.Exists $subnet.ID }}
-          {{ if ne $exists true }}
-            {{ $a := $collectionUtil.Map }}
-            {{ $subnetNodeInterfacesMap := $subnetNodeInterfacesMap.Put $subnet.ID $a }}
-          {{ end }}
-
-          {{ $a := $subnetNodeInterfacesMap.Get $subnet.ID }}
-          {{ $exists := $a.Exists $layer3Interface.Node.ID }}
-          {{ if eq $exists true }}
-            {{ $b := $a.Get $layer3Interface.Node.ID }}
-            {{ $b := $collectionUtil.Append $b $layer3Interface }}
-            {{ $b := $a.Put $layer3Interface.Node.ID $b }}
-          {{ else }}
-            {{ $b := $collectionUtil.Slice $layer3Interface }}
-            {{ $b := $a.Put $layer3Interface.Node.ID $b }}
-          {{ end }}
-
-        {{ end }}
-      {{ end }}
+    {{ $a := $subnetNodeInterfacesMap.Get $subnet.ID }}
+    {{ $exists := $a.Exists $layer3Interface.Node.ID }}
+    {{ if eq $exists true }}
+      {{ $b := $a.Get $layer3Interface.Node.ID }}
+      {{ $b := $collectionUtil.Append $b $layer3Interface }}
+      {{ $b := $a.Put $layer3Interface.Node.ID $b }}
+    {{ else }}
+      {{ $b := $collectionUtil.Slice $layer3Interface }}
+      {{ $b := $a.Put $layer3Interface.Node.ID $b }}
     {{ end }}
   {{ end }}
 
