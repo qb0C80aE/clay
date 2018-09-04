@@ -74,9 +74,16 @@ Of course, you can implement external GUI tool using Clay as a backend, but keep
 
 This sample GUI is using [inet-henge](https://github.com/codeout/inet-henge) to draw diagrams.
 
-#### Using template to generate nwdiag json
+#### Example: Using template to generate nwdiag json
 ![nwdiag template](https://github.com/qb0C80aE/clay/raw/develop/images/nwdiag1.png)
 ![nwdiag output](https://github.com/qb0C80aE/clay/raw/develop/images/nwdiag2.png)
+
+#### Example: Using template to convert models to Neo4j cypher
+![neo4j conversion_1](https://github.com/qb0C80aE/clay/raw/develop/images/neo4j1.png)
+![neo4j conversion_2](https://github.com/qb0C80aE/clay/raw/develop/images/neo4j2.png)
+
+#### Example: Using template to convert models to RFC 8345/8346
+![rfc8345 conversion](https://github.com/qb0C80aE/clay/raw/develop/images/rfc8345.png)
 
 # How to use
 
@@ -257,7 +264,7 @@ $ curl "localhost:8080/nodes?limit=2&page=2" # Select nodes limiting the count o
 
 The one of main features of Clay is defining models through REST API at runtime or boot time without recompiling Clay binary. The model definition is described in JSON or YAML format, and it's handled as Golang struct in Clay. This model definition is bound with tables or view in the database, so you can define data models in various ways as you want using well known language, SQL.
 
-The models may be the ones what you  need and consider based on your business, or the standard models like [RFC 8345 - A YANG Data Model for Network Topologies](https://datatracker.ietf.org/doc/rfc8345/) and [RFC 8346 - A YANG Data Model for Layer 3 Topologies](https://datatracker.ietf.org/doc/rfc8346/). Clay can handle any models if you describe and register those.
+The models may be the ones what you need and consider based on your business, or the standard models like [RFC 8345 - A YANG Data Model for Network Topologies](https://datatracker.ietf.org/doc/rfc8345/) and [RFC 8346 - A YANG Data Model for Layer 3 Topologies](https://datatracker.ietf.org/doc/rfc8346/). Clay can handle any models if you describe and register those.
 
 Clay's Rest API is using [Gin](https://github.com/gin-gonic/gin)(framework) & [GORM](https://github.com/jinzhu/gorm)(orm). Which means, by defining Golang struct field tags, various features like json/yaml marshal, GORM instruction, or field validation, will be available.
 
@@ -435,7 +442,7 @@ $ curl -X GET -H "Accept: application/x-yaml" -H "Accept-Charset: Shift_JIS" "lo
 $ curl -X GET -H "Accept: application/x-yaml" -H "Accept-Charset: Shift_JIS" "localhost:8080/templates/1/generation"
 ```
 
-As described earlier, there is a way to design your target, using standard models in the first place. And as another way, you can generate these standard models from your own models using this template function. In detail, see template resources tab in the api_and_gui example.
+As described earlier, there is a way to design your target, using standard models in the first place. And as another way, you can generate these standard models or other model like [Neo4j](https://neo4j.com/) from your own models using this template function. In detail, see template resources tab in the api_and_gui example.
 
 ## Ephemeral templates, scripts and objects
 
