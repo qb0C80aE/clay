@@ -6,9 +6,13 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/sqlite" // Need to avoid "Got error when connect database, the error is 'sql: unknown driver "sqlite3" (forgotten import?)'"
+	//_ "github.com/jinzhu/gorm/dialects/sqlite" // Need to avoid "Got error when connect database, the error is 'sql: unknown driver "sqlite3" (forgotten import?)'"
+	"database/sql"
+	"errors"
+	"github.com/mattn/go-sqlite3"
 	"github.com/qb0C80aE/clay/extension"
 	"github.com/qb0C80aE/clay/logging"
+	networkutilpkg "github.com/qb0C80aE/clay/util/network"
 	"github.com/serenize/snaker"
 )
 
@@ -36,6 +40,22 @@ func defaultTableNameHandler(db *gorm.DB, defaultTableName string) string {
 	return resourceName
 }
 
+// IsIpv4AddressIncluding checks if left includes right network address, used in sqlite3
+func IsIpv4AddressIncluding(baseCIDR, targetCIDR string) bool {
+	base, _ := networkutilpkg.GetUtility().ParseCIDR(baseCIDR)
+	target, _ := networkutilpkg.GetUtility().ParseCIDR(targetCIDR)
+	return base.IsIncluding(target)
+}
+
+// SetupCustomDBFunctions setups custom sql functions
+func SetupCustomDBFunctions() {
+	sql.Register("sqlite3_custom", &sqlite3.SQLiteDriver{
+		ConnectHook: func(conn *sqlite3.SQLiteConn) error {
+			return conn.RegisterFunc("is_ipv4_address_including", IsIpv4AddressIncluding, true)
+		},
+	})
+}
+
 // Connect connects to its database and returns the instance
 func Connect(dbMode string) (*gorm.DB, error) {
 	environmentalVariableSet := extension.GetCurrentEnvironmentalVariableSet()
@@ -55,7 +75,15 @@ func Connect(dbMode string) (*gorm.DB, error) {
 		return nil, fmt.Errorf("invalid mode'%s'", dbMode)
 	}
 
-	db, err := gorm.Open("sqlite3", dbPath)
+	// to avoid fallback because of unsupported dialect
+	dialect, ok := gorm.GetDialect("sqlite3")
+	if !ok {
+		logging.Logger().Critical("cannot get the dialect sqlite3")
+		return nil, errors.New("cannot get the dialect sqlite3")
+	}
+	gorm.RegisterDialect("sqlite3_custom", dialect)
+
+	db, err := gorm.Open("sqlite3_custom", dbPath)
 
 	if err != nil {
 		logging.Logger().Criticalf("got an error when connect to the database, the error is '%v'", err)

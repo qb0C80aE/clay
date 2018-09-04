@@ -26,6 +26,7 @@ const timeout = 15
 
 var engine *gin.Engine
 var database *gorm.DB
+var isDBCustomFunctionSetupCompleted = false
 
 // EmptyArrayString represents an empty JSON array in string type
 var EmptyArrayString = []byte("[]")
@@ -129,6 +130,11 @@ func doAutoMigrationOnly(db *gorm.DB, initializerList []extension.Initializer, m
 // SetupServer setups server for integration tests
 func SetupServer() *httptest.Server {
 	// Initialize DB every test goes
+	if !isDBCustomFunctionSetupCompleted {
+		dbpkg.SetupCustomDBFunctions()
+		isDBCustomFunctionSetupCompleted = true
+	}
+
 	newDatabase, err := dbpkg.Connect("memory")
 	if err != nil {
 		panic(err)

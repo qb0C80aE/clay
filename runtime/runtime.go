@@ -21,6 +21,8 @@ func (clayRuntime *clayRuntime) Run() {
 	host := environmentalVariableSet.GetClayHost()
 	port := environmentalVariableSet.GetClayPortInt()
 
+	dbpkg.SetupCustomDBFunctions()
+
 	db, err := dbpkg.Connect(environmentalVariableSet.GetClayDBMode())
 	if err != nil {
 		logging.Logger().Critical(err.Error())
