@@ -195,6 +195,36 @@ $(function() {
 		});
 	}
 
+	function saveNodeLocation(diagramInstance) {
+		$('#diagram').ready(function() {
+			loopSleep(100, 200, function(i){
+				n = d3.select('#diagram').selectAll('.node');
+				ns = n[0];
+				if (ns.length > 0) {
+					(function loop(i) {
+					  if (i < ns.length) {
+							var diagramNodeID = ns[i].__data__.meta[metaIndexMap.diagram_node_id].value;
+							var x = ns[i].__data__.x;
+							var y = ns[i].__data__.y;
+							var diagramNode = {
+								diagram_node_id: diagramNodeID,
+								x: x,
+								y: y
+							};
+							putResource('diagram_nodes', diagramNodeID, diagramNode, '', function(result, xhr) {
+						    loop(i + 1);
+							});
+						} else {
+							diagramInstance.cola.start();
+						}
+					})(0);
+					return false;
+				}
+			});
+			return true;
+		});
+	}
+
 	function repaintDiagram() {
 		var href = '#layer1_tab';
 		$('#main_panel a[data-toggle="tab"]').each(function(i) {
@@ -224,6 +254,35 @@ $(function() {
 		updateContextMenu();
 	}
 
+	function repaintAndSaveDiagram() {
+		var href = '#layer1_tab';
+		$('#main_panel a[data-toggle="tab"]').each(function(i) {
+        if ($(this).parent().attr("class") == 'active') {
+            href = $(this).attr('href');
+        }
+    });
+
+		var targetTabPaneID = '#' + href.split('#')[1];
+		var targetDiagramType = href.split('#')[1].split('_')[0];
+		var targetTabPane = $(targetTabPaneID);
+
+		$('#layer1_tab').children().remove();
+		$('#layer2_tab').children().remove();
+		$('#layer3_tab').children().remove();
+		targetTabPane.append($('<div>').prop('id', 'diagram'));
+		var diagramInstance = new Diagram('#diagram', '/diagrams/' + targetDiagramType, {
+			pop: /^([^\s-]+)-/,
+			distance: diagramProperties[targetDiagramType].distance,
+			width: $(window).width(),
+			height: ($(window).height() - 180)
+		});
+		diagramInstance.init('interface', 'node_extra_information', 'diagram_node_id', 'mac_address', 'ipv4_address');
+		diagramInstance.max_ticks = 100;
+
+		saveNodeLocation(diagramInstance);
+		updateContextMenu();
+	}
+
 	function initializeDiagramLayout() {
 		var href = '#layer1_tab';
 		$('#main_panel a[data-toggle="tab"]').each(function(i) {
@@ -234,8 +293,16 @@ $(function() {
 
 		var targetDiagramLayer = href.split('#')[1].split('_')[0].split('layer')[1];
 
-		deleteResource('diagram_nodes', '', 'layer=' + targetDiagramLayer, function(result, xhr) {
-			repaintDiagram();
+    getResources('diagram_nodes', 'q\[diagram_node_id\]=%25__' + targetDiagramLayer + '__%25&fields=diagram_node_id', function(diagramNodesResult) {
+			(function loop(i) {
+			  if (i < diagramNodesResult.length) {
+					deleteResource('diagram_nodes', diagramNodesResult[i].diagram_node_id, '', function(result, xhr) {
+				    loop(i + 1);
+					});
+				} else {
+					repaintAndSaveDiagram();
+				}
+			})(0);
 		});
 	}
 
