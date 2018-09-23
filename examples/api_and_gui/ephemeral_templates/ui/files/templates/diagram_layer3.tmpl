@@ -30,7 +30,7 @@
     {{ $diagramNodeKey := printf "%d_3_3" $subnet.ID }}
     {{ $diagramNodeCount := len $diagramNodeMap }}
     {{ if ne $diagramNodeCount 0 }},{{ end }}{
-    "name": "{{ printf "%s/%d" $subnet.Address $subnet.Prefix }}",
+    "name": "{{ printf "[%d]%s/%d" $subnet.ID $subnet.Address $subnet.Prefix }}",
     "icon": "/ui/files/images/diagram/Segment.png",
     "meta": {
       "node_extra_information": "{{ printf "(%s in VLAN %04d)" $subnet.Name $subnet.VlanID }}",
@@ -76,7 +76,7 @@
       {{ $linkCount := len $linkMap }}
       {{ if ne $linkCount 0 }},{{ end }}{
       "source": "{{ $node.Name }}",
-      "target": "{{ printf "%s/%d" $subnet.Address $subnet.Prefix }}",
+      "target": "{{ printf "[%d]%s/%d" $subnet.ID $subnet.Address $subnet.Prefix }}",
       "meta": {
         "interface": {
           "source": "{{ $joinedInterfaceNames }}",
