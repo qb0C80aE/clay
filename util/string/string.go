@@ -50,3 +50,9 @@ func (receiver *Utility) Trim(value interface{}, cutset string) interface{} {
 	data := fmt.Sprintf("%v", value)
 	return strings.Trim(data, cutset)
 }
+
+// A direct interface to the strings.Replace function
+func (receiver *Utility) Replace(s interface{}, search string, replace string, amount int) interface{} {
+	originalString := fmt.Sprintf("%v", s)
+	return strings.Replace(originalString, search, replace, amount)
+}
