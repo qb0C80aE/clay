@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/qb0C80aE/clay/logging"
 	mapstructutilpkg "github.com/qb0C80aE/clay/util/mapstruct"
+	"regexp"
 	"strings"
 )
 
@@ -49,4 +50,11 @@ func (receiver *Utility) Join(slice interface{}, separator string) (interface{},
 func (receiver *Utility) Trim(value interface{}, cutset string) interface{} {
 	data := fmt.Sprintf("%v", value)
 	return strings.Trim(data, cutset)
+}
+
+// Replace replaces parts of string into another ones in a string
+func (receiver *Utility) Replace(value interface{}, search string, replace string) interface{} {
+	originalString := fmt.Sprintf("%v", value)
+	rep := regexp.MustCompile(search)
+	return rep.ReplaceAllString(originalString, replace)
 }
