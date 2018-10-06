@@ -865,6 +865,18 @@ split
 {{- $ss := .String.Split $sj "," }}
 split slice: {{ $ss }}
 
+sprintf
+{{- $sp := .String.Sprintf " [%s]     " "abcbabcba" }}
+sprintf: {{ $sp }}
+
+trim
+{{- $st := .String.Trim $sp " []" }}
+trim: <{{ $st }}>
+
+replace
+{{- $sr := .String.Replace $st "(.)[b-c]+" "${1}X" }}
+replace: {{ $sr }}
+
 --- slice ---
 slice init
 {{- $slice1 := .Collection.Slice }}

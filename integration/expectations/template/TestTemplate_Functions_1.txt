@@ -203,6 +203,15 @@ join string: 1,99.99,a,false
 split
 split slice: [1 99.99 a false]
 
+sprintf
+sprintf:  [abcbabcba]     
+
+trim
+trim: <abcbabcba>
+
+replace
+replace: aXaXa
+
 --- slice ---
 slice init
 slice1: []
