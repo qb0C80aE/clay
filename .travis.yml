@@ -10,11 +10,6 @@ before_install:
 
 install:
  - sudo apt-get -qq install -y gcc-multilib
- - sudo apt-get -qq install -y binutils-mingw-w64 mingw-w64
- - wget https://storage.googleapis.com/golang/go1.4.3.linux-amd64.tar.gz
- - tar -C $HOME -xzf go1.4.3.linux-amd64.tar.gz
- - mv $HOME/go $HOME/go1.4
- - (cd `which go | sed -e 's/\/bin\/go//g'`/src; GOOS=linux GOARCH=386 ./make.bash; GOOS=windows GOARCH=amd64 ./make.bash; GOOS=windows GOARCH=386 ./make.bash)
  - go get github.com/Masterminds/glide
  - go get github.com/mattn/go-bindata/...
 
@@ -23,14 +18,8 @@ script:
  - go generate -tags=prebuild ./...
  - (cd vendor/github.com/qb0C80aE/pottery/; go generate -tags=prebuild ./...)
  - GOOS=linux GOARCH=amd64 go build --ldflags '-extldflags "-static"' -o linux_amd64/clay/clay
- - CGO_ENABLED=1 GOOS=linux GOARCH=386 go build --ldflags '-extldflags "-static"' -o linux_386/clay/clay
- - CC=x86_64-w64-mingw32-gcc LD=x86_64-w64-mingw32-ld CGO_ENABLED=1 GOOS=windows GOARCH=amd64 go build --ldflags '-extldflags "-static"' -o windows_amd64/clay/clay.exe
- - CC=i686-w64-mingw32-gcc LD=i686-w64-mingw32-ld CGO_ENABLED=1 GOOS=windows GOARCH=386 go build --ldflags '-extldflags "-static"' -o windows_386/clay/clay.exe
 
 after_success:
  - (cd linux_amd64; tar zcvf ../clay.bastet.linux-amd64.tgz clay)
- - (cd linux_386; tar zcvf ../clay.bastet.linux-386.tgz clay)
- - (cd windows_amd64; zip -r ../clay.bastet.windows-amd64.zip clay)
- - (cd windows_386; zip -r ../clay.bastet.windows-386.zip clay)
  - ls -la
  - ./upload.sh
